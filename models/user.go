@@ -105,3 +105,19 @@ type Affiliation struct {
 func (affiliation Affiliation) validateAffiliation(v *revel.Validation) {
 	//TODO
 }
+
+/*Credentials entered at the login page. */
+type Credentials struct {
+	Username string
+	Password string
+}
+
+/*ValidateCredentials ensures that neither the username nor the password are empty or of incorrect size. */
+func (cred *Credentials) ValidateCredentials(v *revel.Validation) {
+
+	v.Required(cred.Username).MessageKey("validation.missing.username")
+	v.Required(cred.Password).MessageKey("validation.missing.password")
+
+	v.MaxSize(cred.Username, 255).MessageKey("validation.max.username")
+	v.MaxSize(cred.Password, 511).MessageKey("validation.max.password")
+}
