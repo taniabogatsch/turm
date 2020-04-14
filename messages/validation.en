@@ -1,0 +1,20 @@
+# -------------------------------------------------------------------------------------------------- #
+# User data validation
+# -------------------------------------------------------------------------------------------------- #
+
+validation.missing.salutation = Please provide your form of address.
+validation.missing.lastname = Please provide your last name.
+validation.missing.firstname = Please provide your first name.
+validation.missing.email = Please provide your e-mail address.
+validation.missing.password = Please provide your password.
+validation.missing.passwordRepeat = Please repeat your password.
+validation.missing.username = Please provide your username (university account) or your e-mail address (external account).
+
+validation.max.lastname = Your last name must have a maximum of 255 characters.
+validation.max.firstname = Your first name must have a maximum of 255 characters.
+validation.max.email = Your e-mail address must have a maximum of 255 characters.
+validation.max.password = Your password must have a maximum of 255 characters.
+validation.max.username = Your username (university account) or your e-mail address (external account) must have a maximum of 255 characters.
+
+validation.invalid.email = Please provide a valid e-mail address.
+validation.invalid.password = Your passwords do not match.
