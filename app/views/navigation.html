@@ -35,6 +35,7 @@
         <a class="nav-link dropdown-toggle text-white" href="#" id="dropdownHelpPages" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{msg $ "page.menu_helpPages"}}
         </a>
+        <!-- TODO -->
         <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
           <a class="dropdown-item" href="#"> {{msg $ "policy.pageName"}} </a>
           <a class="dropdown-item" href="#"> {{msg $ "newsFeed.pageName"}} </a>
@@ -51,8 +52,6 @@
             {{if eq $.currentLocale $language}}
               <img class="menu-flags" src="/public/img/{{$language}}_flag.png">
             {{end}}
-          {{else}}
-            {{template "Icons/Lightning.html" .}}
           {{end}}
         </a>
         <div class="dropdown-menu menu-flag" aria-labelledby="dropdownLanguages">
@@ -65,30 +64,32 @@
       </li>
     </ul>
 
+    {{if .session.userID}}
+      <span class="navbar-text margin-right-20">
+        <a class="text-white" href="#">
+          {{$.session.firstName}} {{$.session.lastName}}
+        </a>
+      </span>
+    {{end}}
+
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder='{{msg $ "search.course"}}'>
       <button class="btn btn-outline-light my-2 my-sm-0" type="submit">
-        {{msg $ "button.search"}}
+        {{msg $ "button.search"}} <!-- TODO -->
       </button>
     </form>
 
     <!-- a user is logged in -->
-    {{if .UserID}}
-      <!--
-        <a class="navbar-brand menu-text menu-text-small" href="#">
-          {{.firstname}} {{.lastname}}
-        </a>
-
-        <form class="form-inline my-2 my-lg-0" action="#" method="GET">
-          <button class="btn my-2 my-sm-0 menu-logBtn" type="submit">
-            {{msg . "logout.button"}}
-          </button>
-        </form>
-      -->
+    {{if .session.userID}}
+      <form class="form-inline my-2 my-lg-0" action='{{url "User.Logout"}}' method="GET">
+        <button class="btn btn-outline-light my-2 my-sm-0 margin-10" type="submit">
+          {{msg $ "logout.button"}}
+        </button>
+      </form>
 
     <!-- no user is logged in, link and button to login page -->
     {{else}}
-      <form class="form-inline my-2 my-lg-0" action='#' method="GET">
+      <form class="form-inline my-2 my-lg-0" action='{{url "User.LoginPage"}}' method="GET">
         <button class="btn btn-outline-light my-2 my-sm-0 margin-10" type="submit">
           {{msg $ "login.pageName"}}
         </button>

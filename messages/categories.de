@@ -10,8 +10,27 @@
 #   - {missing, invalid, info, success, warning, danger}
 #
 # Categories contained in this file are:
+# - General Errors
+# - User
 # - Search
 # -------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------------------------------------------------------- #
+# General Errors
+# -------------------------------------------------------------------------------------------------- #
+
+error.contactSupportMessage = Bitte kontaktieren Sie den Support.
+error.database = Beim Ausführen einer Datenbankanfrage ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+
+# -------------------------------------------------------------------------------------------------- #
+# User
+# -------------------------------------------------------------------------------------------------- #
+
+user.ldap = Uni Account
+user.external = Externer Account
+user.email = E-Mail
+user.username = Benutzername
+user.password = Passwort
 
 # -------------------------------------------------------------------------------------------------- #
 # Search (for something, e.g. users)

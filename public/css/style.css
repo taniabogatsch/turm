@@ -1,3 +1,69 @@
+/* fill */
+.btn-darkblue {
+  color: #fff;
+  background-color: #292961;
+  border-color: #292961;
+}
+.btn-darkblue:hover {
+  color: #292961;
+  background-color: #fff;
+  border-color: #292961;
+}
+.btn-darkblue:focus,
+.btn-darkblue.focus {
+  color: #292961;
+  background-color: #fff;
+  border-color: #292961;
+  box-shadow: 0 0 0 0.2rem rgba(41, 41, 97, 0.5);
+}
+.btn-darkblue.disabled,
+.btn-darkblue:disabled {
+  color: #292961;
+  background-color: transparent;
+}
+.btn-darkblue:not(:disabled):not(.disabled):active,
+.btn-darkblue:not(:disabled):not(.disabled).active,
+.show > .btn-darkblue.dropdown-toggle {
+  color: #292961;
+  background-color: #fff;
+  border-color: #292961;
+}
+.btn-darkblue:not(:disabled):not(.disabled):active:focus,
+.btn-darkblue:not(:disabled):not(.disabled).active:focus,
+.show > .btn-darkblue.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(41, 41, 97, 0.5);
+}
+/* outline */
+.btn-outline-darkblue {
+  color: #292961;
+  border-color: #292961;
+}
+.btn-outline-darkblue:hover {
+  color: #fff;
+  background-color: #292961;
+  border-color: #292961;
+}
+.btn-outline-darkblue:focus,
+.btn-outline-darkblue.focus {
+  box-shadow: 0 0 0 0.2rem rgba(41, 41, 97, 0.5);
+}
+.btn-outline-darkblue.disabled,
+.btn-outline-darkblue:disabled {
+  color: #292961;
+  background-color: transparent;
+}
+.btn-outline-darkblue:not(:disabled):not(.disabled):active,
+.btn-outline-darkblue:not(:disabled):not(.disabled).active,
+.show > .btn-outline-darkblue.dropdown-toggle {
+  color: #fff;
+  background-color: #292961;
+  border-color: #292961;
+}
+.btn-outline-darkblue:not(:disabled):not(.disabled):active:focus,
+.btn-outline-darkblue:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-darkblue.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(41, 41, 97, 0.5);
+}
 @media only screen and (max-width:767px) {
   .mobile-hidden {
     display: none;
@@ -9,6 +75,9 @@
   }
   .margin-10 {
     margin: 10px;
+  }
+  .margin-right-20 {
+    margin-right: 20px;
   }
 }
 .float-right {
@@ -22,10 +91,6 @@
 }
 .display-none {
   display: none;
-}
-.greylink {
-  color: #434a54;
-  text-decoration: none;
 }
 .menu {
   background-color: #292961;

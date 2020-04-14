@@ -1,7 +1,7 @@
 package app
 
 import (
-	"os"
+	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -39,6 +39,11 @@ var (
 	DefaultLanguage string
 	//Languages holds all languages supported by the application
 	Languages []string
+
+	//LdapHost is the host of the LDAP server
+	LdapHost string
+	//LdapPort is the port of the LDAP server
+	LdapPort int
 )
 
 func init() {
@@ -84,14 +89,12 @@ func initDB() {
 	driver := revel.Config.StringDefault("db.driver", "postgres")
 	conn, found := revel.Config.String("db.connection")
 	if !found {
-		revel.AppLog.Error("cannot find key in config", "key", "db.connection")
-		os.Exit(10)
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.connection")
 	}
 
 	db, err := sqlx.Connect(driver, conn)
 	if err != nil {
-		revel.AppLog.Error("DB connection error", "error", err.Error())
-		os.Exit(10)
+		revel.AppLog.Fatal("DB connection error", "driver", driver, "conn", conn, "error", err.Error())
 	}
 
 	Db = &DB{DB: db}
@@ -100,8 +103,7 @@ func initDB() {
 	var dummy int
 	err = Db.Get(&dummy, `select 1 as dummy`)
 	if err != nil {
-		revel.AppLog.Error("DB connection not working", "error", err.Error())
-		os.Exit(1)
+		revel.AppLog.Fatal("DB connection not working", "error", err.Error())
 	}
 
 	revel.AppLog.Info("connected to DB")
@@ -112,21 +114,31 @@ func initConfigVariables() {
 
 	revel.AppLog.Info("init custom config variables")
 	var found bool
+	var err error
 
 	if TimeZone, found = revel.Config.String("timezone.long"); !found {
-		revel.AppLog.Error("cannot find key in config", "key", "timezone.long")
-		os.Exit(1)
+		revel.AppLog.Fatal("cannot find key in config", "key", "timezone.long")
 	}
 
 	if DefaultLanguage, found = revel.Config.String("i18n.default_language"); !found {
-		revel.AppLog.Error("cannot find key in config", "key", "i18n.default_language")
-		os.Exit(1)
+		revel.AppLog.Fatal("cannot find key in config", "key", "i18n.default_language")
 	}
 
 	var languageList string
 	if languageList, found = revel.Config.String("languages.list"); !found {
-		revel.AppLog.Error("cannot find key in config", "key", "languages.list")
-		os.Exit(1)
+		revel.AppLog.Fatal("cannot find key in config", "key", "languages.list")
 	}
 	Languages = strings.Split(languageList, ", ")
+
+	if LdapHost, found = revel.Config.String("ldap.host"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "ldap.host")
+	}
+
+	var portStr string
+	if portStr, found = revel.Config.String("ldap.port"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "ldap.port")
+	}
+	if LdapPort, err = strconv.Atoi(portStr); err != nil {
+		revel.AppLog.Fatal("invalid ldap.port value set in config", "value", portStr, "error", err.Error())
+	}
 }

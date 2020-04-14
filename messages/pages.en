@@ -22,8 +22,23 @@ index.pageName = Home
 # Login, Register, Password forgotten, Activation, Logout
 # -------------------------------------------------------------------------------------------------- #
 
+logout.button = Log out
+logout.success = Log out successful.
+
 login.tabName = Login
 login.pageName = Login
+
+login.stayLoggedIn = Keep me logged in
+login.ldapAuthentication_invalid_danger = The authentication with the university server failed. Please make sure that your username and password are correct.
+login.confirmation_success = Login successful.
+
+register.tabName = Registration
+register.pageName = Registration
+
+newPw.tabName = New password
+newPw.pageName = New Password
+
+newPw.pwforgottenQuestion = Forgot your password?
 
 # -------------------------------------------------------------------------------------------------- #
 # Help pages

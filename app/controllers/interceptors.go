@@ -31,5 +31,14 @@ func general(c *revel.Controller) revel.Result {
 		c.Session["callPath"] = "/"
 	}
 
+	//reset logout timer
+	if c.Session["stayLoggedIn"] != nil {
+		if c.Session["stayLoggedIn"] == "true" {
+			c.Session.SetNoExpiration()
+		} else {
+			c.Session.SetDefaultExpiration()
+		}
+	}
+
 	return nil
 }

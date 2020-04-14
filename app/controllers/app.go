@@ -16,6 +16,7 @@ func (c App) Index() revel.Result {
 
 	revel.AppLog.Debug("requesting index page")
 	c.Session["callPath"] = "/"
+	c.Session["currPath"] = "/"
 	c.ViewArgs["tabName"] = c.Message("index.tabName")
 	return c.Render()
 }
@@ -34,11 +35,11 @@ func (c App) ChangeLanguage(language string) revel.Result {
 	c.Session["currentLocale"] = language
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
 
+	//some pages do not change the callPath and must be detected manually
+	if c.Session["currPath"] == c.Message("login.tabName") {
+		return c.Redirect(User.LoginPage)
+	}
 	/*
-		//some pages do not change the callPath and must be detected manually
-		if c.Session["currPath"] == c.Message("login.pageName") {
-			return c.Redirect(App.LoginPage)
-		}
 		if c.Session["currPath"] == c.Message("register.pageName") {
 			return c.Redirect(App.RegisterPage)
 		}

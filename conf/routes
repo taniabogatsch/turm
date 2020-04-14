@@ -9,6 +9,11 @@ module:testrunner
 GET     /                                       App.Index
 GET     /App/ChangeLanguage                     App.ChangeLanguage
 
+# ------------------------------- User routes. -------------------------------- #
+GET     /User/LoginPage                         User.LoginPage
+POST    /User/Login                             User.Login
+GET     /User/Logout                            User.Logout
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 

@@ -2,6 +2,9 @@ package models
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"errors"
+	"strings"
 
 	"github.com/revel/revel"
 )
@@ -40,23 +43,27 @@ func (u Role) String() string {
 
 /*User contains all directly user related values. */
 type User struct {
-	ID             int            `db:"id, primarykey, autoincrement"`
-	LastName       string         `db:"lastname"`
-	FirstName      string         `db:"firstname"`
-	EMail          string         `db:"email, unique"`
-	Salutation     Salutation     `db:"salutation"`
-	Role           Role           `db:"role"`
-	LastLogin      string         `db:"lastlogin"`
-	FirstLogin     string         `db:"firstlogin"`
-	MatrNr         sql.NullInt32  `db:"matrnr, unique"`
-	AcademicTitle  sql.NullString `db:"academictitle"`
-	Title          sql.NullString `db:"title"`
-	NameAffix      sql.NullString `db:"nameaffix"`
+	ID         int        `db:"id, primarykey, autoincrement"`
+	LastName   string     `db:"lastname"`
+	FirstName  string     `db:"firstname"`
+	EMail      string     `db:"email, unique"`
+	Salutation Salutation `db:"salutation"`
+	Role       Role       `db:"role"`
+	LastLogin  string     `db:"lastlogin"`
+	FirstLogin string     `db:"firstlogin"`
+
+	//ldap user fields
+	MatrNr        sql.NullInt32  `db:"matrnr, unique"`
+	AcademicTitle sql.NullString `db:"academictitle"`
+	Title         sql.NullString `db:"title"`
+	NameAffix     sql.NullString `db:"nameaffix"`
+	Affiliations  Affiliations   `db:"affiliations"`
+	Studies       []Studies      ``
+
+	//external user fields
 	Password       sql.NullString `db:"password"`
 	PasswordRepeat string         `` //not a field in the respective table
 	ActivationCode sql.NullString `db:"activationcode"`
-	Studies        []Studies      ``
-	Affiliations   []Affiliation  ``
 }
 
 /*ValidateUser validates the User struct fields as retrieved by the register form. */
@@ -95,29 +102,53 @@ func (studies Studies) ValidateStudies(v *revel.Validation) {
 	//TODO
 }
 
-/*Affiliation contains all data about the affiliation of an user. */
-type Affiliation struct {
-	UserID int    `db:"userid, primarykey"`
-	Name   string `db:"name, primarykey"`
-}
-
-//validateAffiliation validates the Affiliation struct fields.
-func (affiliation Affiliation) validateAffiliation(v *revel.Validation) {
-	//TODO
-}
-
 /*Credentials entered at the login page. */
 type Credentials struct {
-	Username string
-	Password string
+	Username     string
+	EMail        string
+	Password     string
+	StayLoggedIn bool
 }
 
 /*ValidateCredentials ensures that neither the username nor the password are empty or of incorrect size. */
-func (cred *Credentials) ValidateCredentials(v *revel.Validation) {
+func (credentials *Credentials) ValidateCredentials(v *revel.Validation) {
 
-	v.Required(cred.Username).MessageKey("validation.missing.username")
-	v.Required(cred.Password).MessageKey("validation.missing.password")
+	if credentials.Username != "" {
+		v.MaxSize(credentials.Username, 255).MessageKey("validation.max.username")
+	} else if credentials.EMail != "" {
+		v.MaxSize(credentials.EMail, 255).MessageKey("validation.max.email")
+		v.Email(credentials.EMail).MessageKey("validation.invalid.email")
+	} else {
+		v.ErrorKey("validation.missing.username")
+	}
 
-	v.MaxSize(cred.Username, 255).MessageKey("validation.max.username")
-	v.MaxSize(cred.Password, 511).MessageKey("validation.max.password")
+	v.Required(credentials.Password).MessageKey("validation.missing.password")
+	v.MaxSize(credentials.Password, 511).MessageKey("validation.max.password")
+}
+
+/*Affiliations contains all affiliations of a user. */
+type Affiliations []string
+
+/*Value constructs a SQL Value from Affiliations. */
+func (affiliations Affiliations) Value() (driver.Value, error) {
+
+	var str string
+	for _, affiliation := range affiliations {
+		str += `"` + affiliation + `",`
+	}
+	return driver.Value("{" + strings.TrimRight(str, ",") + "}"), nil
+}
+
+/*Scan constructs Affiliations from an SQL Value. */
+func (affiliations *Affiliations) Scan(value interface{}) error {
+
+	switch value.(type) {
+	case string:
+		str := value.(string)
+		strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(str, "{", ""), "}", ""))
+		*affiliations = strings.Split(str, ",")
+	default:
+		return errors.New("incompatible type for Affiliations")
+	}
+	return nil
 }
