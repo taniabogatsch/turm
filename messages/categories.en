@@ -1,0 +1,20 @@
+# -------------------------------------------------------------------------------------------------- #
+# This message file contains all English messages that are specific to certain categories.
+#
+# Formatting Information:
+# - [category].[content], where category is the category that the message is related to
+# - [content] can be the further composed as follows:
+#   - [subcategory]_[content], common subcategory examples are the priority system or the enrollment specifics of a course
+#   - [description], that describes the message content
+# - messages can have the following suffixes
+#   - {missing, invalid, info, success, warning, danger}
+#
+# Categories contained in this file are:
+# - Search
+# -------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------------------------------------------------------- #
+# Search (for something, e.g. users)
+# -------------------------------------------------------------------------------------------------- #
+
+search.course = Search course

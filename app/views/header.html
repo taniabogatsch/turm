@@ -3,17 +3,38 @@
 <html>
   <head>
     <title>{{.title}}</title>
+
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="/public/css/bootstrap-3.3.6.min.css">
-    <link rel="shortcut icon" type="image/png" href="/public/img/favicon.png">
-    <script src="/public/js/jquery-2.2.4.min.js"></script>
-    <script src="/public/js/bootstrap-3.3.6.min.js"></script>
-    {{range .moreStyles}}
-      <link rel="stylesheet" type="text/css" href="/public/{{.}}">
-    {{end}}
-    {{range .moreScripts}}
-      <script src="/public/{{.}}" type="text/javascript" charset="utf-8"></script>
-    {{end}}
+
+    <link rel="shortcut icon" type="image/png" href="/public/img/TurmIcon.png">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,400|Roboto:300,400,700"> <!-- font -->
+    <link rel="stylesheet" type="text/css" href="/public/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
+
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/public/js/jquery.ui.touch-punch.min.js"></script>
+
+    <script src="/public/js/application.js"></script>
   </head>
   <body>
+
+    {{template "navigation.html" .}}
+
+    <!-- show a warning if javascript is disabled -->
+    <noscript>
+      <div class="alert alert-warning">
+        <h2>
+          {{msg $ "page.noJavaScript"}}
+        </h2>
+      </div>
+    </noscript>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>
+
+    {{if .DevMode}}
+      {{template "debug.html" .}}
+    {{end}}

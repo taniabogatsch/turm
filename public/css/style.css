@@ -1,0 +1,74 @@
+@media only screen and (max-width:767px) {
+  .mobile-hidden {
+    display: none;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .desktop-hidden {
+    display: none;
+  }
+  .margin-10 {
+    margin: 10px;
+  }
+}
+.float-right {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+.display-inline {
+  display: inline;
+}
+.display-none {
+  display: none;
+}
+.greylink {
+  color: #434a54;
+  text-decoration: none;
+}
+.menu {
+  background-color: #292961;
+}
+.menu-icon {
+  height: 54px;
+}
+.menu-flags {
+  width: 1.1rem;
+}
+.menu-flag {
+  min-width: 1rem;
+}
+.page {
+  padding-bottom: 6rem;
+}
+.page-side {
+  float: left;
+  width: 25%;
+}
+.page-side-left {
+  padding-left: 2%;
+}
+.page-side-right {
+  padding-right: 2%;
+}
+.page-middle {
+  float: left;
+  padding-left: 2%;
+  padding-right: 2%;
+  width: 50%;
+}
+@media only screen and (max-width:767px) {
+  .page {
+    padding-bottom: 1rem;
+    width: 100%;
+    font-size: 80%;
+    font-weight: 400;
+  }
+}
+.footer-custom {
+  position: fixed !important;
+  width: 100% !important;
+  border-top: 1px solid #e9ecef;
+  bottom: 0 !important;
+}

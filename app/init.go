@@ -2,6 +2,7 @@ package app
 
 import (
 	"os"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
@@ -24,9 +25,20 @@ var (
 
 	//Db is the database object representing the DB connections
 	Db *DB
+)
 
+//config variables
+var (
 	//TimeZone of the application
 	TimeZone string
+
+	//ServiceMail is the service e-mail-address of the application
+	ServiceMail string
+
+	//DefaultLanguage is the default language of the page
+	DefaultLanguage string
+	//Languages holds all languages supported by the application
+	Languages []string
 )
 
 func init() {
@@ -99,10 +111,22 @@ func initDB() {
 func initConfigVariables() {
 
 	revel.AppLog.Info("init custom config variables")
-
 	var found bool
+
 	if TimeZone, found = revel.Config.String("timezone.long"); !found {
 		revel.AppLog.Error("cannot find key in config", "key", "timezone.long")
 		os.Exit(1)
 	}
+
+	if DefaultLanguage, found = revel.Config.String("i18n.default_language"); !found {
+		revel.AppLog.Error("cannot find key in config", "key", "i18n.default_language")
+		os.Exit(1)
+	}
+
+	var languageList string
+	if languageList, found = revel.Config.String("languages.list"); !found {
+		revel.AppLog.Error("cannot find key in config", "key", "languages.list")
+		os.Exit(1)
+	}
+	Languages = strings.Split(languageList, ", ")
 }

@@ -1,0 +1,46 @@
+# -------------------------------------------------------------------------------------------------- #
+# This message file contains all German messages that are specific to certain pages.
+#
+# Formatting Information:
+# - [page].[content], where page is the page at which the message can be found
+# - [content] can be the further composed as follows:
+#   - title_[title of page section], common examples are the vertical overview pills
+#   - [title of page section]_[description], where description grasps the message's content
+#   - [description], if the page is not divided further into sections
+# - messages can have the following suffixes
+#   - {missing, invalid, info, success, warning, danger}
+# -------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------------------------------------------------------- #
+# Index
+# -------------------------------------------------------------------------------------------------- #
+
+index.tabName = Turm2
+index.pageName = Startseite
+
+# -------------------------------------------------------------------------------------------------- #
+# Login, Register, New password, Activation, Logout
+# -------------------------------------------------------------------------------------------------- #
+
+login.tabName = Anmelden
+login.pageName = Anmelden
+
+# -------------------------------------------------------------------------------------------------- #
+# Help pages
+# -------------------------------------------------------------------------------------------------- #
+
+newsFeed.tabName = Turm2 News
+newsFeed.pageName = Neuerungen & Ankündigungen
+
+faq.tabName = FAQ
+faq.pageName = FAQ
+
+policy.tabName = Datenschutzerklärung
+policy.pageName = Datenschutzerklärung
+policy.here = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>. #TODO
+
+tutorials.tabName = Handbuch
+tutorials.pageName = Handbuch
+
+imprint.tabName = Impressum
+imprint.pageName = Impressum

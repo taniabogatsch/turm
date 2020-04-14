@@ -1,5 +1,19 @@
-  {{if .DevMode}}
-    {{template "debug.html" .}}
-  {{end}}
+<!-- template rendering the footer -->
+
+    <footer class="footer footer-custom">
+      <div class="container">
+        <span class="text-muted">
+          {{msg $ "page.footer_help_info" .serviceMail}}
+
+          <a href="#" class="float-right"> <!-- TODO -->
+            {{msg $ "page.footer_imprint"}}
+          </a>
+
+          <br>
+          {{msg $ "policy.here"}}
+        </span>
+      </div>
+    </footer>
+
   </body>
 </html>

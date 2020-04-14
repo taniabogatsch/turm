@@ -1,0 +1,46 @@
+# -------------------------------------------------------------------------------------------------- #
+# This message file contains all German messages that are specific to certain pages.
+#
+# Formatting Information:
+# - [page].[content], where page is the page at which the message can be found
+# - [content] can be the further composed as follows:
+#   - title_[title of page section], common examples are the vertical overview pills
+#   - [title of page section]_[description], where description grasps the message's content
+#   - [description], if the page is not divided further into sections
+# - messages can have the following suffixes
+#   - {missing, invalid, info, success, warning, danger}
+# -------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------------------------------------------------------- #
+# Index
+# -------------------------------------------------------------------------------------------------- #
+
+index.tabName = Turm2
+index.pageName = Home
+
+# -------------------------------------------------------------------------------------------------- #
+# Login, Register, Password forgotten, Activation, Logout
+# -------------------------------------------------------------------------------------------------- #
+
+login.tabName = Login
+login.pageName = Login
+
+# -------------------------------------------------------------------------------------------------- #
+# Help pages
+# -------------------------------------------------------------------------------------------------- #
+
+newsFeed.tabName = News feed
+newsFeed.pageName = Updates & Announcements
+
+faq.tabName = FAQ
+faq.pageName = FAQ
+
+policy.tabName = Data policy
+policy.pageName = Data policy
+policy.here = <a href="#">Here</a> you can find our privacy policy.
+
+tutorials.tabName = Manual
+tutorials.pageName = Manual
+
+imprint.tabName = Imprint
+imprint.pageName = Imprint

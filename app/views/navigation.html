@@ -1,0 +1,103 @@
+<!-- template containing the navigation bar present at all pages -->
+
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+
+  <div class="navbar-brand">
+    <!-- Turm2 icon -->
+    <a href='{{url "App.Index"}}' class="float-left">
+      <img src="/public/img/TurmIcon.png" class="menu-icon">
+    </a>
+    <!-- Turm2 text -->
+    <a class="text-white float-left" href='{{url "App.Index"}}'>
+      <h2>
+        Turm II
+      </h2>
+    </a>
+  </div>
+
+  <!-- data toggle for mobile view -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarContent">
+    <ul class="navbar-nav mr-auto">
+
+      <!-- get back to main page -->
+      <li class="nav-item active">
+        <a class="nav-link" href='{{url "App.Index"}}'>
+          {{msg $ "index.pageName"}}
+        </a>
+      </li>
+
+      <!-- data policy, news feed, FAQ, tutorials, imprint-->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="dropdownHelpPages" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{msg $ "page.menu_helpPages"}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
+          <a class="dropdown-item" href="#"> {{msg $ "policy.pageName"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "newsFeed.pageName"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "faq.pageName"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "tutorials.pageName"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "imprint.pageName"}} </a>
+        </div>
+      </li>
+
+      <!--languages -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="dropdownLanguages" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{range $key, $language := .languages}}
+            {{if eq $.currentLocale $language}}
+              <img class="menu-flags" src="/public/img/{{$language}}_flag.png">
+            {{end}}
+          {{else}}
+            {{template "Icons/Lightning.html" .}}
+          {{end}}
+        </a>
+        <div class="dropdown-menu menu-flag" aria-labelledby="dropdownLanguages">
+          {{range $key, $language := .languages}}
+            <a class="dropdown-item" href='{{url "App.ChangeLanguage" $language}}'>
+              <img src="/public/img/{{$language}}_flag.png">
+            </a>
+          {{end}}
+        </div>
+      </li>
+    </ul>
+
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder='{{msg $ "search.course"}}'>
+      <button class="btn btn-outline-light my-2 my-sm-0" type="submit">
+        {{msg $ "button.search"}}
+      </button>
+    </form>
+
+    <!-- a user is logged in -->
+    {{if .UserID}}
+      <!--
+        <a class="navbar-brand menu-text menu-text-small" href="#">
+          {{.firstname}} {{.lastname}}
+        </a>
+
+        <form class="form-inline my-2 my-lg-0" action="#" method="GET">
+          <button class="btn my-2 my-sm-0 menu-logBtn" type="submit">
+            {{msg . "logout.button"}}
+          </button>
+        </form>
+      -->
+
+    <!-- no user is logged in, link and button to login page -->
+    {{else}}
+      <form class="form-inline my-2 my-lg-0" action='#' method="GET">
+        <button class="btn btn-outline-light my-2 my-sm-0 margin-10" type="submit">
+          {{msg $ "login.pageName"}}
+        </button>
+      </form>
+    {{end}}
+
+  </div>
+</nav>
+
+{{template "flash.html" .}}
+<br>
+<br>

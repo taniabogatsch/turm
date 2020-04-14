@@ -1,13 +1,50 @@
 package controllers
 
 import (
+	"turm/app/models"
+
 	"github.com/revel/revel"
 )
 
+/*App implements logic to CRUD general page data. */
 type App struct {
 	*revel.Controller
 }
 
+/*Index renders the landing page of the application. */
 func (c App) Index() revel.Result {
+
+	revel.AppLog.Debug("requesting index page")
+	c.Session["callPath"] = "/"
+	c.ViewArgs["tabName"] = c.Message("index.tabName")
 	return c.Render()
+}
+
+/*ChangeLanguage changes the language, then redirects to the page currently set as callPath.
+- Roles: all */
+func (c App) ChangeLanguage(language string) revel.Result {
+
+	revel.AppLog.Debug("change language", "language", language)
+
+	if c.Validation.Check(language, models.LanguageValidator{}); c.Validation.HasErrors() {
+		c.Flash.Error(c.Message("validation.invalid.language"))
+		return c.Redirect(c.Session["callPath"])
+	}
+
+	c.Session["currentLocale"] = language
+	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
+
+	/*
+		//some pages do not change the callPath and must be detected manually
+		if c.Session["currPath"] == c.Message("login.pageName") {
+			return c.Redirect(App.LoginPage)
+		}
+		if c.Session["currPath"] == c.Message("register.pageName") {
+			return c.Redirect(App.RegisterPage)
+		}
+		if c.Session["currPath"] == c.Message("newPw.pageName") {
+			return c.Redirect(App.NewPw)
+		}
+	*/
+	return c.Redirect(c.Session["callPath"])
 }

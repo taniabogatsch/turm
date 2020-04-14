@@ -1,0 +1,19 @@
+# headers, modal titles, buttons, alerts, errors, ...
+# Components are often structured according to their bootstrap structure.
+
+# -------------------------------------------------------------------------------------------------- #
+# Page
+# -------------------------------------------------------------------------------------------------- #
+
+page.noJavaScript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
+
+page.menu_helpPages = Hilfen
+
+page.footer_imprint = Impressum
+page.footer_help_info = Bei Fragen wenden Sie sich bitte an unseren <a href="mailto:%s?Subject=SupportTurm2" target="_top"> Support</a>.
+
+# -------------------------------------------------------------------------------------------------- #
+# Buttons
+# -------------------------------------------------------------------------------------------------- #
+
+button.search = Suchen

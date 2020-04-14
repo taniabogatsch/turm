@@ -1,0 +1,42 @@
+@import "../theme.css.less";
+
+@media @phone {
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+@media @desktop {
+  .desktop-hidden {
+    display: none;
+  }
+
+  .margin {
+    &-10 {
+      margin: 10px;
+    }
+  }
+}
+
+.float {
+  &-right {
+    float: right;
+  }
+  &-left {
+    float: left;
+  }
+}
+
+.display {
+  &-inline {
+    display: inline;
+  }
+  &-none {
+    display: none;
+  }
+}
+
+.greylink {
+  color: @darkgrey;
+  text-decoration: none;
+}
