@@ -10,16 +10,16 @@ import (
 type Salutation int
 
 const (
+	//NONE is for no form of address
+	NONE Salutation = iota
 	//MR is for Mr.
-	MR Salutation = iota
+	MR
 	//MS is for Ms.
 	MS
-	//NONE is for no form of address
-	NONE
 )
 
 func (s Salutation) String() string {
-	return [...]string{"mr", "ms", "none"}[s]
+	return [...]string{"none", "mr", "ms"}[s]
 }
 
 /*Role is a type for encoding different user roles. */
@@ -53,14 +53,31 @@ type User struct {
 	Title          sql.NullString `db:"title"`
 	NameAffix      sql.NullString `db:"nameaffix"`
 	Password       sql.NullString `db:"password"`
+	PasswordRepeat string         `` //not a field in the respective table
 	ActivationCode sql.NullString `db:"activationcode"`
 	Studies        []Studies      ``
 	Affiliations   []Affiliation  ``
 }
 
-/*ValidateUser validates the User struct fields. */
+/*ValidateUser validates the User struct fields as retrieved by the register form. */
 func (user *User) ValidateUser(v *revel.Validation) {
-	//TODO
+
+	v.Required(user.Salutation).MessageKey("validation.missing.salutation")
+	v.Required(user.LastName).MessageKey("validation.missing.lastname")
+	v.Required(user.FirstName).MessageKey("validation.missing.firstname")
+	v.Required(user.EMail).MessageKey("validation.missing.email")
+	v.Required(user.Password.String).MessageKey("validation.missing.password")
+	v.Required(user.PasswordRepeat).MessageKey("validation.missing.passwordRepeat")
+
+	v.MaxSize(user.LastName, 255).MessageKey("validation.max.lastname")
+	v.MaxSize(user.FirstName, 255).MessageKey("validation.max.firstname")
+	v.MaxSize(user.EMail, 255).MessageKey("validation.max.email")
+	v.MaxSize(user.Password.String, 511).MessageKey("validation.max.password")
+
+	v.Email(user.EMail).MessageKey("validation.invalid.email")
+	v.Required(user.Password.String == user.PasswordRepeat).MessageKey("validation.invalid.password")
+
+	user.Password.Valid = true
 }
 
 /*Studies contains all data about the course of study of an user. */
