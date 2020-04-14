@@ -1,46 +1,20 @@
 /* Database schema, 2020-04-14 */
 
 
-CREATE TYPE salutation AS ENUM (
-    'mr',
-    'ms',
-    'none'
-);
-CREATE TYPE role AS ENUM (
-    'user',
-    'creator',
-    'admin'
-);
-CREATE TYPE meetinginterval AS ENUM (
-    'single',
-    'weekly',
-    'even',
-    'odd'
-);
-CREATE TYPE status AS ENUM (
-    'enrolled',
-    'on waitlist',
-    'awaiting payment',
-    'paid',
-    'freed'
-);
-
-
 CREATE TABLE users (
   id              serial                    PRIMARY KEY,
   lastname        varchar(255)              NOT NULL,
   firstname       varchar(255)              NOT NULL,
   email           varchar(255)              UNIQUE NOT NULL,
-  salutation      salutation                NOT NULL,
-  role            role                      NOT NULL,
+  salutation      integer                   NOT NULL,
+  role            integer                   NOT NULL,
   lastlogin       timestamp with time zone  NOT NULL,
   firstlogin      timestamp with time zone  NOT NULL,
   matrnr          integer                   UNIQUE,
-  affiliation     varchar(255)[],
   academictitle   varchar(127),
   title           varchar(127),
   nameaffix       varchar(127),
-  pw              varchar(511),
+  password        varchar(511),
   activationcode  varchar(255)
 );
 
@@ -65,6 +39,15 @@ CREATE TABLE studies (
   FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
   FOREIGN KEY (degreeid) REFERENCES degree (id) ON DELETE CASCADE,
   FOREIGN KEY (courseofstudiesid) REFERENCES courseofstudies (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE affiliation (
+  userid  integer       NOT NULL,
+  name    varchar(127)  NOT NULL,
+
+  PRIMARY KEY (userid, name),
+  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE
 );
 
 
@@ -97,7 +80,7 @@ CREATE TABLE event (
   haswaitlist       boolean       NOT NULL,
   title             varchar(255)  NOT NULL,
   description       text,
-  registrationkey   varchar(512),
+  enrollmentkey     varchar(512),
 
   FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
 );
@@ -106,7 +89,7 @@ CREATE TABLE event (
 CREATE TABLE meeting (
   id              serial                    PRIMARY KEY,
   eventid         integer                   NOT NULL,
-  meetinginterval meetinginterval           NOT NULL,
+  meetinginterval integer                   NOT NULL,
   weekday         integer,
   place           varchar(255),
   annotation      varchar(255),
@@ -118,8 +101,9 @@ CREATE TABLE meeting (
 
 
 CREATE TABLE editor (
-  userid    integer   NOT NULL,
-  courseid  integer   NOT NULL,
+  userid      integer   NOT NULL,
+  courseid    integer   NOT NULL,
+  viewmatrnr  boolean   NOT NULL,
 
   PRIMARY KEY (userid, courseid),
   FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
@@ -128,8 +112,9 @@ CREATE TABLE editor (
 
 
 CREATE TABLE instructor (
-  userid    integer   NOT NULL,
-  courseid  integer   NOT NULL,
+  userid      integer   NOT NULL,
+  courseid    integer   NOT NULL,
+  viewmatrnr  boolean   NOT NULL,
 
   PRIMARY KEY (userid, courseid),
   FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
@@ -173,7 +158,7 @@ CREATE TABLE enrollment_restrictions (
 CREATE TABLE enrolled (
   userid            integer                   NOT NULL,
   eventid           integer                   NOT NULL,
-  status            status                    NOT NULL,
+  status            integer                   NOT NULL,
   emailtraffic      boolean                   NOT NULL,
   timeofenrollment  timestamp with time zone  NOT NULL,
 
