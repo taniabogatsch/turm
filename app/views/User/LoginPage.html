@@ -15,27 +15,27 @@
     </h3>
     <br>
 
-    <div style="width:50%">
+    <div class="login-width">
       <ul class="nav nav-tabs" id="loginType" role="tablist" >
-        <li class="nav-item" style="width:50%;">
-          <a class="nav-link active" id="ldap" data-toggle="tab" href="#loginForm" role="tab" aria-selected="true">
+        <li class="nav-item login-width-tab">
+          <a class="nav-link active" id="ldap" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="true">
             {{msg $ "user.ldap"}}
           </a>
         </li>
-        <li class="nav-item" style="width:50%;">
-          <a class="nav-link" id="external" data-toggle="tab" href="#loginForm" role="tab" aria-selected="false">
+        <li class="nav-item login-width-tab">
+          <a class="nav-link" id="external" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="false">
             {{msg $ "user.external"}}
           </a>
         </li>
       </ul>
-      <div class="tab-content" id="loginTypeContent" style="width:65%;">
-        <div class="tab-pane fade show active" id="loginForm" role="tabpanel">
+      <div class="tab-content login-width-content" id="loginTypeContent">
+        <div class="tab-pane fade show active" id="loginFormTab" role="tabpanel">
 
           <br>
           <br>
 
           <!-- login form -->
-          <form accept-charset="UTF-8" action='{{url "User.Login"}}' method="POST" class="needs-validation" novalidate>
+          <form id="loginForm" accept-charset="UTF-8" action='{{url "User.Login"}}' method="POST" class="needs-validation" novalidate>
             <!-- username or e-mail input -->
             <div class="input-group mb-3">
               <div class="input-group-prepend">
@@ -69,6 +69,7 @@
                 </label>
               </div>
             </div>
+            <br>
             <!-- button to confirm login -->
             <button class="btn btn-darkblue" type="submit">
               {{msg $ "login.pageName"}}
@@ -81,7 +82,7 @@
       <!-- link to register page -->
       <br>
       <br>
-      <a href='#'> <!-- TODO -->
+      <a href='{{url "User.RegistrationPage"}}'>
         {{msg $ "register.pageName"}}
       </a>
 
@@ -119,6 +120,8 @@
       $("#input-user").attr("type", "email");
       $("#input-user-validation").html('{{msg $ "validation.invalid.email"}}');
     }
+
+    $("#input-user").focus();
   });
 </script>
 

@@ -99,3 +99,27 @@ func (c User) Logout() revel.Result {
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
 }
+
+/*RegistrationPage renders the registration page.
+- Roles: not logged in users */
+func (c User) RegistrationPage() revel.Result {
+
+	revel.AppLog.Debug("requesting registration page")
+	//NOTE: we do not set the callPath because we want to be redirected to the activation page
+	c.Session["currPath"] = c.Message("register.tabName")
+	c.ViewArgs["tabName"] = c.Message("register.tabName")
+	return c.Render()
+}
+
+/*Registration registers a new external user and sends an activation e-mail.
+- Roles: not logged in users */
+func (c User) Registration(user models.User) revel.Result {
+
+	revel.AppLog.Debug("registration of user", "user", user)
+	if user.ValidateUser(c.Validation); c.Validation.HasErrors() {
+		c.Validation.Keep()
+		return c.Redirect(User.RegistrationPage)
+	}
+
+	return c.NotFound("not implemented")
+}

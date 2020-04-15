@@ -1,0 +1,24 @@
+<!-- the login page provides the login form -->
+
+<!-- set title and header -->
+{{set . "title" .tabName}}
+{{template "header.html" .}}
+
+<div class="page page-side page-side-left">
+  <br class="mobile-hidden">
+</div>
+
+<div class="page page-middle">
+  <center>
+    <h3>
+      {{msg $ "register.pageName"}}
+    </h3>
+    <br>
+  </center>
+</div>
+
+<div class="page page-side page-side-right">
+  <br class="mobile-hidden">
+</div>
+
+{{template "footer.html" .}}

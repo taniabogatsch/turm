@@ -13,6 +13,8 @@ GET     /App/ChangeLanguage                     App.ChangeLanguage
 GET     /User/LoginPage                         User.LoginPage
 POST    /User/Login                             User.Login
 GET     /User/Logout                            User.Logout
+GET     /User/RegistrationPage                  User.RegistrationPage
+POST    /User/Registration                      User.Registration
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

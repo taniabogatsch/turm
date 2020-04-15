@@ -11,7 +11,8 @@ type App struct {
 	*revel.Controller
 }
 
-/*Index renders the landing page of the application. */
+/*Index renders the landing page of the application.
+- Roles: all (except not activated users) */
 func (c App) Index() revel.Result {
 
 	revel.AppLog.Debug("requesting index page")
@@ -39,10 +40,10 @@ func (c App) ChangeLanguage(language string) revel.Result {
 	if c.Session["currPath"] == c.Message("login.tabName") {
 		return c.Redirect(User.LoginPage)
 	}
+	if c.Session["currPath"] == c.Message("register.tabName") {
+		return c.Redirect(User.RegistrationPage)
+	}
 	/*
-		if c.Session["currPath"] == c.Message("register.pageName") {
-			return c.Redirect(App.RegisterPage)
-		}
 		if c.Session["currPath"] == c.Message("newPw.pageName") {
 			return c.Redirect(App.NewPw)
 		}

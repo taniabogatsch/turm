@@ -1,3 +1,4 @@
+/* import components */
 /* fill */
 .btn-darkblue {
   color: #fff;
@@ -136,4 +137,24 @@
   width: 100% !important;
   border-top: 1px solid #e9ecef;
   bottom: 0 !important;
+}
+/* import pages */
+@media only screen and (max-width:767px) {
+  .login-width-tab {
+    width: 50%;
+  }
+  .login-width-content {
+    width: 90%;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .login-width {
+    width: 50%;
+  }
+  .login-width-tab {
+    width: 50%;
+  }
+  .login-width-content {
+    width: 65%;
+  }
 }
