@@ -3,17 +3,13 @@ package controllers
 import (
 	"strconv"
 	"strings"
+	"turm/app"
 	"turm/app/auth"
 	"turm/app/database"
 	"turm/app/models"
 
 	"github.com/revel/revel"
 )
-
-/*User implements logic to CRUD users. */
-type User struct {
-	*revel.Controller
-}
 
 /*LoginPage renders the login page.
 - Roles: not logged in users */
@@ -33,23 +29,20 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	revel.AppLog.Debug("login user", "username", credentials.Username, "email", credentials.EMail,
 		"stayLoggedIn", credentials.StayLoggedIn)
 	if credentials.ValidateCredentials(c.Validation); c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.FlashParams()
-		return c.Redirect(User.LoginPage)
+		return flashError(errValidation, c.Controller, "/User/LoginPage", "")
 	}
 
 	var user models.User
 
-	if credentials.Username != "" {
-		//ldap login, authenticate the user
+	if credentials.Username != "" { //ldap login, authenticate the user
+
 		if err := auth.LDAPServerAuth(&credentials, &user); err != nil {
-			c.Flash.Error(c.Message("login.ldapAuthentication_invalid_danger"))
-			c.FlashParams()
-			return c.Redirect(User.LoginPage)
+			return flashError(errAuth, c.Controller, "/User/LoginPage", "login.ldapAuthentication_invalid_danger")
 		}
 		revel.AppLog.Debug("authentication successful", "user", user)
-	} else {
-		//external login
+
+	} else { //external login
+
 		user.EMail = strings.ToLower(credentials.EMail)
 		user.Password.String = credentials.Password
 		user.Password.Valid = true
@@ -57,17 +50,11 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	//login of user
 	if err := database.Login(&user); err != nil {
-		c.Flash.Error(c.Message("error.database"))
-		c.FlashParams()
-		return c.Redirect(User.LoginPage)
+		return flashError(errDB, c.Controller, "/User/LoginPage", "")
 	}
 	revel.AppLog.Debug("login successful", "user", user)
 
-	c.Session["userID"] = strconv.Itoa(user.ID)
-	c.Session["firstName"] = user.FirstName
-	c.Session["lastName"] = user.LastName
-	c.Session["role"] = user.Role.String()
-	c.Session["eMail"] = user.EMail
+	setSession(&user, c.Controller)
 	c.Session["stayLoggedIn"] = strconv.FormatBool(credentials.StayLoggedIn)
 
 	//set default expiration of session cookie
@@ -82,9 +69,8 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	//not activated external users get redirected to the activation page
 	if user.ActivationCode.String != "" && credentials.EMail != "" {
 		c.Session["notActivated"] = "true"
-		//return c.Redirect(App.Activation, loginData.Username) //TODO
+		return c.Redirect(User.ActivationPage, user.ID)
 	}
-
 	return c.Redirect(App.Index)
 }
 
@@ -98,6 +84,7 @@ func (c User) Logout() revel.Result {
 			c.Session.Del(k)
 		}
 	}
+
 	revel.AppLog.Debug("logout successful", "length session", len(c.Session))
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
@@ -120,11 +107,21 @@ func (c User) Registration(user models.User) revel.Result {
 
 	revel.AppLog.Debug("registration of user", "user", user)
 	if user.ValidateUser(c.Validation); c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.FlashParams()
-		return c.Redirect(User.RegistrationPage)
+		return flashError(errValidation, c.Controller, "/User/RegistrationPage", "")
 	}
 
+	//register the new user
+	if err := database.Register(&user); err != nil {
+		return flashError(errDB, c.Controller, "/User/RegistrationPage", "")
+	}
+	revel.AppLog.Debug("registration successful", "user", user)
+
+	//TODO: send the activation e-mail
+
+	setSession(&user, c.Controller)
+	c.Session["notActivated"] = "true"
+
+	c.Flash.Success(c.Message("activation.codeSend_info"))
 	return c.Redirect(User.ActivationPage, user.ID)
 }
 
@@ -148,4 +145,39 @@ func (c User) ActivationPage(userID int) revel.Result {
 	c.Session["callPath"] = "/User/ActivationPage?userID=" + strconv.Itoa(userID)
 	c.ViewArgs["tabName"] = c.Message("activation.tabName")
 	return c.Render(userID)
+}
+
+//setSession sets all user related session values.
+func setSession(user *models.User, c *revel.Controller) {
+
+	c.Session["userID"] = strconv.Itoa(user.ID)
+	c.Session["firstName"] = user.FirstName
+	c.Session["lastName"] = user.LastName
+	c.Session["role"] = user.Role.String()
+	c.Session["eMail"] = user.EMail
+}
+
+//sendActivationEMail sends an e-mail with an activation code and an activation URL. */
+func sendActivationEMail(c *revel.Controller, subjectKey string, user *models.User) (err error) {
+
+	data := models.EMailData{User: *user}
+
+	//TODO: get the subject in the default language of the user
+	subject := ""
+
+	//TODO: set e-mail path
+	templatePath := ""
+
+	email := app.EMail{
+		Recipient: user.EMail,
+		Subject:   subject,
+		ReplyTo:   c.Message("mails.doNotReply", app.ServiceEMail),
+	}
+
+	if err = models.GetEMailBody(&data, templatePath, &email.Body, c); err != nil {
+		return
+	}
+
+	app.AddEMailToQueue(&email)
+	return
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"strings"
+	"turm/app"
 
 	"github.com/revel/revel"
 )
@@ -87,6 +88,14 @@ func (user *User) ValidateUser(v *revel.Validation) {
 	}
 
 	user.Password.Valid = true
+	user.EMail = strings.ToLower(user.EMail)
+
+	//validate whether e-mail address is unique
+	data := ValidateUniqueData{Column: "email", Table: "users", Value: user.EMail}
+	v.Check(data, UniqueValidator{}).MessageKey("validation.email.notUnique")
+
+	isLDAPMail := !strings.Contains(user.EMail, app.EMailSuffix)
+	v.Required(isLDAPMail).MessageKey("validation.email.ldap")
 }
 
 /*Studies contains all data about the course of study of an user. */

@@ -13,10 +13,12 @@ func init() {
 	revel.InterceptFunc(general, revel.BEFORE, &revel.Controller{})
 }
 
-//general ... TODO.
+//general intercepts each revel controller.
+//It sets the service e-mail, the languages, the current language,
+//the call path (if not set) and resets the logout timer.
 func general(c *revel.Controller) revel.Result {
 
-	c.ViewArgs["serviceMail"] = app.ServiceMail
+	c.ViewArgs["serviceEMail"] = app.ServiceEMail
 	c.ViewArgs["languages"] = app.Languages
 
 	//set language

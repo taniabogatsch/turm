@@ -26,3 +26,6 @@ validation.invalid.email = Bitte geben Sie eine gültige E-Mail-Adresse an.
 validation.invalid.username = Bitte geben Sie einen gültigen Nutzernamen an.
 validation.invalid.password = Ihre Passwörter stimmen nicht überein.
 validation.invalid.credentials = Bitte geben Sie entweder Ihren Nutzernamen oder Ihre E-Mail-Addresse an.
+
+validation.email.notUnique = Die eingegebene E-Mail-Adresse ist bereits in Verwendung. Bitte lassen Sie sich ein neues Passwort zusenden oder verwenden Sie eine andere E-Mail-Adresse.
+validation.email.ldap = Bei der angegebenen E-Mail-Adresse handelt es sich um eine Universitäts-E-Mail-Adresse. Bitte verwenden Sie den Universitätslogin.

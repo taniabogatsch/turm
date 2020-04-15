@@ -76,7 +76,7 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	//now we simly put the data we searched for with attrNames into an user struct
 	user.FirstName = e.GetAttributeValue("givenName")
 	user.LastName = e.GetAttributeValue("sn")
-	user.EMail = e.GetAttributeValue("mail")
+	user.EMail = strings.ToLower(e.GetAttributeValue("mail"))
 	user.Affiliations = e.GetAttributeValues("eduPersonAffiliation")
 
 	switch salutation := e.GetAttributeValue("thuEduSalutation"); salutation {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"turm/app"
+
+	"github.com/revel/revel"
 )
 
 /*LanguageValidator implements the validation of the selected language. */
@@ -53,4 +55,39 @@ func (v NotRequiredValidator) IsSatisfied(i interface{}) bool {
 /*DefaultMessage returns the default message of NotRequiredValidator. */
 func (v NotRequiredValidator) DefaultMessage() string {
 	return fmt.Sprintln("Please do not provide this value.")
+}
+
+/*UniqueValidator implements the validation of the uniqueness of a column value in a provided table. */
+type UniqueValidator struct{}
+
+/*ValidateUniqueData contains all data to validate the uniqueness of a column value in a table. */
+type ValidateUniqueData struct {
+	Column string
+	Table  string
+	Value  string
+}
+
+/*IsSatisfied implements the validation result of UniqueValidator. */
+func (uniqueV UniqueValidator) IsSatisfied(i interface{}) bool {
+
+	var unique bool
+	data, parsed := i.(ValidateUniqueData)
+	if !parsed {
+		return false
+	}
+
+	selectExists := `SELECT NOT EXISTS (SELECT ` + data.Column +
+		` FROM ` + data.Table + ` WHERE ` + data.Column + ` = $1) AS unique`
+	err := app.Db.Get(&unique, selectExists, data.Value)
+	if err != nil {
+		revel.AppLog.Error("failed to retrieve information about this column",
+			"SQL", selectExists, "data", data, "error", err.Error())
+		return false
+	}
+	return unique
+}
+
+/*DefaultMessage returns the default message of UniqueValidator. */
+func (uniqueV UniqueValidator) DefaultMessage() string {
+	return fmt.Sprintln("Please provide a unique value.")
 }

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"math/rand"
 	"time"
 	"turm/app"
 	"turm/app/models"
@@ -46,10 +47,45 @@ func Login(user *models.User) (err error) {
 			revel.AppLog.Error("failed to update external user", "user", user, "error", err.Error())
 			return
 		}
-
 	}
 
 	return
+}
+
+/*Register inserts an external user. It returns all session values of that user. */
+func Register(user *models.User) (err error) {
+
+	user.ActivationCode.String = generateActivationCode()
+	user.ActivationCode.Valid = true
+	activationCode := user.ActivationCode.String
+
+	//last login and first login
+	now := time.Now().Format("2006-01-02 15:04:05")
+
+	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
+		user.Salutation, now, now, user.Password, user.ActivationCode)
+	if err != nil {
+		revel.AppLog.Error("failed to register external user", "user", user, "error", err.Error())
+	}
+	user.ActivationCode.String = activationCode
+	return
+}
+
+//generateActivationCode generates an activation code.
+func generateActivationCode() string {
+
+	//to create a unique random, we need to take the time in nanoseconds as seed
+	rand.Seed(time.Now().UTC().UnixNano())
+	//characters that can be used in the activation code (no l, I, L, O, 0, 1)
+	var characters = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	//the length of the activation code
+	b := make([]byte, 7)
+
+	//generate the code
+	for i := range b {
+		b[i] = characters[rand.Intn(len(characters))]
+	}
+	return string(b)
 }
 
 const (
@@ -75,4 +111,13 @@ const (
       AND password = crypt($3, password)
     RETURNING id, lastname, firstname, email, role, activationcode
   `
+
+	stmtRegisterExtern = `
+		INSERT INTO users (
+			firstname, lastname, email, salutation, role, lastlogin,
+			firstlogin, password, activationcode
+		)
+		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')))
+		RETURNING id, lastname, firstname, email, role
+	`
 )
