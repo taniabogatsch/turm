@@ -5,15 +5,55 @@
 # Page
 # -------------------------------------------------------------------------------------------------- #
 
+page.title_overview = Overview
+
+page.noMobileView = There is no mobile view for this page. Please use a tablet, a laptop or a desktop PC.
+page.underConstruction = This page is still under construction.
 page.noJavaScript = JavaScript is deactivated. Parts of the page may behave different than expected.
 
+page.menu_courses = Courses
+page.menu_noCourses = No courses
 page.menu_helpPages = Help
 
 page.footer_imprint = Imprint
-page.footer_help_info = If you have any questions, please contact our <a href="mailto:%s?Subject=SupportTurm2" target="_top"> support</a>.
+page.footer_help_info = If you have any questions, please contact our <a class="greylink" href="mailto:%s?Subject=SupportTurm2" target="_top"> support</a>.
 
 # -------------------------------------------------------------------------------------------------- #
 # Buttons
 # -------------------------------------------------------------------------------------------------- #
 
 button.search = Search
+button.confirm = Confirm
+button.cancel = Cancel
+button.send = Send
+button.add = Add
+button.download = Download
+button.edit = Edit
+button.delete = Delete
+button.saveChanges = Save changes
+button.accept = Accept
+button.remove = Remove
+button.ok = OK
+button.next = Next
+button.back = Back
+
+# -------------------------------------------------------------------------------------------------- #
+# Forms (grouped according to bootstrap forms)
+# -------------------------------------------------------------------------------------------------- #
+
+form.check_yes = Yes
+form.check_no = No
+
+# -------------------------------------------------------------------------------------------------- #
+# Alerts (grouped according to bootstrap alert types)
+# -------------------------------------------------------------------------------------------------- #
+
+alert.info_reloadPage = Please reload the page.
+
+alert.success_changesSuccessful = Your changes were successful.
+
+alert.danger_pageAccessDenied = You do not have the rights to access this page: %s
+alert.danger_actionDenied = You do not have the rights to execute this action.
+alert.danger_alreadyLoggedIn = You are already logged in.
+alert.danger_logInToEnroll = You must log in to enroll in events.
+alert.danger_languageInvalid = Please choose a valid language.

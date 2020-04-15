@@ -11,8 +11,13 @@
 #
 # Categories contained in this file are:
 # - General Errors
+# - E-Mails
 # - User
+# - Course
+# - Enrollment
 # - Search
+# - Groups Tree
+# - Enums
 # -------------------------------------------------------------------------------------------------- #
 
 # -------------------------------------------------------------------------------------------------- #
@@ -20,20 +25,285 @@
 # -------------------------------------------------------------------------------------------------- #
 
 error.contactSupportMessage = Please contact the support.
+
+error.general = An error occurred. %(error.contactSupportMessage)s
+error.dataTransfer = An error occurred while transferring your data. %(error.contactSupportMessage)s
+error.sendingMail = An error occurred while sending an e-mail to %s. %(error.contactSupportMessage)s
 error.database = An error occurred while running a database query. %(error.contactSupportMessage)s
+error.template = An error occurred while loading a page component. %(error.contactSupportMessage)s
+error.typeConversion = There was an invalid data conversion. %(error.contactSupportMessage)s
+error.sessionInvalid = Session no longer active.
+
+# -------------------------------------------------------------------------------------------------- #
+# E-mails
+# -------------------------------------------------------------------------------------------------- #
+
+mails.subject_enrollmentConfirmation = Welcome to '%s'
+mails.subject_enrollmentToWaitlist = Information about your enrollment in '%s'
+mails.subject_participantUnsubscribed = A participant unsubscribed from '%s'
+mails.subject_manualToWaitlist = Manual enrollment to the waitlist of '%s'
+mails.subject_manualRemoval = Your were manually unsubscribed from '%s'
+mails.subject_newPw = Your new password for TurmII
+mails.subject_activationCode = Welcome at TurmII - Your activation code
+mails.subject_newRole = Information about your new user role
+mails.subject_statusChange = Please note your payment status change for %s
+mails.subject_courseDeletion = Please notice the deletion of the course %s
+mails.subject_groupCreationRequest = GroupCreationRequest
+mails.subject_courseEdited = New information about one of your courses
+
+mails.doNotReply = 	Please do not reply. <%s>
+mails.subject = Subject
+
+mails.custom_numberMeetings = Number of meetings
+mails.custom_creatorMail = E-mail address of course creator
+mails.custom_courseURL = URL to course
 
 # -------------------------------------------------------------------------------------------------- #
 # User
 # -------------------------------------------------------------------------------------------------- #
 
+user.role = Role
+user.role_user = User
+user.role_leader = Instructor
+user.role_leaders = Instructors
+user.role_leaderOf = Instructor of
+user.role_leadersNone = No instructors
+user.role_creator = Creator
+user.role_creatorOf = Creator of
+user.role_creatorID = Creator ID
+user.role_admin = Admin
+user.role_statusManager = Status administrator
+user.role_noLongerStatusManager = No longer status administrator
+
 user.ldap = University account
 user.external = External account
+user.matr = Matriculation number
+user.noMatr = Does not exist
+
+user.affiliation_staff = Staff
+user.affiliation_student = Student
+user.affiliation_function = Function
+user.affiliationAndMatr = Affiliation, matriculation number
+
+user.degree = Degree
+user.semester = Semester
+user.courseOfStudies = Course of Studies
+user.noCourseOfStudies = No course of studies
+
+user.salutation = Salutation
+user.salutation_female = Ms
+user.salutation_male = Mr
+user.salutation_neutral = No form of address
+
+user.firstname = First name
+user.lastname = Last name
 user.email = E-mail
 user.username = Username
 user.password = Password
+user.registrationDate = Date of registration
+
+user.participant = Participant
+user.academictitle = Academic title
+user.title = Titel
+user.nameaffix = Name affix
+
+# -------------------------------------------------------------------------------------------------- #
+# Course
+# -------------------------------------------------------------------------------------------------- #
+
+course.tabName = Course View
+course.pageName = Course navigation
+course.pageTitle = Course
+
+course.goto = Go to course
+course.notActive = This course no longer exists.
+course.notPublic = You must sign in to view this course.
+course.noneSelected = No course selected! Select a course at the group navigation or search for a course.
+course.generalInformation = General course info
+course.doesNotExist = This course does not exist.
+
+course.id = Course ID
+course.title = Course title
+course.title_spaceValidation = Course names cannot start or end with spaces.
+course.subtitle = Subtitle
+course.description = Course description
+course.fee = Fee
+
+course.restrictions_show = Show detailed enrollment restrictions
+course.restrictions_collapse = Requirements
+course.restrictions_whitelistExists = A whitelist exists.
+course.restrictions_blacklistExists = A blacklist exists.
+course.restrictions_audience = Audience
+course.restrictions_none = There are no enrollment restrictions for this course.
+course.restrictions_minimumSemester = Minimum semester
+course.restrictions_all = All
+course.restrictions_ldapOnly = University account only
+course.restrictions_regardingStuidies = Enrollment restrictions regarding degree/course of study/semester
+course.restrictions_inSubgroup = This course is contained in the group %s.
+course.restrictions_maxX = In this group, you can enroll in a maximum of %d courses.
+
+course.restrictions_info = This course has enrollment restrictions
+
+course.events = Events
+course.event = Event
+course.events_description = Description
+
+course.events_compactView = Compact event layout
+course.events_collapseEvents = Collapse events
+course.events_hide = Fold event
+course.events_collapse = Collapse meeting and enrollment information
+
+course.events_info = A course can have a multitude of events. You can enroll in these events.
+
+course.meeting = Meeting
+course.meeting_timestamp = Time
+course.meeting_place = Place
+course.meeting_day = Day
+course.meeting_annotation = Annotation
+course.meeting_none = This event does not have any meetings.
+course.meeting_everyWeek = Every week
+course.meeting_evenWeeks = Even weeks
+course.meeting_oddWeeks = Odd weeks
+course.meeting_mondays = On Mondays
+course.meeting_tuesdays = On Tuesdays
+course.meeting_wednesdays = On Wednesdays
+course.meeting_thursdays = On Thursdays
+course.meeting_fridays = On Fridays
+course.meeting_saturdays = On Saturdays
+course.meeting_sundays = On Sundays
+course.meeting_datePrefix = At the
+
+course.enrollment_numberEnrolledUsers = Number of enrolled users
+course.enrollment_goto = Go to enrollment
+course.enrollment_period = Enrollment period
+course.enrollment_start = Start of enrollment period
+course.enrollment_end = End of enrollment period
+course.enrollment_expiration = Expiration date
+course.enrollment_from = From
+course.enrollment_to = to
+course.enrollment_clock =
+course.enrollment_unsubscribeUntil = Unsubscribe until
+course.enrollment_key = Enrollment key
+
+course.enrollment_startDate_missing = Please enter an enrollment period start date.
+course.enrollment_startTime_missing = Please enter an enrollment period start time.
+course.enrollment_endDate_missing = Please enter an enrollment period end date.
+course.enrollment_endTime_missing = Please enter an enrollment period start time.
+
+course.enrollment_periodAfterCurrentTime = Please make sure that the enrollment period is not earlier than the current time.
+course.enrollment_startBeforeEnd = Please make sure that the enrollment period start is before its end.
+
+# -------------------------------------------------------------------------------------------------- #
+# Enrollment
+# -------------------------------------------------------------------------------------------------- #
+
+enrollment.enroll = Enroll
+enrollment.enrolledIn = Enrolled in
+enrollment.unsubscribe = Unsubscribe
+enrollment.enrollToWaitlist = Enroll to waitlist
+enrollment.setPriority = Set priority
+
+enrollment.status = Status
+enrollment.status_enrolled = Enrolled
+enrollment.status_onwaitlist = At waitlist
+enrollment.status_paid = paid
+enrollment.status_freed = freed
+enrollment.status_awaitingpayment = awaiting payment
+
+enrollment.feedbackModalTitle = Enrollment status
+enrollment.notSatisfyRestrictions = You do not satisfy this course's enrollment restrictions. <br> Please make sure that all information about your course of study (if such a course exists) at the profile page is up-to-date.
+enrollment.alreadyInOtherEvent = You already enrolled in (an)other event(s) of this course.
+enrollment.atBlacklist = You are at the blacklist of this course.
+enrollment.eventIsFull = This event is already full.
+enrollment.noEnrollmentPeriod = You can only enroll during the enrollment period.
+enrollment.noUnsubscribePeriod = You cannot unsubscribe from this course any longer.
+enrollment.noUnsubscribePeriodShort = Unsubscribe period ended
+enrollment.wrongEnrollmentKey = Incorrect enrollment key.
+enrollment.useNormalEnroll = Please use the normal enrollment function, not the priority enrollment function.
+enrollment.signInFirst = Please sign in to enroll in events.
+enrollment.reachedMaxEnrollCourses = You already enrolled in the maximum number of courses in this group.
+
+enrollment.onlyXEvents_info = You can only enroll in %d event(s) of this course.
+enrollment.toWaitlist_info = %(enrollment.eventIsFull)s If you enroll anyways, you will be placed at the waitlist.
+enrollment.waitlistExists_info = A waitlist exists.
+enrollment.noWaitlist_info = This event does not have a waitlist.
+enrollment.onlyLdap_info = Only users with an university account can enroll.
+
+enrollment.confirmation_success = Enrollment successful.
+enrollment.unsubscribe_success = You successfully unsubscribed.
+enrollment.toWaitlist_success = You are now at the waitlist of this event.
+
+enrollment.failed_danger = Enrollment failed.
+enrollment.manualEnrollmentFailed_danger = The enrollment failed because the respective user account has not yet been activated.
+enrollment.userAlreadyPaid_danger = If a user already paid for an event, that user cannot be moved to the waitlist or unsubscribed.
+enrollment.userIsFirstAtWaitlist_danger = If this user is moved to the waitlist, he will be enrolled again automatically. That is because he will have the earliest enrollment time.
+enrollment.courseTooEmpty_danger = You can only move a user to the waitlist if the event is full.
+
+enrollment.prioritySystem = Priority system
+
+enrollment.prioritySystem_priority1 = Priority 1
+enrollment.prioritySystem_priority2 = Priority 2
+enrollment.prioritySystem_priority3 = Priority 3
+enrollment.prioritySystem_chosenPriority = Chosen priority
+enrollment.prioritySystem_changePriorities = Change priorities
+
+enrollment.prioritySystem_info = A priority system comprises events from different courses. Users can assign priorities to these events. At the end of the enrollment period they will be enrolled according to these priorities.
+enrollment.prioritySystem_changeAtProfile_info = Priorities can be changed at the profile page.
+enrollment.prioritySystem_setPriority_info = Here, you can set a priority for this event. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_alreadySetPriority_info = You already chose priority %s for this event. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_allPrioritiesSet_info = You already used up all priorities. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_course_info = This course is part of a priority system. That means instead of enrolling in an event you have to set a priority between 1 - 3 for that event. At the end of the enrollment period you are automatically enrolled into one of the events of the priority system.
+
+enrollment.prioritySystem_setPriority_success = You set priority %s for this event.
+
+enrollment.prioritySystem_noCourseOfStudy_danger = You must be enrolled in a course of study in order to enroll in a priority system.
+enrollment.prioritySystem_usePriorityEnrollment_danger = Please use the priority enrollment function to enroll in an event of a priority system.
+enrollment.prioritySystem_alreadySetPriority_danger = Priority already in use. %(enrollment.prioritySystem_changeAtProfile_info)s
 
 # -------------------------------------------------------------------------------------------------- #
 # Search (for something, e.g. users)
 # -------------------------------------------------------------------------------------------------- #
 
-search.course = Search course
+search.button = Search
+search.results = Search Results
+search.enterValue = Enter search value
+search.showResults = Go to the search results
+search.course = Search for a course
+
+search.user = Search for user
+
+search.limitedToTen_info = Search results are restricted to a maximum of ten results. If your result is missing, please refine your search value.
+search.userSearchCriteria_info = Search criteria are: last name, first name, e-mail-address, matriculation number (only entire numbers)
+search.userSearchCriteriaShort_info = Last name, first name, e-mail-address, matriculation number (entire number)
+search.noResults_info = No search results
+
+search.moreCharactersRequired_warning = Please enter more characters.
+
+# -------------------------------------------------------------------------------------------------- #
+# Group Tree
+# -------------------------------------------------------------------------------------------------- #
+
+groups.title = Groups
+groups.goto = Go to the group navigation
+groups.prioritySystemBadge = Prio System
+
+groups.noChildren_info = This group does not have any subgroups.
+groups.enrollInMax_info = You can enroll in a maximum of %d course(s) in this group and its subgroups.
+
+# -------------------------------------------------------------------------------------------------- #
+# Enums
+# -------------------------------------------------------------------------------------------------- #
+
+# used in controllers/private_functions.go
+enum.January = January
+enum.February = February
+enum.March = March
+enum.April = April
+enum.May = May
+enum.June = June
+enum.July = July
+enum.August = August
+enum.September = September
+enum.October = October
+enum.November = November
+enum.December = December

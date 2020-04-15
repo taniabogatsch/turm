@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------- #
-# This message file contains all English messages that are specific to certain categories.
+# This message file contains all German messages that are specific to certain categories.
 #
 # Formatting Information:
 # - [category].[content], where category is the category that the message is related to
@@ -11,8 +11,13 @@
 #
 # Categories contained in this file are:
 # - General Errors
+# - E-Mails
 # - User
+# - Course
+# - Enrollment
 # - Search
+# - Groups Tree
+# - Enums
 # -------------------------------------------------------------------------------------------------- #
 
 # -------------------------------------------------------------------------------------------------- #
@@ -20,20 +25,286 @@
 # -------------------------------------------------------------------------------------------------- #
 
 error.contactSupportMessage = Bitte kontaktieren Sie den Support.
+
+error.general = Es ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.dataTransfer = Beim Übertragen Ihrer Daten ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.sendingMail = Beim Senden einer E-Mail an %s ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.database = Beim Ausführen einer Datenbankanfrage ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.template = Beim Laden einer Komponente der Seite ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.typeConversion = Es wurden ungültige Daten konvertiert. %(error.contactSupportMessage)s
+error.sessionInvalid = Sitzung nicht länger aktiv.
+
+# -------------------------------------------------------------------------------------------------- #
+# E-mails
+# -------------------------------------------------------------------------------------------------- #
+
+mails.subject_enrollmentConfirmation = Willkommen im Kurs '%s'
+mails.subject_enrollmentToWaitlist = Information zu Ihrer Einschreibung in '%s'
+mails.subject_participantUnsubscribed = Abmeldung eines Teilnehmers aus '%s'
+mails.subject_manualToWaitlist = Manuelles Einschreiben auf die Warteliste von '%s'
+mails.subject_manualRemoval = Manuelles Austragen aus '%s'
+mails.subject_newPw = Ihr neues TurmII Passwort
+mails.subject_activationCode = Willkommen bei TurmII - Ihr Aktivierungscode
+mails.subject_newRole = Information zu Ihrer neuen Nutzerrolle
+mails.subject_statusChange = Information zu Ihrem neuen Bezahlstatus in %s
+mails.subject_courseDeletion = Information zum gelöschten Kurs %s
+mails.subject_groupCreationRequest = AnfrageGruppenerstellung
+mails.subject_courseEdited = Neue Informationen zu einem Ihrer Kurse
+
+mails.doNotReply = 	Please do not reply. <%s>
+# TODO: Change text to: "Antworten Sie nicht auf diese E-Mail. <%s>" as soon as users can set a default language
+mails.subject = Betreff
+
+mails.custom_numberMeetings = Anzahl der Termine
+mails.custom_creatorMail = E-Mail-Adresse KurserstellerIn
+mails.custom_courseURL = URL zum Kurs
 
 # -------------------------------------------------------------------------------------------------- #
 # User
 # -------------------------------------------------------------------------------------------------- #
 
+user.role = Rolle
+user.role_user = NutzerIn
+user.role_leader = OrganisatorIn
+user.role_leaders = OrganisatorInnen
+user.role_leaderOf = OrganisatorIn von
+user.role_leadersNone = Keine OrganisatorInnen
+user.role_creator = KursverantwortlicheR
+user.role_creatorOf = KursverantwortlicheR von
+user.role_creatorID = KursverantwortlicheR ID
+user.role_admin = Admin
+user.role_statusManager = StatusverwalterIn
+user.role_noLongerStatusManager = KeinE StatusverwalterIn
+
 user.ldap = Uni Account
 user.external = Externer Account
+user.matr = Matrikelnummer
+user.noMatr = Nicht vorhanden
+
+user.affiliation_staff = MitarbeiterIn
+user.affiliation_student = StudentIn
+user.affiliation_function = Funktion
+user.affiliationAndMatr = Zugehörigkeit, Matrikelnummer
+
+user.degree = Abschluss
+user.semester = Semester
+user.courseOfStudies = Studiengang
+user.noCourseOfStudies = Kein Studiengang
+
+user.salutation = Anrede
+user.salutation_female = Frau
+user.salutation_male = Herr
+user.salutation_neutral = Keine Anrede
+
+user.firstname = Vorname
+user.lastname = Nachname
 user.email = E-Mail
 user.username = Benutzername
 user.password = Passwort
+user.registrationDate = Registrierungsdatum
+
+user.participant = TeilnehmerIn
+user.academictitle = Akademischer Titel
+user.title = Titel
+user.nameaffix = Namenszusatz
+
+# -------------------------------------------------------------------------------------------------- #
+# Course
+# -------------------------------------------------------------------------------------------------- #
+
+course.tabName = Kursansicht
+course.pageName = Kursnavigation
+course.pageTitle = Kurs
+
+course.goto = Zum Kurs
+course.notActive = Dieser Kurs existiert nicht länger.
+course.notPublic = Sie müssen sich anmelden, um diesen Kurs zu sehen.
+course.noneSelected = Kein Kurs ausgewählt! Wählen Sie über die Gruppennavigation einen Kurs aus oder verwenden Sie die Kurssuche.
+course.generalInformation = Allgemeine Kursinfos
+course.doesNotExist = Dieser Kurs existiert nicht.
+
+course.id = Kurs ID
+course.title = Kurstitel
+course.title_spaceValidation = Kurstitel dürfen weder mit Leerzeichen anfangen noch enden.
+course.subtitle = Untertitel
+course.description = Kursbeschreibung
+course.fee = Teilnahmegebühr
+
+course.restrictions_show = Detaillierte Einschreibebeschränkungen anzeigen
+course.restrictions_collapse = Voraussetzungen
+course.restrictions_whitelistExists = Es existiert eine Whitelist.
+course.restrictions_blacklistExists = Es existiert eine Blacklist.
+course.restrictions_audience = Zielgruppe
+course.restrictions_none = Für diesen Kurs liegen keine Einschreibebeschränkungen vor.
+course.restrictions_minimumSemester = Mindestsemester
+course.restrictions_all = Alle
+course.restrictions_ldapOnly = Nur für NutzerInnen mit Universitätsaccount
+course.restrictions_regardingStuidies = Einschreibebeschränkungen bezüglich Abschluss/Studiengang/Semester
+course.restrictions_inSubgroup = Dieser Kurs befindet sich in der Gruppe %s.
+course.restrictions_maxX = In dieser Gruppe können Sie sich in maximal %d Kurs(e) einschreiben.
+
+course.restrictions_info =  Für diesen Kurs gelten Einschreibebeschränkungen
+
+course.events = Veranstaltungen
+course.event = Veranstaltung
+course.events_description = Beschreibung
+
+course.events_compactView = Kompakte Ansicht
+course.events_collapseEvents = Veranstaltungen ausklappen
+course.events_hide = Veranstaltung einklappen
+course.events_collapse = Termin- und Einschreibeinformationen ausklappen
+
+course.events_info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
+
+course.meeting = Termin
+course.meeting_timestamp = Zeitpunkt
+course.meeting_place = Ort
+course.meeting_day = Tag
+course.meeting_annotation = Anmerkung
+course.meeting_none = Diese Veranstaltung besitzt keine Termine.
+course.meeting_everyWeek = Jede Woche
+course.meeting_evenWeeks = Gerade Wochen
+course.meeting_oddWeeks = Ungerade Wochen
+course.meeting_mondays = Montags
+course.meeting_tuesdays = Dienstags
+course.meeting_wednesdays = Mittwochs
+course.meeting_thursdays = Donnerstags
+course.meeting_fridays = Freitags
+course.meeting_saturdays = Samstags
+course.meeting_sundays = Sonntags
+course.meeting_datePrefix = Am
+
+course.enrollment_numberEnrolledUsers = Anzahl eingeschriebener NutzerInnen
+course.enrollment_goto = Zur Einschreibung
+course.enrollment_period = Einschreibezeitraum
+course.enrollment_start = Anfang Einschreibezeitraum
+course.enrollment_end = Ende Einschreibezeitraum
+course.enrollment_expiration = Ablaufdatum
+course.enrollment_from = Von
+course.enrollment_to = bis
+course.enrollment_clock = Uhr
+course.enrollment_unsubscribeUntil = Austragen bis
+course.enrollment_key = Einschreibeschlüssel
+
+course.enrollment_startDate_missing = Bitte geben Sie das Datum an, an dem der Einschreibezeitraum beginnen soll.
+course.enrollment_startTime_missing = Bitte geben Sie die Zeit an, zu der der Einschreibezeitraum beginnen soll.
+course.enrollment_endDate_missing = Bitte geben Sie das Datum an, an dem der Einschreibezeitraum enden soll.
+course.enrollment_endTime_missing = Bitte geben Sie die Zeit an, zu der der Einschreibezeitraum enden soll.
+
+course.enrollment_periodAfterCurrentTime = Der Anfang des Einschreibezeitraums darf nicht vor der aktuellen Zeit liegen.
+course.enrollment_startBeforeEnd = Der Anfang des Einschreibezeitraums muss vor dessen Ende liegen.
+
+# -------------------------------------------------------------------------------------------------- #
+# Enrollment
+# -------------------------------------------------------------------------------------------------- #
+
+enrollment.enroll = Einschreiben
+enrollment.enrolledIn = Eingeschrieben in
+enrollment.unsubscribe = Austragen
+enrollment.enrollToWaitlist = Auf Warteliste
+enrollment.setPriority = Priorität setzen
+
+enrollment.status = Status
+enrollment.status_enrolled = Eingeschrieben
+enrollment.status_onwaitlist = Auf der Warteliste
+enrollment.status_paid = bezahlt
+enrollment.status_freed = befreit
+enrollment.status_awaitingpayment = Bezahlung ausstehend
+
+enrollment.feedbackModalTitle = Einschreibestatus
+enrollment.notSatisfyRestrictions = Sie erfüllen die Einschreibebeschränkungen dieses Kurses nicht. <br> Prüfen Sie bitte, ob die Angaben zu Ihrem Studiengang (insofern vorhanden) auf der Profilseite aktualisiert werden müssen.
+enrollment.alreadyInOtherEvent = Sie sind bereits in eine/mehrere andere Veranstaltung(en) dieses Kurses eingeschrieben.
+enrollment.atBlacklist = Sie sind auf der Blacklist dieses Kurses.
+enrollment.eventIsFull = Diese Veranstaltung ist bereits voll.
+enrollment.noEnrollmentPeriod = Sie können sich nur während des Einschreibezeitraums einschreiben.
+enrollment.noUnsubscribePeriod = Der Austragezeitraum dieses Kurses ist bereits abgelaufen.
+enrollment.noUnsubscribePeriodShort = Austragezeitraum abgelaufen
+enrollment.wrongEnrollmentKey = Der angegebene Einschreibeschlüssel ist falsch.
+enrollment.useNormalEnroll = Bitte verwenden Sie die reguläre Einschreibefunktion, nicht die Prioritätseinschreibung.
+enrollment.signInFirst = Sie müssen angemeldet sein, um sich in Veranstaltungen einzuschreiben.
+enrollment.reachedMaxEnrollCourses = Sie haben sich bereits in die maximale Anzahl an Kursen in dieser Gruppe eingeschrieben.
+
+enrollment.onlyXEvents_info = Sie können sich nur in %d Veranstaltung(en) dieses Kurses einschreiben.
+enrollment.toWaitlist_info = %(enrollment.eventIsFull)s Wenn Sie sich dennoch einschreiben, so werden Sie auf die Warteliste gesetzt.
+enrollment.waitlistExists_info = Warteliste vorhanden.
+enrollment.noWaitlist_info = Keine Warteliste vorhanden.
+enrollment.onlyLdap_info = Das Einschreiben ist nur für Nutzer mit Universitätsaccount möglich.
+
+enrollment.confirmation_success = Einschreibung erfolgreich.
+enrollment.unsubscribe_success = Erfolgreich ausgetragen.
+enrollment.toWaitlist_success = Sie befinden sich nun auf der Warteliste dieser Veranstaltung.
+
+enrollment.failed_danger = Einschreibung fehlgeschlagen.
+enrollment.manualEnrollmentFailed_danger = Die Einschreibung ist fehlgeschlagen, da es sich um einen noch nicht aktivierten Account handelt.
+enrollment.userAlreadyPaid_danger = Nutzer, die bereits bezahlt haben, können nicht auf die Warteliste gesetzt oder ausgetragen werden.
+enrollment.userIsFirstAtWaitlist_danger = Wenn Sie dieseN NutzerIn auf die Warteliste verschieben, so wird sie/er automatisch wieder in die Veranstaltung eingeschrieben. Das liegt daran, dass die/der NutzerIn den frühsten Einschreibezeitpunkt besitzen wird.
+enrollment.courseTooEmpty_danger = NutzerInnen können nur auf die Warteliste verschoben werden, wenn die Veranstaltung keine freien Plätze mehr hat.
+
+enrollment.prioritySystem = Prioritätensystem
+
+enrollment.prioritySystem_priority1 = Priorität 1
+enrollment.prioritySystem_priority2 = Priorität 2
+enrollment.prioritySystem_priority3 = Priorität 3
+enrollment.prioritySystem_chosenPriority = Gewählte Priorität
+enrollment.prioritySystem_changePriorities = Prioritäten ändern
+
+enrollment.prioritySystem_info = Ein Prioritätensystem umfasst Veranstaltungen in verschiedenen Kursen. Für diese Veranstaltungen können die Prioritäten 1 bis 3 vergeben werden. Am Ende des Einschreibezeitraums werden Nutzer dann entsprechend dieser Prioritäten eingeschrieben.
+enrollment.prioritySystem_changeAtProfile_info = Prioritäten können im Profil eingesehen oder geändert werden.
+enrollment.prioritySystem_setPriority_info = Hier können Sie eine Priorität für diese Veranstaltung setzen. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_alreadySetPriority_info = Sie haben für diese Veranstaltung bereits die Priorität %d vergeben. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_allPrioritiesSet_info = Sie haben bereits alle möglichen Prioritäten vergeben. %(enrollment.prioritySystem_changeAtProfile_info)s
+enrollment.prioritySystem_course_info = Dieser Kurs ist Teil eines Prioritätensystems. D.h., dass Sie sich nicht direkt in eine Veranstaltung einschreiben, sondern die Prioritäten 1 - 3 vergeben. Am Ende des Einschreibezeitraums werden die Plätze in den Veranstaltungen dann nach Priorität vergeben.
+
+enrollment.prioritySystem_setPriority_success = Sie haben die Priorität %s für diese Veranstaltung vergeben.
+
+enrollment.prioritySystem_noCourseOfStudy_danger = Sie müssen in einem Studiengang immatrikuliert sein, um sich in ein Prioritätensystem einzuschreiben.
+enrollment.prioritySystem_usePriorityEnrollment_danger = Bitte verwenden Sie nicht die normale Einschreibefunktion, um sich in ein Prioritätensystem einzuschreiben.
+enrollment.prioritySystem_alreadySetPriority_danger = Diese Priorität verwenden Sie bereits an anderer Stelle. %(enrollment.prioritySystem_changeAtProfile_info)s
 
 # -------------------------------------------------------------------------------------------------- #
 # Search (for something, e.g. users)
 # -------------------------------------------------------------------------------------------------- #
 
-search.course = Kurs suchen
+search.button = Suchen
+search.results = Suchergebnisse
+search.enterValue = Suchwert eingeben
+search.showResults = Zu den Suchergebnissen
+search.course = Nach Kurs suchen
+
+search.user = Nach NutzerIn suchen
+
+search.limitedToTen_info = Suchergebnisse sind auf maximal 10 Ergebnisse beschränkt. Sollte Ihre Suchergebnis fehlen, so verfeinern Sie bitte den Suchwert.
+search.userSearchCriteria_info = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur komplette Nummern)
+search.userSearchCriteriaShort_info = Name, Vorname, E-Mail-Adresse, Matrikelnummer (komplette Nummern)
+search.noResults_info = Keine Suchergebnisse
+
+search.moreCharactersRequired_warning = Bitte geben Sie mehr Buchstaben ein.
+
+# -------------------------------------------------------------------------------------------------- #
+# Groups Tree
+# -------------------------------------------------------------------------------------------------- #
+
+groups.title = Gruppen
+groups.goto = Zur Gruppennavigation
+groups.prioritySystemBadge = Priosystem
+
+groups.noChildren_info = Diese Gruppe besitzt keine Untergruppen.
+groups.enrollInMax_info = Sie können sich in maximal %d Kurs(e) innerhalb dieser Gruppe und deren Untergruppen einschreiben.
+
+# -------------------------------------------------------------------------------------------------- #
+# Enums
+# -------------------------------------------------------------------------------------------------- #
+
+# used in controllers/details.go
+enum.January = Januar
+enum.February = Februar
+enum.March = März
+enum.April = April
+enum.May = Mai
+enum.June = Juni
+enum.July = Juli
+enum.August = August
+enum.September = September
+enum.October = Oktober
+enum.November = November
+enum.December = Dezember
