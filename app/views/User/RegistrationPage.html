@@ -16,9 +16,20 @@
     <br>
 
     <div class="login-width">
-      
+
       <!-- registration form -->
       <form accept-charset="UTF-8" action='{{url "User.Registration"}}' method="POST" class="needs-validation" novalidate>
+
+        <div class="col login-width-tab">
+          <small class="form-text text-muted">
+            {{msg $ "prefLang.short_info"}}
+          </small>
+          <select name="user.Language.String" class="form-control">
+            {{range $key, $language := .languages}}
+              <option value="{{$language}}" {{if eq $.currentLocale $language}}selected="selected"{{end}}> {{$language}} </option>
+            {{end}}
+          </select>
+        </div>
 
         {{with $salutation := field "user.Salutation" .}}
           <div class="col login-width-tab">
@@ -85,9 +96,9 @@
               {{template "Icons/Lock.html" .}}
             </span>
           </div>
-          <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
+          <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511" minlength="6">
           <div class="invalid-feedback">
-            {{msg $ "validation.invalid.password"}}
+            {{msg $ "validation.min.password"}}
           </div>
         </div>
 
@@ -97,9 +108,9 @@
               {{template "Icons/Lock.html" .}}
             </span>
           </div>
-          <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeatpw"}}' required maxlength="511">
+          <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeatpw"}}' required maxlength="511" minlength="6">
           <div class="invalid-feedback">
-            {{msg $ "validation.invalid.password"}}
+            {{msg $ "validation.min.password"}}
           </div>
         </div>
 

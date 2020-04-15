@@ -133,10 +133,12 @@
   const username = $("#username-flash").html();
   if (username != "") {
     $("#input-user").attr("value", username);
+    $("#ldap").click();
   }
   const email = $("#email-flash").html();
   if (email != "") {
     $("#input-user").attr("value", email);
+    $("#external").click();
   }
   const stayLoggedIn = $("#stayLoggedIn-flash").html();
   if (email != "" || username != "") {

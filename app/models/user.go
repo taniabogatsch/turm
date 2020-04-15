@@ -44,14 +44,15 @@ func (u Role) String() string {
 
 /*User contains all directly user related values. */
 type User struct {
-	ID         int        `db:"id, primarykey, autoincrement"`
-	LastName   string     `db:"lastname"`
-	FirstName  string     `db:"firstname"`
-	EMail      string     `db:"email, unique"`
-	Salutation Salutation `db:"salutation"`
-	Role       Role       `db:"role"`
-	LastLogin  string     `db:"lastlogin"`
-	FirstLogin string     `db:"firstlogin"`
+	ID         int            `db:"id, primarykey, autoincrement"`
+	LastName   string         `db:"lastname"`
+	FirstName  string         `db:"firstname"`
+	EMail      string         `db:"email, unique"`
+	Salutation Salutation     `db:"salutation"`
+	Role       Role           `db:"role"`
+	LastLogin  string         `db:"lastlogin"`
+	FirstLogin string         `db:"firstlogin"`
+	Language   sql.NullString `db:"language"`
 
 	//ldap user fields
 	MatrNr        sql.NullInt32  `db:"matrnr, unique"`
@@ -75,11 +76,13 @@ func (user *User) ValidateUser(v *revel.Validation) {
 	v.Required(user.EMail).MessageKey("validation.missing.email")
 	v.Required(user.Password.String).MessageKey("validation.missing.password")
 	v.Required(user.PasswordRepeat).MessageKey("validation.missing.passwordRepeat")
+	v.Required(user.Language).MessageKey("validation.missing.prefLanguage")
 
 	v.MaxSize(user.LastName, 255).MessageKey("validation.max.lastname")
 	v.MaxSize(user.FirstName, 255).MessageKey("validation.max.firstname")
 	v.MaxSize(user.EMail, 255).MessageKey("validation.max.email")
 	v.MaxSize(user.Password.String, 511).MessageKey("validation.max.password")
+	v.MinSize(user.Password.String, 6).MessageKey("validation.min.password")
 
 	v.Email(user.EMail).MessageKey("validation.invalid.email")
 	v.Required(user.Password.String == user.PasswordRepeat).MessageKey("validation.invalid.password")
@@ -96,6 +99,9 @@ func (user *User) ValidateUser(v *revel.Validation) {
 
 	isLDAPMail := !strings.Contains(user.EMail, app.EMailSuffix)
 	v.Required(isLDAPMail).MessageKey("validation.email.ldap")
+
+	v.Check(user.Language.String, LanguageValidator{}).MessageKey("validation.invalid.language")
+	user.Language.Valid = true
 }
 
 /*Studies contains all data about the course of study of an user. */

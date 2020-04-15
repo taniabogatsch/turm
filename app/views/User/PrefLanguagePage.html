@@ -1,0 +1,49 @@
+<!-- the preferred language page prompts the user to enter his preferred language -->
+
+<!-- set title and header -->
+{{set . "title" .tabName}}
+{{template "header.html" .}}
+
+<div class="page page-side page-side-left">
+  <br class="mobile-hidden">
+</div>
+
+<div class="page page-middle">
+  <center>
+    <h3>
+      {{msg $ "prefLang.title"}}
+    </h3>
+    <br>
+    <div class="login-width">
+
+      <!-- set preferred language form -->
+      <form accept-charset="UTF-8" action='{{url "User.SetPrefLanguage"}}' method="POST" class="needs-validation" novalidate>
+
+        <div class="col login-width-tab">
+          <small class="form-text text-muted">
+            {{msg $ "prefLang.info"}}
+          </small>
+          <br>
+          <select name="prefLanguage" class="form-control">
+            {{range $key, $language := .languages}}
+              <option value="{{$language}}" {{if eq $.currentLocale $language}}selected="selected"{{end}}> {{$language}} </option>
+            {{end}}
+          </select>
+        </div>
+        <br>
+
+        <!-- button to confirm preferred language -->
+        <button class="btn btn-darkblue" type="submit">
+          Save
+        </button>
+      </form>
+    </div>
+
+  </center>
+</div>
+
+<div class="page page-side page-side-right">
+  <br class="mobile-hidden">
+</div>
+
+{{template "footer.html" .}}

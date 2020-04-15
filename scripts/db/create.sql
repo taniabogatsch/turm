@@ -10,6 +10,7 @@ CREATE TABLE users (
   role            integer                   NOT NULL,
   lastlogin       timestamp with time zone  NOT NULL,
   firstlogin      timestamp with time zone  NOT NULL,
+  language        varchar(63),
   matrnr          integer                   UNIQUE,
   affiliations    varchar(127)[],
   academictitle   varchar(127),

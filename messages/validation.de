@@ -14,6 +14,7 @@ validation.missing.email = Bitte geben Sie Ihre E-Mail-Adresse an.
 validation.missing.password = Bitte geben Sie Ihr Passwort an.
 validation.missing.passwordRepeat = Bitte geben Sie Ihr Passwort ein zweites Mal an.
 validation.missing.username = Bitte geben Sie Ihren Nutzernamen (Universitätsaccount) oder Ihre E-Mail-Adresse (externer Account) an.
+validation.missing.language = Bitte geben Sie eine bevorzugte Sprache an.
 
 validation.max.lastname = Ihr Nachname darf maximal 255 Zeichen lang sein.
 validation.max.firstname = Ihr Vorname darf maximal 255 Zeichen lang sein.
@@ -21,11 +22,14 @@ validation.max.email = Ihre E-Mail-Adresse darf maximal 255 Zeichen lang sein.
 validation.max.password = Ihr Passwort darf maximal 511 Zeichen lang sein.
 validation.max.username = Ihr Nutzername darf maximal 255 Zeichen lang sein.
 
+validation.min.password = Ihr Passwort muss mindestens 6 Zeichen lang sein.
+
 validation.invalid.salutation = Bitte geben Sie eine gültige Anrede an.
 validation.invalid.email = Bitte geben Sie eine gültige E-Mail-Adresse an.
 validation.invalid.username = Bitte geben Sie einen gültigen Nutzernamen an.
 validation.invalid.password = Ihre Passwörter stimmen nicht überein.
 validation.invalid.credentials = Bitte geben Sie entweder Ihren Nutzernamen oder Ihre E-Mail-Addresse an.
+validation.invalid.login = Anmeldung fehlgeschlagen. Bitte überprüfen Sie die eingegebene E-Mail-Addresse und das Passwort.
 
 validation.email.notUnique = Die eingegebene E-Mail-Adresse ist bereits in Verwendung. Bitte lassen Sie sich ein neues Passwort zusenden oder verwenden Sie eine andere E-Mail-Adresse.
 validation.email.ldap = Bei der angegebenen E-Mail-Adresse handelt es sich um eine Universitäts-E-Mail-Adresse. Bitte verwenden Sie den Universitätslogin.

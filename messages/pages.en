@@ -68,7 +68,7 @@ admin.stats_coursesSortCriteria = Courses are sorted by the start of their enrol
 admin.stats_coursesNoneActive = No active courses
 
 # -------------------------------------------------------------------------------------------------- #
-# Login, Register, Password forgotten, Activation, Logout
+# Login, Register, Password forgotten, Activation, Logout, Preferred Language
 # -------------------------------------------------------------------------------------------------- #
 
 login.tabName = Login
@@ -138,6 +138,11 @@ activation.accountAlreadyActive_danger = The external account with the e-mail ad
 logout.button = Log out
 logout.success = Log out successful.
 logout.loggedOut = You are not logged in.
+
+prefLang.tabName = Set language
+prefLang.title = Set preferred language
+prefLang.info = E-mail language. Can be changed at the profile page.
+prefLang.short_info = E-mail language
 
 # -------------------------------------------------------------------------------------------------- #
 # Index

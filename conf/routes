@@ -17,6 +17,8 @@ GET     /User/RegistrationPage                  User.RegistrationPage
 POST    /User/Registration                      User.Registration
 GET     /User/NewPasswordPage                   User.NewPasswordPage
 GET     /User/ActivationPage                    User.ActivationPage
+GET     /User/PrefLanguagePage                  User.PrefLanguagePage
+POST    /User/SetPrefLanguage                   User.SetPrefLanguage
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

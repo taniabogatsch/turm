@@ -1,7 +1,9 @@
 package database
 
 import (
+	"database/sql"
 	"math/rand"
+	"strconv"
 	"time"
 	"turm/app"
 	"turm/app/models"
@@ -44,8 +46,11 @@ func Login(user *models.User) (err error) {
 
 		err = app.Db.Get(user, stmtLoginExtern, now, user.EMail, user.Password)
 		if err != nil {
-			revel.AppLog.Error("failed to update external user", "user", user, "error", err.Error())
-			return
+			if err != sql.ErrNoRows {
+				revel.AppLog.Error("failed to update external user", "user", user, "error", err.Error())
+				return
+			}
+			err = nil
 		}
 	}
 
@@ -63,11 +68,28 @@ func Register(user *models.User) (err error) {
 	now := time.Now().Format("2006-01-02 15:04:05")
 
 	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
-		user.Salutation, now, now, user.Password, user.ActivationCode)
+		user.Salutation, now, now, user.Password, user.ActivationCode, user.Language)
 	if err != nil {
 		revel.AppLog.Error("failed to register external user", "user", user, "error", err.Error())
 	}
 	user.ActivationCode.String = activationCode
+	return
+}
+
+/*SetPrefLanguage sets the preferred language of an user. */
+func SetPrefLanguage(userIDSession string, language string) (err error) {
+
+	userID, err := strconv.Atoi(userIDSession)
+	if err != nil {
+		revel.AppLog.Error("failed to parse userID from userIDSession", "userIDSession", userIDSession, "error", err.Error())
+		return
+	}
+
+	updateLanguage := `UPDATE users SET language = $1 WHERE id = $2`
+	_, err = app.Db.Exec(updateLanguage, language, userID)
+	if err != nil {
+		revel.AppLog.Error("failed to update language", "userID", userID, "error", err.Error())
+	}
 	return
 }
 
@@ -100,7 +122,7 @@ const (
 			SET
 				firstname = $1, lastname = $2, salutation = $4, lastlogin = $5,
 				matrnr = $7, academictitle = $8, title = $9, nameaffix = $10, affiliations = $11
-		RETURNING id, lastname, firstname, email, role, matrnr,
+		RETURNING id, lastname, firstname, email, role, matrnr, language,
       TO_CHAR (firstlogin AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI:SS') as firstlogin
 	`
 
@@ -109,15 +131,15 @@ const (
     SET lastlogin = $1
     WHERE email = $2
       AND password = crypt($3, password)
-    RETURNING id, lastname, firstname, email, role, activationcode
+    RETURNING id, lastname, firstname, email, role, activationcode, language
   `
 
 	stmtRegisterExtern = `
 		INSERT INTO users (
 			firstname, lastname, email, salutation, role, lastlogin,
-			firstlogin, password, activationcode
+			firstlogin, password, activationcode, language
 		)
-		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')))
-		RETURNING id, lastname, firstname, email, role
+		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')), $9)
+		RETURNING id, lastname, firstname, email, role, language
 	`
 )

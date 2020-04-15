@@ -68,7 +68,7 @@ admin.stats_coursesSortCriteria = Kurse sind nach dem Anfang des Einschreibezeit
 admin.stats_coursesNoneActive = Keine aktiven Kurse
 
 # -------------------------------------------------------------------------------------------------- #
-# Login, Register, New password, Activation, Logout
+# Login, Register, New password, Activation, Logout, Preferred language
 # -------------------------------------------------------------------------------------------------- #
 
 login.tabName = Anmelden
@@ -138,6 +138,11 @@ activation.accountAlreadyActive_danger = Der externe Account zu der E-Mail-Addre
 logout.button = Abmelden
 logout.success = Erfolgreich abgemeldet.
 logout.loggedOut = Sie sind nicht angemeldet.
+
+prefLang.tabName = Sprache setzen
+prefLang.title = Bevorzugte Sprache setzen
+prefLang.info = Sprache der E-Mails. Kann im Profil geändert werden.
+prefLang.short_info = Sprache der E-Mails
 
 # -------------------------------------------------------------------------------------------------- #
 # Index
