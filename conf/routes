@@ -15,6 +15,8 @@ POST    /User/Login                             User.Login
 GET     /User/Logout                            User.Logout
 GET     /User/RegistrationPage                  User.RegistrationPage
 POST    /User/Registration                      User.Registration
+GET     /User/NewPasswordPage                   User.NewPasswordPage
+GET     /User/ActivationPage                    User.ActivationPage
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

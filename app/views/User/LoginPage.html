@@ -63,7 +63,9 @@
             <!-- keep logged in input -->
             <div class="form-group">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="credentials.StayLoggedIn" value="true" checked>
+                {{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}
+                  <input id="stayLoggedIn-checkbox" class="form-check-input" type="checkbox" name="credentials.StayLoggedIn" value="true" checked>
+                {{end}}
                 <label class="form-check-label">
                   {{msg $ "login.stayLoggedIn"}}
                 </label>
@@ -89,7 +91,7 @@
       <!-- link to new password page -->
       <br>
       <br>
-      <a href='#'> <!-- TODO -->
+      <a href='{{url "User.NewPasswordPage"}}'>
         {{msg $ "newPw.pwforgottenQuestion"}}
       </a>
 
@@ -103,6 +105,9 @@
 
 <div id="icon-person" class="display-none"> {{template "Icons/Person.html" .}} </div>
 <div id="icon-email" class="display-none"> {{template "Icons/Envelope.html" .}} </div>
+<div id="username-flash" class="display-none">{{with $username := field "credentials.Username" .}}{{$username.Flash}}{{end}}</div>
+<div id="email-flash" class="display-none">{{with $email := field "credentials.EMail" .}}{{$email.Flash}}{{end}}</div>
+<div id="stayLoggedIn-flash" class="display-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>
 
 <script>
   //adjust input fields when switching tabs
@@ -123,6 +128,24 @@
 
     $("#input-user").focus();
   });
+
+  //fill the form with flash values
+  const username = $("#username-flash").html();
+  if (username != "") {
+    $("#input-user").attr("value", username);
+  }
+  const email = $("#email-flash").html();
+  if (email != "") {
+    $("#input-user").attr("value", email);
+  }
+  const stayLoggedIn = $("#stayLoggedIn-flash").html();
+  if (email != "" || username != "") {
+    if (stayLoggedIn == 'true') {
+      $('#stayLoggedIn-checkbox').prop('checked', true);
+    } else {
+      $('#stayLoggedIn-checkbox').prop('checked', false);
+    }
+  }
 </script>
 
 {{template "footer.html" .}}

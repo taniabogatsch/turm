@@ -8,7 +8,6 @@ validation.invalid.language = Please provide a valid language.
 # User data validation
 # -------------------------------------------------------------------------------------------------- #
 
-validation.missing.salutation = Please provide your form of address.
 validation.missing.lastname = Please provide your last name.
 validation.missing.firstname = Please provide your first name.
 validation.missing.email = Please provide your e-mail address.
@@ -22,6 +21,7 @@ validation.max.email = Your e-mail address must have a maximum of 255 characters
 validation.max.password = Your password must have a maximum of 255 characters.
 validation.max.username = Your username must have a maximum of 255 characters.
 
+validation.invalid.salutation = Please provide a valid form of address.
 validation.invalid.email = Please provide a valid e-mail address.
 validation.invalid.username = Please provide a valid username.
 validation.invalid.password = Your passwords do not match.

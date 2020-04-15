@@ -34,6 +34,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		"stayLoggedIn", credentials.StayLoggedIn)
 	if credentials.ValidateCredentials(c.Validation); c.Validation.HasErrors() {
 		c.Validation.Keep()
+		c.FlashParams()
 		return c.Redirect(User.LoginPage)
 	}
 
@@ -43,6 +44,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		//ldap login, authenticate the user
 		if err := auth.LDAPServerAuth(&credentials, &user); err != nil {
 			c.Flash.Error(c.Message("login.ldapAuthentication_invalid_danger"))
+			c.FlashParams()
 			return c.Redirect(User.LoginPage)
 		}
 		revel.AppLog.Debug("authentication successful", "user", user)
@@ -56,6 +58,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	//login of user
 	if err := database.Login(&user); err != nil {
 		c.Flash.Error(c.Message("error.database"))
+		c.FlashParams()
 		return c.Redirect(User.LoginPage)
 	}
 	revel.AppLog.Debug("login successful", "user", user)
@@ -118,8 +121,31 @@ func (c User) Registration(user models.User) revel.Result {
 	revel.AppLog.Debug("registration of user", "user", user)
 	if user.ValidateUser(c.Validation); c.Validation.HasErrors() {
 		c.Validation.Keep()
+		c.FlashParams()
 		return c.Redirect(User.RegistrationPage)
 	}
 
-	return c.NotFound("not implemented")
+	return c.Redirect(User.ActivationPage, user.ID)
+}
+
+/*NewPasswordPage renders the page to request a new password.
+- Roles: not logged in users */
+func (c User) NewPasswordPage() revel.Result {
+
+	revel.AppLog.Debug("requesting new password page")
+	//NOTE: we do not set the callPath because we want to be redirected to the login page
+	c.Session["currPath"] = c.Message("newPw.tabName")
+	c.ViewArgs["tabName"] = c.Message("newPw.tabName")
+	return c.Render()
+}
+
+/*ActivationPage renders the activation page.
+- Roles: logged in and not activated users */
+func (c User) ActivationPage(userID int) revel.Result {
+
+	revel.AppLog.Debug("requesting activation page")
+	c.Session["currPath"] = c.Message("activation.tabName")
+	c.Session["callPath"] = "/User/ActivationPage?userID=" + strconv.Itoa(userID)
+	c.ViewArgs["tabName"] = c.Message("activation.tabName")
+	return c.Render(userID)
 }

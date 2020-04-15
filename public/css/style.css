@@ -137,6 +137,7 @@
   width: 100% !important;
   border-top: 1px solid #e9ecef;
   bottom: 0 !important;
+  background: #fff;
 }
 /* import pages */
 @media only screen and (max-width:767px) {

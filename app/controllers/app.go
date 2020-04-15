@@ -19,6 +19,9 @@ func (c App) Index() revel.Result {
 	c.Session["callPath"] = "/"
 	c.Session["currPath"] = "/"
 	c.ViewArgs["tabName"] = c.Message("index.tabName")
+
+	//TODO: get last update
+
 	return c.Render()
 }
 

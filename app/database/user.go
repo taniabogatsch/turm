@@ -34,7 +34,7 @@ func Login(user *models.User) (err error) {
 
 		if user.MatrNr.Valid && user.FirstLogin == now { //update the courses of study of that user
 			revel.AppLog.Debug("first login", "time", user.FirstLogin)
-			//TODO
+			//TODO: update the courses of study
 		}
 
 		tx.Commit()
@@ -43,7 +43,7 @@ func Login(user *models.User) (err error) {
 
 		err = app.Db.Get(user, stmtLoginExtern, now, user.EMail, user.Password)
 		if err != nil {
-			revel.AppLog.Error("failed to update or insert external user", "user", user, "error", err.Error())
+			revel.AppLog.Error("failed to update external user", "user", user, "error", err.Error())
 			return
 		}
 

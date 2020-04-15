@@ -477,9 +477,10 @@ faq.dataInvalid_danger = The category, the question and the answer must not be e
 
 policy.tabName = Data policy
 policy.pageName = Data policy
-policy.here = Here you can find our privacy policy.
+policy.here = <a href="#">Here</a> you can find our privacy policy.
 
 tutorials.tabName = Manual
 tutorials.pageName = Manual
 
 imprint.tabName = Imprint
+imprint.pageName = Imprint

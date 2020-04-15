@@ -477,9 +477,10 @@ faq.dataInvalid_danger = Die Kategorie, die Frage und die Antwort dürfen nicht 
 
 policy.tabName = Datenschutzerklärung
 policy.pageName = Datenschutzerklärung
-policy.here = Unsere Datenschutzerklärung finden Sie hier.
+policy.here = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>.
 
 tutorials.tabName = Handbuch
 tutorials.pageName = Handbuch
 
 imprint.tabName = Impressum
+imprint.pageName = Impressum

@@ -69,7 +69,6 @@ type User struct {
 /*ValidateUser validates the User struct fields as retrieved by the register form. */
 func (user *User) ValidateUser(v *revel.Validation) {
 
-	v.Required(user.Salutation).MessageKey("validation.missing.salutation")
 	v.Required(user.LastName).MessageKey("validation.missing.lastname")
 	v.Required(user.FirstName).MessageKey("validation.missing.firstname")
 	v.Required(user.EMail).MessageKey("validation.missing.email")
@@ -83,6 +82,9 @@ func (user *User) ValidateUser(v *revel.Validation) {
 
 	v.Email(user.EMail).MessageKey("validation.invalid.email")
 	v.Required(user.Password.String == user.PasswordRepeat).MessageKey("validation.invalid.password")
+	if user.Salutation != NONE && user.Salutation != MR && user.Salutation != MS {
+		v.ErrorKey("validation.invalid.salutation")
+	}
 
 	user.Password.Valid = true
 }
