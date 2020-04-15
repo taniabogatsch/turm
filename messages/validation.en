@@ -25,3 +25,4 @@ validation.max.username = Your username must have a maximum of 255 characters.
 validation.invalid.email = Please provide a valid e-mail address.
 validation.invalid.username = Please provide a valid username.
 validation.invalid.password = Your passwords do not match.
+validation.invalid.credentials = Please provide your username or your e-mail address.

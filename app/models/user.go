@@ -115,9 +115,11 @@ func (credentials *Credentials) ValidateCredentials(v *revel.Validation) {
 
 	if credentials.Username != "" {
 		v.MaxSize(credentials.Username, 255).MessageKey("validation.max.username")
+		v.Check(credentials.EMail, NotRequiredValidator{}).MessageKey("validation.invalid.credentials")
 	} else if credentials.EMail != "" {
 		v.MaxSize(credentials.EMail, 255).MessageKey("validation.max.email")
 		v.Email(credentials.EMail).MessageKey("validation.invalid.email")
+		v.Check(credentials.Username, NotRequiredValidator{}).MessageKey("validation.invalid.credentials")
 	} else {
 		v.ErrorKey("validation.missing.username")
 	}
