@@ -41,6 +41,7 @@ func (c App) ChangeLanguage(language string) revel.Result {
 			c.Session["callPath"].(string),
 			"validation.invalid.language",
 			c.Controller,
+			"",
 		)
 	}
 

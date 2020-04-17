@@ -33,7 +33,7 @@ error.database = Beim Ausführen einer Datenbankanfrage ist ein Fehler aufgetret
 error.template = Beim Laden einer Komponente der Seite ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.typeConversion = Es wurden ungültige Daten konvertiert. %(error.contactSupportMessage)s
 error.sessionInvalid = Sitzung nicht länger aktiv.
-error.email = Beim Senden der E-Mail ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.email = Beim Senden einer E-Mail an %s ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 
 # -------------------------------------------------------------------------------------------------- #
 # E-mails

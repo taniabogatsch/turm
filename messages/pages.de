@@ -77,7 +77,7 @@ login.title = Anmelden
 
 login.stayLoggedIn = Angemeldet bleiben
 
-login.confirmation_success = Erfolgreich angemeldet.
+login.confirmation_success = Anmeldung erfolgreich. E-Mail-Adresse: %s, Name: %s %s.
 login.capslock_warning = Achtung! Ihre Feststelltaste ist aktiviert.
 
 login.password_missing_danger = Bitte geben Sie Ihr Passwort an.
@@ -128,8 +128,8 @@ activation.activateAccount = Account aktivieren
 activation.resendCode = Aktivierungscode erneut zusenden
 
 activation.enterCode_info = Vielen Dank für Ihre Registrierung. Geben Sie bitte hier Ihren Aktivierungscode an.
-activation.codeSend_info = Ihr Aktivierungscode wurde an Ihre E-Mail-Adresse gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.
-activation.resendCode_success = Ein neuer Aktivierungscode wurde an Ihre E-Mail-Adresse gesendet.
+activation.codeSend_info = Ihr Aktivierungscode wurde an %s gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.
+activation.resendCode_success = Ein neuer Aktivierungscode wurde an %s gesendet.
 activation.confirmation_success = Sie haben Ihren Account aktiviert, bitte melden Sie sich an.
 activation.codeInvalid_danger = Ungültiger Aktivierungscode
 activation.codeInvalidTryAgain_danger = Der eingegebene Aktivierungscode war ungültig, bitte melden Sie sich an und versuchen es erneut.

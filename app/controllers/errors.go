@@ -21,7 +21,7 @@ func (s ErrorType) String() string {
 }
 
 //flashError flashes an error message and redirects to a page.
-func flashError(errType ErrorType, url string, msg string, c *revel.Controller) revel.Result {
+func flashError(errType ErrorType, url string, msg string, c *revel.Controller, data string) revel.Result {
 
 	//TODO: this will later allow to send an e-mail if any error occurs
 
@@ -46,7 +46,7 @@ func flashError(errType ErrorType, url string, msg string, c *revel.Controller) 
 
 	case errEMail:
 		//flash error and parameters, then redirect
-		c.Flash.Error(c.Message("error.email"))
+		c.Flash.Error(c.Message("error.email", data))
 		return c.Redirect(url)
 
 	case errDataConversion:

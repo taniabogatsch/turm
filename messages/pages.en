@@ -77,7 +77,7 @@ login.title = Login
 
 login.stayLoggedIn = Keep me logged in
 
-login.confirmation_success = Login successful.
+login.confirmation_success = Login successful with e-mail %s and name %s %s.
 login.capslock_warning = Caps Lock is on!
 
 login.password_missing_danger = Please enter your password.
@@ -128,8 +128,8 @@ activation.activateAccount = Activate account
 activation.resendCode = Resend activation code
 
 activation.enterCode_info = Thank you for your registration. Please enter your activation code here.
-activation.codeSend_info = An activation code was send to your e-mail-address. Please also check your junk folder.
-activation.resendCode_success = A new activation code was send to your e-mail-address.
+activation.codeSend_info = An activation code was send to %s. Please also check your junk folder.
+activation.resendCode_success = A new activation code was send to %s.
 activation.confirmation_success = Account activated. Please login.
 activation.codeInvalid_danger = Invalid activation code.
 activation.codeInvalidTryAgain_danger = Invalid activation code. Please login to enter the activation code again.

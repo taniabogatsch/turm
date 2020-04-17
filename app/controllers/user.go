@@ -37,6 +37,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -52,6 +53,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 				routes.User.LoginPage(),
 				"",
 				c.Controller,
+				"",
 			)
 		}
 		revel.AppLog.Debug("ldap authentication successful", "user", user)
@@ -71,6 +73,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -82,6 +85,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -95,7 +99,13 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	}
 
 	revel.AppLog.Debug("login successful", "user", user)
-	c.Flash.Success(c.Message("login.confirmation_success"))
+	c.Flash.Success(
+		c.Message(
+			"login.confirmation_success",
+			user.EMail,
+			user.FirstName,
+			user.LastName,
+		))
 
 	//not activated external users get redirected to the activation page
 	if user.ActivationCode.String != "" && credentials.EMail != "" {
@@ -147,6 +157,7 @@ func (c User) Registration(user models.User) revel.Result {
 			routes.User.RegistrationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -157,6 +168,7 @@ func (c User) Registration(user models.User) revel.Result {
 			routes.User.RegistrationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 	revel.AppLog.Debug("registration successful", "user", user)
@@ -173,10 +185,15 @@ func (c User) Registration(user models.User) revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			user.EMail,
 		)
 	}
 
-	c.Flash.Success(c.Message("activation.codeSend_info"))
+	c.Flash.Success(
+		c.Message(
+			"activation.codeSend_info",
+			user.EMail,
+		))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -215,6 +232,7 @@ func (c User) NewPassword(email string) revel.Result {
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -228,7 +246,11 @@ func (c User) NewPassword(email string) revel.Result {
 		models.NotUnique{},
 	)
 	if c.Validation.HasErrors() {
-		c.Flash.Success(c.Message("newPw.confirmation_success", email))
+		c.Flash.Success(
+			c.Message(
+				"newPw.confirmation_success",
+				email,
+			))
 		return c.Redirect(User.LoginPage)
 	}
 
@@ -239,6 +261,7 @@ func (c User) NewPassword(email string) revel.Result {
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 	revel.AppLog.Debug("set new password", "user", user)
@@ -252,10 +275,15 @@ func (c User) NewPassword(email string) revel.Result {
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
+			user.EMail,
 		)
 	}
 
-	c.Flash.Success(c.Message("newPw.confirmation_success", email))
+	c.Flash.Success(
+		c.Message(
+			"newPw.confirmation_success",
+			email,
+		))
 	return c.Redirect(User.LoginPage)
 }
 
@@ -304,6 +332,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -315,6 +344,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -325,6 +355,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -350,6 +381,7 @@ func (c User) NewActivationCode() revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -359,6 +391,7 @@ func (c User) NewActivationCode() revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -371,10 +404,15 @@ func (c User) NewActivationCode() revel.Result {
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
+			user.EMail,
 		)
 	}
 
-	c.Flash.Success(c.Message("activation.resendCode_success"))
+	c.Flash.Success(
+		c.Message(
+			"activation.resendCode_success",
+			user.EMail,
+		))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -405,6 +443,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 			routes.User.PrefLanguagePage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 
@@ -416,6 +455,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 			routes.User.PrefLanguagePage(),
 			"",
 			c.Controller,
+			"",
 		)
 	}
 	return c.Redirect(c.Session["callPath"])

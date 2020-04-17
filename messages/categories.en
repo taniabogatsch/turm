@@ -33,7 +33,7 @@ error.database = An error occurred while running a database query. %(error.conta
 error.template = An error occurred while loading a page component. %(error.contactSupportMessage)s
 error.typeConversion = There was an invalid data conversion. %(error.contactSupportMessage)s
 error.sessionInvalid = Session no longer active.
-error.email = An error occurred while sending the e-mail. %(error.contactSupportMessage)s
+error.email = An error occurred while sending an e-mail to %s. %(error.contactSupportMessage)s
 
 # -------------------------------------------------------------------------------------------------- #
 # E-mails
