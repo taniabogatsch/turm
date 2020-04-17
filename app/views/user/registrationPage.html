@@ -1,0 +1,156 @@
+<!-- the registration page provides the registration form -->
+
+{{template "header.html" .}}
+
+<div class="page page-side page-side-left">
+  <br class="mobile-hidden">
+</div>
+
+<div class="page page-middle">
+  <center>
+    <h3>
+      {{msg $ "register.title"}}
+    </h3>
+    <br>
+
+    <div class="login-width">
+
+      <!-- registration form -->
+      <form id="registerForm" accept-charset="UTF-8" action='{{url "User.Registration"}}' method="POST" class="needs-validation" novalidate>
+
+        <div class="col login-width-tab">
+          <small class="form-text text-muted">
+            {{msg $ "prefLang.short_info"}}
+          </small>
+          <select name="user.Language.String" class="custom-select">
+            {{range .languages}}
+              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}> {{.}} </option>
+            {{end}}
+          </select>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.language"}}
+          </div>
+        </div>
+
+        {{with $salutation := field "user.Salutation" .}}
+          <div class="col login-width-tab">
+            <small class="form-text text-muted">
+              {{msg $ "user.salutation"}}
+            </small>
+            <select name="user.Salutation" class="custom-select">
+              <option value="1" {{if eq "1" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_male"}} </option>
+              <option value="2" {{if eq "2" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_female"}} </option>
+              <option value="0" {{if eq "0" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_neutral"}} </option>
+            </select>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.salutation"}}
+            </div>
+          </div>
+        {{end}}
+        <br>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{template "icons/pencil.html" .}}
+            </span>
+          </div>
+          {{with $field := field "user.FirstName" .}}
+            <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.firstname"}}' required maxlength="255">
+          {{end}}
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.firstname"}}
+          </div>
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{template "icons/pencil.html" .}}
+            </span>
+          </div>
+          {{with $field := field "user.LastName" .}}
+            <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.lastname"}}' required maxlength="255">
+          {{end}}
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.lastname"}}
+          </div>
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{template "icons/envelope.html" .}}
+            </span>
+          </div>
+          {{with $field := field "user.EMail" .}}
+            <input type="email" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.email"}}' required maxlength="255">
+          {{end}}
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.email"}}
+          </div>
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{template "icons/lock.html" .}}
+            </span>
+          </div>
+          <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511" minlength="6">
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.password"}}
+          </div>
+        </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{template "icons/lock.html" .}}
+            </span>
+          </div>
+          <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeatpw"}}' required maxlength="511" minlength="6">
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.password"}}
+          </div>
+        </div>
+
+        {{range .errors}}
+          <div class="warning-feedback">
+            {{.}}
+          </div>
+        {{end}}
+
+        <br>
+        <p>
+          {{msg $ "register.disclaimer"}}
+        </p>
+
+        <br>
+        <!-- button to confirm login -->
+        <button class="btn btn-darkblue" type="submit">
+          {{msg $ "register.pageName"}}
+        </button>
+      </form>
+
+      <!-- link to new password page -->
+      <br>
+      <br>
+      <a href='{{url "User.NewPasswordPage"}}'>
+        {{msg $ "newPw.pwforgottenQuestion"}}
+      </a>
+    </div>
+  </center>
+</div>
+
+<div class="page page-side page-side-right">
+  {{template "toast.html" .}}
+</div>
+
+<script>
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#registerForm").addClass("was-validated");
+  }
+</script>
+
+{{template "footer.html" .}}

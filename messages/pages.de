@@ -1,0 +1,491 @@
+# -------------------------------------------------------------------------------------------------- #
+# This message file contains all German messages that are specific to certain pages.
+#
+# Formatting Information:
+# - [page].[content], where page is the page at which the message can be found
+# - [content] can be the further composed as follows:
+#   - title_[title of page section], common examples are the vertical overview pills
+#   - [title of page section]_[description], where description grasps the message's content
+#   - [description], if the page is not divided further into sections
+# - messages can have the following suffixes
+#   - {missing, invalid, info, success, warning, danger}
+# -------------------------------------------------------------------------------------------------- #
+
+# -------------------------------------------------------------------------------------------------- #
+# Admin
+# -------------------------------------------------------------------------------------------------- #
+
+admin.tabName = Verwaltung
+admin.pageName = Verwaltung
+
+admin.title_userManagement = Nutzerverwaltung
+admin.title_userOverview = Nutzerübersicht
+admin.title_groupManagement = Gruppen und Prioritätensysteme
+admin.title_statistics = Statistiken
+
+admin.userManagement_changeUserRole = Nutzerrolle ändern
+admin.userManagement_roles = Zu vergebende Rolle
+admin.userManagement_showPDF = Detaillierte Nutzerinformationen
+admin.userManagement_changedOwnRole = Sollten Sie Ihre eigene Rolle geändert haben, so melden Sie sich bitte erneut an, damit die Änderung in Kraft treten kann.
+
+admin.userManagement_update_success = Die Rolle des/der folgenden NutzerIn wurde aktualisiert: %s
+
+admin.groupManagement_newGroupTitle = Gruppenerstellung
+admin.groupManagement_createNewGroup = Neue Gruppe erstellen
+admin.groupManagement_groupName = Name der neuen Gruppe
+admin.groupManagement_asSubgroupOf = Als eine Untergruppe von:
+admin.groupManagement_addGroupHere = Neue Gruppe hier einfügen
+admin.groupManagement_onlyPreview = Dies ist nur eine Vorschau. Laden Sie bitte die Seite neu, um die Gruppe auszuklappen und weitere Untergruppen hinzuzufügen.
+admin.groupManagement_isGroupPrioritySystem = Soll es sich bei dieser Gruppe um ein Prioritätensystem handeln?
+admin.groupManagement_parentIsPrioritySystem = Als Untergruppe eines Prioritätssystems wird diese Gruppe automatisch als Teil dieses Prioritätssystems angelegt.
+admin.groupManagement_name_noWhitespaceSuffixPrefix = Bitte achten Sie darauf, dass Gruppennamen keine führenden oder schließenden Leerzeichen haben dürfen.
+admin.groupManagement_reachedMaximumGroupDepth = Sie haben die Maximalanzahl an Untergruppen erreicht.
+admin.groupManagement_parentHasAlreadyMaxCourses = Da diese Gruppe in einer Gruppe mit einer Maximalanzahl an Einschreibungen erstellt wird, dürfen sich die Maximalanzahlen an Einschreibungen dieser Gruppen nicht voneinander unterscheiden.
+admin.groupManagement_maxXCourses = Max. X Kurs(e)
+
+admin.groupManagement_maxXCourses_info = Innerhalb dieser Gruppe (und Ihrer Untergruppen) können sich NutzerInnen nur in maximal X Kurs(e) einschreiben. Lassen Sie das Feld leer, wenn NutzerInnen sich in beliebig viele Kurse einschreiben dürfen.
+admin.groupManagement_groupName_info = Geben Sie einen Gruppenname an, der mindestens drei Zeichen lang ist.
+admin.groupManagement_newGroup_info = Hier können Sie neue Gruppen erstellen. Navigieren Sie dazu an die entsprechende Stelle und wählen Sie dort '%(admin.groupManagement_addGroupHere)s' aus.
+admin.groupManagement_prioritySystemTimes_info = Der nachfolgende Einschreibezeitraum gilt für alle Kurse, die innerhalb dieses Prioritätensystems erstellt werden.
+admin.groupManagement_parentIsPrioritySystem_info = %(admin.groupManagement_parentIsPrioritySystem)s Daher kann diese Gruppe kein separates Prioritätensystem sein.
+admin.groupManagement_newGroup_success = Neue Gruppe '%s' wurde erstellt.
+admin.groupManagement_enterNumber_warning = Bitte geben Sie eine Zahl an.
+admin.groupManagement_enterBiggerZero_warning = Bitte geben Sie eine Zahl an, die größer als Null ist.
+admin.groupManagement_enterNaturalNumber_warning = Bitte geben Sie eine natürliche Zahl an.
+admin.groupManagement_duplicateName_danger = Der eingegebene Name wird bereits verwendet (Gruppenname oder Kurstitel). Bitte wählen Sie einen anderen.
+
+admin.stats_general = Allgemeine Statistiken
+admin.stats_numberOfCourses = Anzahl Kurse gesamt
+admin.stats_numberActiveCourses = Davon aktiv
+admin.stats_numberInactiveCourses = Davon inaktiv
+admin.stats_numberOfUsers = Anzahl Nutzer gesamt
+admin.stats_numberLDAPUsers = Davon Nutzer mit Universitätsaccount
+admin.stats_numberExternalUsers = Davon Nutzer mit externem Account
+admin.stats_numberGroups = Anzahl an Gruppen
+
+admin.stats_courses = Übersicht über alle aktiven Kurse
+admin.stats_coursesSortCriteria = Kurse sind nach dem Anfang des Einschreibezeitraums sortiert.
+admin.stats_coursesNoneActive = Keine aktiven Kurse
+
+# -------------------------------------------------------------------------------------------------- #
+# Login, Register, New password, Activation, Logout, Preferred language
+# -------------------------------------------------------------------------------------------------- #
+
+login.tabName = Anmelden
+login.pageName = Anmelden
+login.title = Anmelden
+
+login.stayLoggedIn = Angemeldet bleiben
+
+login.confirmation_success = Anmeldung erfolgreich. E-Mail-Adresse: %s, Name: %s %s.
+login.capslock_warning = Achtung! Ihre Feststelltaste ist aktiviert.
+
+login.password_missing_danger = Bitte geben Sie Ihr Passwort an.
+login.username_missing_danger = Bitte geben Sie den Nutzernamen Ihres Universitätslogins an.
+login.email_missing_danger = Bitte geben Sie Ihre E-Mail-Adresse an.
+
+login.ldapAuthentication_invalid_danger = Authentifizierung mit dem Universitätsserver nicht möglich. Bitte prüfen Sie, ob Ihr Nutzername und Ihr Passwort korrekt sind.
+login.data_invalid_danger = Die E-Mail-Adresse oder das Passwort wurde nicht korrekt angegeben.
+login.email_invalid_danger = Bitte geben Sie eine gültige E-Mail-Adresse an.
+
+register.tabName = Registrierung
+register.pageName = Registrierung
+register.title = Externen Account registrieren
+
+register.repeatpw = Passwort wiederholen
+register.disclaimer = Durch das Registrieren akzeptieren Sie die unten verlinkte Datenschutzerklärung.
+register.confirmation = Registrieren
+
+register.fillFields_info = Bitte füllen Sie alle Felder aus.
+
+register.salutation_missing_danger = Bitte wählen Sie eine Anrede aus.
+register.firstname_missing_danger = Bitte geben Sie Ihre(n) Vornamen an.
+register.lastname_missing_danger = Bitte geben Sie Ihren Nachnamen an.
+register.passwordConfirmation_missing_danger = Bitte geben Sie Ihr Passwort ein zweites Mal an.
+
+register.emailExceedsMaxLength_danger = Die E-Mail-Adresse darf aus maximal 100 Zeichen bestehen.
+register.passwordTooShort_danger = Das Passwort muss aus mindestens sechs Zeichen bestehen.
+register.passwordTooLong_danger = Das Passwort darf aus maximal 50 Zeichen bestehen.
+register.passwordsNotEqual_danger = Die Passwörter stimmen nicht überein.
+register.emailInUse_danger = Die eingegebene E-Mail-Adresse ist bereits in Verwendung. Bitte lassen Sie sich ein neues Passwort zusenden oder verwenden Sie eine andere E-Mail-Adresse.
+register.emailInUseLDAP_danger = Die eingegebene E-Mail-Adresse ist bereits für einen Universitätsaccount in Verwendung. Bitte verwenden Sie den Universitätslogin.
+
+newPw.tabName = Neues Passwort
+newPw.pageName = Neues Passwort
+
+newPw.pwforgottenQuestion = Passwort vergessen?
+
+newPw.conditions_info = Bitte geben Sie Ihre E-Mail-Adresse an. Wir werden ein neues Passwort zu dieser E-Mail-Adresse senden. %(newPw.universityAccount_danger)s
+newPw.confirmation_success = Ein neues Passwort wurde an %s gesendet, falls diese E-Mail-Adresse existiert. Bitte überprüfen Sie auch Ihren Spam-Ordner. Sie können sich nun mit dem neuen Passwort anmelden.
+newPw.universityAccount_danger = Neue Passwörter können nur für externe NutzerInnen generiert werden (kein Universitätslogin).
+
+activation.tabName = Account Aktivieren
+activation.pageName = Account aktivieren
+
+activation.success = Account aktiviert.
+activation.code = Aktivierungscode
+activation.activateAccount = Account aktivieren
+activation.resendCode = Aktivierungscode erneut zusenden
+
+activation.enterCode_info = Vielen Dank für Ihre Registrierung. Geben Sie bitte hier Ihren Aktivierungscode an.
+activation.codeSend_info = Ihr Aktivierungscode wurde an %s gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.
+activation.resendCode_success = Ein neuer Aktivierungscode wurde an %s gesendet.
+activation.confirmation_success = Sie haben Ihren Account aktiviert, bitte melden Sie sich an.
+activation.codeInvalid_danger = Ungültiger Aktivierungscode
+activation.codeInvalidTryAgain_danger = Der eingegebene Aktivierungscode war ungültig, bitte melden Sie sich an und versuchen es erneut.
+activation.accountAlreadyActive_danger = Der externe Account zu der E-Mail-Addresse %s wurde bereits aktiviert. Bitte melden Sie sich mit diesem an. Sollten Sie Ihr Passwort vergessen haben, so können Sie ein neues generieren.
+
+logout.button = Abmelden
+logout.success = Erfolgreich abgemeldet.
+logout.loggedOut = Sie sind nicht angemeldet.
+
+prefLang.tabName = Sprache setzen
+prefLang.title = Bevorzugte Sprache setzen
+prefLang.info = Sprache der E-Mails. Kann im Profil geändert werden.
+prefLang.short_info = Sprache der E-Mails
+
+# -------------------------------------------------------------------------------------------------- #
+# Index
+# -------------------------------------------------------------------------------------------------- #
+
+index.tabName = Turm2
+index.pageName = Startseite
+
+index.lastUpdate = Letztes Update
+
+# -------------------------------------------------------------------------------------------------- #
+# Create Course
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tabName = Kurserstellen
+creator.pageName = Kurserstellen
+creator.pageName_edit = Kurs bearbeiten
+
+creator.completeEditing = Bearbeiten abschließen
+
+creator.validation_notNumber = Ein eingegeben Wert ist keine natürliche Zahl.
+creator.validation_noJavaScript = Eingaben dürfen kein JavaScript enthalten.
+
+creator.title_uploadJSON = Gespeicherten Kurs laden
+creator.title_generalInfo = Allgemeine Kursdaten
+creator.title_coursePath = Kurspfad
+creator.title_visibilityAndPayment = Sichtbarkeit und Bezahlung
+creator.title_createCourse = Kurserstellen abschließen
+creator.title_restrictions = Einschreibebeschränkungen
+creator.title_customMail = Automatische E-Mail
+
+creator.uploadJSON_readyForUpload = Die Daten stehen zum Einlesen bereit.
+creator.uploadJSON_success = Das Hochladen Ihrer Datei war erfolgreich. Leere Felder wurden entweder nicht abgespeichert oder nicht erkannt.
+creator.uploadJSON_failed = Fehler beim Hochladen Ihrer Datei.
+creator.uploadJSON_invalid_wrongFormat = Bitte wählen Sie eine Datei aus, deren Inhalt dem Kursformat entspricht. Wenn Sie eigenständig Änderungen an der Datei vorgenommen haben, so machen Sie diese bitte rückgängig und versuchen es erneut.
+creator.uploadJSON_invalid_fileTooBig = Die gewählte Datei überschreitet die maximal zulässige Größe von
+creator.uploadJSON_invalid = Bitte laden Sie eine Datei hoch, die dem JSON-Format entspricht. Wenn Sie eigenständig Änderungen an der Datei vorgenommen haben, so machen Sie diese bitte rückgängig und versuchen es erneut.
+
+creator.uploadJSON_info = Hier können Sie einen heruntergeladenen Kurs hochladen, um dessen Daten einzulesen.
+
+creator.generalInfo_titleExists = Dieser Kurstitel ist bereits in Verwendung.
+creator.generalInfo_title_noWhitespaceSuffixPrefix = Bitte achten Sie darauf, dass Kurstitel keine führenden oder schließenden Leerzeichen haben dürfen.
+
+creator.generalInfo_title_noDuplicates_info = Kurstitel dürfen nicht doppelt vorkommen. Sie erhalten bei der Eingabe eine Information darüber, ob der gewählte Kurstitel bereits verwendet wird.
+creator.generalInfo_subtitle_info = Der Untertitel kann weitere Informationen zum Kurstitel enthalten.
+creator.generalInfo_title_missing = Bitte geben Sie einen Kurstitel an.
+creator.generalInfo_searchLeaders_info = Hier können Sie nach OrganisatorInnen suchen, die sich bereits im System angemeldet/registriert haben. Diese können Sie dann als OrganisatorInnen hinzufügen. Sollten Sie jemanden als OrganisatorIn angeben wollen, der/die sich noch nie im System angemeldet hat, so verwenden Sie bitte das 'Untertitel'-Feld, indem Sie beispielsweise 'Referent: Max Musterman' dort angeben.
+
+creator.coursePath_chosenGroup = Ausgewählte Gruppe
+creator.coursePath_addCourseHere = Kurs hier einfügen
+creator.coursePath_groupConfirmation = Der Kurs wird in dieser Gruppe erstellt:
+creator.coursePath_group = Gruppe des Kurses
+
+creator.coursePath_title_info = Hier wird der Titel des neuen Kurses stehen.
+creator.coursePath_groupNotAvailable_info = Die importierte Gruppe ist nicht mehr verfügbar. Bitte wählen Sie eine andere aus.
+creator.coursePath_info = Navigieren Sie durch die Gruppen, bis Sie an der Stelle angekommen sind, an der Sie den Kurs erstellen möchten.
+creator.coursePath_groupMustExist_warning = Achtung! Um einen Kurs im System anzulegen muss es die Gruppe, in der dieser erstellt werden soll, bereits geben. Eine Anfrage für das Erstellen einer Gruppe kann an <a href="mailto:%s?Subject=%(mails.subject_groupCreationRequest)s" target="_top">%s</a> gestellt werden.
+
+creator.coursePath_groupIsPrioritySystem_info = Sie haben den Kurs zu einer Gruppe eines Prioritätensystems hinzugefügt.
+creator.coursePath_groupIsPrioritySystem1_warning = Der Anfang und das Ende des Einschreibezeitraums wurden durch das Prioritätensystem festgelegt und können nicht geändert werden.
+creator.coursePath_groupIsPrioritySystem2_warning = Alle Veranstaltungen eines Kurses in einem Prioritätensystem müssen eine Warteliste besitzen. Sollten Sie schon Veranstaltungen erstellt haben, so wurde diesen eine Warteliste hinzugefügt.
+creator.coursePath_groupIsPrioritySystem3_warning = Es muss die Einschreibebeschränkung '%(course.restrictions_ldapOnly)s' oder '%(course.restrictions_regardingStuidies)s' ausgewählt werden. Die Option '%(course.restrictions_all)s' wird nicht länger angezeigt.
+creator.coursePath_groupIsPrioritySystem4_warning = Veranstaltungen eines Kurses in einem Prioritätensystem können keinen Einschreibeschlüssel besitzen. Sollten Sie schon Veranstaltungen erstellt haben, so wurden diese entsprechend angepasst.
+
+creator.coursePath_missing = Bitte geben Sie eine Gruppe an, in der der Kurs erstellt werden soll.
+
+creator.timePeriods_unsubscribeUntil_info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
+creator.timePeriods_expirationDate_info = Wenn Sie den Kurs nach diesem Zeitpunkt löschen, so werden TeilnehmerInnen nicht länger via E-Mail über das Löschen informiert. Außerdem werden abgelaufene Kurse einmal täglich automatisch auf inaktiv gesetzt.
+
+creator.timePeriods_validate_enrollmentStartTooEarly = Der Anfang des Einschreibezeitraums darf nicht vor der aktuellen Systemzeit liegen.
+creator.timePeriods_validate_enrollmentEndBeforeStart = Das Ende des Einschreibezeitraums darf nicht vor dessen Anfang sein.
+creator.timePeriods_validate_unsubscribePeriodNotBeforeEnrollmentPeriod = Das Abmeldedatum darf nicht vor dem Anfang des Einschreibezeitraums liegen.
+creator.timePeriods_validate_expirationDateAfterEnrollmentPeriod = Das Ablaufdatum muss nach Ende des Einschreibezeitraums liegen.
+
+creator.timePeriods_enrollmentStartDate_missing = Bitte geben Sie das Datum an, an dem der Einschreibezeitraum beginnen soll.
+creator.timePeriods_enrollmentStartTime_missing = Bitte geben Sie die Uhrzeit an, zu der der Einschreibezeitraum beginnen soll.
+creator.timePeriods_enrollmentEndDate_missing = Bitte geben Sie das Datum an, an dem der Einschreibezeitraum beendet werden soll.
+creator.timePeriods_enrollmentEndTime_missing = Bitte geben Sie die Uhrzeit an, zu der der Einschreibezeitraum enden soll.
+creator.timePeriods_unsubscribeUntilDate_missing = Bitte geben Sie das Datum an, bis zu dem TeilnehmerInnen das Austragen möglich sein soll.
+creator.timePeriods_unsubscribeUntilTime_missing = Bitte geben Sie den Zeitpunkt an, bis zu dem TeilnehmerInnen das Austragen möglich sein soll.
+creator.timePeriods_expirationDate_missing = Bitte geben Sie das Ablaufdatum an.
+creator.timePeriods_expirationTime_missing = Bitte geben Sie den Ablaufzeitpunkt an.
+
+creator.visibilityAndPayment_publiclyVisible = Öffentlich sichtbar
+creator.visibilityAndPayment_paymentRequired = Zahlungspflichtig
+
+creator.visibilityAndPayment_info = Öffentlich sichtbar heißt, dass die Kursinformationen auch für nicht angemeldete NutzerInnen sichtbar sind.
+creator.visibilityAndPayment_payment_info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15,00 oder 15 (ohne Eurozeichen!) für einen Betrag von fünfzehn Euro.
+
+creator.visibilityAndPayment_payment_invalid = Bitte geben Sie einen gültigen Betrag an.
+creator.visibilityAndPayment_payment_missing = Wenn '%(creator.visibilityAndPayment_paymentRequired)s' ausgewählt ist muss ein Betrag angegeben werden.
+
+creator.restrictions_allowedParticipants = Erlaubte TeilnehmerInnen
+creator.restrictions_onlyXEvents = TeilnehmerInnen dürfen sich nur in X Veranstaltung(en) dieses Kurses einschreiben.
+creator.restrictions_onlyXEventsPlaceholder = Einschreiben in max. X Veranstaltung(en)
+creator.restrictions_whitelist = Whitelist
+creator.restrictions_blacklist = Blacklist
+creator.restrictions_permittedCoursesOfStudy = Erlaubte Studiengänge
+creator.restrictions_added = Hinzugefügte Einschreibebeschränkungen
+
+creator.restrictions_maxX_info = Wenn Sie die Zahl X (z.Bsp. 4) angeben, dann können sich NutzerInnen nur in maximal X Veranstaltungen dieses Kurses einschreiben. Wenn Sie dieses Feld leer lassen, dann können sich NutzerInnen in beliebig viele Veranstaltungen einschreiben.
+creator.restrictions_info = Im Folgenden finden Sie je nach ausgewählter Einschreibebeschränkung verschiedene Optionen (z.B. die Blacklist), um die Einschreibebeschränkungen zu verfeinern.
+creator.restrictions_whitelist_info = Diese NutzerInnen dürfen sich einschreiben, obwohl sie die Einschreibebeschränkungen nicht erfüllen.
+creator.restrictions_blacklist_info = Diese NutzerInnen dürfen sich nicht einschreiben.
+
+creator.restrictions_invalid = Bitte geben Sie gültige Einschreibebeschränkungen an.
+creator.restrictions_validate_semester = Bitte geben Sie ein gültiges Mindestfachsemester an.
+creator.restrictions_validate_prioritySystemRestrictionsMismatch = In einem Prioritätensystem muss die Einschreibebeschränkung '%(course.restrictions_ldapOnly)s' oder '%(course.restrictions_regardingStuidies)s' ausgewählt werden.
+
+creator.restrictions_semesterCourseOfStudy_missing = Bitte geben Sie Studiengang und Mindestfachsemester an.
+creator.restrictions_atLeastOne_missing = Wenn Sie eine Option zum Angeben spezifischer Einschreibebeschränkungen auswählen, so müssen Sie mindestens eine solche Einschreibebeschränkung hinzufügen.
+
+creator.description_info = Im folgenden Texteditor kann eine Kursbeschreibung eingegeben werden.
+
+creator.event_add = Veranstaltung hinzufügen
+creator.event_new = Neue Veranstaltung
+creator.event_edit = Veranstaltung bearbeiten
+creator.event_remove = Veranstaltung entfernen
+creator.event_title = Veranstaltungstitel
+creator.event_maximumParticipants = Maximale Teilnehmeranzahl
+creator.event_participants = Teilnehmeranzahl
+creator.event_repeatEnrollmentKey = Einschreibeschlüssel wiederholen
+creator.event_usersEnrolled = Es sind bereits NutzerInnen in diesen Kurs eingeschrieben!
+
+creator.event_info = Ein Kurs kann beliebig viele Veranstaltungen besitzen. NutzerInnen schreiben sich in diese Veranstaltungen ein. Für jede Veranstaltung können Eigenschaften wie das Vorhandensein einer Warteliste und die maximale Teilnehmeranzahl individuell gesetzt werden.
+creator.event_add_info = Schließen Sie hier das Erstellen der Veranstaltung via '%(creator.event_add)s' ab. Danach können Sie weitere Veranstaltungen hinzufügen.
+creator.event_title_info = Der Veranstaltungstitel kann leer gelassen werden oder die Veranstaltungen in einem Kurs spezifizieren, z.B. mit Titeln wie 'Anfängerkurs' oder 'Englisch B1'.
+creator.event_atLeastOne_info = Es muss mindestens eine Veranstaltung hinzugefügt werden.
+creator.event_editNumberOfParticipants_info = Bitte beachten Sie, dass TeilnehmerInnen NICHT automatisch aus der Warteliste (insofern vorhanden) nachrücken, wenn Sie die maximale Teilnehmeranzahl erhöhen. Konkret heißt das, dass Sie bei vollen Veranstaltungen beim Erhöhen der Teilnehmeranzahl manuell TeilnehmerInnen aus der Warteliste einschreiben müssen, sodass die Veranstaltung wieder voll ist.
+
+creator.event_missing = Bitte fügen Sie mindestens eine Veranstaltung hinzu.
+creator.event_maximumParticipants_missing = Bitte geben Sie eine maximale Teilnehmeranzahl an.
+creator.event_enrollmentKey_missing = Bitte geben Sie einen Einschreibeschlüssel an.
+
+creator.event_validate_maximumParticipantsNegative = Bitte geben Sie eine maximale Teilnehmeranzahl an, die größer als null ist.
+creator.event_validate_maximumParticipants_invalid = Bitte geben Sie eine gültige maximale Teilnehmeranzahl an.
+creator.event_validate_keyMismatch = Die Einschreibeschlüssel stimmen nicht überein.
+
+creator.meeting_add = Termin hinzufügen
+creator.meeting_new = Neuer Termin
+creator.meeting_edit = Termin bearbeiten
+creator.meeting_remove = Termin entfernen
+creator.meeting_date = Datum
+creator.meeting_datePlaceholder = yyyy-mm-dd
+creator.meeting_time = Uhrzeit
+creator.meeting_timePlaceholder = hh:mm
+creator.meeting_periodic = Wiederkehrender Termin
+creator.meeting_single = Einzeltermin
+creator.meeting_type = Termintyp
+
+creator.meeting_info = Eine Veranstaltung kann beliebig viele Termine besitzen (auch keine). Ein Termin kann regelmäßig sein, beispielsweise eine Vorlesung jede Woche mittwochs, oder einmalig, beispielsweise eine einmalig stattfindende Einweisung.
+
+creator.meeting_date_invalid = Bitte geben Sie ein gültiges Datum an.
+creator.meeting_date_missing = Bitte geben Sie ein Datum an.
+creator.meeting_time_invalid = Bitte geben Sie eine gültige Zeitangabe an.
+creator.meeting_time_missing = Bitte geben Sie einen Zeitpunkt an.
+
+creator.meeting_validate_tooEarly = Termine dürfen nicht vor dem Beginn des Einschreibezeitraums stattfinden.
+creator.meeting_validate_endBeforeStart = Termine dürfen nicht früher enden als sie anfangen.
+
+creator.customMail_info1 = Hier kann eine E-Mail hinterlegt werden, die automatisch an jedeN NutzerIn gesendet wird, die/der sich in eine Veranstaltung des Kurses einschreibt.
+creator.customMail_info2 = Bleibt das Editorfeld leer, wird eine allgemeine Informations-E-Mail gesendet.
+creator.customMail_fields_info = Zum Individualisieren der E-Mail können Sie die folgenden Felder einbauen
+creator.customMail_fieldsUsage_info = Schreiben Sie dazu die fettgedruckten Bezeichnungen in doppelte eckige Klammern in den E-Mail-Text. <strong> Groß- und Kleinschreibung muss beachtet werden. </strong> Zum Beispiel
+
+creator.createCourse_info = Hier können Sie einen neuen Kurs erstellen oder entwerfen. Sind alle Pflichtfelder ausgefüllt, so können Sie den Kurs im System anlegen. Sollten Sie nur einen Entwurf des Kurses anlegen wollen, so können Sie beliebige Felder frei lassen und den Entwurf herunterladen (Downloadoption im Reiter '%(creator.title_createCourse)s').
+creator.createCourse_confirm_success = Sind Sie sich sicher, dass Sie den Kurs erstellen möchten?
+creator.createCourse_confirmEdit_success = Sind Sie sich sicher, dass Sie das Bearbeiten des Kurses abschließen möchten?
+creator.createCourse_cancel_danger = Sind Sie sich sicher, dass Sie das Kurserstellen bzw. Bearbeiten abbrechen möchten?
+
+creator.createCourse_confirmation_new = Kurs %d wurde erstellt.
+creator.createCourse_confirmation_edit = Kurs %d wurde bearbeitet.
+creator.createCourse_cancel = Kurserstellen abbrechen
+
+creator.createCourse_closePreview = Kursvorschau schließen
+creator.createCourse_openPreview = Kursvorschau öffnen
+creator.createCourse_preview = Kursvorschau
+creator.createCourse_preview_warning = Achtung! Dies ist nur eine Vorschau. Der Kurs wurde noch nicht gespeichert. Um den Kurs zu speichern schließen Sie bitte die Vorschau und wählen dann '%(creator.pageName)s' aus.
+
+creator.createCourse_download = Kursdaten bzw. Entwurf herunterladen
+creator.createCourse_download_filename = Dateiname
+creator.createCourse_download_info = Sie können den Kurs(entwurf) hier herunterladen. Alternativ können Sie den Kurs auch nach dem Erstellen noch über die Profilseite oder über die %(details.title)s herunterladen. Wichtig ist nur, dass Sie den Kurs herunterladen, bevor er abläuft, falls Sie ihn als Vorlage noch einmal verwenden wollen.
+creator.createCourse_download_customName_info = Sie haben hier die Möglichkeit den Kursdaten einen individuellen Dateinamen zu geben. Wenn Sie das Feld leer lassen, dann wird ein Dateiname generiert.
+
+# -------------------------------------------------------------------------------------------------- #
+# Course details
+# -------------------------------------------------------------------------------------------------- #
+
+details.tabName = Kursdetails
+details.pageName = Kursdetails
+details.title = Teilnehmer- und Kursverwaltung
+
+details.backToCourse = Zur allgemeinen Kursansicht
+details.generalDetails = Allgemeine Kursdetails
+details.confirmDeletion = Löschen bestätigen
+details.confirmDeletionQuestion = Möchten Sie diesen Kurs wirklich löschen?
+details.delete = Kurs löschen
+
+details.delete_success = Sie haben Kurs %d gelöscht.
+
+details.userlists_participants = Teilnehmerliste
+details.userlists_downloadCSVEvent = Teilnehmerliste dieser Veranstaltung herunterladen
+details.userlists_downloadCSVCourse = Teilnehmerliste herunterladen
+details.userlists_waitlist = Warteliste
+details.userlists_unsubscribedUsers = Ausgetragene NutzerInnen
+details.userlists_courseName = Teilnehmerliste des Kurses:
+details.userlists_courseID = Kurs ID:
+details.userlists_timeOfEnrollment = Einschreibezeitpunkt
+details.userlists_delimiter = Einträge kommasepariert speichern.
+details.userlists_defaultNamePrefix = Teilnehmerliste_Kurs_
+details.userlists_defaultNameInfix = _Veranstaltung_
+details.userslists_extractionTime = Zeitpunkt des Downloads:
+details.userlists_participantsNone = Bisher haben sich keine TeilnehmerInnen eingetragen.
+details.userlists_waitlistEmpty = Bisher befinden sich keine TeilnehmerInnen auf der Warteliste.
+details.userlists_unsublistEmpty = Bisher haben sich keine TeilnehmerInnen ausgetragen.
+
+details.userlists_isEmpty_info = Die Teilnehmerliste ist leer.
+details.userlists_customName_info = Hier können Sie der Teilnehmerliste einen individuellen Dateinamen geben. Wenn Sie das Feld leer lassen wird ein Dateiname generiert.
+details.userlists_csv_info = Bei der Teilnehmerliste handelt es sich um eine .csv-Datei. Diese können unter anderem mit Excel geöffnet werden.
+details.userlists_delimiter_info = Wählen Sie diese Option, falls Sie NICHT Excel zum Öffnen der Teilnehmerliste verwenden.
+details.userlists_orderByLastname_info = TeilnehmerInnen sind nach NACHNAME sortiert.
+details.userlists_orderByEnrollDate_info = TeilnehmerInnen sind nach EINSCHREIBEZEITPUNKT sortiert.
+
+details.userManagement_enrollUser = Zu Veranstaltung hinzufügen
+details.userManagement_removeUser = NutzerIn austragen
+details.userManagement_moveToWaitlist = Auf die Warteliste verschieben
+details.userManagement_manualEnrollment = Manuell NutzerInnen Einschreiben/Austragen:
+
+details.userManagement_manualEnrollment_info = Hier können Sie manuell nach NutzerInnen suchen, um diese einzuschreiben oder auszutragen. Es können nur NutzerInnen gefunden werden, die sich bereits im System angemeldet haben und einen aktiven Account besitzen.
+details.userManagement_inPrioritySystem_warning = Dieser Kurs ist Teil eines Prioritätensystems. Sie sollten mit der manuellen Einschreibung bis zum Ende des Einschreibezeitraums warten, ansonsten können Fehler auftreten.
+details.userManagement_usersInPrioritySystem_warning = Für alle Veranstaltungen dieses Kurses haben bereits %d NutzerInnen eine Priorität gesetzt.
+
+details.customMail_buttonToCourse = E-Mail an Kurs erstellen
+details.customMail_buttonToEvent = E-Mail an Veranstaltung erstellen
+details.customMail_titleToCourse = E-Mail an gesamten Kurs senden
+details.customMail_titleToEvent = E-Mail an Veranstaltung
+details.customMail_headerToEvent = E-Mail an alle TeilnehmerInnen dieser Veranstaltung senden
+details.customMail_enterText = Geben Sie hier den gewünschten E-Mail-Text an.
+details.customMail_alsoWaitlistEvent = E-Mail auch an TeilnehmerInnen auf der Warteliste senden.
+details.customMail_onlyWaitlistEvent = E-Mail ausschließlich an TeilnehmerInnen auf der Warteliste senden.
+details.customMail_alsoWaitlistCourse = E-Mail auch an TeilnehmerInnen auf der Warteliste (insofern vorhanden) senden.
+details.customMail_onlyWaitlistCourse = E-Mail ausschließlich an TeilnehmerInnen auf der Warteliste (insofern vorhanden) senden.
+details.customMail_enableDoNotReply = TeilnehmerInnen sollen nicht auf diese E-Mail antworten.
+
+details.customMail_titleToEvent_info = Im Gegensatz zur obigen 'E-Mail erstellen'-Option kann diese Option genutzt werden, um eine E-Mail ausschließlich an die TeilnehmerInnen dieser Veranstaltung zu senden, anstatt an den gesamten Kurs.
+details.customMail_options_info = Stellen Sie sicher, dass alle Optionen entsprechend gesetzt sind. Falls Sie keine zusätzliche Option anwählen, so wird die E-Mail an alle eingeschriebenen TeilnehmerInnen gesendet.
+details.customMail_optionsEvent_info = Stellen Sie sicher, dass alle Optionen entsprechend gesetzt sind. Falls Sie keine zusätzliche Option anwählen, so wird die E-Mail an alle eingeschriebenen TeilnehmerInnen dieser Veranstaltung gesendet.
+details.customMail_doNotReply_info = Normalerweise können TeilnehmerInnen nach erhalt der E-Mail über die 'Antworten'-Option ihres E-Mail-Programms eine Antwort verfassen. Wenn Sie allerdings diese Option aktivieren, dann wird TeilnehmerInnen beim Antworten auf diese E-Mail eine 'Antworten Sie nicht auf diese E-Mail.'-Information angezeigt.
+details.customMail_sendTo_success = Ihre E-Mail wurde an %d TeilnehmerInnen gesendet. Bitte beachten Sie, dass TeilnehmerInnen sich aus dem E-Mail-Verkehr einer Veranstaltung ausschreiben können.
+
+# -------------------------------------------------------------------------------------------------- #
+# Profile
+# -------------------------------------------------------------------------------------------------- #
+
+profile.tabName = Profil
+profile.pageName = Profil
+
+profile.generalInfo = Allgemeine Informationen
+profile.enrolledCourses = Eingeschriebene Veranstaltungen
+profile.leadedCourses = Organisierte Kurse
+profile.createdCourses = Erstellte Kurse
+profile.unsubscribedCourses = Ausgetragene Veranstaltungen
+profile.changePassword = Passwort ändern
+profile.managePriorities = Prioritäten verwalten
+
+profile.generalInfo_updateData = Daten aktualisieren
+profile.generalInfo_newData = Es wurden neue Daten angefordert.
+profile.generalInfo_noNewData = Keine neuen Daten verfügbar.
+
+profile.enrolledCourses_none = Sie sind in keine aktiven Veranstaltungen eingeschrieben.
+profile.enrolledCourses_unsubscribeMails = Aus E-Mail-Verkehr austragen
+profile.enrolledCourses_subscribeMails = In E-Mail-Verkehr eintragen
+
+profile.leadedCourses_none = Sie organisieren momentan keine Kurse.
+profile.createdCourses_none = Sie haben momentan keine Kurse erstellt.
+profile.unsubscribedCourses_none = Sie haben momentan keine Veranstaltungen, aus denen Sie ausgetragen sind.
+
+profile.changePassword_oldPassword = Altes Passwort
+profile.changePassword_newPassword = Neues Passwort
+profile.changePassword_repeatNewPassword = Neues Passwort wiederholen
+profile.changePassword_oldPasswordIncorrect = Bitte stellen Sie sicher, dass Sie ihr altes Passwort korrekt eingeben.
+
+profile.managePriorities_none = Sie sind in keine aktiven Prioritätensysteme eingeschrieben.
+
+profile.managePriorities_info = Hier können Sie die bisher gewählten Prioritäten des Prioritätensystems %d neu verteilen.
+profile.managePriorities_enrollment_info = Am Ende des Einschreibezeitraums werden Sie entsprechend dieser Prioritäten eingeschrieben.
+profile.managePriorities_distinct_warning = Bitte stellen Sie sicher, dass Sie jede Priorität nur einmal vergeben.
+
+# -------------------------------------------------------------------------------------------------- #
+# Status administration
+# -------------------------------------------------------------------------------------------------- #
+
+statusManager.tabName = Statusverwaltung
+statusManager.pageName = Statusverwaltung
+statusManager.title = Hier kann der Bezahlstatus von TeilnehmerInnen bearbeitet werden.
+
+statusManager.changeTo = Bezahlstatus ändern zu
+statusManager.cantSetOnWaitlist = Der Bezahlstatus kann nicht zu 'Auf der Warteliste' oder 'Eingeschrieben' geändert werden.
+
+# -------------------------------------------------------------------------------------------------- #
+# Help pages
+# -------------------------------------------------------------------------------------------------- #
+
+newsFeed.tabName = Turm2 Updates
+newsFeed.pageName = Neuerungen & Ankündigungen
+
+newsFeed.add = Update hinzufügen
+newsFeed.edit = Update bearbeiten
+newsFeed.category = Kategorie
+newsFeed.content = Inhalt
+newsFeed.listCategories = Bisherige Kategorien
+newsFeed.listCategoriesNone = Keine Kategorien vorhanden.
+
+newsFeed.none_info = Keine Ankündigungen und Neuerungen vorhanden.
+newsFeed.confirmation_success = Neues Update hinzugefügt.
+newsFeed.edit_success = Update ID=%d bearbeitet.
+newsFeed.delete_success = Update ID=%d entfernt.
+newsFeed.dataInvalid_danger = Die Kategorie und der Inhalt dürfen nicht leer sein.
+
+faq.tabName = FAQ
+faq.pageName = FAQ
+faq.title = Häufig gestellte Fragen
+
+faq.add = FAQ hinzufügen
+faq.edit = FAQ bearbeiten
+faq.category = Kategorie
+faq.question = Frage
+faq.answer = Antwort
+faq.listCategories = Bisherige Kategorien
+faq.listCategoriesNone = Keine Kategorien vorhanden.
+
+faq.none_info = Keine FAQs vorhanden.
+faq.confirmation_success = Neue FAQ hinzugefügt.
+faq.edit_success = FAQ ID=%d bearbeitet.
+faq.delete_success = FAQ ID=%d entfernt.
+faq.dataInvalid_danger = Die Kategorie, die Frage und die Antwort dürfen nicht leer sein.
+
+policy.tabName = Datenschutzerklärung
+policy.pageName = Datenschutzerklärung
+policy.here = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>.
+
+tutorials.tabName = Handbuch
+tutorials.pageName = Handbuch
+
+imprint.tabName = Impressum
+imprint.pageName = Impressum

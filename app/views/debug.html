@@ -12,11 +12,11 @@
 	#toggleSidebar {
 		position: absolute;
 		right: 0px;
-		top: 50px;
+		top: 100px;
 		background-color: #fee;
 	}
-
 </style>
+
 <div id="sidebar" style="display:none;">
 	<h4>Available pipelines</h4>
 	<dl>
@@ -41,7 +41,7 @@
 	{{end}}
 	</dl>
 </div>
-<a id="toggleSidebar" href="#" class="toggles"><i class="glyphicon glyphicon-chevron-left"></i></a>
+<a id="toggleSidebar" href="#" class="toggles">Debug Data</a>
 
 <script>
 	$sidebar = 0;
@@ -58,7 +58,6 @@
 			$('#toggleSidebar i').removeClass('glyphicon-chevron-left');
 			$sidebar = 1;
 		}
-
     return false;
 	});
 </script>

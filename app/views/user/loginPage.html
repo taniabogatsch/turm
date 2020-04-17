@@ -1,0 +1,161 @@
+<!-- the login page provides the login form -->
+
+{{template "header.html" .}}
+
+<div class="page page-side page-side-left">
+  <br class="mobile-hidden">
+</div>
+
+<div class="page page-middle">
+  <center>
+    <h3>
+      {{msg $ "login.pageName"}}
+    </h3>
+    <br>
+
+    <div class="login-width">
+      <ul class="nav nav-tabs" id="loginType" role="tablist" >
+        <li class="nav-item login-width-tab">
+          <a class="nav-link active" id="ldap" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="true">
+            {{msg $ "user.ldap"}}
+          </a>
+        </li>
+        <li class="nav-item login-width-tab">
+          <a class="nav-link" id="external" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="false">
+            {{msg $ "user.external"}}
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content login-width-content" id="loginTypeContent">
+        <div class="tab-pane fade show active" id="loginFormTab" role="tabpanel">
+
+          <br>
+          <br>
+
+          <!-- login form -->
+          <form id="loginForm" accept-charset="UTF-8" action='{{url "User.Login"}}' method="POST" class="needs-validation" novalidate>
+            <!-- username or e-mail input -->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="input-icon">
+                  {{template "icons/person.html" .}}
+                </span>
+              </div>
+              <input id="input-user" type="text" class="form-control" name="credentials.Username" value="" placeholder='{{msg $ "user.username"}}' required maxlength="255">
+              <div class="invalid-feedback" id="input-user-validation">
+                {{msg $ "validation.invalid.username"}}
+              </div>
+            </div>
+            <!-- password input -->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  {{template "icons/lock.html" .}}
+                </span>
+              </div>
+              <input type="password" class="form-control" name="credentials.Password" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
+              <div class="invalid-feedback">
+                {{msg $ "validation.invalid.password"}}
+              </div>
+            </div>
+            <!-- keep logged in input -->
+            <div class="form-group">
+              <div class="form-check">
+                {{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}
+                  <input id="stayLoggedIn-checkbox" class="form-check-input" type="checkbox" name="credentials.StayLoggedIn" value="true" checked>
+                {{end}}
+                <label class="form-check-label">
+                  {{msg $ "login.stayLoggedIn"}}
+                </label>
+              </div>
+            </div>
+
+            {{range .errors}}
+              <div class="warning-feedback">
+                {{.}}
+              </div>
+            {{end}}
+            <br>
+            <!-- button to confirm login -->
+            <button class="btn btn-darkblue" type="submit">
+              {{msg $ "login.pageName"}}
+            </button>
+          </form>
+
+        </div>
+      </div>
+
+      <!-- link to register page -->
+      <br>
+      <br>
+      <a href='{{url "User.RegistrationPage"}}'>
+        {{msg $ "register.pageName"}}
+      </a>
+
+      <!-- link to new password page -->
+      <br>
+      <br>
+      <a href='{{url "User.NewPasswordPage"}}'>
+        {{msg $ "newPw.pwforgottenQuestion"}}
+      </a>
+
+    </div>
+  </center>
+</div>
+
+<div class="page page-side page-side-right">
+  {{template "toast.html" .}}
+</div>
+
+<div id="icon-person" class="display-none"> {{template "icons/person.html" .}} </div>
+<div id="icon-email" class="display-none"> {{template "icons/envelope.html" .}} </div>
+<div id="username-flash" class="display-none">{{with $username := field "credentials.Username" .}}{{$username.Flash}}{{end}}</div>
+<div id="email-flash" class="display-none">{{with $email := field "credentials.EMail" .}}{{$email.Flash}}{{end}}</div>
+<div id="stayLoggedIn-flash" class="display-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>
+
+<script>
+  //adjust input fields when switching tabs
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    if ($(e.target).attr('id') == "ldap") {
+      $("#input-icon").html($("#icon-person").html());
+      $("#input-user").attr("name", "credentials.Username");
+      $("#input-user").attr("placeholder", '{{msg $ "user.username"}}');
+      $("#input-user").attr("type", "text");
+      $("#input-user-validation").html('{{msg $ "validation.invalid.username"}}');
+    } else {
+      $("#input-icon").html($("#icon-email").html());
+      $("#input-user").attr("name", "credentials.EMail");
+      $("#input-user").attr("placeholder", '{{msg $ "user.email"}}');
+      $("#input-user").attr("type", "email");
+      $("#input-user-validation").html('{{msg $ "validation.invalid.email"}}');
+    }
+
+    $("#input-user").focus();
+  });
+
+  //fill the form with flash values
+  const username = $("#username-flash").html();
+  if (username != "") {
+    $("#input-user").attr("value", username);
+    $("#ldap").click();
+  }
+  const email = $("#email-flash").html();
+  if (email != "") {
+    $("#input-user").attr("value", email);
+    $("#external").click();
+  }
+  const stayLoggedIn = $("#stayLoggedIn-flash").html();
+  if (email != "" || username != "") {
+    if (stayLoggedIn == 'true') {
+      $('#stayLoggedIn-checkbox').prop('checked', true);
+    } else {
+      $('#stayLoggedIn-checkbox').prop('checked', false);
+    }
+  }
+
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#loginForm").addClass("was-validated");
+  }
+</script>
+
+{{template "footer.html" .}}

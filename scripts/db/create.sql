@@ -10,7 +10,9 @@ CREATE TABLE users (
   role            integer                   NOT NULL,
   lastlogin       timestamp with time zone  NOT NULL,
   firstlogin      timestamp with time zone  NOT NULL,
+  language        varchar(63),
   matrnr          integer                   UNIQUE,
+  affiliations    varchar(127)[],
   academictitle   varchar(127),
   title           varchar(127),
   nameaffix       varchar(127),
@@ -39,15 +41,6 @@ CREATE TABLE studies (
   FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
   FOREIGN KEY (degreeid) REFERENCES degree (id) ON DELETE CASCADE,
   FOREIGN KEY (courseofstudiesid) REFERENCES courseofstudies (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE affiliation (
-  userid  integer       NOT NULL,
-  name    varchar(127)  NOT NULL,
-
-  PRIMARY KEY (userid, name),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE
 );
 
 

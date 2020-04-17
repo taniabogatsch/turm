@@ -1,18 +1,24 @@
-{{if .flash.success}}
-<div class="alert alert-success">
-	{{.flash.success}}
-</div>
-{{end}}
+<div id="icon-flash-check" class="display-none"> {{template "icons/check.html" .}} {{msg $ "page.flash_success"}} </div>
+<div id="icon-flash-alertCircle" class="display-none"> {{template "icons/alertCircle.html" .}} {{msg $ "page.flash_error"}} </div>
 
-{{if or .errors .flash.error}}
-<div class="alert alert-danger">
+<script>
 	{{if .flash.error}}
-		{{.flash.error}}
+		$(document).ready(function(){
+			$("#feedback-toast").toast('show');
+			$("#toast-title").html($("#icon-flash-alertCircle").html());
+			$("#toast-title").attr("class", "mr-auto btn-outline-danger");
+			$("#toast-content").html('{{.flash.error}}');
+			$("#toast-content").attr("class", "btn-outline-danger");
+		});
 	{{end}}
-	<ul style="margin-top:10px;">
-		{{range .errors}}
-			<li>{{.}}</li>
-		{{end}}
-	</ul>
-</div>
-{{end}}
+
+	{{if .flash.success}}
+		$(document).ready(function(){
+			$("#feedback-toast").toast('show');
+			$("#toast-title").html($("#icon-flash-check").html());
+			$("#toast-title").attr("class", "mr-auto btn-outline-success");
+			$("#toast-content").html('{{.flash.success}}');
+			$("#toast-content").attr("class", "btn-outline-success");
+		});
+	{{end}}
+</script>

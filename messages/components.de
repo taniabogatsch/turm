@@ -1,0 +1,63 @@
+# headers, modal titles, buttons, alerts, errors, ...
+# Components are often structured according to their bootstrap structure.
+
+# -------------------------------------------------------------------------------------------------- #
+# Page
+# -------------------------------------------------------------------------------------------------- #
+
+page.title_overview = Übersicht
+
+page.noMobileView = Für diese Seite gibt es keine mobile Ansicht. Bitte nutzen Sie ein Tablet, einen Laptop oder einen PC.
+page.underConstruction = Diese Seite wird noch entwickelt.
+page.noJavaScript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
+
+page.menu_courses = Kurse
+page.menu_noCourses = Keine Kurse
+page.menu_helpPages = Hilfen
+
+page.footer_imprint = Impressum
+page.footer_help_info = Bei Fragen wenden Sie sich bitte an unseren <a class="greylink" href="mailto:%s?Subject=SupportTurm2" target="_top"> Support</a>.
+
+page.flash_success = Erfolg
+page.flash_error = Fehler
+
+# -------------------------------------------------------------------------------------------------- #
+# Buttons
+# -------------------------------------------------------------------------------------------------- #
+
+button.save = Speichern
+button.search = Suchen
+button.confirm = Bestätigen
+button.cancel = Abbrechen
+button.send = Senden
+button.add = Hinzufügen
+button.download = Herunterladen
+button.edit = Bearbeiten
+button.delete = Löschen
+button.saveChanges = Änderungen übernehmen
+button.accept = Akzeptieren
+button.remove = Entfernen
+button.ok = OK
+button.next = Weiter
+button.back = Zurück
+
+# -------------------------------------------------------------------------------------------------- #
+# Forms (grouped according to bootstrap forms)
+# -------------------------------------------------------------------------------------------------- #
+
+form.check_yes = Ja
+form.check_no = Nein
+
+# -------------------------------------------------------------------------------------------------- #
+# Alerts (grouped according to bootstrap alert types)
+# -------------------------------------------------------------------------------------------------- #
+
+alert.info_reloadPage = Bitte laden Sie die Seite neu.
+
+alert.success_changesSuccessful = Ihre Änderungen waren erfolgreich.
+
+alert.danger_pageAccessDenied = Ihnen fehlt die Berechtigung, um auf diese Seite zuzugreifen: %s
+alert.danger_actionDenied = Ihnen fehlt die Berechtigung zum Ausführen dieser Aktion.
+alert.danger_alreadyLoggedIn = Sie sind bereits angemeldet.
+alert.danger_logInToEnroll = Sie müssen sich anmelden, um sich in Veranstaltungen einzuschreiben.
+alert.danger_languageInvalid = Bitte wählen Sie eine gültige Sprache aus.

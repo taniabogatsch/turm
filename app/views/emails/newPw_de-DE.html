@@ -1,0 +1,30 @@
+{{template "emails/components/MIMETop.html" .}}
+
+{{template "emails/components/salutation.html" .}}
+
+Hier ist Ihr neues Passwort, mit dem Sie sich jetzt anmelden k&ouml;nnen.
+{{.data.User.Password.String}}
+
+Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
+
+{{template "emails/components/bestRegards.html" .}}
+
+{{template "emails/components/MIMEMiddle.html" .}}
+
+<body>
+{{template "emails/components/salutation.html" .}}
+<br>
+<br>
+Hier ist Ihr neues Passwort, mit dem Sie sich jetzt anmelden können.
+<br>
+<font color="red">{{.data.User.Password.String}}</font>
+<br>
+<br>
+<b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
+<br>
+<br>
+{{msg $ "emails.bestRegards" .data.URL}}
+</body>
+</html>
+
+{{template "emails/components/MIMEBottom.html" .}}

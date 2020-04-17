@@ -1,20 +1,25 @@
 # -------------------------------------------------------------------------------------------------- #
+# General data validation
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.language = Please provide a valid language.
+
+# -------------------------------------------------------------------------------------------------- #
 # User data validation
 # -------------------------------------------------------------------------------------------------- #
 
-validation.missing.salutation = Please provide your form of address.
-validation.missing.lastname = Please provide your last name.
-validation.missing.firstname = Please provide your first name.
-validation.missing.email = Please provide your e-mail address.
-validation.missing.password = Please provide your password.
-validation.missing.passwordRepeat = Please repeat your password.
-validation.missing.username = Please provide your username (university account) or your e-mail address (external account).
-
-validation.max.lastname = Your last name must have a maximum of 255 characters.
-validation.max.firstname = Your first name must have a maximum of 255 characters.
-validation.max.email = Your e-mail address must have a maximum of 255 characters.
-validation.max.password = Your password must have a maximum of 255 characters.
-validation.max.username = Your username (university account) or your e-mail address (external account) must have a maximum of 255 characters.
-
+validation.invalid.username = The username must be between 1 - 255 characters long.
+validation.invalid.lastname = The last name must be between 1 - 255 characters long.
+validation.invalid.firstname = The first name must be between 1 - 255 characters long.
 validation.invalid.email = Please provide a valid e-mail address.
-validation.invalid.password = Your passwords do not match.
+validation.invalid.password = The password must be between 1 - 255 characters long.
+validation.invalid.passwords = The passwords do not match and must be between 1 - 127 characters long.
+validation.invalid.salutation = Please provide a valid salutation.
+
+validation.email.notUnique = This e-mail address is already in use. Please use the 'new password' option or use a different e-mail address.
+validation.email.ldap = University e-mail address detected. Please use the university login.
+
+validation.invalid.credentials = Please provide your username or your e-mail address.
+validation.invalid.login = Login failed. Please make sure that the e-mail address and the password are correct.
+
+validation.invalid.activation = Activation code verification failed. Please make sure that you entered the code correctly and that you are logged in. Alternatively, you can use the activation link in your e-mail address or request a new activation code.
