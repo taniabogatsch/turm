@@ -21,3 +21,5 @@ validation.email.ldap = Bei der angegebenen E-Mail-Adresse handelt es sich um ei
 
 validation.invalid.credentials = Bitte geben Sie entweder Ihren Nutzernamen oder Ihre E-Mail-Addresse an.
 validation.invalid.login = Authentifizierung fehlgeschlagen. Bitte überprüfen Sie die eingegebene E-Mail-Addresse und das Passwort.
+
+validation.invalid.activation = Der Aktivierungscode konnte nicht verifiziert werden. Bitte stellen Sie sicher, dass Sie den Aktivierungscode richtig angegeben haben und angemeldet sind. Versuchen Sie alternativ den Aktivierungslink in der E-Mail zu verwenden oder fragen Sie einen neuen Aktivierungscode an.

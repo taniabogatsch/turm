@@ -15,7 +15,7 @@
     <div class="login-width">
 
       <!-- set preferred language form -->
-      <form accept-charset="UTF-8" action='{{url "User.SetPrefLanguage"}}' method="POST" class="needs-validation" novalidate>
+      <form id="pref-lang-form" accept-charset="UTF-8" action='{{url "User.SetPrefLanguage"}}' method="POST" class="needs-validation" novalidate>
 
         <div class="col login-width-tab">
           <small class="form-text text-muted">
@@ -28,11 +28,16 @@
             {{end}}
           </select>
         </div>
-        <br>
 
+        {{range .errors}}
+          <div class="warning-feedback">
+            {{.}}
+          </div>
+        {{end}}
+        <br>
         <!-- button to confirm preferred language -->
         <button class="btn btn-darkblue" type="submit">
-          Save
+          {{msg $ "button.save"}}
         </button>
       </form>
     </div>
@@ -43,5 +48,11 @@
 <div class="page page-side page-side-right">
   {{template "toast.html" .}}
 </div>
+
+<script>
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#pref-lang-form").addClass("was-validated");
+  }
+</script>
 
 {{template "footer.html" .}}

@@ -21,3 +21,5 @@ validation.email.ldap = University e-mail address detected. Please use the unive
 
 validation.invalid.credentials = Please provide your username or your e-mail address.
 validation.invalid.login = Login failed. Please make sure that the e-mail address and the password are correct.
+
+validation.invalid.activation = Activation code verification failed. Please make sure that you entered the code correctly and that you are logged in. Alternatively, you can use the activation link in your e-mail address or request a new activation code.

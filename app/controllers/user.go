@@ -54,13 +54,14 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 				c.Controller,
 			)
 		}
-		revel.AppLog.Debug("authentication successful", "user", user)
+		revel.AppLog.Debug("ldap authentication successful", "user", user)
 
 	} else { //external login
 
 		user.EMail = strings.ToLower(credentials.EMail)
 		user.Password.String = credentials.Password
 		user.Password.Valid = true
+		revel.AppLog.Debug("login of extern user", "user", user)
 	}
 
 	//login of user
@@ -84,7 +85,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		)
 	}
 
-	revel.AppLog.Debug("login successful", "user", user)
 	c.setSession(&user)
 	c.Session["stayLoggedIn"] = strconv.FormatBool(credentials.StayLoggedIn)
 
@@ -94,6 +94,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		c.Session.SetNoExpiration()
 	}
 
+	revel.AppLog.Debug("login successful", "user", user)
 	c.Flash.Success(c.Message("login.confirmation_success"))
 
 	//not activated external users get redirected to the activation page
@@ -106,7 +107,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	if !user.Language.Valid {
 		return c.Redirect(User.PrefLanguagePage)
 	}
-
 	return c.Redirect(c.Session["callPath"])
 }
 
@@ -118,7 +118,6 @@ func (c User) Logout() revel.Result {
 	for k := range c.Session {
 		c.Session.Del(k)
 	}
-
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
 }
@@ -165,7 +164,10 @@ func (c User) Registration(user models.User) revel.Result {
 	c.setSession(&user)
 	c.Session["notActivated"] = "true"
 
-	if err := c.sendActivationEMail(&user); err != nil {
+	err := c.sendEMail(&user,
+		"emails.subject_activation",
+		"activation")
+	if err != nil {
 		return flashError(
 			errEMail,
 			routes.User.ActivationPage(),
@@ -190,8 +192,75 @@ func (c User) NewPasswordPage() revel.Result {
 	return c.Render()
 }
 
+/*NewPassword generates a new password and sends it via e-mail.
+- Roles: all */
+func (c User) NewPassword(email string) revel.Result {
+
+	revel.AppLog.Debug("requesting new password", "email", email)
+
+	c.Validation.Check(email,
+		revel.Required{},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.email")
+	c.Validation.Email(email).
+		MessageKey("validation.invalid.email")
+
+	isLdapEMail := !strings.Contains(strings.ToLower(email), app.EMailSuffix)
+	c.Validation.Required(isLdapEMail).
+		MessageKey("validation.email.ldap")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			routes.User.NewPasswordPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	//we do not want to provide any information on whether an e-mail exists
+	data := models.ValidateUniqueData{
+		Column: "email",
+		Table:  "users",
+		Value:  strings.ToLower(email),
+	}
+	c.Validation.Check(data,
+		models.NotUnique{},
+	)
+	if c.Validation.HasErrors() {
+		c.Flash.Success(c.Message("newPw.confirmation_success", email))
+		return c.Redirect(User.LoginPage)
+	}
+
+	user := models.User{EMail: strings.ToLower(email)}
+	if err := db.NewPassword(&user); err != nil {
+		return flashError(
+			errDB,
+			routes.User.NewPasswordPage(),
+			"",
+			c.Controller,
+		)
+	}
+	revel.AppLog.Debug("set new password", "user", user)
+
+	err := c.sendEMail(&user,
+		"emails.subject_newPw",
+		"newPw")
+	if err != nil {
+		return flashError(
+			errEMail,
+			routes.User.NewPasswordPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	c.Flash.Success(c.Message("newPw.confirmation_success", email))
+	return c.Redirect(User.LoginPage)
+}
+
 /*ActivationPage renders the activation page.
-- Roles: logged in and not activated users */
+- Roles: all */
 func (c User) ActivationPage() revel.Result {
 
 	revel.AppLog.Debug("requesting activation page")
@@ -200,6 +269,113 @@ func (c User) ActivationPage() revel.Result {
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("activation.tabName")
 	return c.Render()
+}
+
+/*VerifyActivationCode verifies an activation code.
+- Roles: all */
+func (c User) VerifyActivationCode(activationCode string) revel.Result {
+
+	//get the user ID of the to-be-activated account
+	userID := c.Params.Query.Get("userID")
+	if userID == "" {
+		if c.Session["userID"] == nil {
+			c.Validation.ErrorKey("validation.invalid.activation")
+		} else {
+			userID = c.Session["userID"].(string)
+		}
+	}
+
+	var uID int
+	if !c.Validation.HasErrors() {
+		c.Validation.Check(activationCode,
+			revel.Required{},
+			revel.MinSize{7},
+			revel.MaxSize{7},
+		).MessageKey("validation.invalid.activation")
+
+		uID, _ = strconv.Atoi(userID)
+		c.Validation.Required(uID).
+			MessageKey("validation.invalid.activation")
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	//set the activation code to null, if it matches
+	success, err := db.VerifyActivationCode(&activationCode, &uID)
+	if err != nil {
+		return flashError(
+			errDB,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	if !success { //invalid activation code
+		c.Validation.ErrorKey("validation.invalid.activation")
+		return flashError(
+			errValidation,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	c.Session.Del("notActivated")
+	c.Flash.Success(c.Message("activation.success"))
+	if c.Session["callPath"].(string) == routes.User.ActivationPage() {
+		return c.Redirect(App.Index)
+	}
+	return c.Redirect(c.Session["callPath"])
+}
+
+/*NewActivationCode sends a new activation code.
+- Roles: logged in and not activated users */
+func (c User) NewActivationCode() revel.Result {
+
+	userID := c.Session["userID"].(string)
+	var user models.User
+	var err error
+
+	if user.ID, err = strconv.Atoi(userID); err != nil {
+		return flashError(
+			errDataConversion,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	if err := db.NewActivationCode(&user); err != nil {
+		return flashError(
+			errDB,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	err = c.sendEMail(&user,
+		"emails.subject_activation",
+		"activation")
+	if err != nil {
+		return flashError(
+			errEMail,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	c.Flash.Success(c.Message("activation.resendCode_success"))
+	return c.Redirect(User.ActivationPage)
 }
 
 /*PrefLanguagePage renders the page to set a preferred language.
@@ -234,7 +410,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
 	//update the language
 	userID := c.Session["userID"].(string)
-	if err := db.SetPrefLanguage(userID, prefLanguage); err != nil {
+	if err := db.SetPrefLanguage(&userID, &prefLanguage); err != nil {
 		return flashError(
 			errDB,
 			routes.User.PrefLanguagePage(),
@@ -256,8 +432,8 @@ func (c User) setSession(user *models.User) {
 	c.Session["prefLanguage"] = user.Language.String
 }
 
-//sendActivationEMail sends an e-mail with an activation code and an activation URL. */
-func (c User) sendActivationEMail(user *models.User) (err error) {
+//sendEMail sends an activation e-mail or a new password e-mail.
+func (c User) sendEMail(user *models.User, subjectKey string, filename string) (err error) {
 
 	data := models.EMailData{User: *user}
 
@@ -273,8 +449,8 @@ func (c User) sendActivationEMail(user *models.User) (err error) {
 	err = models.GetEMailSubjectBody(
 		&data,
 		&user.Language.String,
-		"emails.subject_activation",
-		"activation",
+		subjectKey,
+		filename,
 		&email,
 		c.Controller,
 	)
@@ -282,7 +458,7 @@ func (c User) sendActivationEMail(user *models.User) (err error) {
 		return
 	}
 
-	revel.AppLog.Debug("assembled e-mail", "e-mail", email)
+	revel.AppLog.Debug("assembled e-mail", "email", email)
 
 	app.EMailQueue <- email
 	return

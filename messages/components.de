@@ -25,6 +25,7 @@ page.flash_error = Fehler
 # Buttons
 # -------------------------------------------------------------------------------------------------- #
 
+button.save = Speichern
 button.search = Suchen
 button.confirm = Bestätigen
 button.cancel = Abbrechen

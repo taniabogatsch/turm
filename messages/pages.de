@@ -116,13 +116,13 @@ newPw.pageName = Neues Passwort
 newPw.pwforgottenQuestion = Passwort vergessen?
 
 newPw.conditions_info = Bitte geben Sie Ihre E-Mail-Adresse an. Wir werden ein neues Passwort zu dieser E-Mail-Adresse senden. %(newPw.universityAccount_danger)s
-newPw.confirmation_success = Ein neues Passwort wurde an Ihre E-Mail-Adresse gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner. Sie können sich nun mit dem neuen Passwort anmelden.
+newPw.confirmation_success = Ein neues Passwort wurde an %s gesendet, falls diese E-Mail-Adresse existiert. Bitte überprüfen Sie auch Ihren Spam-Ordner. Sie können sich nun mit dem neuen Passwort anmelden.
 newPw.universityAccount_danger = Neue Passwörter können nur für externe NutzerInnen generiert werden (kein Universitätslogin).
 
 activation.tabName = Account Aktivieren
 activation.pageName = Account aktivieren
 
-activation.success = Ihr Account ist nun aktiviert.
+activation.success = Account aktiviert.
 activation.code = Aktivierungscode
 activation.activateAccount = Account aktivieren
 activation.resendCode = Aktivierungscode erneut zusenden

@@ -8,11 +8,53 @@
 
 <div class="page page-middle">
   <center>
+
+    <!-- enter activation code -->
     <h3>
       {{msg $ "activation.pageName"}}
     </h3>
     <br>
-    TODO
+    <div class="login-width">
+
+      <!-- enter activation code form -->
+      <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}' method="POST" class="needs-validation" novalidate>
+
+        <div class="col">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/lock.html" .}}
+              </span>
+            </div>
+            {{with $field := field "activationCode" .}}
+              <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "activation.code"}}' required maxlength="7" minlength="7">
+            {{end}}
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.activation"}}
+            </div>
+          </div>
+        </div>
+
+        {{range .errors}}
+          <div class="warning-feedback">
+            {{.}}
+          </div>
+        {{end}}
+        <br>
+        <!-- button to confirm activation -->
+        <button class="btn btn-darkblue" type="submit">
+          {{msg $ "activation.activateAccount"}}
+        </button>
+      </form>
+    </div>
+
+    <!-- request new activation code -->
+    <br>
+    <br>
+    <a href='{{url "User.NewActivationCode"}}'>
+      {{template "icons/envelope.html" . }} &nbsp;
+      {{msg $ "activation.resendCode"}}
+    </a>
 
   </center>
 </div>
@@ -20,5 +62,11 @@
 <div class="page page-side page-side-right">
   {{template "toast.html" .}}
 </div>
+
+<script>
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#activation-code-form").addClass("was-validated");
+  }
+</script>
 
 {{template "footer.html" .}}

@@ -10,13 +10,21 @@ GET     /                                       App.Index
 GET     /app/changeLanguage                     App.ChangeLanguage
 
 # ------------------------------- User routes. -------------------------------- #
+
 GET     /user/loginPage                         User.LoginPage
 POST    /user/login                             User.Login
 GET     /user/logout                            User.Logout
+
 GET     /user/registrationPage                  User.RegistrationPage
 POST    /user/registration                      User.Registration
+
 GET     /user/newPasswordPage                   User.NewPasswordPage
+POST    /user/newPassword                       User.NewPassword
+
 GET     /user/activationPage                    User.ActivationPage
+POST    /user/verifyActivationCode              User.VerifyActivationCode
+GET     /user/newActivationCode                 User.NewActivationCode
+
 GET     /user/prefLanguagePage                  User.PrefLanguagePage
 POST    /user/setPrefLanguage                   User.SetPrefLanguage
 

@@ -78,3 +78,16 @@ func (uniqueV Unique) IsSatisfied(i interface{}) bool {
 func (uniqueV Unique) DefaultMessage() string {
 	return fmt.Sprintln("Please provide a unique value.")
 }
+
+/*NotUnique implements the validation of fields that must not be set. */
+type NotUnique struct{}
+
+/*IsSatisfied implements the validation result of NotUnique. */
+func (v NotUnique) IsSatisfied(i interface{}) bool {
+	return !Unique{}.IsSatisfied(i)
+}
+
+/*DefaultMessage returns the default message of NotUnique. */
+func (v NotUnique) DefaultMessage() string {
+	return fmt.Sprintln("Please provide a non-unique value.")
+}

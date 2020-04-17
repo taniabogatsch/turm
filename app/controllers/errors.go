@@ -12,10 +12,12 @@ const (
 	errDB
 	errAuth
 	errEMail
+	errDataConversion
 )
 
 func (s ErrorType) String() string {
-	return [...]string{"validation error", "database error", "authentification error"}[s]
+	return [...]string{"validation error", "database error",
+		"authentification error", "e-mail error", "data conversion error"}[s]
 }
 
 //flashError flashes an error message and redirects to a page.
@@ -45,6 +47,11 @@ func flashError(errType ErrorType, url string, msg string, c *revel.Controller) 
 	case errEMail:
 		//flash error and parameters, then redirect
 		c.Flash.Error(c.Message("error.email"))
+		return c.Redirect(url)
+
+	case errDataConversion:
+		//flash error and parameters, then redirect
+		c.Flash.Error(c.Message("error.typeConversion"))
 		return c.Redirect(url)
 
 	default:
