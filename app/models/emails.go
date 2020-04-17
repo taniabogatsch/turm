@@ -16,7 +16,7 @@ type EMailData struct {
 func GetEMailBody(data *EMailData, filepath string, body *string, c *revel.Controller) (err error) {
 
 	data.URL = app.URL
-	c.ViewArgs["emailData"] = data
+	c.ViewArgs["data"] = data
 
 	//parse template
 	buf, err := revel.TemplateOutputArgs(filepath, c.ViewArgs)

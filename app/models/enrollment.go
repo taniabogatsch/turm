@@ -33,8 +33,8 @@ type Enrolled struct {
 	TimeOfEnrollment string           `db:"timeofenrollment"`
 }
 
-//validateEnrolled validates the Enrolled struct fields.
-func (enrolled *Enrolled) validateEnrolled(v *revel.Validation) {
+/*Validate validates the Enrolled struct fields. */
+func (enrolled *Enrolled) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -44,7 +44,7 @@ type Unsubscribed struct {
 	EventID int `db:"eventid, primarykey"`
 }
 
-//validateUnsubscribed validates the Enrolled struct fields.
-func (unsubscribed *Unsubscribed) validateUnsubscribed(v *revel.Validation) {
+/*Validate validates the Enrolled struct fields. */
+func (unsubscribed *Unsubscribed) Validate(v *revel.Validation) {
 	//TODO
 }

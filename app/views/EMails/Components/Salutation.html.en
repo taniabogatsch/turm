@@ -1,0 +1,7 @@
+{{if eq .mailData.Salutation "female"}}
+Dear Ms.{{if .mailData.Honortitle}} {{.mailData.Honortitle}}{{end}}{{if .mailData.Academictitle}} {{.mailData.Academictitle}}{{end}}{{if .mailData.Nameaffix}} {{.mailData.Nameaffix}}{{end}} {{.mailData.Lastname}},
+{{else if eq .mailData.Salutation "male"}}
+Dear Mr.{{if .mailData.Honortitle}} {{.mailData.Honortitle}}{{end}}{{if .mailData.Academictitle}} {{.mailData.Academictitle}}{{end}}{{if .mailData.Nameaffix}} {{.mailData.Nameaffix}}{{end}} {{.mailData.Lastname}},
+{{else}}
+Hello{{if .mailData.Honortitle}} {{.mailData.Honortitle}}{{end}}{{if .mailData.Academictitle}} {{.mailData.Academictitle}}{{end}} {{.mailData.Firstname}}{{if .mailData.Nameaffix}} {{.mailData.Nameaffix}}{{end}} {{.mailData.Lastname}},
+{{end}}

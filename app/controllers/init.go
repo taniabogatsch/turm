@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"turm/app"
+	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
@@ -28,17 +29,18 @@ func general(c *revel.Controller) revel.Result {
 	}
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
 
-	//ensure that callPath is not nil
+	//ensure that callPath and currPath is not nil
 	if c.Session["callPath"] == nil {
-		c.Session["callPath"] = "/"
+		c.Session["callPath"] = routes.App.Index()
+	}
+	if c.Session["currPath"] == nil {
+		c.Session["currPath"] = routes.App.Index()
 	}
 
 	//reset logout timer
 	if c.Session["stayLoggedIn"] != nil {
 		if c.Session["stayLoggedIn"] == "true" {
 			c.Session.SetNoExpiration()
-		} else {
-			c.Session.SetDefaultExpiration()
 		}
 	}
 

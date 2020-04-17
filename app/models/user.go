@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"strings"
 	"turm/app"
 
@@ -68,40 +69,69 @@ type User struct {
 	ActivationCode sql.NullString `db:"activationcode"`
 }
 
-/*ValidateUser validates the User struct fields as retrieved by the register form. */
-func (user *User) ValidateUser(v *revel.Validation) {
+func (user *User) String() string {
+	return fmt.Sprintf("User(%s)", user.FirstName)
+}
 
-	v.Required(user.LastName).MessageKey("validation.missing.lastname")
-	v.Required(user.FirstName).MessageKey("validation.missing.firstname")
-	v.Required(user.EMail).MessageKey("validation.missing.email")
-	v.Required(user.Password.String).MessageKey("validation.missing.password")
-	v.Required(user.PasswordRepeat).MessageKey("validation.missing.passwordRepeat")
-	v.Required(user.Language).MessageKey("validation.missing.prefLanguage")
+/*Validate validates the User struct fields as retrieved by the register form. */
+func (user *User) Validate(v *revel.Validation) {
 
-	v.MaxSize(user.LastName, 255).MessageKey("validation.max.lastname")
-	v.MaxSize(user.FirstName, 255).MessageKey("validation.max.firstname")
-	v.MaxSize(user.EMail, 255).MessageKey("validation.max.email")
-	v.MaxSize(user.Password.String, 511).MessageKey("validation.max.password")
-	v.MinSize(user.Password.String, 6).MessageKey("validation.min.password")
+	user.EMail = strings.ToLower(user.EMail)
 
-	v.Email(user.EMail).MessageKey("validation.invalid.email")
-	v.Required(user.Password.String == user.PasswordRepeat).MessageKey("validation.invalid.password")
+	v.Check(user.LastName,
+		revel.Required{},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.lastname")
+
+	v.Check(user.FirstName,
+		revel.Required{},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.firstname")
+
+	v.Check(user.EMail,
+		revel.Required{},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.email")
+
+	v.Email(user.EMail).
+		MessageKey("validation.invalid.email")
+
+	data := ValidateUniqueData{
+		Column: "email",
+		Table:  "users",
+		Value:  user.EMail,
+	}
+	v.Check(data, Unique{}).
+		MessageKey("validation.email.notUnique")
+
+	isLdapEMail := !strings.Contains(user.EMail, app.EMailSuffix)
+	v.Required(isLdapEMail).
+		MessageKey("validation.email.ldap")
+
+	v.Check(user.Password.String,
+		revel.Required{},
+		revel.MaxSize{127},
+		revel.MinSize{6},
+	).MessageKey("validation.invalid.passwords")
+
+	equal := (user.Password.String == user.PasswordRepeat)
+	v.Required(equal).
+		MessageKey("validation.invalid.passwords")
+	v.Required(user.PasswordRepeat).
+		MessageKey("validation.invalid.passwords")
+
+	user.Password.Valid = true
+
+	v.Check(user.Language,
+		revel.Required{},
+		LanguageValidator{},
+	).MessageKey("validation.invalid.language")
+
+	user.Language.Valid = true
+
 	if user.Salutation != NONE && user.Salutation != MR && user.Salutation != MS {
 		v.ErrorKey("validation.invalid.salutation")
 	}
-
-	user.Password.Valid = true
-	user.EMail = strings.ToLower(user.EMail)
-
-	//validate whether e-mail address is unique
-	data := ValidateUniqueData{Column: "email", Table: "users", Value: user.EMail}
-	v.Check(data, UniqueValidator{}).MessageKey("validation.email.notUnique")
-
-	isLDAPMail := !strings.Contains(user.EMail, app.EMailSuffix)
-	v.Required(isLDAPMail).MessageKey("validation.email.ldap")
-
-	v.Check(user.Language.String, LanguageValidator{}).MessageKey("validation.invalid.language")
-	user.Language.Valid = true
 }
 
 /*Studies contains all data about the course of study of an user. */
@@ -114,8 +144,8 @@ type Studies struct {
 	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
 }
 
-/*ValidateStudies validates the Studies struct fields. */
-func (studies Studies) ValidateStudies(v *revel.Validation) {
+/*Validate validates the Studies struct fields. */
+func (studies Studies) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -127,22 +157,38 @@ type Credentials struct {
 	StayLoggedIn bool
 }
 
-/*ValidateCredentials ensures that neither the username nor the password are empty or of incorrect size. */
-func (credentials *Credentials) ValidateCredentials(v *revel.Validation) {
+/*Validate ensures that neither the username nor the password are empty or of incorrect size. */
+func (credentials *Credentials) Validate(v *revel.Validation) {
 
-	if credentials.Username != "" {
-		v.MaxSize(credentials.Username, 255).MessageKey("validation.max.username")
-		v.Check(credentials.EMail, NotRequiredValidator{}).MessageKey("validation.invalid.credentials")
-	} else if credentials.EMail != "" {
-		v.MaxSize(credentials.EMail, 255).MessageKey("validation.max.email")
-		v.Email(credentials.EMail).MessageKey("validation.invalid.email")
-		v.Check(credentials.Username, NotRequiredValidator{}).MessageKey("validation.invalid.credentials")
-	} else {
-		v.ErrorKey("validation.missing.username")
+	if credentials.Username != "" { //ldap login credentials
+
+		v.MaxSize(credentials.Username, 255).
+			MessageKey("validation.invalid.username")
+
+		v.Check(credentials.EMail,
+			NotRequired{},
+		).MessageKey("validation.invalid.credentials")
+
+	} else if credentials.EMail != "" { //external login credentials
+
+		v.Required(credentials.EMail).
+			MessageKey("validation.invalid.email")
+
+		v.Email(credentials.EMail).
+			MessageKey("validation.invalid.email")
+
+		v.Check(credentials.Username,
+			NotRequired{},
+		).MessageKey("validation.invalid.credentials")
+
+	} else { //neither username nor e-mail address was provided
+		v.ErrorKey("validation.invalid.username")
 	}
 
-	v.Required(credentials.Password).MessageKey("validation.missing.password")
-	v.MaxSize(credentials.Password, 511).MessageKey("validation.max.password")
+	v.Check(credentials.Password,
+		revel.Required{},
+		revel.MaxSize{127},
+	).MessageKey("validation.invalid.password")
 }
 
 /*Affiliations contains all affiliations of a user. */

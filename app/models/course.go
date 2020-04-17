@@ -32,8 +32,8 @@ type Course struct {
 	Restrictions      []Restriction   ``
 }
 
-/*ValidateCourse validates the Course struct fields. */
-func (course *Course) ValidateCourse(v *revel.Validation) {
+/*Validate validates the Course struct fields. */
+func (course *Course) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -48,8 +48,8 @@ type UserList struct {
 	EMail      string `db:"email"`      //not a field in the respective table
 }
 
-//validateUserList validates the UserList struct fields.
-func (user *UserList) validateUserList(v *revel.Validation) {
+/*Validate validates the UserList struct fields. */
+func (user *UserList) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -62,7 +62,7 @@ type Restriction struct {
 	CourseOfStudiesID int `db:"courseofstudiesid"`
 }
 
-//validateRestriction validates the Restriction struct fields.
-func (restriction *Restriction) validateRestriction(v *revel.Validation) {
+/*Validate validates the Restriction struct fields. */
+func (restriction *Restriction) Validate(v *revel.Validation) {
 	//TODO
 }

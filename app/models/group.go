@@ -15,9 +15,10 @@ type Group struct {
 	MaxCourses   sql.NullInt32 `db:"maxcourses"`
 	Creator      sql.NullInt32 `db:"creator"`
 	CreationDate string        `db:"creationdate"`
+	Children     []Group       `` //not a field in the respective table
 }
 
-/*ValidateGroup validates the Group struct fields. */
-func (group *Group) ValidateGroup(v *revel.Validation) {
+/*Validate validates the Group struct fields. */
+func (group *Group) Validate(v *revel.Validation) {
 	//TODO
 }

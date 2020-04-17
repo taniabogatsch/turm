@@ -36,7 +36,7 @@ type Meeting struct {
 	MeetingEnd      string          `db:"meetingend"`
 }
 
-//validateMeeting validates the Meeting struct fields.
-func (event *Meeting) validateMeeting(v *revel.Validation) {
+/*Validate validates the Meeting struct fields. */
+func (event *Meeting) Validate(v *revel.Validation) {
 	//TODO
 }

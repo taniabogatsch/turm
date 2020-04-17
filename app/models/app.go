@@ -15,8 +15,8 @@ type Category struct {
 	CreationDate string        `db:"creationdate"`
 }
 
-/*ValidateCategory validates the Category struct fields. */
-func (category *Category) ValidateCategory(v *revel.Validation) {
+/*Validate validates the Category struct fields. */
+func (category *Category) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -30,8 +30,8 @@ type FAQ struct {
 	CreationDate string        `db:"creationdate"`
 }
 
-/*ValidateFAQ validates the FAQ struct fields. */
-func (faq *FAQ) ValidateFAQ(v *revel.Validation) {
+/*Validate validates the FAQ struct fields. */
+func (faq *FAQ) Validate(v *revel.Validation) {
 	//TODO
 }
 
@@ -44,7 +44,7 @@ type NewsFeed struct {
 	CreationDate string        `db:"creationdate"`
 }
 
-/*ValidateNewsFeed validates the NewsFeed struct fields. */
-func (newsFeed *NewsFeed) ValidateNewsFeed(v *revel.Validation) {
+/*Validate validates the NewsFeed struct fields. */
+func (newsFeed *NewsFeed) Validate(v *revel.Validation) {
 	//TODO
 }

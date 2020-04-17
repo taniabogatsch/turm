@@ -1,7 +1,5 @@
 <!-- the preferred language page prompts the user to enter his preferred language -->
 
-<!-- set title and header -->
-{{set . "title" .tabName}}
 {{template "header.html" .}}
 
 <div class="page page-side page-side-left">
@@ -24,9 +22,9 @@
             {{msg $ "prefLang.info"}}
           </small>
           <br>
-          <select name="prefLanguage" class="form-control">
-            {{range $key, $language := .languages}}
-              <option value="{{$language}}" {{if eq $.currentLocale $language}}selected="selected"{{end}}> {{$language}} </option>
+          <select name="prefLanguage" class="custom-select">
+            {{range .languages}}
+              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}> {{.}} </option>
             {{end}}
           </select>
         </div>

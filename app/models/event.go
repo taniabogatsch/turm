@@ -18,7 +18,7 @@ type Event struct {
 	Meetings      []Meeting      ``
 }
 
-//validateEvent validates the Event struct fields.
-func (event *Event) validateEvent(v *revel.Validation) {
+/*Validate validates the Event struct fields. */
+func (event *Event) Validate(v *revel.Validation) {
 	//TODO
 }

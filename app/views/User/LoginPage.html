@@ -1,7 +1,5 @@
 <!-- the login page provides the login form -->
 
-<!-- set title and header -->
-{{set . "title" .tabName}}
 {{template "header.html" .}}
 
 <div class="page page-side page-side-left">
@@ -10,6 +8,7 @@
 
 <div class="page page-middle">
   <center>
+    {{template "flash.html" .}}
     <h3>
       {{msg $ "login.pageName"}}
     </h3>
@@ -57,7 +56,7 @@
               </div>
               <input type="password" class="form-control" name="credentials.Password" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
               <div class="invalid-feedback">
-                {{msg $ "validation.missing.password"}}
+                {{msg $ "validation.invalid.password"}}
               </div>
             </div>
             <!-- keep logged in input -->
@@ -71,6 +70,12 @@
                 </label>
               </div>
             </div>
+
+            {{range .errors}}
+              <div class="warning-feedback">
+                {{.}}
+              </div>
+            {{end}}
             <br>
             <!-- button to confirm login -->
             <button class="btn btn-darkblue" type="submit">
@@ -147,6 +152,10 @@
     } else {
       $('#stayLoggedIn-checkbox').prop('checked', false);
     }
+  }
+
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#loginForm").addClass("was-validated");
   }
 </script>
 

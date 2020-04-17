@@ -1,7 +1,5 @@
 <!-- the registration page provides the registration form -->
 
-<!-- set title and header -->
-{{set . "title" .tabName}}
 {{template "header.html" .}}
 
 <div class="page page-side page-side-left">
@@ -10,6 +8,7 @@
 
 <div class="page page-middle">
   <center>
+    {{template "flash.html" .}}
     <h3>
       {{msg $ "register.title"}}
     </h3>
@@ -18,17 +17,20 @@
     <div class="login-width">
 
       <!-- registration form -->
-      <form accept-charset="UTF-8" action='{{url "User.Registration"}}' method="POST" class="needs-validation" novalidate>
+      <form id="registerForm" accept-charset="UTF-8" action='{{url "User.Registration"}}' method="POST" class="needs-validation" novalidate>
 
         <div class="col login-width-tab">
           <small class="form-text text-muted">
             {{msg $ "prefLang.short_info"}}
           </small>
-          <select name="user.Language.String" class="form-control">
-            {{range $key, $language := .languages}}
-              <option value="{{$language}}" {{if eq $.currentLocale $language}}selected="selected"{{end}}> {{$language}} </option>
+          <select name="user.Language.String" class="custom-select">
+            {{range .languages}}
+              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}> {{.}} </option>
             {{end}}
           </select>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.language"}}
+          </div>
         </div>
 
         {{with $salutation := field "user.Salutation" .}}
@@ -36,13 +38,13 @@
             <small class="form-text text-muted">
               {{msg $ "user.salutation"}}
             </small>
-            <select name="user.Salutation" class="form-control">
+            <select name="user.Salutation" class="custom-select">
               <option value="1" {{if eq "1" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_male"}} </option>
               <option value="2" {{if eq "2" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_female"}} </option>
               <option value="0" {{if eq "0" $salutation.Flash}}selected="selected"{{end}}> {{msg $ "user.salutation_neutral"}} </option>
             </select>
             <div class="invalid-feedback">
-              {{msg $ "validation.missing.salutation"}}
+              {{msg $ "validation.invalid.salutation"}}
             </div>
           </div>
         {{end}}
@@ -58,7 +60,7 @@
             <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.firstname"}}' required maxlength="255">
           {{end}}
           <div class="invalid-feedback">
-            {{msg $ "validation.missing.firstname"}}
+            {{msg $ "validation.invalid.firstname"}}
           </div>
         </div>
 
@@ -72,7 +74,7 @@
             <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.lastname"}}' required maxlength="255">
           {{end}}
           <div class="invalid-feedback">
-            {{msg $ "validation.missing.lastname"}}
+            {{msg $ "validation.invalid.lastname"}}
           </div>
         </div>
 
@@ -98,7 +100,7 @@
           </div>
           <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511" minlength="6">
           <div class="invalid-feedback">
-            {{msg $ "validation.min.password"}}
+            {{msg $ "validation.invalid.password"}}
           </div>
         </div>
 
@@ -110,9 +112,15 @@
           </div>
           <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeatpw"}}' required maxlength="511" minlength="6">
           <div class="invalid-feedback">
-            {{msg $ "validation.min.password"}}
+            {{msg $ "validation.invalid.password"}}
           </div>
         </div>
+
+        {{range .errors}}
+          <div class="warning-feedback">
+            {{.}}
+          </div>
+        {{end}}
 
         <br>
         <p>
@@ -139,5 +147,11 @@
 <div class="page page-side page-side-right">
   <br class="mobile-hidden">
 </div>
+
+<script>
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    $("#registerForm").addClass("was-validated");
+  }
+</script>
 
 {{template "footer.html" .}}

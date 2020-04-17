@@ -68,6 +68,9 @@ var (
 
 	//Passwords holds all passwords used in the application
 	Passwords map[string]string
+
+	//EMailTemplates holds all e-mail templates
+	EMailTemplates []string
 )
 
 //init application
@@ -90,8 +93,9 @@ func init() {
 	}
 
 	//Register startup functions with OnAppStart
-	revel.OnAppStart(initConfigVariables)
 	revel.OnAppStart(initPasswords)
+	revel.OnAppStart(initConfigVariables)
+	revel.OnAppStart(initEMailTemplates)
 	revel.OnAppStart(initDB)
 }
 

@@ -1,7 +1,5 @@
 <!-- landing page of the application -->
 
-<!-- set title and header -->
-{{set . "title" .tabName}}
 {{template "header.html" .}}
 
 <div class="page page-side page-side-left">
@@ -9,6 +7,7 @@
 </div>
 
 <div class="page page-middle">
+  {{template "flash.html" .}}
   <h4>
     Index
   </h4>

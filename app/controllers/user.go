@@ -7,6 +7,7 @@ import (
 	"turm/app/auth"
 	"turm/app/database"
 	"turm/app/models"
+	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
@@ -17,7 +18,7 @@ func (c User) LoginPage() revel.Result {
 
 	revel.AppLog.Debug("requesting login page")
 	//NOTE: we do not set the callPath because we want to be redirected to the previous page
-	c.Session["currPath"] = c.Message("login.tabName")
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("login.tabName")
 	return c.Render()
 }
@@ -28,16 +29,30 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	revel.AppLog.Debug("login user", "username", credentials.Username, "email", credentials.EMail,
 		"stayLoggedIn", credentials.StayLoggedIn)
-	if credentials.ValidateCredentials(c.Validation); c.Validation.HasErrors() {
-		return flashError(errValidation, c.Controller, "/User/LoginPage", "")
+
+	credentials.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			routes.User.LoginPage(),
+			"",
+			c.Controller,
+		)
 	}
 
 	var user models.User
 
 	if credentials.Username != "" { //ldap login, authenticate the user
 
-		if err := auth.LDAPServerAuth(&credentials, &user); err != nil {
-			return flashError(errAuth, c.Controller, "/User/LoginPage", "login.ldapAuthentication_invalid_danger")
+		err := auth.LDAPServerAuth(&credentials, &user)
+		if err != nil {
+			c.Validation.ErrorKey("login.ldapAuthentication_invalid_danger")
+			return flashError(
+				errValidation,
+				routes.User.LoginPage(),
+				"",
+				c.Controller,
+			)
 		}
 		revel.AppLog.Debug("authentication successful", "user", user)
 
@@ -50,21 +65,30 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	//login of user
 	if err := database.Login(&user); err != nil {
-		return flashError(errDB, c.Controller, "/User/LoginPage", "")
+		return flashError(errDB,
+			routes.User.LoginPage(),
+			"",
+			c.Controller,
+		)
 	}
-	if c.Validation.Required(user.ID).MessageKey("validation.invalid.login"); c.Validation.HasErrors() {
-		//invalid external user credentials
-		return flashError(errValidation, c.Controller, "/User/LoginPage", "")
-	}
-	revel.AppLog.Debug("login successful", "user", user)
 
+	c.Validation.Required(user.ID).
+		MessageKey("validation.invalid.login")
+	if c.Validation.HasErrors() { //invalid external user credentials
+		return flashError(
+			errValidation,
+			routes.User.LoginPage(),
+			"",
+			c.Controller,
+		)
+	}
+
+	revel.AppLog.Debug("login successful", "user", user)
 	setSession(&user, c.Controller)
 	c.Session["stayLoggedIn"] = strconv.FormatBool(credentials.StayLoggedIn)
 
 	//set default expiration of session cookie
-	if !credentials.StayLoggedIn {
-		c.Session.SetDefaultExpiration()
-	} else {
+	if credentials.StayLoggedIn {
 		c.Session.SetNoExpiration()
 	}
 
@@ -72,7 +96,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	//not activated external users get redirected to the activation page
 	if user.ActivationCode.String != "" && credentials.EMail != "" {
-		c.Session["callPath"] = "/User/ActivationPage"
+		c.Session["callPath"] = routes.User.ActivationPage()
 		c.Session["notActivated"] = "true"
 	}
 
@@ -90,12 +114,9 @@ func (c User) Logout() revel.Result {
 
 	revel.AppLog.Debug("logout", "length session", len(c.Session))
 	for k := range c.Session {
-		if k != "currentLocale" {
-			c.Session.Del(k)
-		}
+		c.Session.Del(k)
 	}
 
-	revel.AppLog.Debug("logout successful", "length session", len(c.Session))
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
 }
@@ -107,8 +128,8 @@ func (c User) RegistrationPage() revel.Result {
 	revel.AppLog.Debug("requesting registration page")
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
-	c.Session["currPath"] = c.Message("register.tabName")
 	c.ViewArgs["tabName"] = c.Message("register.tabName")
+	c.Session["currPath"] = c.Request.URL.String()
 	return c.Render()
 }
 
@@ -117,13 +138,25 @@ func (c User) RegistrationPage() revel.Result {
 func (c User) Registration(user models.User) revel.Result {
 
 	revel.AppLog.Debug("registration of user", "user", user)
-	if user.ValidateUser(c.Validation); c.Validation.HasErrors() {
-		return flashError(errValidation, c.Controller, "/User/RegistrationPage", "")
+
+	user.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			routes.User.RegistrationPage(),
+			"",
+			c.Controller,
+		)
 	}
 
 	//register the new user
 	if err := database.Register(&user); err != nil {
-		return flashError(errDB, c.Controller, "/User/RegistrationPage", "")
+		return flashError(
+			errDB,
+			routes.User.RegistrationPage(),
+			"",
+			c.Controller,
+		)
 	}
 	revel.AppLog.Debug("registration successful", "user", user)
 
@@ -143,7 +176,7 @@ func (c User) NewPasswordPage() revel.Result {
 	revel.AppLog.Debug("requesting new password page")
 	//NOTE: we do not set the callPath because we want to be redirected to the
 	//previous page after logging in
-	c.Session["currPath"] = c.Message("newPw.tabName")
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("newPw.tabName")
 	return c.Render()
 }
@@ -155,7 +188,7 @@ func (c User) ActivationPage() revel.Result {
 	revel.AppLog.Debug("requesting activation page")
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
-	c.Session["currPath"] = c.Message("activation.tabName")
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("activation.tabName")
 	return c.Render()
 }
@@ -167,7 +200,7 @@ func (c User) PrefLanguagePage() revel.Result {
 	revel.AppLog.Debug("requesting preferred language page")
 	//NOTE: we do not set the callPath because we want to be redirected to the previous
 	//page after a successful login
-	c.Session["currPath"] = c.Message("prefLang.tabName")
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("prefLang.tabName")
 	return c.Render()
 }
@@ -177,13 +210,28 @@ func (c User) PrefLanguagePage() revel.Result {
 func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
 	revel.AppLog.Debug("set preferred language", "prefLanguage", prefLanguage)
-	if c.Validation.Check(prefLanguage, models.LanguageValidator{}); c.Validation.HasErrors() {
-		return flashError(errValidation, c.Controller, c.Session["callPath"].(string), "")
+
+	c.Validation.Check(prefLanguage,
+		models.LanguageValidator{},
+	)
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			routes.User.PrefLanguagePage(),
+			"",
+			c.Controller,
+		)
 	}
 
 	//update the language
-	if err := database.SetPrefLanguage(c.Session["userID"].(string), prefLanguage); err != nil {
-		return flashError(errDB, c.Controller, c.Session["callPath"].(string), "")
+	userID := c.Session["userID"].(string)
+	if err := database.SetPrefLanguage(userID, prefLanguage); err != nil {
+		return flashError(
+			errDB,
+			routes.User.PrefLanguagePage(),
+			"",
+			c.Controller,
+		)
 	}
 	return c.Redirect(c.Session["callPath"])
 }

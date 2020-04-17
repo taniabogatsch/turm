@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"reflect"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -32,33 +31,21 @@ func (v LanguageValidator) DefaultMessage() string {
 	return fmt.Sprintln("Please provide a valid language.")
 }
 
-/*NotRequiredValidator implements the validation of fields that must not be set. */
-type NotRequiredValidator struct{}
+/*NotRequired implements the validation of fields that must not be set. */
+type NotRequired struct{}
 
-/*IsSatisfied implements the validation result of NotRequiredValidator. */
-func (v NotRequiredValidator) IsSatisfied(i interface{}) bool {
-
-	if i == nil {
-		return true
-	}
-	switch value := reflect.ValueOf(i); value.Kind() {
-	case reflect.Array, reflect.Slice, reflect.Map, reflect.String, reflect.Chan:
-		if value.Len() == 0 {
-			return true
-		}
-	case reflect.Ptr:
-		return v.IsSatisfied(reflect.Indirect(value).Interface())
-	}
-	return reflect.DeepEqual(i, reflect.Zero(reflect.TypeOf(i)).Interface())
+/*IsSatisfied implements the validation result of NotRequired. */
+func (v NotRequired) IsSatisfied(i interface{}) bool {
+	return !revel.Required{}.IsSatisfied(i)
 }
 
-/*DefaultMessage returns the default message of NotRequiredValidator. */
-func (v NotRequiredValidator) DefaultMessage() string {
+/*DefaultMessage returns the default message of NotRequired. */
+func (v NotRequired) DefaultMessage() string {
 	return fmt.Sprintln("Please do not provide this value.")
 }
 
-/*UniqueValidator implements the validation of the uniqueness of a column value in a provided table. */
-type UniqueValidator struct{}
+/*Unique implements the validation of the uniqueness of a column value in a provided table. */
+type Unique struct{}
 
 /*ValidateUniqueData contains all data to validate the uniqueness of a column value in a table. */
 type ValidateUniqueData struct {
@@ -67,8 +54,8 @@ type ValidateUniqueData struct {
 	Value  string
 }
 
-/*IsSatisfied implements the validation result of UniqueValidator. */
-func (uniqueV UniqueValidator) IsSatisfied(i interface{}) bool {
+/*IsSatisfied implements the validation result of Unique. */
+func (uniqueV Unique) IsSatisfied(i interface{}) bool {
 
 	var unique bool
 	data, parsed := i.(ValidateUniqueData)
@@ -87,7 +74,7 @@ func (uniqueV UniqueValidator) IsSatisfied(i interface{}) bool {
 	return unique
 }
 
-/*DefaultMessage returns the default message of UniqueValidator. */
-func (uniqueV UniqueValidator) DefaultMessage() string {
+/*DefaultMessage returns the default message of Unique. */
+func (uniqueV Unique) DefaultMessage() string {
 	return fmt.Sprintln("Please provide a unique value.")
 }
