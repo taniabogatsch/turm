@@ -26,7 +26,15 @@ func (c App) ChangeLanguage(language string) revel.Result {
 
 	revel.AppLog.Debug("change language", "language", language)
 
-	c.Validation.Check(language, models.LanguageValidator{})
+	//some pages do not change the callPath and must be detected manually
+	if c.Session["currPath"] != routes.App.Index() {
+		c.Session["callPath"] = c.Session["currPath"]
+	}
+
+	c.Validation.Check(language,
+		models.LanguageValidator{},
+	).MessageKey("validation.invalid.language")
+
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
@@ -38,20 +46,6 @@ func (c App) ChangeLanguage(language string) revel.Result {
 
 	c.Session["currentLocale"] = language
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
-
-	//some pages do not change the callPath and must be detected manually
-	switch c.Session["currPath"] {
-	case routes.User.LoginPage():
-		return c.Redirect(User.LoginPage)
-	case routes.User.RegistrationPage():
-		return c.Redirect(User.RegistrationPage)
-	case routes.User.NewPasswordPage():
-		return c.Redirect(User.NewPasswordPage)
-	case routes.User.ActivationPage():
-		return c.Redirect(User.ActivationPage)
-	case routes.User.PrefLanguagePage():
-		return c.Redirect(User.PrefLanguagePage)
-	}
 
 	return c.Redirect(c.Session["callPath"])
 }

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"fmt"
 	"strings"
 	"turm/app"
 
@@ -67,10 +66,6 @@ type User struct {
 	Password       sql.NullString `db:"password"`
 	PasswordRepeat string         `` //not a field in the respective table
 	ActivationCode sql.NullString `db:"activationcode"`
-}
-
-func (user *User) String() string {
-	return fmt.Sprintf("User(%s)", user.FirstName)
 }
 
 /*Validate validates the User struct fields as retrieved by the register form. */

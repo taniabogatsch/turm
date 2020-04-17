@@ -38,6 +38,7 @@ func general(c *revel.Controller) revel.Result {
 	}
 
 	//reset logout timer
+	c.Session.SetDefaultExpiration()
 	if c.Session["stayLoggedIn"] != nil {
 		if c.Session["stayLoggedIn"] == "true" {
 			c.Session.SetNoExpiration()

@@ -65,7 +65,8 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	//login of user
 	if err := database.Login(&user); err != nil {
-		return flashError(errDB,
+		return flashError(
+			errDB,
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
@@ -88,6 +89,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	c.Session["stayLoggedIn"] = strconv.FormatBool(credentials.StayLoggedIn)
 
 	//set default expiration of session cookie
+	c.Session.SetDefaultExpiration()
 	if credentials.StayLoggedIn {
 		c.Session.SetNoExpiration()
 	}

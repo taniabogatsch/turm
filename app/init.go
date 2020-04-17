@@ -92,6 +92,8 @@ func init() {
 		revel.ActionInvoker,           //Invoke the action.
 	}
 
+	revel.TimeFormats = append(revel.TimeFormats, "2006-01-02 15:04:05")
+
 	//Register startup functions with OnAppStart
 	revel.OnAppStart(initPasswords)
 	revel.OnAppStart(initConfigVariables)

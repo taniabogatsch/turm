@@ -15,7 +15,7 @@ import (
 func Login(user *models.User) (err error) {
 
 	//last login (and first login)
-	now := time.Now().Format(revel.DefaultDateTimeFormat)
+	now := time.Now().Format(revel.TimeFormats[2])
 
 	if !user.Password.Valid { //ldap login
 
@@ -65,7 +65,7 @@ func Register(user *models.User) (err error) {
 	activationCode := user.ActivationCode.String
 
 	//last login and first login
-	now := time.Now().Format(revel.DefaultDateTimeFormat)
+	now := time.Now().Format(revel.TimeFormats[2])
 
 	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
 		user.Salutation, now, now, user.Password, user.ActivationCode, user.Language)
@@ -123,7 +123,7 @@ const (
 				firstname = $1, lastname = $2, salutation = $4, lastlogin = $5,
 				matrnr = $7, academictitle = $8, title = $9, nameaffix = $10, affiliations = $11
 		RETURNING id, lastname, firstname, email, role, matrnr, language,
-      TO_CHAR (firstlogin AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI') as firstlogin
+      TO_CHAR (firstlogin AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI:SS') as firstlogin
 	`
 
 	stmtLoginExtern = `
