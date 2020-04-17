@@ -8,7 +8,6 @@
 
 <div class="page page-middle">
   <center>
-    {{template "flash.html" .}}
     <h3>
       {{msg $ "login.pageName"}}
     </h3>
@@ -105,7 +104,7 @@
 </div>
 
 <div class="page page-side page-side-right">
-  <br class="mobile-hidden">
+  {{template "toast.html" .}}
 </div>
 
 <div id="icon-person" class="display-none"> {{template "icons/person.html" .}} </div>

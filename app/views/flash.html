@@ -1,13 +1,24 @@
-{{if .flash.success}}
-	<div class="btn-outline-success">
-		{{.flash.success}}
-	</div>
-	<br>
-{{end}}
+<div id="icon-flash-check" class="display-none"> {{template "icons/check.html" .}} {{msg $ "page.flash_success"}} </div>
+<div id="icon-flash-alertCircle" class="display-none"> {{template "icons/alertCircle.html" .}} {{msg $ "page.flash_error"}} </div>
 
-{{if .flash.error}}
-	<div class="btn-outline-danger">
-		{{.flash.error}}
-	</div>
-	<br>
-{{end}}
+<script>
+	{{if .flash.error}}
+		$(document).ready(function(){
+			$("#feedback-toast").toast('show');
+			$("#toast-title").html($("#icon-flash-alertCircle").html());
+			$("#toast-title").attr("class", "mr-auto btn-outline-danger");
+			$("#toast-content").html('{{.flash.error}}');
+			$("#toast-content").attr("class", "btn-outline-danger");
+		});
+	{{end}}
+
+	{{if .flash.success}}
+		$(document).ready(function(){
+			$("#feedback-toast").toast('show');
+			$("#toast-title").html($("#icon-flash-check").html());
+			$("#toast-title").attr("class", "mr-auto btn-outline-success");
+			$("#toast-content").html('{{.flash.success}}');
+			$("#toast-content").attr("class", "btn-outline-success");
+		});
+	{{end}}
+</script>

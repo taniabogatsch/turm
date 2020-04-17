@@ -8,7 +8,6 @@
 
 <div class="page page-middle">
   <center>
-    {{template "flash.html" .}}
     <h3>
       {{msg $ "register.title"}}
     </h3>
@@ -145,7 +144,7 @@
 </div>
 
 <div class="page page-side page-side-right">
-  <br class="mobile-hidden">
+  {{template "toast.html" .}}
 </div>
 
 <script>

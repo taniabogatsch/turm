@@ -18,6 +18,9 @@ page.menu_helpPages = Hilfen
 page.footer_imprint = Impressum
 page.footer_help_info = Bei Fragen wenden Sie sich bitte an unseren <a class="greylink" href="mailto:%s?Subject=SupportTurm2" target="_top"> Support</a>.
 
+page.flash_success = Erfolg
+page.flash_error = Fehler
+
 # -------------------------------------------------------------------------------------------------- #
 # Buttons
 # -------------------------------------------------------------------------------------------------- #

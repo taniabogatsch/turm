@@ -18,6 +18,9 @@ page.menu_helpPages = Help
 page.footer_imprint = Imprint
 page.footer_help_info = If you have any questions, please contact our <a class="greylink" href="mailto:%s?Subject=SupportTurm2" target="_top"> support</a>.
 
+page.flash_success = Success
+page.flash_error = Error
+
 # -------------------------------------------------------------------------------------------------- #
 # Buttons
 # -------------------------------------------------------------------------------------------------- #

@@ -117,7 +117,7 @@ func (user *User) Validate(v *revel.Validation) {
 
 	user.Password.Valid = true
 
-	v.Check(user.Language,
+	v.Check(user.Language.String,
 		revel.Required{},
 		LanguageValidator{},
 	).MessageKey("validation.invalid.language")
