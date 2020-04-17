@@ -1,6 +1,7 @@
 package models
 
 import (
+	"path/filepath"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -12,20 +13,31 @@ type EMailData struct {
 	URL  string
 }
 
-/*GetEMailBody assigns the template content to the e-mail body an e-mail body. */
-func GetEMailBody(data *EMailData, filepath string, body *string, c *revel.Controller) (err error) {
+/*GetEMailSubjectBody assigns the template content to the e-mail body and sets the e-mail subject. */
+func GetEMailSubjectBody(data *EMailData, language *string, subjectKey string,
+	filename string, email *app.EMail, c *revel.Controller) (err error) {
 
 	data.URL = app.URL
-	c.ViewArgs["data"] = data
+	c.ViewArgs["data"] = data //set the data for parsing the e-mail body
 
-	//parse template
+	cLanguage := c.Session["currentLocale"].(string)
+	c.ViewArgs["currentLocale"] = *language //set the preferred language for template parsing
+	c.Request.Locale = *language
+
+	email.Subject = c.Message(subjectKey) //set the e-mail subject
+
+	filepath := filepath.Join("emails", filename+"_"+*language+".html")
+
+	//parse template / e-mail body
 	buf, err := revel.TemplateOutputArgs(filepath, c.ViewArgs)
 	if err != nil {
 		revel.AppLog.Error("failed to parse e-mail template", "filepath", filepath,
 			"viewArgs", c.ViewArgs, "error", err.Error())
 		return
 	}
+	email.Body = string(buf)
 
-	*body = string(buf)
+	c.ViewArgs["currentLocale"] = cLanguage //reset to original language
+	c.Request.Locale = cLanguage
 	return
 }

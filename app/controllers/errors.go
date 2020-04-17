@@ -11,6 +11,7 @@ const (
 	errValidation ErrorType = iota
 	errDB
 	errAuth
+	errEMail
 )
 
 func (s ErrorType) String() string {
@@ -22,24 +23,28 @@ func flashError(errType ErrorType, url string, msg string, c *revel.Controller) 
 
 	//TODO: this will later allow to send an e-mail if any error occurs
 
+	c.FlashParams()
+
 	switch errType {
 
 	case errValidation:
 		//keep the validation errors and flash the parameters, then redirect
 		c.Validation.Keep()
-		c.FlashParams()
 		return c.Redirect(url)
 
 	case errDB:
 		//flash error and parameters, then redirect
 		c.Flash.Error(c.Message("error.database"))
-		c.FlashParams()
 		return c.Redirect(url)
 
 	case errAuth:
 		//flash error and parameters, then redirect
 		c.Flash.Error(c.Message(msg))
-		c.FlashParams()
+		return c.Redirect(url)
+
+	case errEMail:
+		//flash error and parameters, then redirect
+		c.Flash.Error(c.Message("error.email"))
 		return c.Redirect(url)
 
 	default:

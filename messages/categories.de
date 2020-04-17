@@ -33,6 +33,7 @@ error.database = Beim Ausführen einer Datenbankanfrage ist ein Fehler aufgetret
 error.template = Beim Laden einer Komponente der Seite ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.typeConversion = Es wurden ungültige Daten konvertiert. %(error.contactSupportMessage)s
 error.sessionInvalid = Sitzung nicht länger aktiv.
+error.email = Beim Senden der E-Mail ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 
 # -------------------------------------------------------------------------------------------------- #
 # E-mails
@@ -44,7 +45,7 @@ mails.subject_participantUnsubscribed = Abmeldung eines Teilnehmers aus '%s'
 mails.subject_manualToWaitlist = Manuelles Einschreiben auf die Warteliste von '%s'
 mails.subject_manualRemoval = Manuelles Austragen aus '%s'
 mails.subject_newPw = Ihr neues TurmII Passwort
-mails.subject_activationCode = Willkommen bei TurmII - Ihr Aktivierungscode
+emails.subject_activation = Willkommen bei TurmII - Ihr Aktivierungscode
 mails.subject_newRole = Information zu Ihrer neuen Nutzerrolle
 mails.subject_statusChange = Information zu Ihrem neuen Bezahlstatus in %s
 mails.subject_courseDeletion = Information zum gelöschten Kurs %s
@@ -58,6 +59,13 @@ mails.subject = Betreff
 mails.custom_numberMeetings = Anzahl der Termine
 mails.custom_creatorMail = E-Mail-Adresse KurserstellerIn
 mails.custom_courseURL = URL zum Kurs
+
+emails.ms = Sehr geehrte Frau
+emails.mr = Sehr geehrter Herr
+emails.none = Hallo
+emails.bestRegardsPlain = Mit freundlichen Gr&uuml;&beta;en
+emails.yourDevTeamPlain = Ihr Turm2 Entwicklerteam
+emails.bestRegards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwicklerteam <br>
 
 # -------------------------------------------------------------------------------------------------- #
 # User

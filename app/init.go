@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"turm/modules/jobs/app/jobs"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
@@ -68,9 +69,6 @@ var (
 
 	//Passwords holds all passwords used in the application
 	Passwords map[string]string
-
-	//EMailTemplates holds all e-mail templates
-	EMailTemplates []string
 )
 
 //init application
@@ -97,8 +95,12 @@ func init() {
 	//Register startup functions with OnAppStart
 	revel.OnAppStart(initPasswords)
 	revel.OnAppStart(initConfigVariables)
-	revel.OnAppStart(initEMailTemplates)
 	revel.OnAppStart(initDB)
+
+	//register scheduled jobs
+	revel.OnAppStart(func() {
+		jobs.Schedule("@every 30s", sendEMails{})
+	})
 }
 
 //HeaderFilter adds common security headers

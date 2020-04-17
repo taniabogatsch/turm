@@ -3,9 +3,6 @@ package app
 import (
 	"encoding/base64"
 	"net/smtp"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/k3a/html2text"
@@ -29,22 +26,6 @@ func init() {
 	EMailQueue = make(chan EMail, 1000)
 }
 
-//initEMailTemplates parses all e-mail template names
-func initEMailTemplates() {
-
-	//TODO: is this function necessary?
-	folder := filepath.Join(revel.BasePath, "app", "views", "EMails")
-	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
-		if strings.Contains(path, "_") {
-			EMailTemplates = append(EMailTemplates, filepath.Base(path))
-		}
-		return nil
-	})
-	if err != nil {
-		revel.AppLog.Fatal("error parsing e-mail templates", "error", err.Error())
-	}
-}
-
 //sendEMails sends e-mails from the queue.
 type sendEMails struct{}
 
@@ -57,11 +38,6 @@ func (e sendEMails) Run() {
 
 	//wait before sending the next e-mail
 	time.Sleep(time.Second * 15) //necessary to not spam the e-mail server too much
-}
-
-/*AddEMailToQueue adds an e-mail to the e-mail queue. */
-func AddEMailToQueue(email *EMail) {
-	EMailQueue <- *email
 }
 
 //mailer sends an e-mail.

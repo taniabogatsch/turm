@@ -1,31 +1,31 @@
 ﻿{{template "emails/components/MIMETop.html" .}}
 
-{{template "emails/components/Salutation.html.de" .}}
+{{template "emails/components/salutation.html" .}}
 
 Mit dem folgenden Code kann Ihr Account aktiviert werden:
-{{.data.User.ActivationCode}}
+{{.data.User.ActivationCode.String}}
 
 Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
-{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode}}
+{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode.String}}
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 
-{{template "emails/components/BestRegardsPlain.html.de" .}}
+{{template "emails/components/bestRegards.html" .}}
 
 {{template "emails/components/MIMEMiddle.html" .}}
 
 <body>
-{{template "emails/components/Salutation.html.de" .}}
+{{template "emails/components/salutation.html" .}}
 <br>
 <br>
 Mit dem folgenden Code kann Ihr Account aktiviert werden:
 <br>
-<font color="red">{{.data.User.ActivationCode}}</font>
+<font color="red">{{.data.User.ActivationCode.String}}</font>
 <br>
 <br>
 Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
 <br>
-<a href="{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode}}">
+<a href="{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode.String}}">
   Account aktivieren
 </a>
 <br>
@@ -33,7 +33,7 @@ Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
 <br>
 <br>
-{{template "emails/components/BestRegards.html.de" .}}
+{{msg $ "emails.bestRegards" .data.URL}}
 </body>
 </html>
 

@@ -33,6 +33,7 @@ error.database = An error occurred while running a database query. %(error.conta
 error.template = An error occurred while loading a page component. %(error.contactSupportMessage)s
 error.typeConversion = There was an invalid data conversion. %(error.contactSupportMessage)s
 error.sessionInvalid = Session no longer active.
+error.email = An error occurred while sending the e-mail. %(error.contactSupportMessage)s
 
 # -------------------------------------------------------------------------------------------------- #
 # E-mails
@@ -44,7 +45,7 @@ mails.subject_participantUnsubscribed = A participant unsubscribed from '%s'
 mails.subject_manualToWaitlist = Manual enrollment to the waitlist of '%s'
 mails.subject_manualRemoval = Your were manually unsubscribed from '%s'
 mails.subject_newPw = Your new password for TurmII
-mails.subject_activationCode = Welcome at TurmII - Your activation code
+emails.subject_activation = Welcome at TurmII - Your activation code
 mails.subject_newRole = Information about your new user role
 mails.subject_statusChange = Please note your payment status change for %s
 mails.subject_courseDeletion = Please notice the deletion of the course %s
@@ -57,6 +58,14 @@ mails.subject = Subject
 mails.custom_numberMeetings = Number of meetings
 mails.custom_creatorMail = E-mail address of course creator
 mails.custom_courseURL = URL to course
+
+emails.ms = Dear Ms.
+emails.mr = Dear Mr.
+emails.none = Hello
+emails.bestRegardsPlain = Sincerly
+emails.yourDevTeamPlain = Your Turm2 Development Team
+emails.bestRegards = Sincerly <br> Your <a href="%s/">Turm2</a> Development Team <br>
+
 
 # -------------------------------------------------------------------------------------------------- #
 # User

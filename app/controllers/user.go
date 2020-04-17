@@ -85,7 +85,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	}
 
 	revel.AppLog.Debug("login successful", "user", user)
-	setSession(&user, c.Controller)
+	c.setSession(&user)
 	c.Session["stayLoggedIn"] = strconv.FormatBool(credentials.StayLoggedIn)
 
 	//set default expiration of session cookie
@@ -162,10 +162,17 @@ func (c User) Registration(user models.User) revel.Result {
 	}
 	revel.AppLog.Debug("registration successful", "user", user)
 
-	//TODO: send the activation e-mail
-
-	setSession(&user, c.Controller)
+	c.setSession(&user)
 	c.Session["notActivated"] = "true"
+
+	if err := c.sendActivationEMail(&user); err != nil {
+		return flashError(
+			errEMail,
+			routes.User.ActivationPage(),
+			"",
+			c.Controller,
+		)
+	}
 
 	c.Flash.Success(c.Message("activation.codeSend_info"))
 	return c.Redirect(User.ActivationPage)
@@ -239,7 +246,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 }
 
 //setSession sets all user related session values.
-func setSession(user *models.User, c *revel.Controller) {
+func (c User) setSession(user *models.User) {
 
 	c.Session["userID"] = strconv.Itoa(user.ID)
 	c.Session["firstName"] = user.FirstName
@@ -250,26 +257,33 @@ func setSession(user *models.User, c *revel.Controller) {
 }
 
 //sendActivationEMail sends an e-mail with an activation code and an activation URL. */
-func sendActivationEMail(c *revel.Controller, subjectKey string, user *models.User) (err error) {
+func (c User) sendActivationEMail(user *models.User) (err error) {
 
 	data := models.EMailData{User: *user}
 
-	//TODO: get the subject in the default language of the user
-	subject := ""
-
-	//TODO: set e-mail path
-	templatePath := ""
+	if !user.Language.Valid {
+		user.Language.String = app.DefaultLanguage
+	}
 
 	email := app.EMail{
 		Recipient: user.EMail,
-		Subject:   subject,
 		ReplyTo:   c.Message("mails.doNotReply", app.ServiceEMail),
 	}
 
-	if err = models.GetEMailBody(&data, templatePath, &email.Body, c); err != nil {
+	err = models.GetEMailSubjectBody(
+		&data,
+		&user.Language.String,
+		"emails.subject_activation",
+		"activation",
+		&email,
+		c.Controller,
+	)
+	if err != nil {
 		return
 	}
 
-	app.AddEMailToQueue(&email)
+	revel.AppLog.Debug("assembled e-mail", "e-mail", email)
+
+	app.EMailQueue <- email
 	return
 }
