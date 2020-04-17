@@ -39,7 +39,7 @@
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="input-icon">
-                  {{template "Icons/Person.html" .}}
+                  {{template "icons/person.html" .}}
                 </span>
               </div>
               <input id="input-user" type="text" class="form-control" name="credentials.Username" value="" placeholder='{{msg $ "user.username"}}' required maxlength="255">
@@ -51,7 +51,7 @@
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">
-                  {{template "Icons/Lock.html" .}}
+                  {{template "icons/lock.html" .}}
                 </span>
               </div>
               <input type="password" class="form-control" name="credentials.Password" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
@@ -108,8 +108,8 @@
   <br class="mobile-hidden">
 </div>
 
-<div id="icon-person" class="display-none"> {{template "Icons/Person.html" .}} </div>
-<div id="icon-email" class="display-none"> {{template "Icons/Envelope.html" .}} </div>
+<div id="icon-person" class="display-none"> {{template "icons/person.html" .}} </div>
+<div id="icon-email" class="display-none"> {{template "icons/envelope.html" .}} </div>
 <div id="username-flash" class="display-none">{{with $username := field "credentials.Username" .}}{{$username.Flash}}{{end}}</div>
 <div id="email-flash" class="display-none">{{with $email := field "credentials.EMail" .}}{{$email.Flash}}{{end}}</div>
 <div id="stayLoggedIn-flash" class="display-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>

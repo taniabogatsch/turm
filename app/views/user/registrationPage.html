@@ -53,7 +53,7 @@
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">
-              {{template "Icons/Pencil.html" .}}
+              {{template "icons/pencil.html" .}}
             </span>
           </div>
           {{with $field := field "user.FirstName" .}}
@@ -67,7 +67,7 @@
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">
-              {{template "Icons/Pencil.html" .}}
+              {{template "icons/pencil.html" .}}
             </span>
           </div>
           {{with $field := field "user.LastName" .}}
@@ -81,7 +81,7 @@
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">
-              {{template "Icons/Envelope.html" .}}
+              {{template "icons/envelope.html" .}}
             </span>
           </div>
           {{with $field := field "user.EMail" .}}
@@ -95,7 +95,7 @@
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">
-              {{template "Icons/Lock.html" .}}
+              {{template "icons/lock.html" .}}
             </span>
           </div>
           <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511" minlength="6">
@@ -107,7 +107,7 @@
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">
-              {{template "Icons/Lock.html" .}}
+              {{template "icons/lock.html" .}}
             </span>
           </div>
           <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeatpw"}}' required maxlength="511" minlength="6">

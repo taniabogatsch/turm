@@ -7,18 +7,18 @@ module:testrunner
 
 # ------------------------------- App routes. -------------------------------- #
 GET     /                                       App.Index
-GET     /App/ChangeLanguage                     App.ChangeLanguage
+GET     /app/changeLanguage                     App.ChangeLanguage
 
 # ------------------------------- User routes. -------------------------------- #
-GET     /User/LoginPage                         User.LoginPage
-POST    /User/Login                             User.Login
-GET     /User/Logout                            User.Logout
-GET     /User/RegistrationPage                  User.RegistrationPage
-POST    /User/Registration                      User.Registration
-GET     /User/NewPasswordPage                   User.NewPasswordPage
-GET     /User/ActivationPage                    User.ActivationPage
-GET     /User/PrefLanguagePage                  User.PrefLanguagePage
-POST    /User/SetPrefLanguage                   User.SetPrefLanguage
+GET     /user/loginPage                         User.LoginPage
+POST    /user/login                             User.Login
+GET     /user/logout                            User.Logout
+GET     /user/registrationPage                  User.RegistrationPage
+POST    /user/registration                      User.Registration
+GET     /user/newPasswordPage                   User.NewPasswordPage
+GET     /user/activationPage                    User.ActivationPage
+GET     /user/prefLanguagePage                  User.PrefLanguagePage
+POST    /user/setPrefLanguage                   User.SetPrefLanguage
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

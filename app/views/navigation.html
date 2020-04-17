@@ -73,7 +73,14 @@
     {{end}}
 
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder='{{msg $ "search.course"}}'>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            {{template "icons/search.html"}}
+          </span>
+        </div>
+        <input class="form-control mr-sm-2" type="search" placeholder='{{msg $ "search.course"}}'>
+      </div>
       <button class="btn btn-outline-light my-2 my-sm-0" type="submit">
         {{msg $ "button.search"}} <!-- TODO -->
       </button>

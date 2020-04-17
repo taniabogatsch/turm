@@ -5,7 +5,7 @@ import (
 	"strings"
 	"turm/app"
 	"turm/app/auth"
-	"turm/app/database"
+	"turm/app/db"
 	"turm/app/models"
 	"turm/app/routes"
 
@@ -64,7 +64,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	}
 
 	//login of user
-	if err := database.Login(&user); err != nil {
+	if err := db.Login(&user); err != nil {
 		return flashError(
 			errDB,
 			routes.User.LoginPage(),
@@ -152,7 +152,7 @@ func (c User) Registration(user models.User) revel.Result {
 	}
 
 	//register the new user
-	if err := database.Register(&user); err != nil {
+	if err := db.Register(&user); err != nil {
 		return flashError(
 			errDB,
 			routes.User.RegistrationPage(),
@@ -227,7 +227,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
 	//update the language
 	userID := c.Session["userID"].(string)
-	if err := database.SetPrefLanguage(userID, prefLanguage); err != nil {
+	if err := db.SetPrefLanguage(userID, prefLanguage); err != nil {
 		return flashError(
 			errDB,
 			routes.User.PrefLanguagePage(),
