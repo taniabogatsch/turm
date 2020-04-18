@@ -1,7 +1,5 @@
 package auth
 
-//NOTE: this file comprises all logic concerning the authentification against the LDAP server
-
 import (
 	"crypto/tls"
 	"fmt"

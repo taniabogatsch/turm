@@ -16,7 +16,7 @@ import (
 - Roles: not logged in users */
 func (c User) LoginPage() revel.Result {
 
-	revel.AppLog.Debug("requesting login page")
+	c.Log.Debug("render login page", "url", c.Request.URL)
 	//NOTE: we do not set the callPath because we want to be redirected to the previous page
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("login.tabName")
@@ -27,13 +27,14 @@ func (c User) LoginPage() revel.Result {
 - Roles: not logged in users */
 func (c User) Login(credentials models.Credentials) revel.Result {
 
-	revel.AppLog.Debug("login user", "username", credentials.Username, "email", credentials.EMail,
-		"stayLoggedIn", credentials.StayLoggedIn)
+	c.Log.Debug("login user", "username", credentials.Username,
+		"email", credentials.EMail, "stayLoggedIn", credentials.StayLoggedIn)
 
 	credentials.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
@@ -49,27 +50,29 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		if err != nil {
 			c.Validation.ErrorKey("login.ldapAuthentication_invalid_danger")
 			return flashError(
-				errValidation,
+				errAuth,
+				err,
 				routes.User.LoginPage(),
 				"",
 				c.Controller,
 				"",
 			)
 		}
-		revel.AppLog.Debug("ldap authentication successful", "user", user)
+		c.Log.Debug("ldap authentication successful", "user", user)
 
 	} else { //external login
 
 		user.EMail = strings.ToLower(credentials.EMail)
 		user.Password.String = credentials.Password
 		user.Password.Valid = true
-		revel.AppLog.Debug("login of extern user", "user", user)
+		c.Log.Debug("login of external user", "user", user)
 	}
 
 	//login of user
 	if err := db.Login(&user); err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
@@ -82,6 +85,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	if c.Validation.HasErrors() { //invalid external user credentials
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.LoginPage(),
 			"",
 			c.Controller,
@@ -98,7 +102,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		c.Session.SetNoExpiration()
 	}
 
-	revel.AppLog.Debug("login successful", "user", user)
+	c.Log.Debug("login successful", "user", user)
 	c.Flash.Success(
 		c.Message(
 			"login.confirmation_success",
@@ -124,7 +128,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 - Roles: all */
 func (c User) Logout() revel.Result {
 
-	revel.AppLog.Debug("logout", "length session", len(c.Session))
+	c.Log.Debug("logout", "length session", len(c.Session))
 	for k := range c.Session {
 		c.Session.Del(k)
 	}
@@ -136,7 +140,7 @@ func (c User) Logout() revel.Result {
 - Roles: not logged in users */
 func (c User) RegistrationPage() revel.Result {
 
-	revel.AppLog.Debug("requesting registration page")
+	c.Log.Debug("render registration page", "url", c.Request.URL)
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
 	c.ViewArgs["tabName"] = c.Message("register.tabName")
@@ -148,12 +152,13 @@ func (c User) RegistrationPage() revel.Result {
 - Roles: not logged in users */
 func (c User) Registration(user models.User) revel.Result {
 
-	revel.AppLog.Debug("registration of user", "user", user)
+	c.Log.Debug("registration of user", "user", user)
 
 	user.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.RegistrationPage(),
 			"",
 			c.Controller,
@@ -165,13 +170,14 @@ func (c User) Registration(user models.User) revel.Result {
 	if err := db.Register(&user); err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.RegistrationPage(),
 			"",
 			c.Controller,
 			"",
 		)
 	}
-	revel.AppLog.Debug("registration successful", "user", user)
+	c.Log.Debug("registration successful", "user", user)
 
 	c.setSession(&user)
 	c.Session["notActivated"] = "true"
@@ -182,6 +188,7 @@ func (c User) Registration(user models.User) revel.Result {
 	if err != nil {
 		return flashError(
 			errEMail,
+			err,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -201,7 +208,7 @@ func (c User) Registration(user models.User) revel.Result {
 - Roles: not logged in users */
 func (c User) NewPasswordPage() revel.Result {
 
-	revel.AppLog.Debug("requesting new password page")
+	c.Log.Debug("render new password page", "url", c.Request.URL)
 	//NOTE: we do not set the callPath because we want to be redirected to the
 	//previous page after logging in
 	c.Session["currPath"] = c.Request.URL.String()
@@ -213,7 +220,7 @@ func (c User) NewPasswordPage() revel.Result {
 - Roles: all */
 func (c User) NewPassword(email string) revel.Result {
 
-	revel.AppLog.Debug("requesting new password", "email", email)
+	c.Log.Debug("requesting new password", "email", email)
 
 	c.Validation.Check(email,
 		revel.Required{},
@@ -229,6 +236,7 @@ func (c User) NewPassword(email string) revel.Result {
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
@@ -258,13 +266,14 @@ func (c User) NewPassword(email string) revel.Result {
 	if err := db.NewPassword(&user); err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
 			"",
 		)
 	}
-	revel.AppLog.Debug("set new password", "user", user)
+	c.Log.Debug("successfully set new password", "user", user)
 
 	err := c.sendEMail(&user,
 		"emails.subject_newPw",
@@ -272,6 +281,7 @@ func (c User) NewPassword(email string) revel.Result {
 	if err != nil {
 		return flashError(
 			errEMail,
+			err,
 			routes.User.NewPasswordPage(),
 			"",
 			c.Controller,
@@ -291,7 +301,7 @@ func (c User) NewPassword(email string) revel.Result {
 - Roles: all */
 func (c User) ActivationPage() revel.Result {
 
-	revel.AppLog.Debug("requesting activation page")
+	c.Log.Debug("render activation page", "url", c.Request.URL)
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
 	c.Session["currPath"] = c.Request.URL.String()
@@ -329,6 +339,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -341,6 +352,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 	if err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -352,6 +364,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 		c.Validation.ErrorKey("validation.invalid.activation")
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -377,7 +390,8 @@ func (c User) NewActivationCode() revel.Result {
 
 	if user.ID, err = strconv.Atoi(userID); err != nil {
 		return flashError(
-			errDataConversion,
+			errDataConv,
+			err,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -388,6 +402,7 @@ func (c User) NewActivationCode() revel.Result {
 	if err := db.NewActivationCode(&user); err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -401,6 +416,7 @@ func (c User) NewActivationCode() revel.Result {
 	if err != nil {
 		return flashError(
 			errEMail,
+			err,
 			routes.User.ActivationPage(),
 			"",
 			c.Controller,
@@ -420,7 +436,7 @@ func (c User) NewActivationCode() revel.Result {
 - Roles: logged in users. */
 func (c User) PrefLanguagePage() revel.Result {
 
-	revel.AppLog.Debug("requesting preferred language page")
+	c.Log.Debug("render preferred language page", "url", c.Request.URL)
 	//NOTE: we do not set the callPath because we want to be redirected to the previous
 	//page after a successful login
 	c.Session["currPath"] = c.Request.URL.String()
@@ -432,7 +448,7 @@ func (c User) PrefLanguagePage() revel.Result {
 - Roles: logged in users. */
 func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
-	revel.AppLog.Debug("set preferred language", "prefLanguage", prefLanguage)
+	c.Log.Debug("set preferred language", "prefLanguage", prefLanguage)
 
 	c.Validation.Check(prefLanguage,
 		models.LanguageValidator{},
@@ -440,6 +456,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			routes.User.PrefLanguagePage(),
 			"",
 			c.Controller,
@@ -452,18 +469,22 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	if err := db.SetPrefLanguage(&userID, &prefLanguage); err != nil {
 		return flashError(
 			errDB,
+			err,
 			routes.User.PrefLanguagePage(),
 			"",
 			c.Controller,
 			"",
 		)
 	}
+
+	c.Flash.Success(c.Message("prefLang.success", prefLanguage))
 	return c.Redirect(c.Session["callPath"])
 }
 
 //setSession sets all user related session values.
 func (c User) setSession(user *models.User) {
 
+	c.Log.Debug("setting user session", "user", user)
 	c.Session["userID"] = strconv.Itoa(user.ID)
 	c.Session["firstName"] = user.FirstName
 	c.Session["lastName"] = user.LastName
@@ -474,6 +495,9 @@ func (c User) setSession(user *models.User) {
 
 //sendEMail sends an activation e-mail or a new password e-mail.
 func (c User) sendEMail(user *models.User, subjectKey string, filename string) (err error) {
+
+	c.Log.Debug("sending EMail", "user", user, "subjectKey", subjectKey,
+		"filename", filename)
 
 	data := models.EMailData{User: *user}
 
@@ -498,7 +522,7 @@ func (c User) sendEMail(user *models.User, subjectKey string, filename string) (
 		return
 	}
 
-	revel.AppLog.Debug("assembled e-mail", "email", email)
+	c.Log.Debug("assembled e-mail", "email", email)
 
 	app.EMailQueue <- email
 	return

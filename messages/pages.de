@@ -143,6 +143,7 @@ prefLang.tabName = Sprache setzen
 prefLang.title = Bevorzugte Sprache setzen
 prefLang.info = Sprache der E-Mails. Kann im Profil geändert werden.
 prefLang.short_info = Sprache der E-Mails
+prefLang.success = Sprache der E-Mails wurde auf %s gesetzt.
 
 # -------------------------------------------------------------------------------------------------- #
 # Index

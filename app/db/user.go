@@ -19,9 +19,11 @@ func Login(user *models.User) (err error) {
 
 	if !user.Password.Valid { //ldap login
 
+		dbLog.Debug("ldap login")
+
 		tx, err := app.Db.Beginx()
 		if err != nil {
-			revel.AppLog.Error("failed to begin tx in Login()", "error", err.Error())
+			dbLog.Error("failed to begin tx in Login()", "error", err.Error())
 			return err
 		}
 
@@ -30,13 +32,13 @@ func Login(user *models.User) (err error) {
 			user.FirstName, user.LastName, user.EMail, user.Salutation, now, now, user.MatrNr,
 			user.AcademicTitle, user.Title, user.NameAffix, user.Affiliations, app.TimeZone)
 		if err != nil {
-			revel.AppLog.Error("failed to update or insert ldap user", "user", user, "error", err.Error())
+			dbLog.Error("failed to update or insert ldap user", "user", user, "error", err.Error())
 			tx.Rollback()
 			return err
 		}
 
 		if user.MatrNr.Valid && user.FirstLogin == now { //update the courses of study of that user
-			revel.AppLog.Debug("first login", "time", user.FirstLogin)
+			dbLog.Debug("first login", "time", user.FirstLogin)
 			//TODO: update the courses of study
 		}
 
@@ -44,10 +46,12 @@ func Login(user *models.User) (err error) {
 
 	} else { //external login
 
+		dbLog.Debug("external login")
+
 		err = app.Db.Get(user, stmtLoginExtern, now, user.EMail, user.Password)
 		if err != nil {
 			if err != sql.ErrNoRows {
-				revel.AppLog.Error("failed to update external user", "user", user, "error", err.Error())
+				dbLog.Error("failed to update external user", "user", user, "error", err.Error())
 				return
 			}
 			err = nil
@@ -60,7 +64,7 @@ func Login(user *models.User) (err error) {
 /*Register inserts an external user. It returns all session values of that user. */
 func Register(user *models.User) (err error) {
 
-	activationCode := generateActivationCode()
+	activationCode := generateCode()
 
 	//last login and first login
 	now := time.Now().Format(revel.TimeFormats[2])
@@ -68,7 +72,7 @@ func Register(user *models.User) (err error) {
 	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
 		user.Salutation, now, now, user.Password, activationCode, user.Language)
 	if err != nil {
-		revel.AppLog.Error("failed to register external user", "user", user, "error", err.Error())
+		dbLog.Error("failed to register external user", "user", user, "error", err.Error())
 	}
 	user.ActivationCode.String = activationCode
 	return
@@ -83,11 +87,11 @@ func NewPassword(user *models.User) (err error) {
 		WHERE email = $2
 		RETURNING id, lastname, firstname, email, language
 	`
-	password := generateActivationCode()
+	password := generateCode()
 
 	err = app.Db.Get(user, updatePassword, password, user.EMail)
 	if err != nil {
-		revel.AppLog.Error("failed to update password", "user", user,
+		dbLog.Error("failed to update password", "user", user,
 			"password", password, "error", err.Error())
 	}
 	user.Password.String = password
@@ -113,25 +117,27 @@ func VerifyActivationCode(activationCode *string, userID *int) (success bool, er
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		revel.AppLog.Error("failed to begin tx in VerifyActivationCode()", "error", err.Error())
+		dbLog.Error("failed to begin tx in VerifyActivationCode()", "error", err.Error())
 		return
 	}
 
 	err = tx.Get(&success, selectCode, *activationCode, *userID)
 	if err != nil {
-		revel.AppLog.Error("failed to select activation code", "activationCode", *activationCode,
+		dbLog.Error("failed to select activation code", "activationCode", *activationCode,
 			"userID", *userID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
 	if !success {
+		dbLog.Debug("invalid activation code, verification failed", "activation code", *activationCode)
+		tx.Commit()
 		return
 	}
 
 	_, err = tx.Exec(updateCode, *userID)
 	if err != nil {
-		revel.AppLog.Error("failed to update activation code", "userID", *userID, "error", err.Error())
+		dbLog.Error("failed to update activation code", "userID", *userID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -149,11 +155,11 @@ func NewActivationCode(user *models.User) (err error) {
 		WHERE id = $2
 		RETURNING id, lastname, firstname, email, language
 	`
-	activationCode := generateActivationCode()
+	activationCode := generateCode()
 
 	err = app.Db.Get(user, updateCode, activationCode, user.ID)
 	if err != nil {
-		revel.AppLog.Error("failed to update activation code", "user", user,
+		dbLog.Error("failed to update activation code", "user", user,
 			"activationCode", activationCode, "error", err.Error())
 	}
 	user.ActivationCode.String = activationCode
@@ -163,23 +169,24 @@ func NewActivationCode(user *models.User) (err error) {
 /*SetPrefLanguage sets the preferred language of an user. */
 func SetPrefLanguage(userIDSession *string, language *string) (err error) {
 
+	updateLanguage := `UPDATE users SET language = $1 WHERE id = $2`
+
 	userID, err := strconv.Atoi(*userIDSession)
 	if err != nil {
-		revel.AppLog.Error("failed to parse userID from userIDSession",
+		dbLog.Error("failed to parse userID from userIDSession",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
 
-	updateLanguage := `UPDATE users SET language = $1 WHERE id = $2`
 	_, err = app.Db.Exec(updateLanguage, *language, userID)
 	if err != nil {
-		revel.AppLog.Error("failed to update language", "userID", userID, "error", err.Error())
+		dbLog.Error("failed to update language", "userID", userID, "error", err.Error())
 	}
 	return
 }
 
-//generateActivationCode generates an activation code.
-func generateActivationCode() string {
+//generateCode generates an activation code or a random password.
+func generateCode() string {
 
 	//to create a unique random, we need to take the time in nanoseconds as seed
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -192,6 +199,8 @@ func generateActivationCode() string {
 	for i := range b {
 		b[i] = characters[rand.Intn(len(characters))]
 	}
+
+	dbLog.Debug("generated code", "code", string(b))
 	return string(b)
 }
 

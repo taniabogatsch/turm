@@ -11,7 +11,7 @@ import (
 - Roles: all (except not activated users) */
 func (c App) Index() revel.Result {
 
-	revel.AppLog.Debug("requesting index page")
+	c.Log.Debug("render index page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL
 	c.ViewArgs["tabName"] = c.Message("index.tabName")
 
@@ -24,7 +24,9 @@ func (c App) Index() revel.Result {
 - Roles: all */
 func (c App) ChangeLanguage(language string) revel.Result {
 
-	revel.AppLog.Debug("change language", "language", language)
+	c.Log.Debug("change language",
+		"old language", c.Session["currentLocale"],
+		"language", language)
 
 	//some pages do not change the callPath and must be detected manually
 	if c.Session["currPath"] != routes.App.Index() {
@@ -38,8 +40,9 @@ func (c App) ChangeLanguage(language string) revel.Result {
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
+			nil,
 			c.Session["callPath"].(string),
-			"validation.invalid.language",
+			"",
 			c.Controller,
 			"",
 		)
