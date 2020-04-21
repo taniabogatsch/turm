@@ -1,5 +1,7 @@
 package models
 
+//more specific validators are in the respective model files
+
 import (
 	"fmt"
 	"turm/app"
@@ -67,7 +69,7 @@ func (uniqueV Unique) IsSatisfied(i interface{}) bool {
 		` FROM ` + data.Table + ` WHERE ` + data.Column + ` = $1) AS unique`
 	err := app.Db.Get(&unique, selectExists, data.Value)
 	if err != nil {
-		modelLog.Error("failed to retrieve information about this column",
+		modelsLog.Error("failed to retrieve information about this column",
 			"SQL", selectExists, "data", data, "error", err.Error())
 		return false
 	}

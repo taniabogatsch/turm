@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
+	"math/rand"
+	"strconv"
 	"strings"
+	"time"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -42,7 +45,7 @@ func (u Role) String() string {
 	return [...]string{"user", "creator", "admin"}[u]
 }
 
-/*User contains all directly user related values. */
+/*User is a model of the users table. */
 type User struct {
 	ID         int            `db:"id, primarykey, autoincrement"`
 	LastName   string         `db:"lastname"`
@@ -68,7 +71,7 @@ type User struct {
 	ActivationCode sql.NullString `db:"activationcode"`
 }
 
-/*Validate validates the User struct fields as retrieved by the register form. */
+/*Validate user fields of newly registered users. */
 func (user *User) Validate(v *revel.Validation) {
 
 	user.EMail = strings.ToLower(user.EMail)
@@ -130,21 +133,6 @@ func (user *User) Validate(v *revel.Validation) {
 	}
 }
 
-/*Studies contains all data about the course of study of an user. */
-type Studies struct {
-	UserID            int    `db:"userid, primarykey"`
-	Semester          int    `db:"semester"`
-	DegreeID          int    `db:"degreeid, primarykey"`
-	CourseOfStudiesID int    `db:"courseofstudiesid, primarykey"`
-	Degree            string `db:"degree"`          //not a field in the studies table
-	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
-}
-
-/*Validate validates the Studies struct fields. */
-func (studies Studies) Validate(v *revel.Validation) {
-	//TODO
-}
-
 /*Credentials entered at the login page. */
 type Credentials struct {
 	Username     string
@@ -153,7 +141,7 @@ type Credentials struct {
 	StayLoggedIn bool
 }
 
-/*Validate ensures that neither the username nor the password are empty or of incorrect size. */
+/*Validate the credentials. */
 func (credentials *Credentials) Validate(v *revel.Validation) {
 
 	if credentials.Username != "" { //ldap login credentials
@@ -187,6 +175,215 @@ func (credentials *Credentials) Validate(v *revel.Validation) {
 	).MessageKey("validation.invalid.password")
 }
 
+/*Login inserts or updates a user. It provides all session values of that user. */
+func (user *User) Login() (err error) {
+
+	//last login (and first login)
+	now := time.Now().Format(revel.TimeFormats[0])
+
+	if !user.Password.Valid { //ldap login
+
+		modelsLog.Debug("ldap login")
+
+		tx, err := app.Db.Beginx()
+		if err != nil {
+			modelsLog.Error("failed to begin tx in Login()", "error", err.Error())
+			return err
+		}
+
+		//insert or update users table data
+		err = tx.Get(user, stmtLoginLdap,
+			user.FirstName, user.LastName, user.EMail, user.Salutation, now, now, user.MatrNr,
+			user.AcademicTitle, user.Title, user.NameAffix, user.Affiliations, app.TimeZone)
+		if err != nil {
+			modelsLog.Error("failed to update or insert ldap user", "user", user, "error", err.Error())
+			tx.Rollback()
+			return err
+		}
+
+		if user.MatrNr.Valid && user.FirstLogin == now { //update the courses of study of that user
+			modelsLog.Debug("first login", "time", user.FirstLogin)
+			//TODO: update the courses of study
+		}
+
+		tx.Commit()
+
+	} else { //external login
+
+		modelsLog.Debug("external login")
+
+		err = app.Db.Get(user, stmtLoginExtern, now, user.EMail, user.Password)
+		if err != nil {
+			if err != sql.ErrNoRows {
+				modelsLog.Error("failed to update external user", "user", user, "error", err.Error())
+				return
+			}
+			err = nil
+		}
+	}
+	return
+}
+
+/*Register inserts an external user. It provides all session values of that user. */
+func (user *User) Register() (err error) {
+
+	activationCode := generateCode()
+
+	//last login and first login
+	now := time.Now().Format(revel.TimeFormats[0])
+
+	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
+		user.Salutation, now, now, user.Password, activationCode, user.Language)
+	if err != nil {
+		modelsLog.Error("failed to register external user", "user", user, "error", err.Error())
+	}
+	user.ActivationCode.String = activationCode
+	return
+}
+
+/*NewPassword generates a new password for an user. */
+func (user *User) NewPassword() (err error) {
+
+	updatePassword := `
+		UPDATE users
+		SET password = crypt($1, gen_salt('bf'))
+		WHERE email = $2
+		RETURNING id, lastname, firstname, email, language
+	`
+	password := generateCode()
+
+	err = app.Db.Get(user, updatePassword, password, user.EMail)
+	if err != nil {
+		modelsLog.Error("failed to update password", "user", user,
+			"password", password, "error", err.Error())
+	}
+	user.Password.String = password
+	return
+}
+
+/*VerifyActivationCode verifies an activation code. */
+func (user *User) VerifyActivationCode() (success bool, err error) {
+
+	selectCode := `
+		SELECT EXISTS (
+			SELECT true
+			FROM users
+			WHERE id = $2
+				AND (
+					activationcode = CRYPT($1, activationcode)
+					OR
+					activationcode IS NULL
+				)
+		) AS success
+	`
+	updateCode := `UPDATE users SET activationcode = null WHERE id = $1`
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		modelsLog.Error("failed to begin tx in VerifyActivationCode()", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(&success, selectCode, user.ActivationCode.String, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to select activation code", "user", user, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if !success {
+		modelsLog.Debug("invalid activation code, verification failed",
+			"user", user)
+		tx.Commit()
+		return
+	}
+
+	_, err = tx.Exec(updateCode, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to update activation code", "user", user, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+/*NewActivationCode creates a new activation code for an user. */
+func (user *User) NewActivationCode() (err error) {
+
+	updateCode := `
+		UPDATE users
+		SET activationcode = crypt($1, gen_salt('bf'))
+		WHERE id = $2
+		RETURNING id, lastname, firstname, email, language
+	`
+	activationCode := generateCode()
+
+	err = app.Db.Get(user, updateCode, activationCode, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to update activation code", "user", user,
+			"activationCode", activationCode, "error", err.Error())
+	}
+	user.ActivationCode.String = activationCode
+	return
+}
+
+/*SetPrefLanguage sets the preferred language of an user. */
+func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
+
+	updateLanguage := `UPDATE users SET language = $1 WHERE id = $2`
+
+	user.ID, err = strconv.Atoi(*userIDSession)
+	if err != nil {
+		modelsLog.Error("failed to parse userID from userIDSession",
+			"userIDSession", *userIDSession, "error", err.Error())
+		return
+	}
+
+	_, err = app.Db.Exec(updateLanguage, user.Language.String, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to update language", "userID", user.ID, "error", err.Error())
+	}
+	return
+}
+
+/*Studies is a model of the studies table. */
+type Studies struct {
+	UserID            int    `db:"userid, primarykey"`
+	Semester          int    `db:"semester"`
+	DegreeID          int    `db:"degreeid, primarykey"`
+	CourseOfStudiesID int    `db:"courseofstudiesid, primarykey"`
+	Degree            string `db:"degree"`          //not a field in the studies table
+	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
+}
+
+/*Validate the studies when loaded from the user enrollment file. */
+func (studies Studies) Validate(v *revel.Validation) {
+	//TODO
+}
+
+//generateCode generates an activation code or a random password.
+func generateCode() string {
+
+	//to create a unique random, we need to take the time in nanoseconds as seed
+	rand.Seed(time.Now().UTC().UnixNano())
+	//characters that can be used in the activation code (no l, I, L, O, 0, 1)
+	var characters = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	//the length of the activation code
+	b := make([]byte, 7)
+
+	//generate the code
+	for i := range b {
+		b[i] = characters[rand.Intn(len(characters))]
+	}
+
+	modelsLog.Debug("generated code", "code", string(b))
+	return string(b)
+}
+
+/* --- CUSTOM SQL TYPES --- */
+
 /*Affiliations contains all affiliations of a user. */
 type Affiliations []string
 
@@ -200,7 +397,7 @@ func (affiliations Affiliations) Value() (driver.Value, error) {
 	return driver.Value("{" + strings.TrimRight(str, ",") + "}"), nil
 }
 
-/*Scan constructs Affiliations from an SQL Value. */
+/*Scan constructs Affiliations from a SQL Value. */
 func (affiliations *Affiliations) Scan(value interface{}) error {
 
 	switch value.(type) {
@@ -213,3 +410,37 @@ func (affiliations *Affiliations) Scan(value interface{}) error {
 	}
 	return nil
 }
+
+const (
+	stmtLoginLdap = `
+		INSERT INTO users (
+			firstname, lastname, email, salutation, role, lastlogin,
+			firstlogin, matrnr, academictitle, title, nameaffix, affiliations
+		)
+		VALUES ($1, $2, $3, $4, 0, $5, $6, $7, $8, $9, $10, $11)
+		ON CONFLICT (email)
+		DO UPDATE
+			SET
+				firstname = $1, lastname = $2, salutation = $4, lastlogin = $5,
+				matrnr = $7, academictitle = $8, title = $9, nameaffix = $10, affiliations = $11
+		RETURNING id, lastname, firstname, email, role, matrnr, language,
+			TO_CHAR (firstlogin AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI:SS') as firstlogin
+	`
+
+	stmtLoginExtern = `
+		UPDATE users
+		SET lastlogin = $1
+		WHERE email = $2
+			AND password = crypt($3, password)
+		RETURNING id, lastname, firstname, email, role, activationcode, language
+	`
+
+	stmtRegisterExtern = `
+		INSERT INTO users (
+			firstname, lastname, email, salutation, role, lastlogin,
+			firstlogin, password, activationcode, language
+		)
+		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')), $9)
+		RETURNING id, lastname, firstname, email, role, language
+	`
+)

@@ -18,3 +18,19 @@
     });
   }, false);
 })();
+
+//groupsChangeIcon adjusts the group collapse icons according to the collapse state
+function groupsChangeIcon(id) {
+
+  //get icons
+  const iconRightClass = $("#icon-right-" + id).attr("class");
+  const iconDownClass = $("#icon-down-" + id).attr("class");
+
+  if (iconRightClass == "display-block") {
+    $("#icon-right-" + id).attr("class", "display-none");
+    $("#icon-down-" + id).attr("class", "display-block");
+  } else {
+    $("#icon-right-" + id).attr("class", "display-block");
+    $("#icon-down-" + id).attr("class", "display-none");
+  }
+}

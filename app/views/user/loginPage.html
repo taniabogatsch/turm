@@ -9,7 +9,7 @@
 <div class="page page-middle">
   <center>
     <h3>
-      {{msg $ "login.pageName"}}
+      {{msg $ "login.page"}}
     </h3>
     <br>
 
@@ -65,20 +65,15 @@
                   <input id="stayLoggedIn-checkbox" class="form-check-input" type="checkbox" name="credentials.StayLoggedIn" value="true" checked>
                 {{end}}
                 <label class="form-check-label">
-                  {{msg $ "login.stayLoggedIn"}}
+                  {{msg $ "login.stay"}}
                 </label>
               </div>
             </div>
 
-            {{range .errors}}
-              <div class="warning-feedback">
-                {{.}}
-              </div>
-            {{end}}
             <br>
             <!-- button to confirm login -->
             <button class="btn btn-darkblue" type="submit">
-              {{msg $ "login.pageName"}}
+              {{msg $ "button.login"}}
             </button>
           </form>
 
@@ -89,14 +84,14 @@
       <br>
       <br>
       <a href='{{url "User.RegistrationPage"}}'>
-        {{msg $ "register.pageName"}}
+        {{msg $ "register.tab"}}
       </a>
 
       <!-- link to new password page -->
       <br>
       <br>
       <a href='{{url "User.NewPasswordPage"}}'>
-        {{msg $ "newPw.pwforgottenQuestion"}}
+        {{msg $ "new.pw.question"}}
       </a>
 
     </div>
@@ -122,12 +117,18 @@
       $("#input-user").attr("placeholder", '{{msg $ "user.username"}}');
       $("#input-user").attr("type", "text");
       $("#input-user-validation").html('{{msg $ "validation.invalid.username"}}');
+      if ($('#loginForm').attr("class") == "needs-validation was-validated") {
+        $("#input-user-validation").hide();
+      }
     } else {
       $("#input-icon").html($("#icon-email").html());
       $("#input-user").attr("name", "credentials.EMail");
       $("#input-user").attr("placeholder", '{{msg $ "user.email"}}');
       $("#input-user").attr("type", "email");
       $("#input-user-validation").html('{{msg $ "validation.invalid.email"}}');
+      if ($('#loginForm').attr("class") == "needs-validation was-validated") {
+        $("#input-user-validation").show();
+      }
     }
 
     $("#input-user").focus();
@@ -153,8 +154,9 @@
     }
   }
 
+  //detect validation error
   if ({{if .errors}}true{{else}}false{{end}}) {
-    $("#loginForm").addClass("was-validated");
+    showErrorToast($('#flash-errors').html());
   }
 </script>
 

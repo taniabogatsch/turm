@@ -11,3 +11,8 @@ type App struct {
 type User struct {
 	*revel.Controller
 }
+
+/*Admin implements logic to CRUD dadta for admin functions. */
+type Admin struct {
+	*revel.Controller
+}

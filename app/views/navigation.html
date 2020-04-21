@@ -2,13 +2,16 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark menu">
 
-  <div class="navbar-brand">
+  <div class="navbar-brand padding-bottom-24">
     <!-- Turm2 icon -->
     <a href='{{url "App.Index"}}' class="float-left">
       <img src="/public/img/TurmIcon.png" class="menu-icon">
     </a>
+  </div>
+
+  <div class="navbar-brand">
     <!-- Turm2 text -->
-    <a class="text-white float-left" href='{{url "App.Index"}}'>
+    <a class="text-white card-link float-left" href='{{url "App.Index"}}'>
       <h2>
         Turm II
       </h2>
@@ -26,38 +29,37 @@
       <!-- get back to main page -->
       <li class="nav-item active">
         <a class="nav-link" href='{{url "App.Index"}}'>
-          {{msg $ "index.pageName"}}
+          {{msg $ "index.page"}}
         </a>
       </li>
 
-      <!-- data policy, news feed, FAQ, tutorials, imprint-->
+      <!-- data privacy, news feed, FAQ, tutorials, imprint-->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-white" href="#" id="dropdownHelpPages" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{msg $ "page.menu_helpPages"}}
+          {{msg $ "nav.help"}}
         </a>
         <!-- TODO -->
         <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
-          <a class="dropdown-item" href="#"> {{msg $ "policy.pageName"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "newsFeed.pageName"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "faq.pageName"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "tutorials.pageName"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "imprint.pageName"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "data.privacy.tab"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "news.feed.tab"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "faq.tab"}} </a>
+          <a class="dropdown-item" href="#"> {{msg $ "imprint.tab"}} </a>
         </div>
       </li>
 
       <!--languages -->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-white" href="#" id="dropdownLanguages" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{range $key, $language := .languages}}
-            {{if eq $.currentLocale $language}}
-              <img class="menu-flags" src="/public/img/{{$language}}_flag.png">
+          {{range .languages}}
+            {{if eq $.currentLocale .}}
+              <img class="menu-flags" src="/public/img/{{.}}_flag.png">
             {{end}}
           {{end}}
         </a>
         <div class="dropdown-menu menu-flag" aria-labelledby="dropdownLanguages">
-          {{range $key, $language := .languages}}
-            <a class="dropdown-item" href='{{url "App.ChangeLanguage" $language}}'>
-              <img src="/public/img/{{$language}}_flag.png">
+          {{range .languages}}
+            <a class="dropdown-item" href='{{url "App.ChangeLanguage" .}}'>
+              <img src="/public/img/{{.}}_flag.png">
             </a>
           {{end}}
         </div>
@@ -72,33 +74,34 @@
       </span>
     {{end}}
 
-    <form class="form-inline my-2 my-lg-0">
+    <form class="form-inline my-2 my-lg-0 margin-10">
       <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">
+        <input class="form-control" type="search" placeholder='{{msg $ "search.course"}}'>
+        <div class="input-group-append">
+          <span class="btn btn-outline-light border-left-none">
             {{template "icons/search.html"}}
           </span>
         </div>
-        <input class="form-control mr-sm-2" type="search" placeholder='{{msg $ "search.course"}}'>
       </div>
-      <button class="btn btn-outline-light my-2 my-sm-0" type="submit">
-        {{msg $ "button.search"}} <!-- TODO -->
-      </button>
     </form>
+
+    <button class="btn btn-outline-light" type="button">
+      Gruppen
+    </button>
 
     <!-- a user is logged in -->
     {{if .session.userID}}
       <form class="form-inline my-2 my-lg-0" action='{{url "User.Logout"}}' method="GET">
-        <button class="btn btn-outline-light my-2 my-sm-0 margin-10" type="submit">
-          {{msg $ "logout.button"}}
+        <button class="btn btn-outline-light margin-10" type="submit">
+          {{msg $ "button.logout"}}
         </button>
       </form>
 
     <!-- no user is logged in, link and button to login page -->
     {{else}}
       <form class="form-inline my-2 my-lg-0" action='{{url "User.LoginPage"}}' method="GET">
-        <button class="btn btn-outline-light my-2 my-sm-0 margin-10" type="submit">
-          {{msg $ "login.pageName"}}
+        <button class="btn btn-outline-light margin-10" type="submit">
+          {{msg $ "button.login"}}
         </button>
       </form>
     {{end}}
@@ -108,5 +111,3 @@
 
 <br>
 <br>
-
-{{template "flash.html" .}}

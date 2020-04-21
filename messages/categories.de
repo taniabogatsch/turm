@@ -27,7 +27,7 @@
 error.contactSupportMessage = Bitte kontaktieren Sie den Support.
 
 error.general = Es ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
-error.dataTransfer = Beim Übertragen Ihrer Daten ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
+error.dataTransfer = Bei der Datenübertragung ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.sendingMail = Beim Senden einer E-Mail an %s ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.database = Beim Ausführen einer Datenbankanfrage ist ein Fehler aufgetreten. %(error.contactSupportMessage)s
 error.template = Beim Laden einer Komponente der Seite ist ein Fehler aufgetreten. %(error.contactSupportMessage)s

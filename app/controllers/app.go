@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"turm/app/models"
 	"turm/app/routes"
 
@@ -12,12 +13,43 @@ import (
 func (c App) Index() revel.Result {
 
 	c.Log.Debug("render index page", "url", c.Request.URL)
-	c.Session["callPath"] = c.Request.URL
-	c.ViewArgs["tabName"] = c.Message("index.tabName")
+	c.Session["callPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("index.tab")
 
 	//TODO: get last update
 
 	return c.Render()
+}
+
+/*Groups renders all groups.
+- Roles: all */
+func (c App) Groups(prefix string) revel.Result {
+
+	c.Log.Debug("get groups", "prefix", prefix)
+
+	c.Validation.Required(prefix)
+	if c.Validation.HasErrors() {
+		return renderError(
+			errContent,
+			errors.New("missing prefix"),
+			"",
+			c.Controller,
+			"",
+		)
+	}
+
+	var Groups models.Groups
+	if err := Groups.Get(&prefix); err != nil {
+		return renderError(
+			errDB,
+			err,
+			"",
+			c.Controller,
+			"",
+		)
+	}
+
+	return c.Render(Groups)
 }
 
 /*ChangeLanguage changes the language, then redirects to the page currently set as callPath.
@@ -50,6 +82,8 @@ func (c App) ChangeLanguage(language string) revel.Result {
 
 	c.Session["currentLocale"] = language
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
+	c.Request.Locale = c.Session["currentLocale"].(string)
 
+	c.Flash.Success(c.Message("language.change.success", language))
 	return c.Redirect(c.Session["callPath"])
 }

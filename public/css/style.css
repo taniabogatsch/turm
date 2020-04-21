@@ -80,6 +80,9 @@
   .margin-right-20 {
     margin-right: 20px;
   }
+  .margin-left-10 {
+    margin-left: 10px;
+  }
 }
 .float-right {
   float: right;
@@ -93,6 +96,24 @@
 .display-none {
   display: none;
 }
+.display-block {
+  display: block;
+}
+.padding-bottom-24 {
+  padding-bottom: 24px;
+}
+.border-left-none {
+  border-left: none;
+}
+.background-color-darkblue {
+  background-color: #292961;
+}
+.color-success {
+  color: #28a745;
+}
+.color-danger {
+  color: #dc3545;
+}
 .warning-feedback {
   width: 100%;
   margin-top: 0.25rem;
@@ -103,10 +124,10 @@
   background-color: #292961;
 }
 .menu-icon {
-  height: 54px;
+  height: 40px;
 }
 .menu-flags {
-  width: 1.1rem;
+  width: 1.5rem;
 }
 .menu-flag {
   min-width: 1rem;

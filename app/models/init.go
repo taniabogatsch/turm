@@ -6,6 +6,6 @@ package models
 import "github.com/revel/revel"
 
 var (
-	//modelLog logs all model errors
-	modelLog = revel.AppLog.New("section", "models")
+	//modelsLog logs all model errors
+	modelsLog = revel.AppLog.New("section", "models")
 )

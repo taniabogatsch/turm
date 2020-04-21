@@ -27,7 +27,7 @@
 error.contactSupportMessage = Please contact the support.
 
 error.general = An error occurred. %(error.contactSupportMessage)s
-error.dataTransfer = An error occurred while transferring your data. %(error.contactSupportMessage)s
+error.dataTransfer = An error occurred while transferring data. %(error.contactSupportMessage)s
 error.sendingMail = An error occurred while sending an e-mail to %s. %(error.contactSupportMessage)s
 error.database = An error occurred while running a database query. %(error.contactSupportMessage)s
 error.template = An error occurred while loading a page component. %(error.contactSupportMessage)s

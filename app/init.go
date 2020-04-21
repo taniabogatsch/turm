@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -101,6 +102,22 @@ func init() {
 	revel.OnAppStart(func() {
 		jobs.Schedule("@every 30s", sendEMails{})
 	})
+
+	revel.TemplateFuncs["dict_addLocale"] = func(locale string, values ...interface{}) (map[string]interface{}, error) {
+		if len(values)%2 != 0 {
+			return nil, errors.New("invalid dict call")
+		}
+		dict := make(map[string]interface{}, len(values)/2)
+		for i := 0; i < len(values); i += 2 {
+			key, ok := values[i].(string)
+			if !ok {
+				return nil, errors.New("dict keys must be strings")
+			}
+			dict[key] = values[i+1]
+		}
+		dict["currentLocale"] = locale
+		return dict, nil
+	}
 }
 
 //HeaderFilter adds common security headers

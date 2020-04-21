@@ -1,7 +1,7 @@
-{{if eq .data.User.Salutation 1}}
-  {{msg $ "emails.ms"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
-{{else if eq .data.User.Salutation 2}}
-  {{msg $ "emails.mr"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
+{{if eq .data.User.Salutation 2}}
+  {{msg $ "email.ms"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
+{{else if eq .data.User.Salutation 1}}
+  {{msg $ "email.mr"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
 {{else}}
-  {{msg $ "emails.none"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}} {{.data.User.FirstName}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
+  {{msg $ "email.none"}}{{if .data.User.Title.Valid}} {{.data.User.Title.String}}{{end}}{{if .data.User.AcademicTitle.Valid}} {{.data.User.AcademicTitle.String}}{{end}} {{.data.User.FirstName}}{{if .data.User.NameAffix.Valid}} {{.data.User.NameAffix.String}}{{end}} {{.data.User.LastName}},
 {{end}}

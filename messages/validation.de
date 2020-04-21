@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------- #
-# General data validation
+# Language validation
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.language = Bitte geben Sie eine gültige Sprache an.
@@ -12,14 +12,22 @@ validation.invalid.username = Der Nutzername muss 1 bis 255 Zeichen betragen.
 validation.invalid.lastname = Der Nachname muss 1 bis 255 Zeichen betragen.
 validation.invalid.firstname = Der Vorname muss 1 bis 255 Zeichen betragen.
 validation.invalid.email = Bitte geben Sie eine gültige E-Mail-Adresse an.
-validation.invalid.password = Das Passwort muss 1 bis 127 Zeichen betragen.
+validation.invalid.password = Das Passwort muss 6 bis 127 Zeichen betragen.
 validation.invalid.passwords = Die Passwörter müssen übereinstimmen und dürfen nur 6 bis 127 Zeichen betragen.
 validation.invalid.salutation = Bitte geben Sie eine gültige Anrede an.
 
 validation.email.notUnique = Die eingegebene E-Mail-Adresse ist bereits in Verwendung. Bitte lassen Sie sich ein neues Passwort zusenden oder verwenden Sie eine andere E-Mail-Adresse.
 validation.email.ldap = Bei der angegebenen E-Mail-Adresse handelt es sich um eine Universitäts-E-Mail-Adresse. Bitte verwenden Sie den Universitätslogin.
 
-validation.invalid.credentials = Bitte geben Sie entweder Ihren Nutzernamen oder Ihre E-Mail-Addresse an.
+validation.invalid.credentials = Bitte geben Sie entweder einen Universitätsaccount oder einen externen Account an.
 validation.invalid.login = Authentifizierung fehlgeschlagen. Bitte überprüfen Sie die eingegebene E-Mail-Addresse und das Passwort.
 
 validation.invalid.activation = Der Aktivierungscode konnte nicht verifiziert werden. Bitte stellen Sie sicher, dass Sie den Aktivierungscode richtig angegeben haben und angemeldet sind. Versuchen Sie alternativ den Aktivierungslink in der E-Mail zu verwenden oder fragen Sie einen neuen Aktivierungscode an.
+
+# -------------------------------------------------------------------------------------------------- #
+# Group validation
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.courseLimit = Bitte geben Sie ein gültiges Kurslimit an oder lassen Sie dieses Feld leer. Gültige Kurslimits sind Werte zwischen 1 bis 100. Falls eine Übergruppe dieser Gruppe bereits ein Kurslimit hat, so darf diese Gruppe kein getrenntes Limit besitzen.
+validation.invalid.groupName = Der Gruppenname muss 3 bis 255 Zeichen betragen.
+validation.invalid.groupID = Bitte geben Sie eine gültige Gruppen ID an. Gruppen können nur gelöscht werden, wenn sie keine Untergruppen sowie keine aktiven Kurse enthalten.

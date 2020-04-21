@@ -6,8 +6,10 @@ module:testrunner
 module:jobs
 
 # ------------------------------- App routes. -------------------------------- #
+
 GET     /                                       App.Index
 GET     /app/changeLanguage                     App.ChangeLanguage
+GET     /app/groups                             App.Groups
 
 # ------------------------------- User routes. -------------------------------- #
 
@@ -22,11 +24,17 @@ GET     /user/newPasswordPage                   User.NewPasswordPage
 POST    /user/newPassword                       User.NewPassword
 
 GET     /user/activationPage                    User.ActivationPage
-POST    /user/verifyActivationCode              User.VerifyActivationCode
+GET     /user/verifyActivationCode              User.VerifyActivationCode
 GET     /user/newActivationCode                 User.NewActivationCode
 
 GET     /user/prefLanguagePage                  User.PrefLanguagePage
 POST    /user/setPrefLanguage                   User.SetPrefLanguage
+
+# ------------------------------- App routes. -------------------------------- #
+
+POST    /admin/addGroup                         Admin.AddGroup
+POST    /admin/editGroup                        Admin.EditGroup
+POST    /admin/deleteGroup                      Admin.DeleteGroup
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

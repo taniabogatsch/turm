@@ -1,0 +1,66 @@
+<!-- this template loads all current groups and recursively loads their children -->
+<!-- TODO: only show add, edit and delete button if the user's role is admin -->
+
+<!-- show all children -->
+{{range .Groups}}
+  <div class="card border-0">
+    {{if not .CourseID.Valid}} <!-- group entry -->
+      <div id="heading-{{.IDPrefix}}-{{.ID}}">
+        <button onclick='groupsChangeIcon("{{.IDPrefix}}-{{.ID}}")' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#{{.IDPrefix}}-{{.ID}}" aria-expanded="true" aria-controls="{{.IDPrefix}}-{{.ID}}">
+
+          <!-- edit -->
+          <a href="#" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}})' class="badge badge-secondary btn-darkblue float-right margin-left-10">
+            {{template "icons/pencil.html" . }}
+          </a>
+          <!-- delete -->
+          {{if not .Groups}}
+            <a href="#" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}})' class="badge badge-secondary btn-darkblue float-right margin-left-10">
+              {{template "icons/trash.html" . }}
+            </a>
+          {{end}}
+
+          <!-- dropdown and dropright icon and group name-->
+          <div id="icon-right-{{.IDPrefix}}-{{.ID}}" class="display-block">
+            {{template "icons/caretRight.html" .}} {{.Name}}
+          </div>
+          <div id="icon-down-{{.IDPrefix}}-{{.ID}}" class="display-none">
+            {{template "icons/caretDown.html" .}} {{.Name}}
+          </div>
+
+          <!-- course limit information -->
+          {{if .CourseLimit.Valid}}
+            <small class="form-text text-muted">
+              {{msg $ "group.course.limit.info" .CourseLimit.Int32}}
+            </small>
+          {{end}}
+        </button>
+      </div>
+
+      <div id="{{.IDPrefix}}-{{.ID}}" class="collapse" aria-labelledby="heading-{{.IDPrefix}}-{{.ID}}">
+        <div class="card-body">
+
+          <!-- add group -->
+          <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});">
+            {{msg $ "button.add.group"}}
+          </button>
+          <br>
+          <br>
+
+          <!-- get the children of this group -->
+          {{template "app/groups.html" dict_addLocale $.currentLocale "Groups" .Groups}}
+        </div>
+      </div>
+    </div>
+  {{else}}
+    <!-- TODO: open course, either via redirect or via reload -->
+    <button class="btn btn-block btn-light text-justify list-group-item" type="button">
+      <span class="badge badge-secondary btn-darkblue"> {{msg $ "course"}} </span>
+      &nbsp; {{.Name}}
+    </button>
+  {{end}}
+
+{{else}}
+  <small class="form-text text-muted">
+    {{msg $ "group.no.children"}}
+  </small>
+{{end}}
