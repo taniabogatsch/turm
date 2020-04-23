@@ -32,7 +32,9 @@ POST    /user/setPrefLanguage                   User.SetPrefLanguage
 
 # ------------------------------- Admin routes. -------------------------------- #
 
-GET     /admin/index                            Admin.Index
+GET     /admin/userManagement                   Admin.UserManagement
+GET     /admin/roleManagement                   Admin.RoleManagement
+GET     /admin/dashboard                        Admin.Dashboard
 
 POST    /admin/addGroup                         Admin.AddGroup
 POST    /admin/editGroup                        Admin.EditGroup

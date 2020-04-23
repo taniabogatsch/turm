@@ -173,6 +173,11 @@
   bottom: 0 !important;
   background: #fff;
 }
+.toast-custom {
+  z-index: 5000 !important;
+  position: absolute;
+  right: 24px;
+}
 /* import pages */
 @media only screen and (max-width:767px) {
   .login-width-tab {

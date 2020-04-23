@@ -5,16 +5,26 @@ import (
 	"strings"
 	"turm/app"
 	"turm/app/models"
-	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
 
-/*Index renders the administration page.
+/*UserManagement renders the user management page.
 - Roles: admin */
-func (c Admin) Index() revel.Result {
+func (c Admin) UserManagement() revel.Result {
 
-	c.Log.Debug("render admin page", "url", c.Request.URL)
+	c.Log.Debug("render user management page", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("admin.tab")
+
+	return c.Render()
+}
+
+/*RoleManagement renders the role management page.
+- Roles: admin */
+func (c Admin) RoleManagement() revel.Result {
+
+	c.Log.Debug("render role management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
@@ -33,6 +43,17 @@ func (c Admin) Index() revel.Result {
 	}
 
 	return c.Render(admins, creators)
+}
+
+/*Dashboard renders the dashboard.
+- Roles: admin */
+func (c Admin) Dashboard() revel.Result {
+
+	c.Log.Debug("render dashboard", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("admin.tab")
+
+	return c.Render()
 }
 
 /*SearchUser renders search results for a search value.
@@ -97,7 +118,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.Admin.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -107,7 +128,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.Admin.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -120,7 +141,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errEMail,
 			err,
-			routes.Admin.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			user.EMail,
 		)
@@ -131,7 +152,8 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		user.LastName,
 		c.Message("user.role."+user.Role.String()),
 	))
-	return c.Redirect(Admin.Index)
+
+	return c.Redirect(c.Session["callPath"].(string))
 }
 
 /*AddGroup adds a new group.
@@ -144,7 +166,7 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -155,14 +177,14 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
 	c.Flash.Success(c.Message("group.new.success", group.Name, group.ID))
-	return c.Redirect(App.Index)
+	return c.Redirect(c.Session["callPath"].(string))
 }
 
 /*EditGroup edits the name and the course limits of a group.
@@ -175,7 +197,7 @@ func (c Admin) EditGroup(group models.Group) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -186,14 +208,14 @@ func (c Admin) EditGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
 	c.Flash.Success(c.Message("group.edit.success", group.Name, group.ID))
-	return c.Redirect(App.Index)
+	return c.Redirect(c.Session["callPath"].(string))
 }
 
 /*DeleteGroup deletes a group. Groups can only be deleted if it has no
@@ -214,7 +236,7 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -224,14 +246,14 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.App.Index(),
+			c.Session["callPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
 	c.Flash.Success(c.Message("group.delete.success", group.ID))
-	return c.Redirect(App.Index)
+	return c.Redirect(c.Session["callPath"].(string))
 }
 
 //sendEMail sends an notification e-mail about a new user role.

@@ -8,23 +8,20 @@
       <div id="heading-{{.IDPrefix}}-{{.ID}}">
         <button onclick='changeIcon("{{.IDPrefix}}-{{.ID}}");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#{{.IDPrefix}}-{{.ID}}" aria-expanded="true" aria-controls="{{.IDPrefix}}-{{.ID}}">
 
-          <!-- groups can only be deleted, edited and added at the index page -->
-          {{if eq .IDPrefix "index"}}
-            <!-- delete -->
-            {{if not .Groups}}
-              <a href="#" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="badge badge-secondary btn-darkblue float-right margin-left-10">
-                {{template "icons/trash.html" . }}
-              </a>
-            {{end}}
-            <!-- edit -->
-            <a href="#" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="badge badge-secondary btn-darkblue float-right margin-left-10">
-              {{template "icons/pencil.html" . }}
-            </a>
-            <!-- add -->
-            <a href="#" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="badge badge-secondary btn-darkblue float-right margin-left-10">
-              {{template "icons/plus.html" . }}
+          <!-- delete -->
+          {{if not .Groups}}
+            <a href="#" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="badge badge-secondary btn-darkblue float-right margin-left-10">
+              {{template "icons/trash.html" . }}
             </a>
           {{end}}
+          <!-- edit -->
+          <a href="#" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="badge badge-secondary btn-darkblue float-right margin-left-10">
+            {{template "icons/pencil.html" . }}
+          </a>
+          <!-- add -->
+          <a href="#" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="badge badge-secondary btn-darkblue float-right margin-left-10">
+            {{template "icons/plus.html" . }}
+          </a>
 
           <!-- dropdown and dropright icon and group name-->
           <div id="icon-right-{{.IDPrefix}}-{{.ID}}" class="display-block">

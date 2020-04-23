@@ -228,4 +228,3 @@ admin.new.role = Neue Rolle wählen
 admin.current.role = Bisher
 admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.
 admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
-admin.groups.use.index = Bitte verwenden Sie die Startseite, um Gruppen zu verwalten.

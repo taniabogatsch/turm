@@ -228,4 +228,3 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
-admin.groups.use.index = Please use the index page to manage groups.

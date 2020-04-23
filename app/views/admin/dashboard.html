@@ -1,6 +1,23 @@
 <!-- template containing page statistics -->
 
-<h4>
-  {{template "icons/graphUp.html" . }} &nbsp; {{msg $ "admin.dashboard"}}
-</h4>
-<hr>
+{{template "header.html" .}}
+
+{{template "admin/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+    <h4>
+      {{template "icons/graphUp.html" . }} &nbsp; {{msg $ "admin.dashboard"}}
+    </h4>
+    <hr>
+  </div>
+</div>
+
+{{template "admin/rightNav.html" . }}
+
+<script>
+  //adjust the nav pills
+  $('#v-pills-dashboard-tab').addClass("active");
+</script>
+
+{{template "footer.html" .}}
