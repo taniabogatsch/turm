@@ -38,7 +38,7 @@ Adjust all config values `app/conf/app.conf`.
 
 ### Run or deploy
 
-Run with `revel run turm` or create a `run.sh` with `revel package turm2 prod`.
+Run with `revel run turm` or create a `run.sh` with `revel package turm prod`.
 
 ## Code Layout
 
