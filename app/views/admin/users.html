@@ -1,0 +1,71 @@
+<!-- template containing the search-for-users field and an overview over all users with elevated roles -->
+
+<h4>
+  {{template "icons/search.html" . }} &nbsp; {{msg $ "admin.users"}}
+</h4>
+<hr>
+
+<!--search for users -->
+<small class="form-text text-muted">
+  {{msg $ "search.criteria"}}
+</small>
+<form id="search-form" accept-charset="UTF-8" class="needs-validation" novalidate>
+  <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text border-right-0">
+          {{template "icons/search.html" . }}
+        </span>
+      </div>
+      <input id="user-search-input" type="text" class="form-control rounded-right" placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3">
+      <div class="invalid-feedback">
+        {{msg $ "validation.invalid.searchValue"}}
+      </div>
+    </div>
+  </div>
+</form>
+<div class="form-group form-check">
+  <input id="search-inactive" type="checkbox" class="form-check-input">
+  <label class="form-check-label">
+    {{msg $ "search.inactive.users"}}
+  </label>
+</div>
+
+<br>
+<div id="user-search-results"></div>
+
+<script>
+  //react to user input
+  $('#user-search-input').keyup(function() {
+    reactToInput();
+  });
+
+  $('#search-inactive').change(function() {
+    reactToInput();
+  });
+
+  //call if the search value changes of the 'inactive users'-checkbox is changed
+  function reactToInput() {
+    document.getElementById("search-form").classList.add('was-validated');
+    const value = $('#user-search-input').val();
+    if (value.length > 2) { //search matching users
+      const searchInactive = $('#search-inactive').is(':checked');
+      search(value, searchInactive);
+    } else if (value.length == 0) {
+      $('#user-search-results').html("");
+      document.getElementById("search-form").classList.remove('was-validated');
+    } else {
+      $('#user-search-results').html("");
+    }
+  }
+
+  //renders all users matching value
+  function search(value, searchInactive) {
+    $.get("{{url "Admin.SearchUser"}}", {
+      "value": value,
+      "searchInactive": searchInactive
+    }, function(data) {
+      $('#user-search-results').html(data);
+    });
+  }
+</script>

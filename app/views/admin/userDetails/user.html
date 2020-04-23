@@ -1,0 +1,70 @@
+<!-- template containing all user data of the user details -->
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row"> {{msg $ "user.id"}} </th>
+      <td> {{.User.ID}} </td>
+    </tr>
+    <tr>
+      <th scope="row"> {{msg $ "user.name"}} </th>
+      <td>
+        {{if eq .User.Salutation 2}}
+          {{msg $ "user.salutation.ms"}}{{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+        {{else if eq .User.Salutation 1}}
+          {{msg $ "user.salutation.mr"}}{{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+        {{else}}
+          {{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+        {{end}}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row"> {{msg $ "user.email"}} </th>
+      <td> {{.User.EMail}} </td>
+    </tr>
+    <tr>
+      <th scope="row"> {{msg $ "user.role"}} </th>
+      <td>
+        {{if eq .User.Role 0}}
+          {{msg $ "user.role.user"}}
+        {{else if eq .User.Role 1}}
+          {{msg $ "user.role.creator"}}
+        {{else if eq .User.Role 2}}
+          {{msg $ "user.role.admin"}}
+        {{end}}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row"> {{msg $ "user.last.login"}} </th>
+      <td> {{.User.LastLogin}} </td>
+    </tr>
+    <tr>
+      <th scope="row"> {{msg $ "user.first.login"}} </th>
+      <td> {{.User.FirstLogin}} </td>
+    </tr>
+    {{if .User.Language.Valid}}
+      <tr>
+        <th scope="row"> {{msg $ "user.language"}} </th>
+        <td> {{.User.Language.String}} </td>
+      </tr>
+    {{end}}
+    {{if .User.MatrNr.Valid}}
+      <tr>
+        <th scope="row"> {{msg $ "user.matr.nr"}} </th>
+        <td> {{.User.MatrNr.Int32}} </td>
+      </tr>
+    {{end}}
+    {{if .User.Affiliations.Valid}}
+      <tr>
+        <th scope="row"> {{msg $ "user.affiliation"}} </th>
+        <td>
+          {{range $key, $value := .User.Affiliations.Affiliations}}
+            {{if eq $key 0}}{{$value}}{{else}}, {{$value}}{{end}}
+          {{end}}
+        </td>
+      </tr>
+    {{end}}
+
+    <!-- TODO: add studies -->
+  </tbody>
+</table>

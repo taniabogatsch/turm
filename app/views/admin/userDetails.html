@@ -1,0 +1,112 @@
+<!-- template rendering the content of the user details modal -->
+
+<!-- modal header -->
+<div class="modal-header background-color-darkblue border-radius-2">
+  <h5 class="modal-title text-white">
+    {{msg $ "user.details"}} {{.user.User.FirstName}} {{.user.User.LastName}}
+  </h5>
+  <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<!-- modal body -->
+<div class="modal-body">
+
+  <h5> {{msg $ "admin.change.role"}} </h5>
+
+  <!-- change the user role -->
+  {{if .user.User.ActivationCode.Valid}}
+    <div class="warning-feedback">
+      {{msg $ "admin.account.inactive"}}
+    </div>
+  {{end}}
+  <form id="change-role-form" accept-charset="UTF-8" action='{{url "Admin.ChangeRole"}}' method="POST" class="needs-validation" novalidate>
+
+    <!-- user ID -->
+    <input type="hidden" id="input-user-ID" name="user.ID" value="{{.user.User.ID}}">
+
+    <small class="form-text text-muted">
+      {{msg $ "admin.new.role"}}
+    </small>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          {{msg $ "admin.current.role"}}
+          {{if eq .user.User.Role 0}}
+            {{msg $ "user.role.user"}}
+          {{else if eq .user.User.Role 1}}
+            {{msg $ "user.role.creator"}}
+          {{else if eq .user.User.Role 2}}
+            {{msg $ "user.role.admin"}}
+          {{end}}
+        </span>
+      </div>
+      {{with $role := field "user.Role" .}}
+        <select name="user.Role" class="custom-select">
+          <option value="0" {{if eq "0" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.user"}} </option>
+          <option value="1" {{if eq "1" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.creator"}} </option>
+          <option value="2" {{if eq "2" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.admin"}} </option>
+        </select>
+        <div class="invalid-feedback">
+          {{msg $ "validation.invalid.role"}}
+        </div>
+      {{end}}
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-darkblue"> {{msg $ "button.save"}} </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- TODO: link to download data as PDF -->
+
+  <br>
+  <h5> {{msg $ "user.details"}} </h5>
+
+  <!-- general user data -->
+  <div class="card border-0">
+    <button onclick='changeIcon("user-data");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#user-data" aria-expanded="true" aria-controls="user-data">
+      <!-- dropdown and dropright icon and section name-->
+      <div id="icon-right-user-data" class="display-block">
+        {{template "icons/caretRight.html" .}} {{msg $ "user.data"}}
+      </div>
+      <div id="icon-down-user-data" class="display-none">
+        {{template "icons/caretDown.html" .}} {{msg $ "user.data"}}
+      </div>
+    </button>
+
+    <div id="user-data" class="collapse">
+      <div class="card-body">
+        {{template "admin/userDetails/user.html" dict_addLocale $.currentLocale "User" .user.User}}
+      </div>
+    </div>
+  </div>
+
+  <!-- all groups created by the user -->
+  {{if .user.Groups}}
+    <div class="card border-0">
+      <button onclick='changeIcon("group-data");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#group-data" aria-expanded="true" aria-controls="group-data">
+        <!-- dropdown and dropright icon and section name-->
+        <div id="icon-right-group-data" class="display-block">
+          {{template "icons/caretRight.html" .}} {{msg $ "groups"}}
+        </div>
+        <div id="icon-down-group-data" class="display-none">
+          {{template "icons/caretDown.html" .}} {{msg $ "groups"}}
+        </div>
+      </button>
+
+      <div id="group-data" class="collapse">
+        <div class="card-body">
+          {{template "admin/userDetails/groups.html" dict_addLocale $.currentLocale "Groups" .user.Groups}}
+        </div>
+      </div>
+    </div>
+  {{end}}
+</div>
+
+<!-- modal footer -->
+<div class="modal-footer">
+  <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+    {{msg $ "button.close"}}
+  </button>
+</div>

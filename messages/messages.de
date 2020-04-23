@@ -1,0 +1,231 @@
+
+header.no.javascript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
+
+footer.support.email = Bei Fragen wenden Sie sich bitte an unseren <a href="mailto:%s?Subject=SupportTurm2" target="_top">Support</a>.
+footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>. #TODO
+
+nav.help = Hilfen
+
+toast.error = Fehler
+toast.success = Erfolg
+
+language.change.success = Die Sprache der Seite ist nun '%s'.
+
+# -------------------------------------------------------------------------------------------------- #
+# BUTTON
+# -------------------------------------------------------------------------------------------------- #
+
+button.search = Suchen
+button.send = Senden
+button.save = Speichern
+
+button.login = Anmelden
+button.logout = Abmelden
+button.register = Registrieren
+button.activate.account = Account aktivieren
+
+button.add = + &nbsp; Hinzufügen
+button.add.group = + &nbsp; Gruppe hinzufügen
+
+button.edit = Bearbeiten
+button.delete = Löschen
+
+button.abort = Abbrechen
+button.close = Schließen
+
+# -------------------------------------------------------------------------------------------------- #
+# ERROR
+# -------------------------------------------------------------------------------------------------- #
+
+error.support = Bitte kontaktieren Sie den Support.
+
+error.db = Fehler beim Ausführen einer Datenbankanfrage. %(error.support)s
+error.email = Fehler beim Senden der E-Mail an %s. %(error.support)s
+error.typeConv = Ungültige Daten konvertiert. %(error.support)s
+error.content = Fehler beim Laden von Inhalten. %(error.support)s
+error.undefined = Es ist ein Fehler aufgetreten. %(error.support)s
+
+# -------------------------------------------------------------------------------------------------- #
+# USER
+# -------------------------------------------------------------------------------------------------- #
+
+user.role = Rolle
+user.role.admin = Admin
+user.role.creator = KursverantwortlicheR
+user.role.user = NutzerIn
+
+user.admins = Admins
+user.creators = Kursverantwortliche
+
+user.ldap = Uni Account
+user.external = Externer Account
+user.matr.nr = Matrikelnummer
+user.affiliation = Zugehörigkeit
+
+user.name = Name
+user.firstname = Vorname
+user.lastname = Nachname
+user.email = E-Mail
+user.username = Benutzername
+user.password = Passwort
+
+user.salutation = Anrede
+user.salutation.ms = Frau
+user.salutation.mr = Herr
+user.salutation.none = Keine Anrede
+
+user.id = Nutzer ID
+user.last.login = Letzte Anmeldung
+user.first.login = Erste Anmeldung
+user.language = Sprache
+
+user.data = Nutzerdaten
+user.details = Nutzerdetails
+
+# -------------------------------------------------------------------------------------------------- #
+# EMAIL
+# -------------------------------------------------------------------------------------------------- #
+
+email.ms = Sehr geehrte Frau
+email.mr = Sehr geehrter Herr
+email.none = Hallo
+
+email.regards.plain = Mit freundlichen Grüßen
+email.dev.team = Ihr Turm2 Entwicklerteam
+
+email.no.reply = Antworten Sie nicht auf diese E-Mail. <%s>
+email.regards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwicklerteam <br>
+
+email.subject.activation = Willkommen bei TurmII - Ihr Aktivierungscode
+email.subject.new.pw = Ihr neues TurmII Passwort
+email.subject.new.role = Information zu Ihrer neuen Nutzerrolle
+
+# -------------------------------------------------------------------------------------------------- #
+# SEARCH
+# -------------------------------------------------------------------------------------------------- #
+
+search.course = Kurs suchen...
+search.user = NutzerIn suchen...
+search.enter.value = Suchwert eingeben...
+
+search.course.title = Kurssuche
+search.results = Suchergebnisse
+search.no.results = Keine Suchergebnisse
+search.limit = Suchergebnisse sind auf <strong>maximal %d Ergebnisse</strong> beschränkt. Sollte Ihr Suchergebnis fehlen, so verfeinern Sie bitte den Suchwert.
+search.criteria = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur ganze Nummer).
+search.inactive.users = Nicht aktivierte Accounts anzeigen
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+course = Kurs
+
+# -------------------------------------------------------------------------------------------------- #
+# INDEX AND GROUP
+# -------------------------------------------------------------------------------------------------- #
+
+index.tab = Turm2
+index.page = Startseite
+
+groups = Gruppen
+
+group.id = Gruppen ID
+group.parent.id = Vorgänger ID
+group.name = Gruppenname
+group.course.limit = Kurslimit
+group.last.edited = Letzte Bearbeitung
+
+group.new = Neue Gruppe erstellen
+group.new.success = Gruppe '%s' wurde erstellt, ID = %d.
+
+group.edit = Gruppe bearbeiten
+group.edit.success = Gruppe '%s' wurde bearbeitet, ID = %d.
+
+group.delete.question = Sind Sie sicher, dass Sie die Gruppe '%s' löschen wollen?
+group.delete.title = Gruppe löschen
+group.delete.success = Gruppe ID = %d gelöscht.
+
+group.no.children = Diese Gruppe besitzt keine Untergruppen.
+group.course.limit.info = Innerhalb dieser Gruppe können Sie sich in maximal %d Kurse einschreiben.
+group.course.limit.x.info = Innerhalb dieser Gruppe (und Ihrer Untergruppen) können sich NutzerInnen nur in maximal X Kurse einschreiben. Wenn Sie das Feld leer lassen, dann können sich NutzerInnen in beliebig viele Kurse einschreiben.
+group.inherits.limit.info = Ein Vor-oder Nachgänger dieser Gruppe besitzt bereits ein Kurslimit.
+
+# -------------------------------------------------------------------------------------------------- #
+# LOGIN, LOGOUT, REGISTER, ACTIVATION, NEW PASSWORD, PREFERRED LANGUAGE
+# -------------------------------------------------------------------------------------------------- #
+
+login.tab = Anmelden
+login.page = Anmelden
+
+login.success = Anmeldung erfolgreich. E-Mail-Adresse: %s, Name: %s %s.
+login.ldap.auth.failed = Authentifizierung mit dem Universitätsserver nicht möglich. Bitte prüfen Sie, ob Ihr Nutzername und Ihr Passwort korrekt sind.
+login.stay = Angemeldet bleiben
+login.instead = Zurück zur Anmeldung?
+
+logout.success = Erfolgreich abgemeldet.
+
+register.tab = Registrierung
+register.page = Externen Account registrieren
+register.disclaimer = Durch das Registrieren akzeptieren Sie unsere Nutzungsbedingungen und unseren Datenschutz.
+
+register.success = Registrierung erfolgreich. Ihr Aktivierungscode wurde an %s gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.
+register.repeat.pw = Passwort wiederholen
+
+new.pw.tab = Neues Passwort
+new.pw.page = Neues Passwort
+
+new.pw.success = Ein neues Passwort wurde an %s gesendet, falls diese E-Mail-Adresse existiert. Bitte überprüfen Sie auch Ihren Spam-Ordner. Sie können sich nun mit dem neuen Passwort anmelden.
+new.pw.question = Passwort vergessen?
+new.pw.info = Bitte geben Sie Ihre E-Mail-Adresse an. Wir werden ein neues Passwort an diese E-Mail-Adresse senden. Neue Passwörter können <strong>nur</strong> für <strong>externe Accounts</strong> generiert werden (kein Universitätslogin).
+
+activation.tab = Account Aktivieren
+activation.page = Account Aktivieren
+
+activation.success = Account aktiviert.
+activation.resend.success = Ein neuer Aktivierungscode wurde an %s gesendet.
+activation.code = Aktivierungscode
+activation.resend = Aktivierungscode erneut zusenden
+
+pref.lang.tab = Sprache setzen
+pref.lang.page = Bevorzugte E-Mail-Sprache setzen
+
+pref.lang.success = Sprache der E-Mails wurde auf %s gesetzt.
+pref.lang.info = Sprache der E-Mails
+pref.lang.info.long = Sprache der E-Mails. Kann später im Profil geändert werden.
+
+# -------------------------------------------------------------------------------------------------- #
+# HELP PAGE
+# -------------------------------------------------------------------------------------------------- #
+
+data.privacy.tab = Nutzungsbedingungen und Datenschutz
+data.privacy.page = Nutzungsbedingungen und Datenschutz
+
+news.feed.tab = Turm2 News
+news.feed.page = Neuerungen & Ankündigungen
+
+faq.tab = FAQ
+faq.page = FAQs
+
+imprint.tab = Impressum
+imprint.page = Impressum
+
+# -------------------------------------------------------------------------------------------------- #
+# ADMINISTRATION
+# -------------------------------------------------------------------------------------------------- #
+
+admin.tab = Administration
+admin.page = Administration
+
+admin.users = Nutzerverwaltung
+admin.roles = Rollenverwaltung
+admin.dashboard = Dashboard
+
+admin.no.creators = Keine Kursverantwortlichen
+
+admin.change.role = Nutzerrolle ändern
+admin.new.role = Neue Rolle wählen
+admin.current.role = Bisher
+admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.
+admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
+admin.groups.use.index = Bitte verwenden Sie die Startseite, um Gruppen zu verwalten.

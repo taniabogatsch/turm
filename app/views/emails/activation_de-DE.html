@@ -6,7 +6,7 @@ Mit dem folgenden Code kann Ihr Account aktiviert werden:
 {{.data.User.ActivationCode.String}}
 
 Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
-{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode.String}}
+{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&activationCode={{.data.User.ActivationCode.String}}
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 
@@ -25,7 +25,7 @@ Mit dem folgenden Code kann Ihr Account aktiviert werden:
 <br>
 Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
 <br>
-<a href="{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&code={{.data.User.ActivationCode.String}}">
+<a href="{{.data.URL}}/user/verifyActivationCode?userID={{.data.User.ID}}&activationCode={{.data.User.ActivationCode.String}}">
   Account aktivieren
 </a>
 <br>
@@ -33,7 +33,7 @@ Oder verwenden Sie den folgenden Link, um Ihren Account zu aktivieren:
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
 <br>
 <br>
-{{msg $ "emails.bestRegards" .data.URL}}
+{{msg $ "email.regards" .data.URL}}
 </body>
 </html>
 

@@ -1,0 +1,110 @@
+<!-- this template contains two modals, one to add/edit groups, the other one to delete them -->
+
+<!-- add/edit groups -->
+<div class="modal fade" id="group-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header background-color-darkblue border-radius-2">
+        <h5 class="modal-title text-white" id="group-modal-title"></h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- form -->
+      <form id="group-form" accept-charset="UTF-8" action='{{url "Admin.AddGroup"}}' method="POST" class="needs-validation" novalidate>
+        <div class="modal-body">
+
+          <!-- ID -->
+          <input type="hidden" id="input-ID" name="group.ID" value="">
+
+          <!-- parent ID -->
+          <input type="hidden" id="input-parentID" name="group.ParentID.Int32" value="">
+
+          <!-- group name -->
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input id="input-name" type="text" class="form-control" name="group.Name" value="" placeholder='{{msg $ "group.name"}}' minlength="3" maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.groupName"}}
+            </div>
+          </div>
+
+          <!-- course limit -->
+          <small class="form-text text-muted" id="courseLimits-info">
+            {{msg $ "group.course.limit.x.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input id="input-courseLimits" min="1" max="100" type="number" name="group.CourseLimit.Int32" value="" class="form-control" placeholder='{{msg $ "group.course.limit"}}'>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.courseLimit"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- confirm the deletion of a group -->
+<div class="modal fade" id="group-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header background-color-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "group.delete.title"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- form -->
+      <form accept-charset="UTF-8" action='{{url "Admin.DeleteGroup"}}' method="POST">
+        <div class="modal-body">
+
+          <!-- ID -->
+          <input type="hidden" id="delete-input-ID" name="group.ID" value="">
+
+          <!--  confirmation text -->
+          <p id="group-delete-content"></p>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+            {{msg $ "button.delete"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

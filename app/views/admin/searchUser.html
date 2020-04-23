@@ -1,0 +1,72 @@
+<!-- template containing user search results -->
+
+<!-- title -->
+<h5>
+  {{msg $ "search.results"}}
+</h5>
+<small class="form-text text-muted">
+  {{msg $ "search.limit" 5}}
+</small>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"> {{msg $ "user.name"}} </th>
+      <th scope="col"> {{msg $ "user.email"}} </th>
+      <th scope="col"> {{msg $ "user.last.login"}} </th>
+      <th scope="col"> {{msg $ "user.role"}} </th>
+      <th scope="col"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .users}}
+      <tr>
+        <td>
+          {{if eq .Salutation 0}}
+            {{msg $ "user.salutation.none"}}
+          {{else if eq .Salutation 1}}
+            {{msg $ "user.salutation.mr"}}
+          {{else if eq .Salutation 2}}
+            {{msg $ "user.salutation.ms"}}
+          {{end}}
+          {{.FirstName}} {{.LastName}}
+        </td>
+        <td> {{.EMail}} </td>
+        <td> {{.LastLogin}} </td>
+        <td>
+          {{if eq .Role 0}}
+            {{msg $ "user.role.user"}}
+          {{else if eq .Role 1}}
+            {{msg $ "user.role.creator"}}
+          {{else if eq .Role 2}}
+            {{msg $ "user.role.admin"}}
+          {{end}}
+        </td>
+        <td class="text-right">
+          <a href="#" onclick="userDetails({{.ID}})" class="badge badge-secondary btn-darkblue">
+            {{template "icons/tools.html"}}
+          </a>
+        </td>
+      </tr>
+    {{else}}
+      <tr>
+        <td colspan="5">
+          {{if .errMsg}}
+            <div class="warning-feedback color-danger">
+              {{.errMsg}}
+            </div>
+          {{else}}
+            {{msg $ "search.no.results"}}
+          {{end}}
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+
+<script>
+  //detect validation error
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    showErrorToast($('#flash-errors').html());
+  }
+</script>

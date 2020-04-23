@@ -176,12 +176,13 @@ CREATE TABLE groups (
   parentid      integer,
   courseid      integer,
   name          varchar(255)              NOT NULL,
-  maxcourses    integer,
+  courselimit   integer,
   creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
   creationdate  timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (courseid) REFERENCES course (id)
+  FOREIGN KEY (courseid) REFERENCES course (id),
+  FOREIGN KEY (parentid) REFERENCES groups(id)
 );
 
 

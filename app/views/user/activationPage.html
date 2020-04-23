@@ -9,15 +9,15 @@
 <div class="page page-middle">
   <center>
 
-    <!-- enter activation code -->
+    <!-- account activation page -->
     <h3>
-      {{msg $ "activation.pageName"}}
+      {{msg $ "activation.page"}}
     </h3>
     <br>
     <div class="login-width">
 
       <!-- enter activation code form -->
-      <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}' method="POST" class="needs-validation" novalidate>
+      <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}' method="GET" class="needs-validation" novalidate>
 
         <div class="col">
           <div class="input-group mb-3">
@@ -35,15 +35,10 @@
           </div>
         </div>
 
-        {{range .errors}}
-          <div class="warning-feedback">
-            {{.}}
-          </div>
-        {{end}}
         <br>
         <!-- button to confirm activation -->
         <button class="btn btn-darkblue" type="submit">
-          {{msg $ "activation.activateAccount"}}
+          {{msg $ "button.activate.account"}}
         </button>
       </form>
     </div>
@@ -53,7 +48,7 @@
     <br>
     <a href='{{url "User.NewActivationCode"}}'>
       {{template "icons/envelope.html" . }} &nbsp;
-      {{msg $ "activation.resendCode"}}
+      {{msg $ "activation.resend"}}
     </a>
 
   </center>
@@ -64,8 +59,9 @@
 </div>
 
 <script>
+  //detect validation error
   if ({{if .errors}}true{{else}}false{{end}}) {
-    $("#activation-code-form").addClass("was-validated");
+    showErrorToast($('#flash-errors').html());
   }
 </script>
 

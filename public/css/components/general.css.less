@@ -15,9 +15,17 @@
     &-10 {
       margin: 10px;
     }
+    &-5 {
+      margin: 5px;
+    }
     &-right {
       &-20 {
         margin-right: 20px;
+      }
+    }
+    &-left {
+      &-10 {
+        margin-left: 10px;
       }
     }
   }
@@ -38,6 +46,45 @@
   }
   &-none {
     display: none;
+  }
+  &-block {
+    display: block;
+  }
+}
+
+.border-radius-2 {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.padding {
+  &-bottom {
+    &-24 {
+      padding-bottom: 24px;
+    }
+  }
+}
+
+.border {
+  &-left {
+    &-none {
+      border-left: none;
+    }
+  }
+}
+
+.background-color {
+  &-darkblue {
+    background-color: @darkblue;
+  }
+}
+
+.color {
+  &-success {
+    color: @alertsuccess;
+  }
+  &-danger {
+    color: @alertdanger;
   }
 }
 

@@ -9,7 +9,7 @@
 <div class="page page-middle">
   <center>
     <h3>
-      {{msg $ "prefLang.title"}}
+      {{msg $ "pref.lang.page"}}
     </h3>
     <br>
     <div class="login-width">
@@ -19,7 +19,7 @@
 
         <div class="col login-width-tab">
           <small class="form-text text-muted">
-            {{msg $ "prefLang.info"}}
+            {{msg $ "pref.lang.info.long"}}
           </small>
           <br>
           <select name="prefLanguage" class="custom-select">
@@ -29,11 +29,6 @@
           </select>
         </div>
 
-        {{range .errors}}
-          <div class="warning-feedback">
-            {{.}}
-          </div>
-        {{end}}
         <br>
         <!-- button to confirm preferred language -->
         <button class="btn btn-darkblue" type="submit">
@@ -50,8 +45,9 @@
 </div>
 
 <script>
+  //detect validation error
   if ({{if .errors}}true{{else}}false{{end}}) {
-    $("#pref-lang-form").addClass("was-validated");
+    showErrorToast($('#flash-errors').html());
   }
 </script>
 

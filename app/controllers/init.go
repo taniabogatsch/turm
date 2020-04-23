@@ -31,6 +31,7 @@ func general(c *revel.Controller) revel.Result {
 		c.Session.Set("currentLocale", app.DefaultLanguage)
 	}
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
+	c.Request.Locale = c.Session["currentLocale"].(string)
 
 	//ensure that callPath and currPath is not nil
 	if c.Session["callPath"] == nil {
