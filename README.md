@@ -1,4 +1,4 @@
-# Welcome to Turm2
+# Welcome to Turm
 
 Turm2 is an enrollment system allowing users to enroll in courses. There is no official release yet. An older version is currently deployed at [Turm2](https://turm2.tu-ilmenau.de). This project provides a new design as well as extended functionality.
 
