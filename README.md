@@ -61,11 +61,11 @@ The directory structure of a generated Revel application:
     modules/jobs/          Chron jobs
 
     public/                Public static assets
-        css/               CSS files
-        js/                Javascript files
-        images/            Image files
+         css/              CSS files
+         js/               Javascript files
+         images/           Image files
     
-    scripts/db/create.sql  DB schema
+    scripts/db/            DB schema
 
     tests/                 Test suites
     
