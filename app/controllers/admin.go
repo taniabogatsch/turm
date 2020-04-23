@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"turm/app"
 	"turm/app/models"
@@ -147,12 +148,28 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		)
 	}
 
+	//update the session if the user updated his own role
+	sessionID, err := strconv.Atoi(c.Session["userID"].(string))
+	if err != nil {
+		c.Log.Error("failed to parse userID from session",
+			"session", c.Session, "error", err.Error())
+		return flashError(
+			errTypeConv,
+			err,
+			c.Session["callPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+	if sessionID == user.ID {
+		c.Session["role"] = user.Role.String()
+	}
+
 	c.Flash.Success(c.Message("admin.new.role.success",
 		user.FirstName,
 		user.LastName,
 		c.Message("user.role."+user.Role.String()),
 	))
-
 	return c.Redirect(c.Session["callPath"].(string))
 }
 
