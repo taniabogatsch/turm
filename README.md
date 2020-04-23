@@ -1,43 +1,61 @@
-# Welcome to Revel
+# Welcome to Turm2
 
-A high-productivity web framework for the [Go language](http://www.golang.org/).
+Turm2 is an enrollment system allowing users to enroll in courses. There is no official release yet. An older version is currently deployed at [Turm2](https://turm2.tu-ilmenau.de). This project provides a new design as well as extended functionality.
 
+It uses [Go](https://github.com/golang/go) and [Revel](https://github.com/revel/).
+
+## Usage
+
+### Set up a PostgreSQL database
+
+```
+create database turm;
+create user turm with encrypted password 'turmpw';
+grant all privileges on database turm to turm;
+```
+Import the database ERD, which is `erd.sql`.
+
+Execute the DB Change Log, which is `db_changes.sql`.
 
 ### Start the web server:
 
-   revel run myapp
+```
+go get -u github.com/revel/cmd/revel
 
-### Go to http://localhost:9000/ and you'll see:
+go get -u github.com/jmoiron/sqlx
+go get -u gopkg.in/ldap.v2
+```
 
-    "It works"
+### Run or deploy the application: 
 
+```
+revel run turm
+```
 ## Code Layout
 
 The directory structure of a generated Revel application:
 
-    conf/             Configuration directory
-        app.conf      Main app configuration file
-        routes        Routes definition file
+    app/                   App sources
+         auth              Authentication against the LDAP server
+         controllers/      GET, POST, etc. controllers
+         models/           DB models
+         views/            HTML templates and some JS
+         init.go           App initialization, e.g. opens a DB connection
+         mailer.go         Sends e-mails
 
-    app/              App sources
-        init.go       Interceptor registration
-        controllers/  App controllers go here
-        views/        Templates directory
+    conf/                  Configuration directory
+         app.conf          Main app configuration file
+         passwords.json    Map of passwords, not included in the repository
+         routes            Routes definition file
 
-    messages/         Message files
+    messages/              Message files, currently supported languages are en-US and de-DE
+    modules/jobs/          Chron jobs
 
-    public/           Public static assets
-        css/          CSS files
-        js/           Javascript files
-        images/       Image files
+    public/                Public static assets
+        css/               CSS files
+        js/                Javascript files
+        images/            Image files
+    
+    scripts/db/create.sql  DB schema
 
-    tests/            Test suites
-
-
-## Help
-
-* The [Getting Started with Revel](http://revel.github.io/tutorial/gettingstarted.html).
-* The [Revel guides](http://revel.github.io/manual/index.html).
-* The [Revel sample apps](http://revel.github.io/examples/index.html).
-* The [API documentation](https://godoc.org/github.com/revel/revel).
-
+    tests/                 Test suites
