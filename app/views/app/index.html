@@ -52,15 +52,7 @@
 {{template "footer.html" .}}
 
 <script>
-  //loads the groups template
-  function getGroups(prefix) {
-    $.get('{{url "App.Groups"}}', {
-      "prefix": prefix
-    }, function(data) {
-      $('#groups').html(data);
-    })
-  }
-  getGroups("index");
+  getGroups("index", '#groups');
 
   function openCreateGroup(parentID, inheritsLimits) {
 

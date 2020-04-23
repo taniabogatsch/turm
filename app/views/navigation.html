@@ -86,7 +86,7 @@
       </div>
     </form>
 
-    <button class="btn btn-outline-light" type="button">
+    <button class="btn btn-outline-light" type="button" onclick="openGroupsNav();">
       {{msg $ "groups"}}
     </button>
 
@@ -109,6 +109,53 @@
 
   </div>
 </nav>
+
+<!-- group modal -->
+<div class="modal fade" id="nav-groups-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header background-color-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "groups"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- modal body -->
+      <div class="modal-body">
+        {{if .session.role}}
+          {{if eq .session.role "admin"}}
+            <div class="warning-feedback">
+              {{msg $ "admin.groups.use.index"}}
+            </div>
+            <br>
+          {{end}}
+        {{end}}
+        <!-- content is loaded into this div -->
+        <div id="nav-groups-modal-content">
+        </div>
+      </div>
+
+      <!-- modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+          {{msg $ "button.close"}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openGroupsNav() {
+    getGroups("nav", '#nav-groups-modal-content');
+    $('#nav-groups-modal').modal('show');
+  }
+</script>
 
 <br>
 <br>

@@ -18,7 +18,7 @@
   <!-- change the user role -->
   {{if .user.User.ActivationCode.Valid}}
     <div class="warning-feedback">
-      This account is not activated.
+      {{msg $ "admin.account.inactive"}}
     </div>
   {{end}}
   <form id="change-role-form" accept-charset="UTF-8" action='{{url "Admin.ChangeRole"}}' method="POST" class="needs-validation" novalidate>

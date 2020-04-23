@@ -34,3 +34,32 @@ function changeIcon(id) {
     $("#icon-down-" + id).attr("class", "display-none");
   }
 }
+
+//load an error message into the toast and show it
+function showErrorToast(content) {
+
+  $("#toast-title").html($("#icon-flash-alertCircle").html());
+  $("#toast-title").attr("class", "mr-auto color-danger");
+  $("#toast-content").html(content);
+  $("#toast-content").attr("class", "color-danger");
+  $("#feedback-toast").toast('show');
+}
+
+//load a success message into the toast and show it
+function showSuccessToast(content) {
+
+  $("#toast-title").html($("#icon-flash-check").html());
+  $("#toast-title").attr("class", "mr-auto color-success");
+  $("#toast-content").html(content);
+  $("#toast-content").attr("class", "color-success");
+  $("#feedback-toast").toast('show');
+}
+
+//loads the groups template
+function getGroups(prefix, div) {
+  $.get('{{url "App.Groups"}}', {
+    "prefix": prefix
+  }, function(data) {
+    $(div).html(data);
+  })
+}

@@ -1,20 +1,4 @@
 <script>
-	function showErrorToast(content) {
-		$("#feedback-toast").toast('show');
-		$("#toast-title").html($("#icon-flash-alertCircle").html());
-		$("#toast-title").attr("class", "mr-auto color-danger");
-		$("#toast-content").html(content);
-		$("#toast-content").attr("class", "color-danger");
-	}
-
-	function showSuccessToast(content) {
-		$("#feedback-toast").toast('show');
-		$("#toast-title").html($("#icon-flash-check").html());
-		$("#toast-title").attr("class", "mr-auto color-success");
-		$("#toast-content").html(content);
-		$("#toast-content").attr("class", "color-success");
-	}
-
 	{{if .flash.error}}
 		$(document).ready(function(){
 			showErrorToast('{{.flash.error}}');
