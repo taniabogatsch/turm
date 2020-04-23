@@ -75,7 +75,11 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	user.FirstName = e.GetAttributeValue("givenName")
 	user.LastName = e.GetAttributeValue("sn")
 	user.EMail = strings.ToLower(e.GetAttributeValue("mail"))
-	user.Affiliations = e.GetAttributeValues("eduPersonAffiliation")
+
+	user.Affiliations.Affiliations = e.GetAttributeValues("eduPersonAffiliation")
+	if len(user.Affiliations.Affiliations) != 0 {
+		user.Affiliations.Valid = true
+	}
 
 	switch salutation := e.GetAttributeValue("thuEduSalutation"); salutation {
 	case "Frau":

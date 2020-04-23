@@ -49,9 +49,20 @@ error.undefined = Es ist ein Fehler aufgetreten. %(error.support)s
 # USER
 # -------------------------------------------------------------------------------------------------- #
 
+user.role = Rolle
+user.role.admin = Admin
+user.role.creator = KursverantwortlicheR
+user.role.user = NutzerIn
+
+user.admins = Admins
+user.creators = Kursverantwortliche
+
 user.ldap = Uni Account
 user.external = Externer Account
+user.matr.nr = Matrikelnummer
+user.affiliation = Zugehörigkeit
 
+user.name = Name
 user.firstname = Vorname
 user.lastname = Nachname
 user.email = E-Mail
@@ -62,6 +73,14 @@ user.salutation = Anrede
 user.salutation.ms = Frau
 user.salutation.mr = Herr
 user.salutation.none = Keine Anrede
+
+user.id = Nutzer ID
+user.last.login = Letzte Anmeldung
+user.first.login = Erste Anmeldung
+user.language = Sprache
+
+user.data = Nutzerdaten
+user.details = Nutzerdetails
 
 # -------------------------------------------------------------------------------------------------- #
 # EMAIL
@@ -79,13 +98,22 @@ email.regards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwi
 
 email.subject.activation = Willkommen bei TurmII - Ihr Aktivierungscode
 email.subject.new.pw = Ihr neues TurmII Passwort
+email.subject.new.role = Information zu Ihrer neuen Nutzerrolle
 
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH
 # -------------------------------------------------------------------------------------------------- #
 
-search.course = Kurs suchen
-search.enter.value = Suchwert eingeben
+search.course = Kurs suchen...
+search.user = NutzerIn suchen...
+search.enter.value = Suchwert eingeben...
+
+search.course.title = Kurssuche
+search.results = Suchergebnisse
+search.no.results = Keine Suchergebnisse
+search.limit = Suchergebnisse sind auf <strong>maximal %d Ergebnisse</strong> beschränkt. Sollte Ihr Suchergebnis fehlen, so verfeinern Sie bitte den Suchwert.
+search.criteria = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur ganze Nummer).
+search.inactive.users = Nicht aktivierte Accounts anzeigen
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE
@@ -102,6 +130,12 @@ index.page = Startseite
 
 groups = Gruppen
 
+group.id = Gruppen ID
+group.parent.id = Vorgänger ID
+group.name = Gruppenname
+group.course.limit = Kurslimit
+group.last.edited = Letzte Bearbeitung
+
 group.new = Neue Gruppe erstellen
 group.new.success = Gruppe '%s' wurde erstellt, ID = %d.
 
@@ -112,9 +146,7 @@ group.delete.question = Sind Sie sicher, dass Sie die Gruppe '%s' löschen wolle
 group.delete.title = Gruppe löschen
 group.delete.success = Gruppe ID = %d gelöscht.
 
-group.name = Gruppenname
 group.no.children = Diese Gruppe besitzt keine Untergruppen.
-group.course.limit = Kurslimit
 group.course.limit.info = Innerhalb dieser Gruppe können Sie sich in maximal %d Kurse einschreiben.
 group.course.limit.x.info = Innerhalb dieser Gruppe (und Ihrer Untergruppen) können sich NutzerInnen nur in maximal X Kurse einschreiben. Wenn Sie das Feld leer lassen, dann können sich NutzerInnen in beliebig viele Kurse einschreiben.
 group.inherits.limit.info = Ein Vor-oder Nachgänger dieser Gruppe besitzt bereits ein Kurslimit.
@@ -177,3 +209,21 @@ faq.page = FAQs
 
 imprint.tab = Impressum
 imprint.page = Impressum
+
+# -------------------------------------------------------------------------------------------------- #
+# ADMINISTRATION
+# -------------------------------------------------------------------------------------------------- #
+
+admin.tab = Administration
+admin.page = Administration
+
+admin.users = Nutzerverwaltung
+admin.roles = Rollenverwaltung
+admin.dashboard = Dashboard
+
+admin.no.creators = Keine Kursverantwortlichen
+
+admin.change.role = Nutzerrolle ändern
+admin.new.role = Neue Rolle wählen
+admin.current.role = Bisher
+admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.

@@ -200,6 +200,26 @@ func (groups *Groups) Get(prefix *string) (err error) {
 	return
 }
 
+/*GetByUser gets all groups created by a provided user. */
+func (groups *Groups) GetByUser(userID *int, tx *sqlx.Tx) (err error) {
+
+	selectGroups := `
+		SELECT
+			id, parentid, name, courselimit,
+			TO_CHAR (lastedited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastedited
+		FROM groups
+		WHERE lasteditor = $2
+			AND courseid IS NULL
+		ORDER BY name ASC
+	`
+	err = tx.Select(groups, selectGroups, app.TimeZone, *userID)
+	if err != nil {
+		modelsLog.Error("failed to get groups", "error", err.Error())
+		tx.Rollback()
+	}
+	return
+}
+
 //getChildren recursively returns all children of the current group.
 func getChildren(tx *sqlx.Tx, group *Group) (hasLimits bool, err error) {
 

@@ -77,6 +77,9 @@
   .margin-10 {
     margin: 10px;
   }
+  .margin-5 {
+    margin: 5px;
+  }
   .margin-right-20 {
     margin-right: 20px;
   }
@@ -98,6 +101,10 @@
 }
 .display-block {
   display: block;
+}
+.border-radius-2 {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 .padding-bottom-24 {
   padding-bottom: 24px;

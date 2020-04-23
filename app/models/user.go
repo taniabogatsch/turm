@@ -10,6 +10,7 @@ import (
 	"time"
 	"turm/app"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
 
@@ -58,12 +59,12 @@ type User struct {
 	Language   sql.NullString `db:"language"`
 
 	//ldap user fields
-	MatrNr        sql.NullInt32  `db:"matrnr, unique"`
-	AcademicTitle sql.NullString `db:"academictitle"`
-	Title         sql.NullString `db:"title"`
-	NameAffix     sql.NullString `db:"nameaffix"`
-	Affiliations  Affiliations   `db:"affiliations"`
-	Studies       []Studies      ``
+	MatrNr        sql.NullInt32    `db:"matrnr, unique"`
+	AcademicTitle sql.NullString   `db:"academictitle"`
+	Title         sql.NullString   `db:"title"`
+	NameAffix     sql.NullString   `db:"nameaffix"`
+	Affiliations  NullAffiliations `db:"affiliations"`
+	Studies       []Studies        ``
 
 	//external user fields
 	Password       sql.NullString `db:"password"`
@@ -175,6 +176,20 @@ func (credentials *Credentials) Validate(v *revel.Validation) {
 	).MessageKey("validation.invalid.password")
 }
 
+/*Get all data of an user. */
+func (user *User) Get(tx *sqlx.Tx) (err error) {
+
+	err = tx.Get(user, stmtGetUser, app.TimeZone, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to get user", "user", user, "error", err.Error())
+		tx.Rollback()
+	}
+
+	//TODO: get courses of studies
+
+	return
+}
+
 /*Login inserts or updates a user. It provides all session values of that user. */
 func (user *User) Login() (err error) {
 
@@ -187,7 +202,7 @@ func (user *User) Login() (err error) {
 
 		tx, err := app.Db.Beginx()
 		if err != nil {
-			modelsLog.Error("failed to begin tx in Login()", "error", err.Error())
+			modelsLog.Error("failed to begin tx", "error", err.Error())
 			return err
 		}
 
@@ -248,7 +263,9 @@ func (user *User) NewPassword() (err error) {
 		UPDATE users
 		SET password = crypt($1, gen_salt('bf'))
 		WHERE email = $2
-		RETURNING id, lastname, firstname, email, language
+		RETURNING
+			/* data to send notification e-mail containing the new password */
+			id, lastname, firstname, email, language, salutation
 	`
 	password := generateCode()
 
@@ -280,7 +297,7 @@ func (user *User) VerifyActivationCode() (success bool, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx in VerifyActivationCode()", "error", err.Error())
+		modelsLog.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
@@ -316,7 +333,9 @@ func (user *User) NewActivationCode() (err error) {
 		UPDATE users
 		SET activationcode = crypt($1, gen_salt('bf'))
 		WHERE id = $2
-		RETURNING id, lastname, firstname, email, language
+		RETURNING
+			/* data to send notification e-mail containing the new code */
+			id, lastname, firstname, email, language, salutation
 	`
 	activationCode := generateCode()
 
@@ -332,35 +351,47 @@ func (user *User) NewActivationCode() (err error) {
 /*SetPrefLanguage sets the preferred language of an user. */
 func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
 
-	updateLanguage := `UPDATE users SET language = $1 WHERE id = $2`
+	updateLanguage := `
+		UPDATE users
+		SET language = $1
+		WHERE id = $2
+		RETURNING id
+	`
 
 	user.ID, err = strconv.Atoi(*userIDSession)
 	if err != nil {
-		modelsLog.Error("failed to parse userID from userIDSession",
+		modelsLog.Error("failed to parse userID from session",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
 
-	_, err = app.Db.Exec(updateLanguage, user.Language.String, user.ID)
+	err = app.Db.Get(updateLanguage, user.Language.String, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to update language", "userID", user.ID, "error", err.Error())
+		modelsLog.Error("failed to update language", "userID", user.ID,
+			"language", user.Language, "error", err.Error())
 	}
 	return
 }
 
-/*Studies is a model of the studies table. */
-type Studies struct {
-	UserID            int    `db:"userid, primarykey"`
-	Semester          int    `db:"semester"`
-	DegreeID          int    `db:"degreeid, primarykey"`
-	CourseOfStudiesID int    `db:"courseofstudiesid, primarykey"`
-	Degree            string `db:"degree"`          //not a field in the studies table
-	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
-}
+/*ChangeRole of an user. */
+func (user *User) ChangeRole() (err error) {
 
-/*Validate the studies when loaded from the user enrollment file. */
-func (studies Studies) Validate(v *revel.Validation) {
-	//TODO
+	updateRole := `
+		UPDATE users
+		SET role = $1
+		WHERE id = $2
+		RETURNING
+			/* data to send notification e-mail about the new role */
+			id, firstname, lastname, role, language,
+			academictitle, email, nameaffix, salutation, title
+	`
+
+	err = app.Db.Get(user, updateRole, user.Role, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to update user role", "userID", user.ID,
+			"role", user.Role, "error", err.Error())
+	}
+	return
 }
 
 //generateCode generates an activation code or a random password.
@@ -387,24 +418,42 @@ func generateCode() string {
 /*Affiliations contains all affiliations of a user. */
 type Affiliations []string
 
-/*Value constructs a SQL Value from Affiliations. */
-func (affiliations Affiliations) Value() (driver.Value, error) {
+/*NullAffiliations represents affiliations that may be null. */
+type NullAffiliations struct {
+	Affiliations Affiliations
+	Valid        bool //Valid is true if Affiliations is not NULL
+}
+
+/*Value constructs a SQL Value from NullAffiliations. */
+func (affiliations NullAffiliations) Value() (driver.Value, error) {
+
+	if !affiliations.Valid {
+		return nil, nil
+	}
 
 	var str string
-	for _, affiliation := range affiliations {
+	for _, affiliation := range affiliations.Affiliations {
 		str += `"` + affiliation + `",`
 	}
 	return driver.Value("{" + strings.TrimRight(str, ",") + "}"), nil
 }
 
-/*Scan constructs Affiliations from a SQL Value. */
-func (affiliations *Affiliations) Scan(value interface{}) error {
+/*Scan constructs NullAffiliations from a SQL Value. */
+func (affiliations *NullAffiliations) Scan(value interface{}) error {
+
+	if value == nil {
+		affiliations.Affiliations = []string{""}
+		affiliations.Valid = false
+		return nil
+	}
+
+	affiliations.Valid = true
 
 	switch value.(type) {
 	case string:
 		str := value.(string)
-		strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(str, "{", ""), "}", ""))
-		*affiliations = strings.Split(str, ",")
+		str = strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(str, "{", ""), "}", ""))
+		affiliations.Affiliations = strings.Split(str, ",")
 	default:
 		return errors.New("incompatible type for Affiliations")
 	}
@@ -441,6 +490,18 @@ const (
 			firstlogin, password, activationcode, language
 		)
 		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')), $9)
-		RETURNING id, lastname, firstname, email, role, language
+		RETURNING
+			/* data to send notification e-mail containing the activation */
+			id, lastname, firstname, email, role, language, salutation
+	`
+
+	stmtGetUser = `
+		SELECT
+			id, lastname, firstname, email, salutation, role, activationcode,
+			language, matrnr, academictitle, title, nameaffix, affiliations,
+			TO_CHAR (lastlogin AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastlogin,
+			TO_CHAR (firstlogin AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as firstlogin
+		FROM users
+		WHERE id = $2
 	`
 )

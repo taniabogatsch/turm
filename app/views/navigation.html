@@ -64,7 +64,13 @@
           {{end}}
         </div>
       </li>
-    </ul>
+
+      <li class="nav-item active">
+        <a class="nav-link" href='{{url "Admin.Index"}}'>
+          {{msg $ "admin.tab"}}
+        </a>
+      </li>
+    </ul> <!-- end of left aligned entries -->
 
     {{if .session.userID}}
       <span class="navbar-text margin-right-20">
@@ -77,16 +83,11 @@
     <form class="form-inline my-2 my-lg-0 margin-10">
       <div class="input-group">
         <input class="form-control" type="search" placeholder='{{msg $ "search.course"}}'>
-        <div class="input-group-append">
-          <span class="btn btn-outline-light border-left-none">
-            {{template "icons/search.html"}}
-          </span>
-        </div>
       </div>
     </form>
 
     <button class="btn btn-outline-light" type="button">
-      Gruppen
+      {{msg $ "groups"}}
     </button>
 
     <!-- a user is logged in -->

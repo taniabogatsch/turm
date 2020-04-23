@@ -19,8 +19,8 @@
   }, false);
 })();
 
-//groupsChangeIcon adjusts the group collapse icons according to the collapse state
-function groupsChangeIcon(id) {
+//changeIcon adjusts the group collapse icons according to the collapse state
+function changeIcon(id) {
 
   //get icons
   const iconRightClass = $("#icon-right-" + id).attr("class");

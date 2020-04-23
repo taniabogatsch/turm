@@ -1,0 +1,34 @@
+<!-- all groups created by this user -->
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"> {{msg $ "group.id"}} </th>
+      <th scope="col"> {{msg $ "group.parent.id"}} </th>
+      <th scope="col"> {{msg $ "group.name"}} </th>
+      <th scope="col"> {{msg $ "group.course.limit"}} </th>
+      <th scope="col"> {{msg $ "group.last.edited"}} </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .Groups}}
+      <tr>
+        <td class="text-right"> {{.ID}} </td>
+        <td class="text-right">
+          {{if .ParentID.Valid}}
+            {{.ParentID.Int32}}
+          {{end}}
+        </td>
+        <td> {{.Name}} </td>
+        <td>
+          {{if .CourseLimit.Valid}}
+            {{.CourseLimit.Int32}}
+          {{end}}
+        </td>
+        <td>
+          {{.LastEdited}}
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>

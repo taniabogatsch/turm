@@ -36,7 +36,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			errValidation,
 			nil,
 			routes.User.LoginPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -53,7 +52,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 				errAuth,
 				err,
 				routes.User.LoginPage(),
-				"",
 				c.Controller,
 				"",
 			)
@@ -74,7 +72,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			errDB,
 			err,
 			routes.User.LoginPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -87,7 +84,6 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			errValidation,
 			nil,
 			routes.User.LoginPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -160,7 +156,6 @@ func (c User) Registration(user models.User) revel.Result {
 			errValidation,
 			nil,
 			routes.User.RegistrationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -172,7 +167,6 @@ func (c User) Registration(user models.User) revel.Result {
 			errDB,
 			err,
 			routes.User.RegistrationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -190,7 +184,6 @@ func (c User) Registration(user models.User) revel.Result {
 			errEMail,
 			err,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			user.EMail,
 		)
@@ -238,7 +231,6 @@ func (c User) NewPassword(email string) revel.Result {
 			errValidation,
 			nil,
 			routes.User.NewPasswordPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -268,7 +260,6 @@ func (c User) NewPassword(email string) revel.Result {
 			errDB,
 			err,
 			routes.User.NewPasswordPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -283,7 +274,6 @@ func (c User) NewPassword(email string) revel.Result {
 			errEMail,
 			err,
 			routes.User.NewPasswordPage(),
-			"",
 			c.Controller,
 			user.EMail,
 		)
@@ -340,7 +330,6 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			errValidation,
 			nil,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -353,7 +342,6 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			errDB,
 			err,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -365,7 +353,6 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 			errValidation,
 			nil,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -392,7 +379,6 @@ func (c User) NewActivationCode() revel.Result {
 			errTypeConv,
 			err,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -403,7 +389,6 @@ func (c User) NewActivationCode() revel.Result {
 			errDB,
 			err,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -417,7 +402,6 @@ func (c User) NewActivationCode() revel.Result {
 			errEMail,
 			err,
 			routes.User.ActivationPage(),
-			"",
 			c.Controller,
 			user.EMail,
 		)
@@ -457,7 +441,6 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 			errValidation,
 			nil,
 			routes.User.PrefLanguagePage(),
-			"",
 			c.Controller,
 			"",
 		)
@@ -471,7 +454,6 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 			errDB,
 			err,
 			routes.User.PrefLanguagePage(),
-			"",
 			c.Controller,
 			"",
 		)

@@ -8,6 +8,8 @@ validation.invalid.language = Please provide a valid language.
 # USER
 # -------------------------------------------------------------------------------------------------- #
 
+validation.missing.userID = Please provide a user ID.
+
 validation.invalid.username = The username must be between 1 - 255 characters long.
 validation.invalid.lastname = The last name must be between 1 - 255 characters long.
 validation.invalid.firstname = The first name must be between 1 - 255 characters long.
@@ -23,6 +25,7 @@ validation.invalid.credentials = Please provide an university account or an exte
 validation.invalid.login = Login failed. Please make sure that the e-mail address and the password are correct.
 
 validation.invalid.activation = Activation code verification failed. Please make sure that you entered the code correctly and that you are logged in. Alternatively, you can use the activation link in your e-mail address or request a new activation code.
+validation.invalid.role = Please provide a valid user role.
 
 # -------------------------------------------------------------------------------------------------- #
 # GROUP
@@ -31,3 +34,9 @@ validation.invalid.activation = Activation code verification failed. Please make
 validation.invalid.courseLimit = Please provide a valid course limit or leave this field empty. Valid course limits are values between 1 and 100. If any parent or child of this group already has a course limit, this group cannot have a separate one.
 validation.invalid.groupName = The group name must be between 1 - 255 characters long.
 validation.invalid.groupID = Please provide a valid group ID. Groups can only be deleted if they contain no subgroups and no active courses.
+
+# -------------------------------------------------------------------------------------------------- #
+# SEARCH
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.searchValue = The search value must be between 3 - 127 characters long.

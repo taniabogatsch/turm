@@ -23,7 +23,7 @@ func (s ErrorType) String() string {
 }
 
 //flashError flashes an error message and redirects to a page.
-func flashError(errType ErrorType, err error, url string, msg string, c *revel.Controller, i interface{}) revel.Result {
+func flashError(errType ErrorType, err error, url string, c *revel.Controller, i interface{}) revel.Result {
 
 	//TODO: this will later allow to send an e-mail if any error occurs
 
@@ -61,33 +61,42 @@ func flashError(errType ErrorType, err error, url string, msg string, c *revel.C
 
 	default:
 		c.Log.Error("undefined error type", "error type", errType)
+		c.Flash.Error(c.Message("error.undefined"))
 		return c.Redirect(App.Index)
 	}
 }
 
 //renderError renders a template containing the error.
-func renderError(errType ErrorType, err error, msg string, c *revel.Controller, i interface{}) revel.Result {
+func renderError(err error, c *revel.Controller) revel.Result {
 
 	//TODO: this will later allow to send an e-mail if any error occurs
 
 	if err != nil {
 		c.Log.Error(err.Error())
 	}
-	templatePath := ""
 
-	switch errType {
+	templatePath := "errors/render.html"
 
-	case errContent:
-		msg = c.Message("error.content")
+	c.ViewArgs["errMsg"] = c.Message("error.content")
+	c.Validation.Keep()
 
-	default:
-		c.Log.Error("undefined error type")
-		msg = c.Message("error.undefined")
+	c.Log.Warn("render", "path", templatePath)
+	return c.RenderTemplate(templatePath)
+}
+
+//renderQuietError renders an error message.
+func renderQuietError(errType ErrorType, err error, c *revel.Controller) {
+
+	//TODO: this will later allow to send an e-mail if any error occurs
+
+	if err != nil {
+		c.Log.Error(err.Error())
 	}
 
-	c.ViewArgs["msg"] = msg
-	templatePath = "errors/render.html"
-
-	c.Log.Warn(errType.String(), "render", templatePath)
-	return c.RenderTemplate(templatePath)
+	switch errType {
+	case errDB:
+		c.ViewArgs["errMsg"] = c.Message("error.db")
+	default:
+		c.ViewArgs["errMsg"] = c.Message("error.undefined")
+	}
 }

@@ -30,11 +30,17 @@ GET     /user/newActivationCode                 User.NewActivationCode
 GET     /user/prefLanguagePage                  User.PrefLanguagePage
 POST    /user/setPrefLanguage                   User.SetPrefLanguage
 
-# ------------------------------- App routes. -------------------------------- #
+# ------------------------------- Admin routes. -------------------------------- #
+
+GET     /admin/index                            Admin.Index
 
 POST    /admin/addGroup                         Admin.AddGroup
 POST    /admin/editGroup                        Admin.EditGroup
 POST    /admin/deleteGroup                      Admin.DeleteGroup
+
+GET     /admin/searchUser                       Admin.SearchUser
+GET     /admin/userDetails                      Admin.UserDetails
+POST    /admin/changeRole                       Admin.ChangeRole
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

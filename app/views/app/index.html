@@ -10,15 +10,18 @@
   {{template "flash.html" .}}
 
   <h4>
-    {{msg $ "search.course"}}
+    {{msg $ "search.course.title"}}
   </h4>
-  <form>
+  <form accept-charset="UTF-8" class="needs-validation" novalidate>
     <div class="input-group">
-      <input class="form-control" type="search" placeholder='{{msg $ "search.enter.value"}}'>
-      <div class="input-group-append">
-        <span class="input-group-text">
-          {{template "icons/search.html"}}
+      <div class="input-group-prepend">
+        <span class="input-group-text border-right-0">
+          {{template "icons/search.html" . }}
         </span>
+      </div>
+      <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}' required maxlength="127" minlength="3">
+      <div class="invalid-feedback">
+        {{msg $ "validation.invalid.searchValue"}}
       </div>
     </div>
   </form>
@@ -44,7 +47,7 @@
   {{template "toast.html" .}}
 </div>
 
-{{template "admin/groupModals.html" .}}
+{{template "admin/groups.html" .}}
 
 {{template "footer.html" .}}
 

@@ -30,22 +30,16 @@ func (c App) Groups(prefix string) revel.Result {
 	c.Validation.Required(prefix)
 	if c.Validation.HasErrors() {
 		return renderError(
-			errContent,
 			errors.New("missing prefix"),
-			"",
 			c.Controller,
-			"",
 		)
 	}
 
 	var Groups models.Groups
 	if err := Groups.Get(&prefix); err != nil {
 		return renderError(
-			errDB,
 			err,
-			"",
 			c.Controller,
-			"",
 		)
 	}
 
@@ -74,7 +68,6 @@ func (c App) ChangeLanguage(language string) revel.Result {
 			errValidation,
 			nil,
 			c.Session["callPath"].(string),
-			"",
 			c.Controller,
 			"",
 		)
