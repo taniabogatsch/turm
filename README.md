@@ -36,6 +36,13 @@ git clone https://github.com/taniabogatsch/turm.git
 
 Adjust all config values `app/conf/app.conf`.
 
+Create a `passwords.json` file at `app/conf/`. Currently, it should only contain one value for the mailer to work properly, which is 
+```
+{
+  "email.pw": "setValue"
+}
+```
+
 ### Run or deploy
 
 Run with `revel run turm` or create a `run.sh` with `revel package turm prod`.
