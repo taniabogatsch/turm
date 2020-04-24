@@ -12,7 +12,12 @@ type User struct {
 	*revel.Controller
 }
 
-/*Admin implements logic to CRUD dadta for admin functions. */
+/*Creator implements logic to CRUD data for creator functions. */
+type Creator struct {
+	*revel.Controller
+}
+
+/*Admin implements logic to CRUD data for admin functions. */
 type Admin struct {
 	*revel.Controller
 }

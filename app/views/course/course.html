@@ -1,0 +1,86 @@
+<!-- course shows all course information -->
+
+<!-- subtitle -->
+{{if .course.Subtitle.Valid}}
+  <h5>
+    {{.course.Subtitle.String}}
+  </h5>
+{{end}}
+
+<!-- general course information -->
+<table class="table">
+
+  <!-- course creator -->
+  <tr>
+    <td class="text-muted">
+      {{msg $ "user.role.creator"}}:
+    </td>
+    <td>
+      {{if eq .course.CreatorData.Salutation 2}}
+        {{msg $ "user.salutation.ms"}}{{if .course.CreatorData.Title.Valid}} {{.course.CreatorData.Title.String}}{{end}}{{if .course.CreatorData.AcademicTitle.Valid}} {{.course.CreatorData.AcademicTitle.String}}{{end}} {{.course.CreatorData.FirstName}}{{if .course.CreatorData.NameAffix.Valid}} {{.course.CreatorData.NameAffix.String}}{{end}} {{.course.CreatorData.LastName}}
+      {{else if eq .course.CreatorData.Salutation 1}}
+        {{msg $ "user.salutation.mr"}}{{if .course.CreatorData.Title.Valid}} {{.course.CreatorData.Title.String}}{{end}}{{if .course.CreatorData.AcademicTitle.Valid}} {{.course.CreatorData.AcademicTitle.String}}{{end}} {{.course.CreatorData.FirstName}}{{if .course.CreatorData.NameAffix.Valid}} {{.course.CreatorData.NameAffix.String}}{{end}} {{.course.CreatorData.LastName}}
+      {{else}}
+        {{if .course.CreatorData.Title.Valid}} {{.course.CreatorData.Title.String}}{{end}}{{if .course.CreatorData.AcademicTitle.Valid}} {{.course.CreatorData.AcademicTitle.String}}{{end}} {{.course.CreatorData.FirstName}}{{if .course.CreatorData.NameAffix.Valid}} {{.course.CreatorData.NameAffix.String}}{{end}} {{.course.CreatorData.LastName}}
+      {{end}} |
+      <a href="mailto:{{.course.CreatorData.EMail}}" target="_top">
+        {{template "icons/envelope.html" .}}
+        {{.course.CreatorData.EMail}}
+      </a>
+    </td>
+  </tr>
+
+  <!-- course editors and instructors -->
+  {{if or .course.Editors .course.Instructors}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "user.role.instructors"}}:
+      </td>
+      <td>
+        {{range $i, $t := .course.Editors}}
+          <!-- TODO -->
+        {{end}}
+        {{range $i, $t := .course.Instructors}}
+          <!-- TODO -->
+        {{end}}
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- registration period -->
+  <tr>
+    <td class="text-muted">
+      {{msg $ "course.enrollment.period"}}:
+    </td>
+    <td>
+      {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}} <br>
+      {{msg $ "course.to"}} {{.course.EnrollmentEnd}} {{msg $ "course.clock"}}
+    </td>
+  </tr>
+
+  <!-- if the course has a time up to which users can unsubscribe -->
+  {{if .course.UnsubscribeEnd.Valid}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "course.enrollment.unsubscribe.end"}}:
+      </td>
+      <td>
+        {{.course.UnsubscribeEnd.String}}
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- TODO: only show expiration date at course management page -->
+
+  <!-- show fee if there is one -->
+  {{if .course.Fee.Valid}}
+    <tr>
+       <td class="text-muted">
+         {{msg $ "course.fee"}}
+       </td>
+       <td>
+         {{.course.Fee.Float64}}€
+       </td>
+    </tr>
+  {{end}}
+</table>

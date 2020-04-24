@@ -129,7 +129,7 @@ func (user *User) Validate(v *revel.Validation) {
 
 	user.Language.Valid = true
 
-	if user.Salutation != NONE && user.Salutation != MR && user.Salutation != MS {
+	if user.Salutation < NONE || user.Salutation > MS {
 		v.ErrorKey("validation.invalid.salutation")
 	}
 }
@@ -187,6 +187,21 @@ func (user *User) Get(tx *sqlx.Tx) (err error) {
 
 	//TODO: get courses of studies
 
+	return
+}
+
+/*GetBasicData returns basic information of an user. */
+func (user *User) GetBasicData(tx *sqlx.Tx) (err error) {
+
+	selectUser := `
+		SELECT id, email, firstname, lastname, salutation, title, academictitle, nameaffix
+		FROM users WHERE id = $1
+	`
+	err = tx.Get(user, selectUser, user.ID)
+	if err != nil {
+		modelsLog.Error("failed to get user", "user", user, "error", err.Error())
+		tx.Rollback()
+	}
 	return
 }
 

@@ -1,0 +1,24 @@
+<!-- template containing the new course creation -->
+
+{{template "header.html" .}}
+
+{{template "creator/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      {{template "icons/folder.html" . }}
+      &nbsp; {{.course.Title}}
+    </h4>
+    <hr>
+
+    <!-- TODO: pass on session -->
+    {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+
+  </div>
+</div>
+
+{{template "creator/rightNav.html" . }}
+
+{{template "footer.html" .}}

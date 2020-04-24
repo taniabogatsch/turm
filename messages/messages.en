@@ -18,6 +18,7 @@ language.change.success = Set the page language to '%s'.
 button.search = Search
 button.send = Send
 button.save = Save
+button.load = Load
 
 button.login = Login
 button.logout = Logout
@@ -52,6 +53,7 @@ error.undefined = Application error. %(error.support)s
 user.role = Role
 user.role.admin = Admin
 user.role.creator = Creator
+user.role.instructors = Instructors
 user.role.user = User
 
 user.admins = Admins
@@ -228,3 +230,39 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+course.title = Course title
+course.fee = Fee
+
+course.clock =
+course.from = From
+course.to = to
+course.enrollment.period = Enrollment period
+course.enrollment.unsubscribe.end = Unsubscribe end
+
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tab = Course management
+creator.page = Course management
+
+creator.course.open = Open course
+creator.course.new = New course
+creator.drafts = Drafts
+creator.courses.active = Active courses
+creator.courses.expired = Expired courses
+
+creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
+creator.draft = Draft
+creator.course.blank = Blank course
+creator.course.draft = Load course data
+creator.course.upload = Upload course data
+
+creator.title.working.info = Working course title. Can be edited later.
+
+creator.new.blank.success = Created new blank course, ID = %d.

@@ -40,3 +40,16 @@ validation.invalid.groupID = Bitte geben Sie eine gültige Gruppen ID an. Gruppe
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.searchValue = Der Suchwert muss aus 3 bis 127 Zeichen bestehen.
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.title = Der Kurstitel muss aus 1 bis 511 Zeichen bestehen.
+
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.option = Bitte geben Sie eine gültige Option an.
+validation.invalid.courseID = Bitte geben Sie eine gültige Kurs ID an.

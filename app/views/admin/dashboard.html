@@ -16,8 +16,10 @@
 {{template "admin/rightNav.html" . }}
 
 <script>
-  //adjust the nav pills
-  $('#v-pills-dashboard-tab').addClass("active");
+  $(function() {
+    //adjust the nav pills
+    $('#v-pills-dashboard-tab').addClass("active");
+  });
 </script>
 
 {{template "footer.html" .}}

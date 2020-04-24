@@ -45,17 +45,19 @@
 {{template "admin/rightNav.html" . }}
 
 <script>
-  //react to user input
-  $('#user-search-input').keyup(function() {
-    reactToInput();
-  });
+  $(function() {
+    //react to user input
+    $('#user-search-input').keyup(function() {
+      reactToInput();
+    });
 
-  $('#search-inactive').change(function() {
-    reactToInput();
-  });
+    $('#search-inactive').change(function() {
+      reactToInput();
+    });
 
-  //adjust the nav pills
-  $('#v-pills-users-tab').addClass("active");
+    //adjust the nav pills
+    $('#v-pills-users-tab').addClass("active");
+  });
 
   //call if the search value changes of the 'inactive users'-checkbox is changed
   function reactToInput() {

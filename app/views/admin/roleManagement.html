@@ -112,8 +112,10 @@
 {{template "admin/rightNav.html" . }}
 
 <script>
-  //adjust the nav pills
-  $('#v-pills-roles-tab').addClass("active");
+  $(function() {
+    //adjust the nav pills
+    $('#v-pills-roles-tab').addClass("active");
+  });
 </script>
 
 {{template "footer.html" .}}

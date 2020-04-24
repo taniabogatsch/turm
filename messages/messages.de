@@ -18,6 +18,7 @@ language.change.success = Die Sprache der Seite ist nun '%s'.
 button.search = Suchen
 button.send = Senden
 button.save = Speichern
+button.load = Laden
 
 button.login = Anmelden
 button.logout = Abmelden
@@ -52,6 +53,7 @@ error.undefined = Es ist ein Fehler aufgetreten. %(error.support)s
 user.role = Rolle
 user.role.admin = Admin
 user.role.creator = KursverantwortlicheR
+user.role.instructors = OrganisatorInnen
 user.role.user = NutzerIn
 
 user.admins = Admins
@@ -228,3 +230,39 @@ admin.new.role = Neue Rolle wählen
 admin.current.role = Bisher
 admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.
 admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+course.title = Kurstitel
+course.fee = Teilnahmegebühr
+
+course.clock = Uhr
+course.from = Von
+course.to = bis
+course.enrollment.period = Einschreibezeitraum
+course.enrollment.unsubscribe.end = Austragen bis
+
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tab = Kursverwaltung
+creator.page = Kursverwaltung
+
+creator.course.open = Kurs öffnen
+creator.course.new = Neuer Kurs
+creator.drafts = Entwürfe
+creator.courses.active = Aktive Kurse
+creator.courses.expired = Abgelaufene Kurse
+
+creator.drafts.info = Kursvorlagen erlauben es Ihnen Kursdaten aus vorherigen Kursen zu importieren.
+creator.draft = Vorlage
+creator.course.blank = Leerer Kurs
+creator.course.draft = Aus Kursen
+creator.course.upload = Kursvorlage hochladen
+
+creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
+
+creator.new.blank.success = Neuer leerer Kurs erstellt, ID = %d.

@@ -1,0 +1,31 @@
+<!-- this template contains all inactive courses either created by the user or of whom he is an editor -->
+
+<h5>
+  Creator of
+</h5>
+
+<ul class="list-group">
+  {{range .created}}
+    <li class="list-group-item">
+      {{.Title}}
+      <small class="form-text text-muted">
+        {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+      </small>
+      <!-- edit -->
+      <a href="#" class="badge badge-secondary btn-darkblue float-right margin-left-10">
+        {{template "icons/trash.html" . }}
+      </a>
+      <!-- add -->
+      <a href='{{url "Creator.OpenCourse" .ID ""}}' class="badge badge-secondary btn-darkblue float-right margin-left-10">
+        {{template "icons/pencil.html" . }}
+      </a>
+    </li>
+  {{end}}
+</ul>
+
+<br>
+<h5>
+  Editor of
+</h5>
+
+<!-- TODO -->

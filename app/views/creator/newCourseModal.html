@@ -1,0 +1,76 @@
+<!-- template rendering the content of the new course modal -->
+
+<!-- modal header -->
+<div class="modal-header background-color-darkblue border-radius-2">
+  <h5 class="modal-title text-white">
+    {{msg $ "creator.course.new"}}
+  </h5>
+  <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<form id="new-course-form" accept-charset="UTF-8" action='{{url "Creator.NewCourse"}}' method="POST" class="needs-validation" novalidate>
+
+  <!-- modal body -->
+  <div class="modal-body">
+    <!-- title -->
+    <small class="form-text text-muted">
+      {{msg $ "creator.course.title.working"}}
+    </small>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          {{template "icons/pencil.html" .}}
+        </span>
+      </div>
+      <input type="text" class="form-control rounded-right" name="param.Title" placeholder='{{msg $ "course.title"}}' required minlength="3" maxlength="255">
+      <div class="invalid-feedback">
+        {{msg $ "validation.invalid.title"}}
+      </div>
+    </div>
+
+    <!-- load option -->
+    <small class="form-text text-muted">
+      {{msg $ "creator.drafts.info"}}
+    </small>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <label class="input-group-text border-right-0"> {{msg $ "creator.draft"}} </label>
+      </div>
+      <select name="param.Option" class="custom-select rounded-right">
+        <option value="0" selected> {{msg $ "creator.course.blank"}}</option>
+        <option value="1"> {{msg $ "creator.course.draft"}} </option>
+        <option value="2"> {{msg $ "creator.course.upload"}} </option>
+        <!-- TODO: show further configuration if 'draft' or 'upload' is chosen -->
+      </select>
+      <div class="invalid-feedback">
+        {{msg $ "validation.invalid.option"}}
+      </div>
+    </div>
+  </div>
+
+  <!-- modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+      {{msg $ "button.close"}}
+    </button>
+    <button type="submit" class="btn btn-darkblue">
+      {{msg $ "button.load"}}
+    </button>
+  </div>
+</form>
+
+<script>
+  $(function() {
+    //add submit listener to the new modal form
+    const form = document.getElementById('new-course-form');
+    form.addEventListener('submit', function(event) {
+      if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+</script>

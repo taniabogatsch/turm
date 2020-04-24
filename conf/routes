@@ -30,6 +30,16 @@ GET     /user/newActivationCode                 User.NewActivationCode
 GET     /user/prefLanguagePage                  User.PrefLanguagePage
 POST    /user/setPrefLanguage                   User.SetPrefLanguage
 
+# ------------------------------- Creator routes. -------------------------------- #
+
+GET     /creator/activeCourses                  Creator.ActiveCourses
+GET     /creator/drafts                         Creator.Drafts
+GET     /creator/openCourse                     Creator.OpenCourse
+
+POST    /creator/newCourse                      Creator.NewCourse
+GET     /creator/newCourseModal                 Creator.NewCourseModal
+GET     /creator/getDrafts                      Creator.GetDrafts
+
 # ------------------------------- Admin routes. -------------------------------- #
 
 GET     /admin/userManagement                   Admin.UserManagement
