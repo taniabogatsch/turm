@@ -13,8 +13,14 @@ type UserDetails struct {
 	Enrollments       []Enrolled
 	FormerEnrollments []Unsubscribed
 
-	//all courses created by this user
-	Courses []Course
+	//all courses in which the user was directly involved
+	CreatedCourses []Course
+	EditorOf       []Course
+	InstructorOf   []Course
+
+	//all courses of which the user was on the whitelist/blacklist
+	OnWhitelist []Course
+	OnBlacklist []Course
 
 	//all categories, faqs and news created by this user
 	Categories []Category

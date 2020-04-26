@@ -34,11 +34,15 @@
   <!-- 'Add Group'-button -->
   <!-- TODO: only show this if role is admin -->
   <br>
-  <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" onclick="openCreateGroup(0);">
-    {{msg $ "button.add.group"}}
-  </button>
-  <br>
-  <br>
+  {{if $.session.userID}}
+    {{if eq $.session.role "admin"}}
+      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" onclick="openCreateGroup(0);">
+        {{msg $ "button.add.group"}}
+      </button>
+      <br>
+      <br>
+    {{end}}
+  {{end}}
   <div id="groups">
   </div>
 </div>

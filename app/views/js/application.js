@@ -69,51 +69,84 @@ function openGroupsNav() {
   $('#nav-groups-modal').modal('show');
 }
 
-function openCreateGroup(parentID, inheritsLimits) {
+//hide all elements that are not to be seen by users without the respective authority
+$(function() {
 
-  $('#group-form').attr("action", '{{url "Admin.AddGroup"}}');
-  $('#group-modal-title').html('{{msg $ "group.new"}}');
-  $('#input-parentID').val(parentID);
-  $('#input-name').val("");
-  $('#group-confirm-btn').html('{{msg $ "button.add"}}');
-
-  if (inheritsLimits) {
-    $('#input-courseLimits').attr("disabled", true);
-    $('#input-courseLimits').val("");
-    $('#courseLimits-info').html('{{msg $ "group.inherits.limit.info"}}');
-  } else {
-    $('#input-courseLimits').attr("disabled", false);
-    $('#input-courseLimits').val("");
-    $('#courseLimits-info').html('{{msg $ "group.course.limit.x.info"}}');
+  if ({{.session.role}} == "admin") {
+    $(".admin").each(function() {
+      $(this).removeClass("display-none");
+    });
   }
 
-  $('#group-modal').modal('show');
-}
-
-function openEditGroup(ID, parentID, childHasLimits, inheritsLimits, name, courseLimits) {
-
-  $('#group-form').attr("action", '{{url "Admin.EditGroup"}}');
-  $('#group-modal-title').html('{{msg $ "group.edit"}}');
-  $('#input-ID').val(ID);
-  $('#input-parentID').val(parentID);
-  $('#input-name').val(name);
-  $('#group-confirm-btn').html('{{msg $ "button.edit"}}');
-
-  if (courseLimits != 0) {
-    $('#input-courseLimits').attr("disabled", false);
-    $('#input-courseLimits').val(courseLimits);
-    $('#courseLimits-info').html('{{msg $ "group.course.limit.x.info"}}');
-  } else if (inheritsLimits || childHasLimits) {
-    $('#input-courseLimits').attr("disabled", true);
-    $('#input-courseLimits').val("");
-    $('#courseLimits-info').html('{{msg $ "group.inherits.limit.info"}}');
+  if ({{.session.role}} == "creator") {
+    $(".creator").each(function() {
+      $(this).removeClass("display-none");
+    });
   }
 
-  $('#group-modal').modal('show');
-}
+  if ({{.session.isEditor}} == "true") {
+    $(".editor").each(function() {
+      $(this).removeClass("display-none");
+    });
+  }
 
-function openDeleteGroup(ID, content) {
-  $('#group-delete-content').html(content);
-  $('#delete-input-ID').val(ID);
-  $('#group-delete-modal').modal('show');
-}
+  if ({{.session.isInstructor}} == "true") {
+    $(".instructor").each(function() {
+      $(this).removeClass("display-none");
+    });
+  }
+});
+
+{{if $.session.userID}}
+  {{if eq $.session.role "admin"}}
+
+    function openCreateGroup(parentID, inheritsLimits) {
+
+      $('#group-form').attr("action", '{{url "Admin.AddGroup"}}');
+      $('#group-modal-title').html('{{msg $ "group.new"}}');
+      $('#input-parentID').val(parentID);
+      $('#input-name').val("");
+      $('#group-confirm-btn').html('{{msg $ "button.add"}}');
+
+      if (inheritsLimits) {
+        $('#input-courseLimits').attr("disabled", true);
+        $('#input-courseLimits').val("");
+        $('#courseLimits-info').html('{{msg $ "group.inherits.limit.info"}}');
+      } else {
+        $('#input-courseLimits').attr("disabled", false);
+        $('#input-courseLimits').val("");
+        $('#courseLimits-info').html('{{msg $ "group.course.limit.x.info"}}');
+      }
+
+      $('#group-modal').modal('show');
+    }
+
+    function openEditGroup(ID, parentID, childHasLimits, inheritsLimits, name, courseLimits) {
+
+      $('#group-form').attr("action", '{{url "Admin.EditGroup"}}');
+      $('#group-modal-title').html('{{msg $ "group.edit"}}');
+      $('#input-ID').val(ID);
+      $('#input-parentID').val(parentID);
+      $('#input-name').val(name);
+      $('#group-confirm-btn').html('{{msg $ "button.edit"}}');
+
+      if (courseLimits != 0) {
+        $('#input-courseLimits').attr("disabled", false);
+        $('#input-courseLimits').val(courseLimits);
+        $('#courseLimits-info').html('{{msg $ "group.course.limit.x.info"}}');
+      } else if (inheritsLimits || childHasLimits) {
+        $('#input-courseLimits').attr("disabled", true);
+        $('#input-courseLimits').val("");
+        $('#courseLimits-info').html('{{msg $ "group.inherits.limit.info"}}');
+      }
+
+      $('#group-modal').modal('show');
+    }
+
+    function openDeleteGroup(ID, content) {
+      $('#group-delete-content').html(content);
+      $('#delete-input-ID').val(ID);
+      $('#group-delete-modal').modal('show');
+    }
+  {{end}}
+{{end}}

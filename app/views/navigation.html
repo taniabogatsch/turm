@@ -65,13 +65,13 @@
         </div>
       </li>
 
-      <li class="nav-item active">
+      <li class="nav-item active display-none admin creator editor instructor">
         <a class="nav-link" href='{{url "Creator.ActiveCourses"}}'>
           {{msg $ "creator.tab"}}
         </a>
       </li>
 
-      <li class="nav-item active">
+      <li class="nav-item active display-none admin">
         <a class="nav-link" href='{{url "Admin.UserManagement"}}'>
           {{msg $ "admin.tab"}}
         </a>
@@ -148,7 +148,11 @@
   </div>
 </div>
 
-{{template "admin/groups.html" .}}
+{{if $.session.userID}}
+  {{if eq $.session.role "admin"}}
+    {{template "admin/groups.html" .}}
+  {{end}}
+{{end}}
 
 <br>
 <br>

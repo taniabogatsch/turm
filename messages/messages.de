@@ -11,6 +11,8 @@ toast.success = Erfolg
 
 language.change.success = Die Sprache der Seite ist nun '%s'.
 
+intercept.invalid.action = Für diese Aktion fehlt Ihnen die Berechtigung.
+
 # -------------------------------------------------------------------------------------------------- #
 # BUTTON
 # -------------------------------------------------------------------------------------------------- #

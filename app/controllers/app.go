@@ -3,7 +3,6 @@ package controllers
 import (
 	"errors"
 	"turm/app/models"
-	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
@@ -14,15 +13,14 @@ func (c App) Index() revel.Result {
 
 	c.Log.Debug("render index page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("index.tab")
-
-	//TODO: get last update
 
 	return c.Render()
 }
 
 /*Groups renders all groups.
-- Roles: all */
+- Roles: all (except not activated users) */
 func (c App) Groups(prefix string) revel.Result {
 
 	c.Log.Debug("get groups", "prefix", prefix)
@@ -46,18 +44,13 @@ func (c App) Groups(prefix string) revel.Result {
 	return c.Render(Groups)
 }
 
-/*ChangeLanguage changes the language, then redirects to the page currently set as callPath.
+/*ChangeLanguage changes the language, then redirects to the page currently set as currPath.
 - Roles: all */
 func (c App) ChangeLanguage(language string) revel.Result {
 
 	c.Log.Debug("change language",
 		"old language", c.Session["currentLocale"],
 		"language", language)
-
-	//some pages do not change the callPath and must be detected manually
-	if c.Session["currPath"] != routes.App.Index() {
-		c.Session["callPath"] = c.Session["currPath"]
-	}
 
 	c.Validation.Check(language,
 		models.LanguageValidator{},
@@ -67,7 +60,7 @@ func (c App) ChangeLanguage(language string) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -77,6 +70,8 @@ func (c App) ChangeLanguage(language string) revel.Result {
 	c.ViewArgs["currentLocale"] = c.Session["currentLocale"]
 	c.Request.Locale = c.Session["currentLocale"].(string)
 
-	c.Flash.Success(c.Message("language.change.success", language))
-	return c.Redirect(c.Session["callPath"])
+	c.Flash.Success(c.Message("language.change.success",
+		language,
+	))
+	return c.Redirect(c.Session["currPath"])
 }

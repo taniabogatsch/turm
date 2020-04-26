@@ -7,7 +7,6 @@ import (
 	"turm/app"
 	"turm/app/auth"
 	"turm/app/models"
-	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
@@ -20,10 +19,11 @@ func (c User) LoginPage() revel.Result {
 	//NOTE: we do not set the callPath because we want to be redirected to the previous page
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("login.tab")
+
 	return c.Render()
 }
 
-/*Login implements the login of an user. It redirects to callPath.
+/*Login implements the login of an user.
 - Roles: not logged in users */
 func (c User) Login(credentials models.Credentials) revel.Result {
 
@@ -35,7 +35,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.LoginPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -51,7 +51,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 			return flashError(
 				errAuth,
 				err,
-				routes.User.LoginPage(),
+				c.Session["currPath"].(string),
 				c.Controller,
 				"",
 			)
@@ -71,7 +71,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.LoginPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -83,7 +83,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.LoginPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -99,17 +99,15 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	}
 
 	c.Log.Debug("login successful", "user", user)
-	c.Flash.Success(
-		c.Message(
-			"login.success",
-			user.EMail,
-			user.FirstName,
-			user.LastName,
-		))
+	c.Flash.Success(c.Message("login.success",
+		user.EMail,
+		user.FirstName,
+		user.LastName,
+	))
 
 	//not activated external users get redirected to the activation page
 	if user.ActivationCode.String != "" && credentials.EMail != "" {
-		c.Session["callPath"] = routes.User.ActivationPage()
+		c.Session["callPath"] = "/user/activationPage"
 		c.Session["notActivated"] = "true"
 	}
 
@@ -128,6 +126,7 @@ func (c User) Logout() revel.Result {
 	for k := range c.Session {
 		c.Session.Del(k)
 	}
+
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
 }
@@ -141,6 +140,7 @@ func (c User) RegistrationPage() revel.Result {
 	//the previous page after account activation
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("register.tab")
+
 	return c.Render()
 }
 
@@ -155,7 +155,7 @@ func (c User) Registration(user models.User) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.RegistrationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -166,7 +166,7 @@ func (c User) Registration(user models.User) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.RegistrationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -183,17 +183,15 @@ func (c User) Registration(user models.User) revel.Result {
 		return flashError(
 			errEMail,
 			err,
-			routes.User.ActivationPage(),
+			"/user/activationPage",
 			c.Controller,
 			user.EMail,
 		)
 	}
 
-	c.Flash.Success(
-		c.Message(
-			"register.success",
-			user.EMail,
-		))
+	c.Flash.Success(c.Message("register.success",
+		user.EMail,
+	))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -206,6 +204,7 @@ func (c User) NewPasswordPage() revel.Result {
 	//previous page after logging in
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("new.pw.tab")
+
 	return c.Render()
 }
 
@@ -230,7 +229,7 @@ func (c User) NewPassword(email string) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.NewPasswordPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -246,11 +245,9 @@ func (c User) NewPassword(email string) revel.Result {
 		models.NotUnique{},
 	)
 	if c.Validation.HasErrors() {
-		c.Flash.Success(
-			c.Message(
-				"new.pw.success",
-				email,
-			))
+		c.Flash.Success(c.Message("new.pw.success",
+			email,
+		))
 		return c.Redirect(User.LoginPage)
 	}
 
@@ -259,7 +256,7 @@ func (c User) NewPassword(email string) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.NewPasswordPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -273,17 +270,15 @@ func (c User) NewPassword(email string) revel.Result {
 		return flashError(
 			errEMail,
 			err,
-			routes.User.NewPasswordPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			user.EMail,
 		)
 	}
 
-	c.Flash.Success(
-		c.Message(
-			"new.pw.success",
-			email,
-		))
+	c.Flash.Success(c.Message("new.pw.success",
+		email,
+	))
 	return c.Redirect(User.LoginPage)
 }
 
@@ -296,6 +291,7 @@ func (c User) ActivationPage() revel.Result {
 	//the previous page after account activation
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("activation.tab")
+
 	return c.Render()
 }
 
@@ -329,7 +325,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -341,7 +337,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -352,7 +348,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -360,7 +356,7 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 
 	c.Session.Del("notActivated")
 	c.Flash.Success(c.Message("activation.success"))
-	if c.Session["callPath"].(string) == routes.User.ActivationPage() {
+	if c.Session["callPath"].(string) == "/user/activationPage" {
 		return c.Redirect(App.Index)
 	}
 	return c.Redirect(c.Session["callPath"])
@@ -378,7 +374,7 @@ func (c User) NewActivationCode() revel.Result {
 		return flashError(
 			errTypeConv,
 			err,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -388,7 +384,7 @@ func (c User) NewActivationCode() revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -401,17 +397,15 @@ func (c User) NewActivationCode() revel.Result {
 		return flashError(
 			errEMail,
 			err,
-			routes.User.ActivationPage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			user.EMail,
 		)
 	}
 
-	c.Flash.Success(
-		c.Message(
-			"activation.resend.success",
-			user.EMail,
-		))
+	c.Flash.Success(c.Message("activation.resend.success",
+		user.EMail,
+	))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -424,6 +418,7 @@ func (c User) PrefLanguagePage() revel.Result {
 	//page after a successful login
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("pref.lang.tab")
+
 	return c.Render()
 }
 
@@ -436,11 +431,12 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	c.Validation.Check(prefLanguage,
 		models.LanguageValidator{},
 	)
+
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
 			nil,
-			routes.User.PrefLanguagePage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -453,13 +449,15 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			routes.User.PrefLanguagePage(),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
-	c.Flash.Success(c.Message("pref.lang.success", prefLanguage))
+	c.Flash.Success(c.Message("pref.lang.success",
+		user.Language.String,
+	))
 	return c.Redirect(c.Session["callPath"])
 }
 
@@ -471,6 +469,8 @@ func (c User) setSession(user *models.User) {
 	c.Session["firstName"] = user.FirstName
 	c.Session["lastName"] = user.LastName
 	c.Session["role"] = user.Role.String()
+	c.Session["isEditor"] = strconv.FormatBool(user.IsEditor)
+	c.Session["isInstructor"] = strconv.FormatBool(user.IsInstructor)
 	c.Session["eMail"] = user.EMail
 	c.Session["prefLanguage"] = user.Language.String
 }

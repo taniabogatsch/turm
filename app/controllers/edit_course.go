@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"strings"
 	"turm/app/models"
-	"turm/app/routes"
 
 	"github.com/revel/revel"
 )
@@ -22,17 +21,13 @@ func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
 	//get the course data
 	course := models.Course{ID: ID}
 	if err := course.Get(); err != nil {
-		return flashError(
-			errDB,
-			err,
-			routes.Creator.ActiveCourses(),
-			c.Controller,
-			"",
-		)
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
 	}
 
-	//only set these if the course was loaded successfully
+	//only set these after the course is loaded
 	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("creator.tab")
 
 	c.Log.Debug("loaded course", "course", course)
@@ -57,7 +52,7 @@ func (c EditCourse) ChangeTitle(ID int, title string) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -68,7 +63,7 @@ func (c EditCourse) ChangeTitle(ID int, title string) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -78,14 +73,14 @@ func (c EditCourse) ChangeTitle(ID int, title string) revel.Result {
 		course.Title,
 		course.ID,
 	))
-	return c.Redirect(c.Session["callPath"].(string))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*ChangeSubtitle changes the subtitle.
 - Roles: creator and editors of the course */
 func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 
-	c.Log.Debug("change course title", "ID", ID, "subtitle", subtitle)
+	c.Log.Debug("change subtitle", "ID", ID, "subtitle", subtitle)
 
 	//NOTE: the interceptor assures that the course ID is valid
 	course := models.Course{ID: ID}
@@ -102,7 +97,7 @@ func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 			return flashError(
 				errValidation,
 				nil,
-				c.Session["callPath"].(string),
+				c.Session["currPath"].(string),
 				c.Controller,
 				"",
 			)
@@ -114,7 +109,7 @@ func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -130,7 +125,7 @@ func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 			course.ID,
 		))
 	}
-	return c.Redirect(c.Session["callPath"].(string))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*ChangeUnsubscribeEnd changes the unsubscribe end.
@@ -162,7 +157,7 @@ func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -172,7 +167,7 @@ func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -187,7 +182,7 @@ func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel
 			course.ID,
 		))
 	}
-	return c.Redirect(c.Session["callPath"].(string))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*ChangeUserList changes the users on the specified user list of a course.
@@ -209,7 +204,7 @@ func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Re
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -220,14 +215,17 @@ func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Re
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
-	c.Flash.Success(c.Message("course."+listType+".change.success", entry.EMail, entry.CourseID))
-	return c.Redirect(c.Session["callPath"].(string))
+	c.Flash.Success(c.Message("course."+listType+".change.success",
+		entry.EMail,
+		entry.CourseID,
+	))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*ChangeViewMatrNr toggles the matriculation number restrictions for an editor/instructor.

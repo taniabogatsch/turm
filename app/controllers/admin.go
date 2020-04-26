@@ -11,22 +11,24 @@ import (
 )
 
 /*UserManagement renders the user management page.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) UserManagement() revel.Result {
 
 	c.Log.Debug("render user management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
 	return c.Render()
 }
 
 /*RoleManagement renders the role management page.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) RoleManagement() revel.Result {
 
 	c.Log.Debug("render role management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
 	//get all admins
@@ -47,25 +49,29 @@ func (c Admin) RoleManagement() revel.Result {
 }
 
 /*Dashboard renders the dashboard.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) Dashboard() revel.Result {
 
 	c.Log.Debug("render dashboard", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
 	return c.Render()
 }
 
 /*SearchUser renders search results for a search value.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) SearchUser(value string, searchInactive bool) revel.Result {
 
 	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive)
 
 	trimmedValue := strings.TrimSpace(value)
-	c.Validation.MinSize(trimmedValue, 3).MessageKey("validation.invalid.searchValue")
-	c.Validation.MaxSize(trimmedValue, 127).MessageKey("validation.invalid.searchValue")
+	c.Validation.Check(trimmedValue,
+		revel.MinSize{3},
+		revel.MaxSize{127},
+	).MessageKey("validation.invalid.searchValue")
+
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
 		return c.Render()
@@ -76,11 +82,12 @@ func (c Admin) SearchUser(value string, searchInactive bool) revel.Result {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
 	return c.Render(users)
 }
 
 /*UserDetails renders detailed information about an user.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) UserDetails(ID int) revel.Result {
 
 	c.Log.Debug("get user details", "userID", ID)
@@ -105,21 +112,22 @@ func (c Admin) UserDetails(ID int) revel.Result {
 }
 
 /*ChangeRole changes the role of an user and sends a notification e-mail.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) ChangeRole(user models.User) revel.Result {
 
 	c.Log.Debug("change user role", "userID", user.ID, "role", user.Role)
 
-	c.Validation.Required(user.ID).MessageKey("validation.missing.userID")
-	if user.Role != models.ADMIN && user.Role != models.CREATOR &&
-		user.Role != models.USER {
+	c.Validation.Required(user.ID).
+		MessageKey("validation.missing.userID")
+	if user.Role < models.USER || user.Role > models.ADMIN {
 		c.Validation.ErrorKey("validation.invalid.role")
 	}
+
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -129,7 +137,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -142,7 +150,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errEMail,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			user.EMail,
 		)
@@ -156,7 +164,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		return flashError(
 			errTypeConv,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -170,11 +178,11 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		user.LastName,
 		c.Message("user.role."+user.Role.String()),
 	))
-	return c.Redirect(c.Session["callPath"].(string))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*AddGroup adds a new group.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) AddGroup(group models.Group) revel.Result {
 
 	c.Log.Debug("add group", "group", group)
@@ -183,7 +191,7 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -194,27 +202,31 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
-	c.Flash.Success(c.Message("group.new.success", group.Name, group.ID))
-	return c.Redirect(c.Session["callPath"].(string))
+	c.Flash.Success(c.Message("group.new.success",
+		group.Name,
+		group.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
 }
 
-/*EditGroup edits the name and the course limits of a group.
-- Roles: admin */
+/*EditGroup edits the name and the course limit of a group.
+- Roles: admin (activated) */
 func (c Admin) EditGroup(group models.Group) revel.Result {
 
 	c.Log.Debug("edit group", "group", group)
 
+	//NOTE: the DB statement ensures that no courses are deleted
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -225,35 +237,38 @@ func (c Admin) EditGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
-	c.Flash.Success(c.Message("group.edit.success", group.Name, group.ID))
-	return c.Redirect(c.Session["callPath"].(string))
+	c.Flash.Success(c.Message("group.edit.success",
+		group.Name,
+		group.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*DeleteGroup deletes a group. Groups can only be deleted if it has no
 sub groups and no active courses. Upon deletion, all inactive courses of
 that group become the children of the parent group.
-- Roles: admin */
+- Roles: admin (activated) */
 func (c Admin) DeleteGroup(group models.Group) revel.Result {
 
 	c.Log.Debug("delete group", "group", group)
 
+	//NOTE: the DB statement ensures that no courses are deleted
 	c.Validation.Check(group.ID,
 		models.NoActiveChildren{},
 		revel.Required{},
 	).MessageKey("validation.invalid.groupID")
-	//NOTE: the DB statement ensures that no courses are edited
 
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation,
 			nil,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
@@ -263,14 +278,16 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 		return flashError(
 			errDB,
 			err,
-			c.Session["callPath"].(string),
+			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
 	}
 
-	c.Flash.Success(c.Message("group.delete.success", group.ID))
-	return c.Redirect(c.Session["callPath"].(string))
+	c.Flash.Success(c.Message("group.delete.success",
+		group.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
 }
 
 //sendEMail sends an notification e-mail about a new user role.
@@ -302,7 +319,6 @@ func (c Admin) sendEMail(user *models.User, subjectKey string, filename string) 
 	}
 
 	c.Log.Debug("assembled e-mail", "email", email)
-
 	app.EMailQueue <- email
 	return
 }
