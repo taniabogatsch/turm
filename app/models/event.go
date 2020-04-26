@@ -7,7 +7,7 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Event contains all directly event related values. */
+/*Event is a model of the event table. */
 type Event struct {
 	ID            int            `db:"id, primarykey, autoincrement"`
 	CourseID      int            `db:"courseid"`
@@ -19,25 +19,18 @@ type Event struct {
 	Meetings      Meetings       ``
 }
 
-/*Validate validates the Event struct fields. */
+/*Validate event fields. */
 func (event *Event) Validate(v *revel.Validation) {
 	//TODO
 }
 
-/*Events contains all events of a course. */
+/*Events holds all events of a course. */
 type Events []Event
 
 /*Get all events of a course. */
 func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
 
-	selectEvents := `
-		SELECT
-			id, courseid, capacity, haswaitlist, title, description, enrollmentkey
-		FROM event
-		WHERE courseid = $1
-		ORDER BY id ASC
-	`
-	err = tx.Select(events, selectEvents, *courseID)
+	err = tx.Select(events, stmtSelectEvents, *courseID)
 	if err != nil {
 		modelsLog.Error("failed to get events of course", "course ID", *courseID, "error", err.Error())
 		tx.Rollback()
@@ -52,3 +45,13 @@ func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
 	}
 	return
 }
+
+const (
+	stmtSelectEvents = `
+		SELECT
+			id, courseid, capacity, haswaitlist, title, description, enrollmentkey
+		FROM event
+		WHERE courseid = $1
+		ORDER BY id ASC
+	`
+)

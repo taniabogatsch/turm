@@ -2,7 +2,7 @@ package models
 
 import "turm/app"
 
-/*UserDetails contains all data related to this user. */
+/*UserDetails holds detailed data related to a user. */
 type UserDetails struct {
 	User User
 
@@ -28,7 +28,7 @@ func (user *UserDetails) Get() (err error) {
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		modelsLog.Error("failed to begin tx", "error", err.Error())
-		return err
+		return
 	}
 
 	//get user

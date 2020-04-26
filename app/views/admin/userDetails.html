@@ -3,7 +3,8 @@
 <!-- modal header -->
 <div class="modal-header background-color-darkblue border-radius-2">
   <h5 class="modal-title text-white">
-    {{msg $ "user.details"}} {{.user.User.FirstName}} {{.user.User.LastName}}
+    {{msg $ "user.details"}}
+    {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .user.User}}
   </h5>
   <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>

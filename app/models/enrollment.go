@@ -8,15 +8,15 @@ import (
 type EnrollmentStatus int
 
 const (
-	//ENROLLED is for users that enrolled in an event
+	//ENROLLED users enrolled in an event
 	ENROLLED EnrollmentStatus = iota
-	//ONWAITLIST is for users that are at the waitlist of an event
+	//ONWAITLIST users are at the waitlist of an event
 	ONWAITLIST
-	//AWAITINGPAYMENT is for users that enrolled in an event but did not yet pay the fee of the course
+	//AWAITINGPAYMENT users enrolled in an event but did not yet pay the fee of the course
 	AWAITINGPAYMENT
-	//PAID is for users that enrolled in an event and did pay the fee of the course
+	//PAID users enrolled in an event and did pay the fee of the course
 	PAID
-	//FREED is for users that enrolled in an event and do not have to pay the fee of the course
+	//FREED users enrolled in an event and do not have to pay the fee of the course
 	FREED
 )
 
@@ -24,7 +24,7 @@ func (status EnrollmentStatus) String() string {
 	return [...]string{"enrolled", "on waitlist", "awaiting payment", "paid", "freed"}[status]
 }
 
-/*Enrolled contains all directly enrollment status related values. */
+/*Enrolled is a model of the enrolled table. */
 type Enrolled struct {
 	UserID           int              `db:"userid, primarykey"`
 	EventID          int              `db:"eventid, primarykey"`
@@ -33,18 +33,18 @@ type Enrolled struct {
 	TimeOfEnrollment string           `db:"timeofenrollment"`
 }
 
-/*Validate validates the Enrolled struct fields. */
+/*Validate Enrolled fields. */
 func (enrolled *Enrolled) Validate(v *revel.Validation) {
 	//TODO
 }
 
-/*Unsubscribed contains all fields of a user that unsubscribed from an event. */
+/*Unsubscribed is a model of the unsubscribed table. */
 type Unsubscribed struct {
 	UserID  int `db:"userid, primarykey"`
 	EventID int `db:"eventid, primarykey"`
 }
 
-/*Validate validates the Enrolled struct fields. */
+/*Validate Unsubscribed fields. */
 func (unsubscribed *Unsubscribed) Validate(v *revel.Validation) {
 	//TODO
 }

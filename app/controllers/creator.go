@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"strconv"
+	"strings"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -124,34 +125,27 @@ func (c Creator) NewCourse(param models.NewCourseParam, msg string) revel.Result
 		)
 	}
 
-	return c.Redirect(Creator.OpenCourse, course.ID, msg)
+	return c.Redirect(EditCourse.OpenCourse, course.ID, msg)
 }
 
-/*OpenCourse opens an already existing course for modification, etc.
-- Roles: creator and editors of this course. */
-func (c Creator) OpenCourse(ID int, msg string) revel.Result {
+/*SearchUser searches for users for the different user lists.
+- Roles: creator and editors. */
+func (c Creator) SearchUser(value string, searchInactive bool, listType string) revel.Result {
 
-	c.Log.Debug("course management: open course", "ID", ID, "msg", msg)
+	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
 
-	//TODO: param validation
-
-	//get the course data
-	course := models.Course{ID: ID}
-	if err := course.Get(); err != nil {
-		return flashError(
-			errDB,
-			err,
-			c.Session["callPath"].(string),
-			c.Controller,
-			"",
-		)
+	trimmedValue := strings.TrimSpace(value)
+	c.Validation.MinSize(trimmedValue, 3).MessageKey("validation.invalid.searchValue")
+	c.Validation.MaxSize(trimmedValue, 127).MessageKey("validation.invalid.searchValue")
+	if c.Validation.HasErrors() {
+		c.Validation.Keep()
+		return c.Render()
 	}
 
-	//only set these if the course was loaded successfully
-	c.Session["callPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
-
-	c.Log.Debug("loaded course", "course", course)
-	c.Flash.Success(c.Message(msg))
-	return c.Render(course)
+	var users models.UserList
+	if err := users.Search(&value, &searchInactive, &listType); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+	return c.Render(users, listType)
 }

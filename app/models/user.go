@@ -72,7 +72,7 @@ type User struct {
 	ActivationCode sql.NullString `db:"activationcode"`
 }
 
-/*Validate user fields of newly registered users. */
+/*Validate User fields of newly registered users. */
 func (user *User) Validate(v *revel.Validation) {
 
 	user.EMail = strings.ToLower(user.EMail)
@@ -176,6 +176,21 @@ func (credentials *Credentials) Validate(v *revel.Validation) {
 	).MessageKey("validation.invalid.password")
 }
 
+/*Studies is a model of the studies table. */
+type Studies struct {
+	UserID            int    `db:"userid, primarykey"`
+	Semester          int    `db:"semester"`
+	DegreeID          int    `db:"degreeid, primarykey"`
+	CourseOfStudiesID int    `db:"courseofstudiesid, primarykey"`
+	Degree            string `db:"degree"`          //not a field in the studies table
+	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
+}
+
+/*Validate Studies fields when loaded from the user enrollment file. */
+func (studies Studies) Validate(v *revel.Validation) {
+	//TODO
+}
+
 /*Get all data of an user. */
 func (user *User) Get(tx *sqlx.Tx) (err error) {
 
@@ -193,11 +208,7 @@ func (user *User) Get(tx *sqlx.Tx) (err error) {
 /*GetBasicData returns basic information of an user. */
 func (user *User) GetBasicData(tx *sqlx.Tx) (err error) {
 
-	selectUser := `
-		SELECT id, email, firstname, lastname, salutation, title, academictitle, nameaffix
-		FROM users WHERE id = $1
-	`
-	err = tx.Get(user, selectUser, user.ID)
+	err = tx.Get(user, stmtSelectUser, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to get user", "user", user, "error", err.Error())
 		tx.Rollback()
@@ -274,17 +285,9 @@ func (user *User) Register() (err error) {
 /*NewPassword generates a new password for an user. */
 func (user *User) NewPassword() (err error) {
 
-	updatePassword := `
-		UPDATE users
-		SET password = crypt($1, gen_salt('bf'))
-		WHERE email = $2
-		RETURNING
-			/* data to send notification e-mail containing the new password */
-			id, lastname, firstname, email, language, salutation
-	`
 	password := generateCode()
 
-	err = app.Db.Get(user, updatePassword, password, user.EMail)
+	err = app.Db.Get(user, stmtUpdatePassword, password, user.EMail)
 	if err != nil {
 		modelsLog.Error("failed to update password", "user", user,
 			"password", password, "error", err.Error())
@@ -296,27 +299,13 @@ func (user *User) NewPassword() (err error) {
 /*VerifyActivationCode verifies an activation code. */
 func (user *User) VerifyActivationCode() (success bool, err error) {
 
-	selectCode := `
-		SELECT EXISTS (
-			SELECT true
-			FROM users
-			WHERE id = $2
-				AND (
-					activationcode = CRYPT($1, activationcode)
-					OR
-					activationcode IS NULL
-				)
-		) AS success
-	`
-	updateCode := `UPDATE users SET activationcode = null WHERE id = $1`
-
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		modelsLog.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
-	err = tx.Get(&success, selectCode, user.ActivationCode.String, user.ID)
+	err = tx.Get(&success, stmtSelectCode, user.ActivationCode.String, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to select activation code", "user", user, "error", err.Error())
 		tx.Rollback()
@@ -330,7 +319,7 @@ func (user *User) VerifyActivationCode() (success bool, err error) {
 		return
 	}
 
-	_, err = tx.Exec(updateCode, user.ID)
+	_, err = tx.Exec(stmtUpdateCode, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to update activation code", "user", user, "error", err.Error())
 		tx.Rollback()
@@ -344,17 +333,9 @@ func (user *User) VerifyActivationCode() (success bool, err error) {
 /*NewActivationCode creates a new activation code for an user. */
 func (user *User) NewActivationCode() (err error) {
 
-	updateCode := `
-		UPDATE users
-		SET activationcode = crypt($1, gen_salt('bf'))
-		WHERE id = $2
-		RETURNING
-			/* data to send notification e-mail containing the new code */
-			id, lastname, firstname, email, language, salutation
-	`
 	activationCode := generateCode()
 
-	err = app.Db.Get(user, updateCode, activationCode, user.ID)
+	err = app.Db.Get(user, stmtUpdateCodeReturningData, activationCode, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to update activation code", "user", user,
 			"activationCode", activationCode, "error", err.Error())
@@ -366,13 +347,6 @@ func (user *User) NewActivationCode() (err error) {
 /*SetPrefLanguage sets the preferred language of an user. */
 func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
 
-	updateLanguage := `
-		UPDATE users
-		SET language = $1
-		WHERE id = $2
-		RETURNING id
-	`
-
 	user.ID, err = strconv.Atoi(*userIDSession)
 	if err != nil {
 		modelsLog.Error("failed to parse userID from session",
@@ -380,7 +354,7 @@ func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
 		return
 	}
 
-	err = app.Db.Get(updateLanguage, user.Language.String, user.ID)
+	err = app.Db.Get(stmtUpdateLanguage, user.Language.String, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to update language", "userID", user.ID,
 			"language", user.Language, "error", err.Error())
@@ -391,17 +365,7 @@ func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
 /*ChangeRole of an user. */
 func (user *User) ChangeRole() (err error) {
 
-	updateRole := `
-		UPDATE users
-		SET role = $1
-		WHERE id = $2
-		RETURNING
-			/* data to send notification e-mail about the new role */
-			id, firstname, lastname, role, language,
-			academictitle, email, nameaffix, salutation, title
-	`
-
-	err = app.Db.Get(user, updateRole, user.Role, user.ID)
+	err = app.Db.Get(user, stmtUpdateRole, user.Role, user.ID)
 	if err != nil {
 		modelsLog.Error("failed to update user role", "userID", user.ID,
 			"role", user.Role, "error", err.Error())
@@ -518,5 +482,64 @@ const (
 			TO_CHAR (firstlogin AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as firstlogin
 		FROM users
 		WHERE id = $2
+	`
+
+	stmtSelectUser = `
+		SELECT id, email, firstname, lastname, salutation, title, academictitle, nameaffix
+		FROM users WHERE id = $1
+	`
+
+	stmtUpdatePassword = `
+		UPDATE users
+		SET password = crypt($1, gen_salt('bf'))
+		WHERE email = $2
+		RETURNING
+			/* data to send notification e-mail containing the new password */
+			id, lastname, firstname, email, language, salutation
+	`
+
+	stmtSelectCode = `
+		SELECT EXISTS (
+			SELECT true
+			FROM users
+			WHERE id = $2
+				AND (
+					activationcode = CRYPT($1, activationcode)
+					OR
+					activationcode IS NULL
+				)
+		) AS success
+	`
+
+	stmtUpdateCode = `
+		UPDATE users
+		SET activationcode = NULL
+		WHERE id = $1
+	`
+
+	stmtUpdateCodeReturningData = `
+		UPDATE users
+		SET activationcode = crypt($1, gen_salt('bf'))
+		WHERE id = $2
+		RETURNING
+			/* data to send notification e-mail containing the new code */
+			id, lastname, firstname, email, language, salutation
+	`
+
+	stmtUpdateLanguage = `
+		UPDATE users
+		SET language = $1
+		WHERE id = $2
+		RETURNING id
+	`
+
+	stmtUpdateRole = `
+		UPDATE users
+		SET role = $1
+		WHERE id = $2
+		RETURNING
+			/* data to send notification e-mail about the new role */
+			id, firstname, lastname, role, language,
+			academictitle, email, nameaffix, salutation, title
 	`
 )

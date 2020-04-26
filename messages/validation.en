@@ -45,11 +45,17 @@ validation.invalid.searchValue = The search value must be between 3 - 127 charac
 # COURSE
 # -------------------------------------------------------------------------------------------------- #
 
-validation.invalid.title = The course title must be between 6 - 511 characters long.
+validation.invalid.courseID = Please provide a valid course ID.
+validation.invalid.title = The course title must be between 3 - 511 characters long.
+validation.invalid.subtitle = The subtitle must be between 3 - 511 characters long.
+
+validation.invalid.date = Please provide a date between [now, 2200-01-01].
+validation.invalid.time = Please provide a time.
+validation.invalid.timestamp = Please provide a valid date and time.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.option = Please provide a valid option.
-validation.invalid.courseID = Please provide a valid course ID.
+validation.invalid.params = Please provide valid parameters.

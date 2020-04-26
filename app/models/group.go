@@ -29,7 +29,7 @@ type Group struct {
 	ChildHasLimits bool ``
 }
 
-/*Validate group fields of new and edited groups. */
+/*Validate Group fields. */
 func (group *Group) Validate(v *revel.Validation) {
 
 	v.Check(group.Name,
@@ -66,12 +66,6 @@ func (group *Group) Validate(v *revel.Validation) {
 /*Add a new group to the groups table. */
 func (group *Group) Add(userIDSession *string) (err error) {
 
-	insertGroup := `
-		INSERT INTO groups
-			(parentid, name, courselimit, lasteditor, lastedited)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, name
-	`
 	userID, err := strconv.Atoi(*userIDSession)
 	if err != nil {
 		modelsLog.Error("failed to parse userID from userIDSession",
@@ -79,7 +73,7 @@ func (group *Group) Add(userIDSession *string) (err error) {
 		return
 	}
 
-	err = app.Db.Get(group, insertGroup, group.ParentID, group.Name,
+	err = app.Db.Get(group, stmtInsertGroup, group.ParentID, group.Name,
 		group.CourseLimit, userID, time.Now().Format(revel.TimeFormats[0]))
 	if err != nil {
 		modelsLog.Error("failed to add group", "group", group, "userID",
@@ -91,13 +85,6 @@ func (group *Group) Add(userIDSession *string) (err error) {
 /*Edit a group of the groups table. */
 func (group *Group) Edit(userIDSession *string) (err error) {
 
-	updateGroup := `
-		UPDATE groups
-		SET name = $1, courselimit = $2, lasteditor = $3, lastedited = $4
-		WHERE id = $5
-			AND courseid IS NULL /* courses must be edited differently */
-		RETURNING id, name
-	`
 	userID, err := strconv.Atoi(*userIDSession)
 	if err != nil {
 		modelsLog.Error("failed to parse userID from userIDSession",
@@ -105,7 +92,7 @@ func (group *Group) Edit(userIDSession *string) (err error) {
 		return
 	}
 
-	err = app.Db.Get(group, updateGroup, group.Name, group.CourseLimit, userID,
+	err = app.Db.Get(group, stmtUpdateGroup, group.Name, group.CourseLimit, userID,
 		time.Now().Format(revel.TimeFormats[0]), group.ID)
 	if err != nil {
 		modelsLog.Error("failed to update group", "group", group, "userID",
@@ -117,31 +104,20 @@ func (group *Group) Edit(userIDSession *string) (err error) {
 /*Delete a group of the groups table. */
 func (group *Group) Delete() (err error) {
 
-	moveInactiveCourses := `
-		UPDATE groups
-		SET parentid = (
-			SELECT parentid FROM groups WHERE id = $1
-		) WHERE parentid = $1
-	`
-	deleteGroup := `
-		DELETE FROM groups
-		WHERE id = $1
-			AND courseid IS NULL
-	`
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		modelsLog.Error("failed to begin tx", "error", err.Error())
-		return err
+		return
 	}
 
-	_, err = tx.Exec(moveInactiveCourses, group.ID)
+	_, err = tx.Exec(stmtMoveInactiveCourses, group.ID)
 	if err != nil {
 		modelsLog.Error("failed to move inactive courses", "group", group, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	_, err = tx.Exec(deleteGroup, group.ID)
+	_, err = tx.Exec(stmtDeleteGroup, group.ID)
 	if err != nil {
 		modelsLog.Error("failed to delete group", "group", group, "error", err.Error())
 		tx.Rollback()
@@ -152,18 +128,11 @@ func (group *Group) Delete() (err error) {
 	return
 }
 
-/*Groups contains all groups of the groups table. */
+/*Groups holds all groups of the groups table. */
 type Groups []Group
 
 /*Get all groups. */
 func (groups *Groups) Get(prefix *string) (err error) {
-
-	getRootGroups := `
-    SELECT id, parentid, courseid, name, courselimit
-    FROM groups
-    WHERE parentid IS NULL
-		ORDER BY name ASC
-  `
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -172,7 +141,7 @@ func (groups *Groups) Get(prefix *string) (err error) {
 	}
 
 	//get root groups for recursive calls
-	err = tx.Select(groups, getRootGroups)
+	err = tx.Select(groups, stmtGetRootGroups)
 	if err != nil {
 		modelsLog.Error("failed to get root groups", "error", err.Error())
 		tx.Rollback()
@@ -200,19 +169,10 @@ func (groups *Groups) Get(prefix *string) (err error) {
 	return
 }
 
-/*GetByUser gets all groups created by a provided user. */
+/*GetByUser gets all groups created by a user. */
 func (groups *Groups) GetByUser(userID *int, tx *sqlx.Tx) (err error) {
 
-	selectGroups := `
-		SELECT
-			id, parentid, name, courselimit,
-			TO_CHAR (lastedited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastedited
-		FROM groups
-		WHERE lasteditor = $2
-			AND courseid IS NULL
-		ORDER BY name ASC
-	`
-	err = tx.Select(groups, selectGroups, app.TimeZone, *userID)
+	err = tx.Select(groups, stmtSelectGroups, app.TimeZone, *userID)
 	if err != nil {
 		modelsLog.Error("failed to get groups", "error", err.Error())
 		tx.Rollback()
@@ -423,5 +383,50 @@ const (
 		SELECT id, parentid, courseid, name, courselimit
 		FROM groups
 		WHERE parentid = $1
+	`
+
+	stmtInsertGroup = `
+		INSERT INTO groups
+			(parentid, name, courselimit, lasteditor, lastedited)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, name
+	`
+
+	stmtUpdateGroup = `
+		UPDATE groups
+		SET name = $1, courselimit = $2, lasteditor = $3, lastedited = $4
+		WHERE id = $5
+			AND courseid IS NULL /* courses must be edited differently */
+		RETURNING id, name
+	`
+
+	stmtMoveInactiveCourses = `
+		UPDATE groups
+		SET parentid = (
+			SELECT parentid FROM groups WHERE id = $1
+		) WHERE parentid = $1
+	`
+
+	stmtDeleteGroup = `
+		DELETE FROM groups
+		WHERE id = $1
+			AND courseid IS NULL
+	`
+
+	stmtGetRootGroups = `
+		SELECT id, parentid, courseid, name, courselimit
+		FROM groups
+		WHERE parentid IS NULL
+		ORDER BY name ASC
+	`
+
+	stmtSelectGroups = `
+		SELECT
+			id, parentid, name, courselimit,
+			TO_CHAR (lastedited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastedited
+		FROM groups
+		WHERE lasteditor = $2
+			AND courseid IS NULL
+		ORDER BY name ASC
 	`
 )

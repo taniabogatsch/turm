@@ -12,7 +12,12 @@ type User struct {
 	*revel.Controller
 }
 
-/*Creator implements logic to CRUD data for creator functions. */
+/*EditCourse implements logic to edit course data. */
+type EditCourse struct {
+	*revel.Controller
+}
+
+/*Creator implements logic to manage courses. */
 type Creator struct {
 	*revel.Controller
 }

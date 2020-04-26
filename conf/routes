@@ -7,55 +7,69 @@ module:jobs
 
 # ------------------------------- App routes. -------------------------------- #
 
-GET     /                                       App.Index
-GET     /app/changeLanguage                     App.ChangeLanguage
-GET     /app/groups                             App.Groups
+GET     /                                           App.Index
+GET     /app/changeLanguage                         App.ChangeLanguage
+GET     /app/groups                                 App.Groups
 
 # ------------------------------- User routes. -------------------------------- #
 
-GET     /user/loginPage                         User.LoginPage
-POST    /user/login                             User.Login
-GET     /user/logout                            User.Logout
+GET     /user/loginPage                             User.LoginPage
+POST    /user/login                                 User.Login
+GET     /user/logout                                User.Logout
 
-GET     /user/registrationPage                  User.RegistrationPage
-POST    /user/registration                      User.Registration
+GET     /user/registrationPage                      User.RegistrationPage
+POST    /user/registration                          User.Registration
 
-GET     /user/newPasswordPage                   User.NewPasswordPage
-POST    /user/newPassword                       User.NewPassword
+GET     /user/newPasswordPage                       User.NewPasswordPage
+POST    /user/newPassword                           User.NewPassword
 
-GET     /user/activationPage                    User.ActivationPage
-GET     /user/verifyActivationCode              User.VerifyActivationCode
-GET     /user/newActivationCode                 User.NewActivationCode
+GET     /user/activationPage                        User.ActivationPage
+GET     /user/verifyActivationCode                  User.VerifyActivationCode
+GET     /user/newActivationCode                     User.NewActivationCode
 
-GET     /user/prefLanguagePage                  User.PrefLanguagePage
-POST    /user/setPrefLanguage                   User.SetPrefLanguage
+GET     /user/prefLanguagePage                      User.PrefLanguagePage
+POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
 # ------------------------------- Creator routes. -------------------------------- #
 
-GET     /creator/activeCourses                  Creator.ActiveCourses
-GET     /creator/drafts                         Creator.Drafts
-GET     /creator/openCourse                     Creator.OpenCourse
+GET     /creator/activeCourses                      Creator.ActiveCourses
+GET     /creator/drafts                             Creator.Drafts
+GET     /creator/searchUser                         Creator.SearchUser
 
-POST    /creator/newCourse                      Creator.NewCourse
-GET     /creator/newCourseModal                 Creator.NewCourseModal
-GET     /creator/getDrafts                      Creator.GetDrafts
+POST    /creator/newCourse                          Creator.NewCourse
+GET     /creator/newCourseModal                     Creator.NewCourseModal
+GET     /creator/getDrafts                          Creator.GetDrafts
+
+# ------------------------------- Edit course routes. -------------------------------- #
+
+GET     /editCourse/openCourse                      EditCourse.OpenCourse
+
+POST    /editCourse/modals/changeTitle              EditCourse.ChangeTitle
+POST    /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
+POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
+POST    /editCourse/modals/changeUnsubscribeEnd     EditCourse.ChangeUnsubscribeEnd
+
+GET     /editCourse/modals/changeTitle              EditCourse.ChangeTitle
+GET     /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
+GET     /editCourse/modals/changeUserList           EditCourse.ChangeUserList
+GET     /editCourse/modals/changeUnsubscribeEnd     EditCourse.ChangeUnsubscribeEnd
 
 # ------------------------------- Admin routes. -------------------------------- #
 
-GET     /admin/userManagement                   Admin.UserManagement
-GET     /admin/roleManagement                   Admin.RoleManagement
-GET     /admin/dashboard                        Admin.Dashboard
+GET     /admin/userManagement                       Admin.UserManagement
+GET     /admin/roleManagement                       Admin.RoleManagement
+GET     /admin/dashboard                            Admin.Dashboard
 
-POST    /admin/addGroup                         Admin.AddGroup
-POST    /admin/editGroup                        Admin.EditGroup
-POST    /admin/deleteGroup                      Admin.DeleteGroup
+POST    /admin/addGroup                             Admin.AddGroup
+POST    /admin/editGroup                            Admin.EditGroup
+POST    /admin/deleteGroup                          Admin.DeleteGroup
 
-GET     /admin/searchUser                       Admin.SearchUser
-GET     /admin/userDetails                      Admin.UserDetails
-POST    /admin/changeRole                       Admin.ChangeRole
+GET     /admin/searchUser                           Admin.SearchUser
+GET     /admin/userDetails                          Admin.UserDetails
+POST    /admin/changeRole                           Admin.ChangeRole
 
 # Ignore favicon requests
-GET     /favicon.ico                            404
+GET     /favicon.ico                                404
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/*filepath                       Static.Serve("public")

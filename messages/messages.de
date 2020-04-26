@@ -53,6 +53,7 @@ error.undefined = Es ist ein Fehler aufgetreten. %(error.support)s
 user.role = Rolle
 user.role.admin = Admin
 user.role.creator = KursverantwortlicheR
+user.role.editor = EditorIn
 user.role.instructors = OrganisatorInnen
 user.role.user = NutzerIn
 
@@ -62,6 +63,7 @@ user.creators = Kursverantwortliche
 user.ldap = Uni Account
 user.external = Externer Account
 user.matr.nr = Matrikelnummer
+user.matr.nrs = Matrikelnummern
 user.affiliation = Zugehörigkeit
 
 user.name = Name
@@ -88,8 +90,8 @@ user.details = Nutzerdetails
 # EMAIL
 # -------------------------------------------------------------------------------------------------- #
 
-email.ms = Sehr geehrte Frau
-email.mr = Sehr geehrter Herr
+email.dear.ms = Sehr geehrte Frau
+email.dear.mr = Sehr geehrter Herr
 email.none = Hallo
 
 email.regards.plain = Mit freundlichen Grüßen
@@ -236,13 +238,25 @@ admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
 # -------------------------------------------------------------------------------------------------- #
 
 course.title = Kurstitel
+course.subtitle = Untertitel
 course.fee = Teilnahmegebühr
 
 course.clock = Uhr
 course.from = Von
 course.to = bis
 course.enrollment.period = Einschreibezeitraum
-course.enrollment.unsubscribe.end = Austragen bis
+course.unsubscribe.end = Austragen bis
+
+course.title.change.success = Kurstitel zu '%s' geändert, Kurs ID = %d.
+course.subtitle.change.success = Untertitel zu '%s' geändert, Kurs ID = %d.
+course.subtitle.delete.success = Untertitel gelöscht, Kurs ID = %d.
+course.unsubscribe.end.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
+course.unsubscribe.end.delete.success = Austragen bis gelöscht, Kurs ID = %d.
+
+course.editor.change.success = EditorIn hinzugefügt: %s, Kurs ID = %d.
+course.instructor.change.success = OrganisatorIn hinzugefügt: %s, Kurs ID = %d.
+course.whitelist.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.
+course.blacklist.change.success = NutzerIn zu Blacklist hinzugefügt: %s, Kurs ID = %d.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
@@ -251,6 +265,7 @@ course.enrollment.unsubscribe.end = Austragen bis
 creator.tab = Kursverwaltung
 creator.page = Kursverwaltung
 
+creator.course.is.open = Kurs geöffnet
 creator.course.open = Kurs öffnen
 creator.course.new = Neuer Kurs
 creator.drafts = Entwürfe
@@ -264,5 +279,12 @@ creator.course.draft = Aus Kursen
 creator.course.upload = Kursvorlage hochladen
 
 creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
+creator.unsubscribe.end.info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
 
 creator.new.blank.success = Neuer leerer Kurs erstellt, ID = %d.
+
+creator.add.subtitle = + &nbsp; Untertitel
+creator.add.instructor = + &nbsp; OrganisatorIn
+creator.add.editor = + &nbsp; EditorIn
+creator.add.unsubscribe.end = + &nbsp; Austragen bis
+creator.add.fee = + &nbsp; Teilnahmegebühr

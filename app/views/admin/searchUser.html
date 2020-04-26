@@ -22,14 +22,7 @@
     {{range .users}}
       <tr>
         <td>
-          {{if eq .Salutation 0}}
-            {{msg $ "user.salutation.none"}}
-          {{else if eq .Salutation 1}}
-            {{msg $ "user.salutation.mr"}}
-          {{else if eq .Salutation 2}}
-            {{msg $ "user.salutation.ms"}}
-          {{end}}
-          {{.FirstName}} {{.LastName}}
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
         </td>
         <td> {{.EMail}} </td>
         <td> {{.LastLogin}} </td>

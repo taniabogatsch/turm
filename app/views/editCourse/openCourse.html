@@ -7,14 +7,10 @@
 <div class="page page-middle">
   <div class="tab-content">
 
-    <h4>
-      {{template "icons/folder.html" . }}
-      &nbsp; {{.course.Title}}
-    </h4>
-    <hr>
-
-    <!-- TODO: pass on session -->
     {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+
+    <!-- load all modals responsible for changing content -->
+    {{template "editCourse/loadModals.html" dict_addLocale $.currentLocale "course" .course}}
 
   </div>
 </div>

@@ -2,7 +2,7 @@ package models
 
 import "github.com/revel/revel"
 
-/*Restriction contains all data about an enrollment restriction of a course. */
+/*Restriction is a model of the restriction table. */
 type Restriction struct {
 	ID                int `db:"id, primarykey, autoincrement"`
 	CourseID          int `db:"courseid"`
@@ -11,7 +11,7 @@ type Restriction struct {
 	CourseOfStudiesID int `db:"courseofstudiesid"`
 }
 
-/*Validate validates the Restriction struct fields. */
+/*Validate Restriction fields. */
 func (restriction *Restriction) Validate(v *revel.Validation) {
 	//TODO
 }

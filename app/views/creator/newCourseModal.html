@@ -16,7 +16,7 @@
   <div class="modal-body">
     <!-- title -->
     <small class="form-text text-muted">
-      {{msg $ "creator.course.title.working"}}
+      {{msg $ "creator.title.working.info"}}
     </small>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
@@ -24,7 +24,7 @@
           {{template "icons/pencil.html" .}}
         </span>
       </div>
-      <input type="text" class="form-control rounded-right" name="param.Title" placeholder='{{msg $ "course.title"}}' required minlength="3" maxlength="255">
+      <input type="text" class="form-control rounded-right" name="param.Title" placeholder='{{msg $ "course.title"}}' required minlength="3" maxlength="511">
       <div class="invalid-feedback">
         {{msg $ "validation.invalid.title"}}
       </div>
