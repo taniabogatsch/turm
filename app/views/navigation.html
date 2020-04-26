@@ -65,8 +65,14 @@
         </div>
       </li>
 
-      <li class="nav-item active">
-        <a class="nav-link" href='{{url "Admin.Index"}}'>
+      <li class="nav-item active display-none admin creator editor instructor">
+        <a class="nav-link" href='{{url "Creator.ActiveCourses"}}'>
+          {{msg $ "creator.tab"}}
+        </a>
+      </li>
+
+      <li class="nav-item active display-none admin">
+        <a class="nav-link" href='{{url "Admin.UserManagement"}}'>
           {{msg $ "admin.tab"}}
         </a>
       </li>
@@ -127,14 +133,6 @@
 
       <!-- modal body -->
       <div class="modal-body">
-        {{if .session.role}}
-          {{if eq .session.role "admin"}}
-            <div class="warning-feedback">
-              {{msg $ "admin.groups.use.index"}}
-            </div>
-            <br>
-          {{end}}
-        {{end}}
         <!-- content is loaded into this div -->
         <div id="nav-groups-modal-content">
         </div>
@@ -150,12 +148,11 @@
   </div>
 </div>
 
-<script>
-  function openGroupsNav() {
-    getGroups("nav", '#nav-groups-modal-content');
-    $('#nav-groups-modal').modal('show');
-  }
-</script>
+{{if $.session.userID}}
+  {{if eq $.session.role "admin"}}
+    {{template "admin/groups.html" .}}
+  {{end}}
+{{end}}
 
 <br>
 <br>

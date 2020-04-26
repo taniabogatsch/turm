@@ -12,7 +12,17 @@ type User struct {
 	*revel.Controller
 }
 
-/*Admin implements logic to CRUD dadta for admin functions. */
+/*EditCourse implements logic to edit course data. */
+type EditCourse struct {
+	*revel.Controller
+}
+
+/*Creator implements logic to manage courses. */
+type Creator struct {
+	*revel.Controller
+}
+
+/*Admin implements logic to CRUD data for admin functions. */
 type Admin struct {
 	*revel.Controller
 }

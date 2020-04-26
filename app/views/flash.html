@@ -1,15 +1,11 @@
 <script>
-	{{if .flash.error}}
-		$(document).ready(function(){
-			showErrorToast('{{.flash.error}}');
-		});
-	{{end}}
-
-	{{if .flash.success}}
-		$(document).ready(function(){
+	$(function(){
+		{{if .flash.success}}
 			showSuccessToast('{{.flash.success}}');
-		});
-	{{end}}
+		{{else if .flash.error}}
+			showErrorToast('{{.flash.error}}');
+		{{end}}
+	});
 </script>
 
 <div id="flash-errors" class="display-none">

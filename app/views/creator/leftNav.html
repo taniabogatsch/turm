@@ -1,0 +1,67 @@
+<!-- navigate to the different pages for course management -->
+
+<div class="page page-side page-side-left">
+  <h4>
+    {{msg $ "creator.page"}}
+  </h4>
+  <hr>
+  <div class="login-width">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator" id="v-pills-new-tab" href='#' onclick="showNewCourseModal();" role="tab">
+        {{template "icons/folderPlus.html" . }}
+        &nbsp; {{msg $ "creator.course.new"}}
+      </a>
+      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-new-tab" href='#' role="tab">
+        {{template "icons/folder.html" . }}
+        &nbsp; {{msg $ "creator.course.open"}}
+      </a>
+
+      <a class="dropdown-divider display-none admin creator editor"></a>
+
+      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-drafts-tab" href='{{url "Creator.Drafts"}}' role="tab">
+        {{template "icons/paperclip.html" . }}
+        &nbsp; {{msg $ "creator.drafts"}}
+      </a>
+
+      <a class="dropdown-divider display-none admin creator editor"></a>
+
+      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-active-tab" href='{{url "Creator.ActiveCourses"}}' role="tab">
+        {{template "icons/layoutTextSidebarReversed.html" . }}
+        &nbsp; {{msg $ "creator.courses.active"}}
+      </a>
+      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-inactive-tab" href='#' role="tab">
+        {{template "icons/archive.html" . }}
+        &nbsp; {{msg $ "creator.courses.expired"}}
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- new course modal -->
+<div class="modal fade" id="new-course-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <!-- content is loaded into this div -->
+    <div class="modal-content" id="new-course-modal-content">
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function showNewCourseModal() {
+    $.get("{{url "Creator.NewCourseModal"}}", {
+    }, function(data) {
+      $('#new-course-modal-content').html(data);
+    });
+    $('#new-course-modal').modal('show');
+  }
+
+  $(function() {
+    //detect validation error
+    if ({{if .errors}}true{{else}}false{{end}}) {
+      showErrorToast($('#flash-errors').html());
+    }
+  });
+</script>

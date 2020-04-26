@@ -30,7 +30,7 @@
                 {{template "icons/pencil.html" .}}
               </span>
             </div>
-            <input id="input-name" type="text" class="form-control" name="group.Name" value="" placeholder='{{msg $ "group.name"}}' minlength="3" maxlength="255">
+            <input id="input-name" type="text" class="form-control" name="group.Name" value="" placeholder='{{msg $ "group.name"}}' required minlength="3" maxlength="255">
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.groupName"}}
             </div>

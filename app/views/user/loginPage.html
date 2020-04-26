@@ -109,57 +109,59 @@
 <div id="stayLoggedIn-flash" class="display-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>
 
 <script>
-  //adjust input fields when switching tabs
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    if ($(e.target).attr('id') == "ldap") {
-      $("#input-icon").html($("#icon-person").html());
-      $("#input-user").attr("name", "credentials.Username");
-      $("#input-user").attr("placeholder", '{{msg $ "user.username"}}');
-      $("#input-user").attr("type", "text");
-      $("#input-user-validation").html('{{msg $ "validation.invalid.username"}}');
-      if ($('#loginForm').attr("class") == "needs-validation was-validated") {
-        $("#input-user-validation").hide();
-      }
-      document.getElementById("loginForm").classList.remove('was-validated');
-    } else {
-      $("#input-icon").html($("#icon-email").html());
-      $("#input-user").attr("name", "credentials.EMail");
-      $("#input-user").attr("placeholder", '{{msg $ "user.email"}}');
-      $("#input-user").attr("type", "email");
-      $("#input-user-validation").html('{{msg $ "validation.invalid.email"}}');
-      if ($('#loginForm').attr("class") == "needs-validation was-validated") {
-        $("#input-user-validation").show();
-      }
-      document.getElementById("loginForm").classList.remove('was-validated');
+  $(function() {
+    //detect validation error
+    if ({{if .errors}}true{{else}}false{{end}}) {
+      showErrorToast($('#flash-errors').html());
     }
 
-    $("#input-user").focus();
+    //fill the form with flash values
+    const username = $("#username-flash").html();
+    if (username != "") {
+      $("#input-user").attr("value", username);
+      $("#ldap").click();
+    }
+    const email = $("#email-flash").html();
+    if (email != "") {
+      $("#input-user").attr("value", email);
+      $("#external").click();
+    }
+    const stayLoggedIn = $("#stayLoggedIn-flash").html();
+    if (email != "" || username != "") {
+      if (stayLoggedIn == 'true') {
+        $('#stayLoggedIn-checkbox').prop('checked', true);
+      } else {
+        $('#stayLoggedIn-checkbox').prop('checked', false);
+      }
+    }
+
+    //adjust input fields when switching tabs
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+      if ($(e.target).attr('id') == "ldap") {
+        $("#input-icon").html($("#icon-person").html());
+        $("#input-user").attr("name", "credentials.Username");
+        $("#input-user").attr("placeholder", '{{msg $ "user.username"}}');
+        $("#input-user").attr("type", "text");
+        $("#input-user-validation").html('{{msg $ "validation.invalid.username"}}');
+        if ($('#loginForm').attr("class") == "needs-validation was-validated") {
+          $("#input-user-validation").hide();
+        }
+        document.getElementById("loginForm").classList.remove('was-validated');
+      } else {
+        $("#input-icon").html($("#icon-email").html());
+        $("#input-user").attr("name", "credentials.EMail");
+        $("#input-user").attr("placeholder", '{{msg $ "user.email"}}');
+        $("#input-user").attr("type", "email");
+        $("#input-user-validation").html('{{msg $ "validation.invalid.email"}}');
+        if ($('#loginForm').attr("class") == "needs-validation was-validated") {
+          $("#input-user-validation").show();
+        }
+        document.getElementById("loginForm").classList.remove('was-validated');
+      }
+
+      $("#input-user").focus();
+    });
   });
-
-  //fill the form with flash values
-  const username = $("#username-flash").html();
-  if (username != "") {
-    $("#input-user").attr("value", username);
-    $("#ldap").click();
-  }
-  const email = $("#email-flash").html();
-  if (email != "") {
-    $("#input-user").attr("value", email);
-    $("#external").click();
-  }
-  const stayLoggedIn = $("#stayLoggedIn-flash").html();
-  if (email != "" || username != "") {
-    if (stayLoggedIn == 'true') {
-      $('#stayLoggedIn-checkbox').prop('checked', true);
-    } else {
-      $('#stayLoggedIn-checkbox').prop('checked', false);
-    }
-  }
-
-  //detect validation error
-  if ({{if .errors}}true{{else}}false{{end}}) {
-    showErrorToast($('#flash-errors').html());
-  }
 </script>
 
 {{template "footer.html" .}}

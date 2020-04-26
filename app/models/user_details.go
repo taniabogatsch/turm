@@ -2,7 +2,7 @@ package models
 
 import "turm/app"
 
-/*UserDetails contains all data related to this user. */
+/*UserDetails holds detailed data related to a user. */
 type UserDetails struct {
 	User User
 
@@ -13,8 +13,14 @@ type UserDetails struct {
 	Enrollments       []Enrolled
 	FormerEnrollments []Unsubscribed
 
-	//all courses created by this user
-	Courses []Course
+	//all courses in which the user was directly involved
+	CreatedCourses []Course
+	EditorOf       []Course
+	InstructorOf   []Course
+
+	//all courses of which the user was on the whitelist/blacklist
+	OnWhitelist []Course
+	OnBlacklist []Course
 
 	//all categories, faqs and news created by this user
 	Categories []Category
@@ -28,7 +34,7 @@ func (user *UserDetails) Get() (err error) {
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		modelsLog.Error("failed to begin tx", "error", err.Error())
-		return err
+		return
 	}
 
 	//get user

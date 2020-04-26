@@ -1,0 +1,190 @@
+<!-- course shows all course information -->
+
+<!-- general course information -->
+<table class="table table-borderless">
+
+  <!-- title -->
+  <tr>
+    <td colspan="2">
+      <h4>
+        {{.course.Title}}
+        <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-title-modal">
+          {{template "icons/pencil.html" . }}
+        </a>
+      </h4>
+    </td>
+  </tr>
+
+  <!-- subtitle -->
+  {{if .course.Subtitle.Valid}}
+    <tr>
+      <td colspan="2">
+        <h5>
+          {{.course.Subtitle.String}}
+          <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-subtitle-modal">
+            {{template "icons/pencil.html" . }}
+          </a>
+          <a href='{{url "EditCourse.ChangeSubtitle" .course.ID}}' class="badge btn-outline-darkblue preview-hide">
+            {{template "icons/trash.html" . }}
+          </a>
+        </h5>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td colspan="2">
+        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-subtitle-modal">
+          {{msg $ "creator.add.subtitle"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- course creator -->
+  <tr>
+    <td class="text-muted">
+      {{msg $ "user.role.creator"}}:
+    </td>
+    <td>
+      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .course.CreatorData}} |
+      <a href="mailto:{{.course.CreatorData.EMail}}" target="_top">
+        {{template "icons/envelope.html" .}}
+        {{.course.CreatorData.EMail}}
+      </a>
+    </td>
+  </tr>
+
+  <!-- course editors and instructors -->
+  {{if or .course.Editors .course.Instructors}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "user.role.instructors"}}:
+      </td>
+      <td>
+        {{range $key, $user := .course.Editors}}
+          {{if ne $key 0}}<br>{{end}}
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+          <a href="mailto:{{.EMail}}" target="_top">
+            {{template "icons/envelope.html" .}}
+            {{.EMail}}
+          </a>
+          <div class="preview-hide text-muted">
+            {{msg $ "user.role.editor"}}
+            |
+            {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
+            <a href="#" class="badge btn-outline-darkblue">
+              {{template "icons/pencil.html" . }} <!-- TODO -->
+            </a>
+            |
+            <a href="#" class="badge btn-outline-darkblue">
+              {{template "icons/trash.html" . }} <!-- TODO -->
+            </a>
+          </div>
+        {{end}}
+        {{range $key, $user := .course.Instructors}}
+          {{if $.course.Editors}}<br>{{else if ne $key 0}}<br>{{end}}
+          <!-- TODO -->
+        {{end}}
+      </td>
+    </tr>
+  {{end}}
+  <tr class="preview-hide">
+    <td></td>
+    <td>
+      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-editors-modal">
+        {{msg $ "creator.add.editor"}}
+      </button>
+      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-instructors-modal">
+        {{msg $ "creator.add.instructor"}} <!-- TODO -->
+      </button>
+    </td>
+  </tr>
+
+  <!-- registration period -->
+  <tr>
+    <td class="text-muted">
+      {{msg $ "course.enrollment.period"}}:
+    </td>
+    <td>
+      {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}} <br>
+      {{msg $ "course.to"}} {{.course.EnrollmentEnd}} {{msg $ "course.clock"}}
+      <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-enrollment-period-modal">
+        {{template "icons/pencil.html" . }} <!-- TODO -->
+      </a>
+    </td>
+  </tr>
+
+  <!-- if the course has a time up to which users can unsubscribe -->
+  {{if .course.UnsubscribeEnd.Valid}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "course.unsubscribe.end"}}:
+      </td>
+      <td>
+        {{.course.UnsubscribeEnd.String}} {{msg $ "course.clock"}}
+        <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-unsubscribe-end-modal">
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href='{{url "EditCourse.ChangeUnsubscribeEnd" .course.ID}}' class="badge btn-outline-darkblue preview-hide">
+          {{template "icons/trash.html" . }}
+        </a>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-unsubscribe-end-modal">
+          {{msg $ "creator.add.unsubscribe.end"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- TODO: only show expiration date at course management page -->
+
+  <!-- show fee if there is one -->
+  {{if .course.Fee.Valid}}
+    <tr>
+       <td class="text-muted">
+         {{msg $ "course.fee"}}:
+       </td>
+       <td>
+         {{.course.Fee.Float64}}€
+         <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-fee-modal">
+           {{template "icons/pencil.html" . }} <!-- TODO -->
+         </a>
+         <a href='#' class="badge btn-outline-darkblue preview-hide">
+           {{template "icons/trash.html" . }} <!-- TODO -->
+         </a>
+       </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <!-- TODO -->
+        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-fee-modal">
+          {{msg $ "creator.add.fee"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+</table>
+
+<script>
+  function showPreview() {
+    $(".preview-hide").each(function() {
+      $(this).addClass("display-none");
+    });
+    $('#preview-btn').attr("onclick", "hidePreview();");
+    $('#preview-btn').html("Edit");
+  }
+  function hidePreview() {
+    $(".preview-hide").each(function() {
+      $(this).removeClass("display-none");
+    });
+    $('#preview-btn').attr("onclick", "showPreview();");
+    $('#preview-btn').html("Preview");
+  }
+</script>

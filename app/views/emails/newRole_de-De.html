@@ -1,6 +1,6 @@
 {{template "emails/components/MIMETop.html" .}}
 
-{{template "emails/components/salutation.html" .}}
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
 Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet
 {{if eq .data.User.Role 0}}
@@ -18,7 +18,7 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 {{template "emails/components/MIMEMiddle.html" .}}
 
 <body>
-{{template "emails/components/salutation.html" .}}
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 <br>
 <br>
 Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet

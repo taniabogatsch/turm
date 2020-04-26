@@ -54,6 +54,7 @@ CREATE TABLE course (
   onlyldap            boolean                   NOT NULL,
   creationdate        timestamp with time zone  NOT NULL,
   description         text,
+  speaker             text,
   fee                 real,
   customemail         text,
   enrolllimitevents   integer,

@@ -40,3 +40,22 @@ validation.invalid.groupID = Bitte geben Sie eine gültige Gruppen ID an. Gruppe
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.searchValue = Der Suchwert muss aus 3 bis 127 Zeichen bestehen.
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.courseID = Bitte geben Sie eine gültige Kurs ID an.
+validation.invalid.title = Der Kurstitel muss aus 3 bis 511 Zeichen bestehen.
+validation.invalid.subtitle = Der Untertitel muss aus 3 bis 511 Zeichen bestehen.
+
+validation.invalid.date = Bitte geben Sie ein Datum zwischen [jetzt, 2200-01-01] an.
+validation.invalid.time = Bitte geben Sie eine Zeit an.
+validation.invalid.timestamp = Bitte geben Sie ein gültiges Datum und eine Uhrzeit an.
+
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+validation.invalid.option = Bitte geben Sie eine gültige Option an.
+validation.invalid.params = Bitte geben Sie gültige Parameter an.

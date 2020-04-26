@@ -1,0 +1,35 @@
+<!-- this template contains all inactive courses either created by the user or of whom he is an editor -->
+
+<h5>
+  Creator of
+</h5>
+
+<ul class="list-group">
+  {{range .created}}
+    <li class="list-group-item">
+      <!-- edit -->
+      <a class="btn btn-outline-darkblue float-right" href='{{url "EditCourse.OpenCourse" .ID ""}}' role="button">
+        {{template "icons/pencil.html" . }}
+      </a>
+      <!-- TODO: download -->
+      <a class="btn btn-outline-darkblue float-right margin-right-20" href='#' role="button">
+        {{template "icons/download.html" . }}
+      </a>
+      <!-- TODO: manage users -->
+      <a class="btn btn-outline-darkblue float-right margin-right-20" href='#' role="button">
+        {{template "icons/people.html" . }}
+      </a>
+      {{.Title}}
+      <small class="form-text text-muted">
+        {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+      </small>
+    </li>
+  {{end}}
+</ul>
+
+<br>
+<h5>
+  Editor of
+</h5>
+
+<!-- TODO -->

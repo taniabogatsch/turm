@@ -1,0 +1,43 @@
+<!-- template containing the new course creation -->
+
+{{template "header.html" .}}
+
+{{template "creator/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      {{template "icons/folder.html" . }}
+      &nbsp; {{msg $ "creator.course.is.open"}}
+
+      <button type="button" class="btn btn-outline-darkblue float-right">
+        {{template "icons/trash.html"}}
+      </button>
+      <button type="button" class="btn btn-outline-darkblue float-right margin-right-20">
+        Activate
+      </button>
+      <button type="button" class="btn btn-outline-darkblue float-right margin-right-20">
+        Validate
+      </button>
+      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-right margin-right-20" onclick="showPreview();">
+        Preview
+      </button>
+    </h4>
+    <hr>
+
+    {{if .errMsg}}
+      <div class="warning-feedback color-danger">
+        {{.errMsg}}
+      </div>
+    {{else}}
+      {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+      <!-- load all modals responsible for changing content -->
+      {{template "editCourse/loadModals.html" dict_addLocale $.currentLocale "course" .course}}
+    {{end}}
+  </div>
+</div>
+
+{{template "creator/rightNav.html" . }}
+
+{{template "footer.html" .}}

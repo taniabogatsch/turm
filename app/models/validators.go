@@ -4,6 +4,7 @@ package models
 
 import (
 	"fmt"
+	"time"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -92,4 +93,28 @@ func (v NotUnique) IsSatisfied(i interface{}) bool {
 /*DefaultMessage returns the default message of NotUnique. */
 func (v NotUnique) DefaultMessage() string {
 	return fmt.Sprintln("Please provide a non-unique value.")
+}
+
+/*IsTimestamp validates if a value can be parsed to a timestamp. */
+type IsTimestamp struct{}
+
+/*IsSatisfied implements the validation result of IsTimestamp. */
+func (v IsTimestamp) IsSatisfied(i interface{}) bool {
+
+	timestamp, parsed := i.(string)
+	if !parsed {
+		return false
+	}
+
+	loc, _ := time.LoadLocation(app.TimeZone)
+	_, err := time.ParseInLocation("2006-01-02 15:04", timestamp, loc)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+/*DefaultMessage returns the default message of IsTimestamp. */
+func (v IsTimestamp) DefaultMessage() string {
+	return fmt.Sprintln("Please provide a valid date and time format.")
 }

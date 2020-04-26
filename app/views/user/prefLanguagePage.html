@@ -45,10 +45,12 @@
 </div>
 
 <script>
-  //detect validation error
-  if ({{if .errors}}true{{else}}false{{end}}) {
-    showErrorToast($('#flash-errors').html());
-  }
+  $(function() {
+    //detect validation error
+    if ({{if .errors}}true{{else}}false{{end}}) {
+      showErrorToast($('#flash-errors').html());
+    }
+  });
 </script>
 
 {{template "footer.html" .}}

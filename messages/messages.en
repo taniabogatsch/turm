@@ -11,6 +11,8 @@ toast.success = Success
 
 language.change.success = Set the page language to '%s'.
 
+intercept.invalid.action = You are not authorized for this action.
+
 # -------------------------------------------------------------------------------------------------- #
 # BUTTON
 # -------------------------------------------------------------------------------------------------- #
@@ -18,6 +20,7 @@ language.change.success = Set the page language to '%s'.
 button.search = Search
 button.send = Send
 button.save = Save
+button.load = Load
 
 button.login = Login
 button.logout = Logout
@@ -52,6 +55,8 @@ error.undefined = Application error. %(error.support)s
 user.role = Role
 user.role.admin = Admin
 user.role.creator = Creator
+user.role.editor = Editor
+user.role.instructors = Instructors
 user.role.user = User
 
 user.admins = Admins
@@ -60,6 +65,7 @@ user.creators = Creators
 user.ldap = University account
 user.external = External account
 user.matr.nr = Matriculation number
+user.matr.nrs = Matriculation numbers
 user.affiliation = Affiliation
 
 user.name = Name
@@ -86,8 +92,8 @@ user.details = User details
 # EMAIL
 # -------------------------------------------------------------------------------------------------- #
 
-email.ms = Dear Ms.
-email.mr = Dear Mr.
+email.dear.ms = Dear Ms.
+email.dear.mr = Dear Mr.
 email.none = Hello
 
 email.regards.plain = Sincerely
@@ -228,4 +234,59 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
-admin.groups.use.index = Please use the index page to manage groups.
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE
+# -------------------------------------------------------------------------------------------------- #
+
+course.title = Course title
+course.subtitle = Subtitle
+course.fee = Fee
+
+course.clock =
+course.from = From
+course.to = to
+course.enrollment.period = Enrollment period
+course.unsubscribe.end = Unsubscribe end
+
+course.title.change.success = Changed course title to '%s', course ID = %d.
+course.subtitle.change.success = Changed subtitle to '%s', course ID = %d.
+course.subtitle.delete.success = Deleted subtitle, course ID = %d.
+course.unsubscribe.end.change.success = Set unsubscribe end to %s, course ID = %d.
+course.unsubscribe.end.delete.success = Deleted unsubscribe end, course ID = %d.
+
+course.editor.change.success = Added editor: %s, course ID = %d.
+course.instructor.change.success = Added instructor: %s, course ID = %d.
+course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
+course.blacklist.change.success = Added user to blacklist: %s, course ID = %d.
+
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tab = Course management
+creator.page = Course management
+
+creator.course.is.open = Opened course
+creator.course.open = Open course
+creator.course.new = New course
+creator.drafts = Drafts
+creator.courses.active = Active courses
+creator.courses.expired = Expired courses
+
+creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
+creator.draft = Draft
+creator.course.blank = Blank course
+creator.course.draft = Load course data
+creator.course.upload = Upload course data
+
+creator.title.working.info = Working course title. Can be edited later.
+creator.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
+
+creator.new.blank.success = Created new blank course, ID = %d.
+
+creator.add.subtitle = + &nbsp; Subtitle
+creator.add.instructor = + &nbsp; Instructor
+creator.add.editor = + &nbsp; Editor
+creator.add.unsubscribe.end = + &nbsp; Unsubscribe end
+creator.add.fee = + &nbsp; Fee

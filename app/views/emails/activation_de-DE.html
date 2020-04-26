@@ -1,6 +1,6 @@
 ﻿{{template "emails/components/MIMETop.html" .}}
 
-{{template "emails/components/salutation.html" .}}
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
 Mit dem folgenden Code kann Ihr Account aktiviert werden:
 {{.data.User.ActivationCode.String}}
@@ -15,7 +15,7 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 {{template "emails/components/MIMEMiddle.html" .}}
 
 <body>
-{{template "emails/components/salutation.html" .}}
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 <br>
 <br>
 Mit dem folgenden Code kann Ihr Account aktiviert werden:

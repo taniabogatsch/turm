@@ -1,0 +1,28 @@
+<!-- template containing an overview over all users with elevated roles -->
+
+{{template "header.html" .}}
+
+{{template "creator/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      {{template "icons/layoutTextSidebarReversed.html" . }}
+      &nbsp; {{msg $ "creator.courses.active"}}
+    </h4>
+    <hr>
+
+  </div>
+</div>
+
+{{template "creator/rightNav.html" . }}
+
+<script>
+  $(function() {
+    //adjust the nav pills
+    $('#v-pills-active-tab').addClass("active");
+  });
+</script>
+
+{{template "footer.html" .}}

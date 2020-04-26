@@ -1,0 +1,48 @@
+<!-- template containing user search results -->
+
+<!-- title -->
+<h5>
+  {{msg $ "search.results"}}
+</h5>
+<small class="form-text text-muted">
+  {{msg $ "search.limit" 5}}
+</small>
+
+<table class="table">
+  <tbody>
+    {{range .users}}
+      <tr {{if .OnList}}class="text-muted"{{end}}>
+        <!-- TODO: add text muted if on list -->
+        <td> {{.EMail}} </td>
+        <td>
+          {{if not .OnList}}
+            <button type="button" class="btn btn-outline-darkblue" onclick="submitList('{{$.listType}}', {{.UserID}});">
+              +
+            </button>
+          {{end}}
+        </td>
+      </tr>
+    {{else}}
+      <tr>
+        <td colspan="2">
+          {{if .errMsg}}
+            <div class="warning-feedback color-danger">
+              {{.errMsg}}
+            </div>
+          {{else}}
+            {{msg $ "search.no.results"}}
+          {{end}}
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+
+<script>
+  $(function() {
+    //detect validation error
+    if ({{if .errors}}true{{else}}false{{end}}) {
+      showErrorToast($('#flash-errors').html());
+    }
+  });
+</script>

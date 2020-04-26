@@ -1,0 +1,7 @@
+{{if eq .User.Salutation 2}}
+  {{msg $ "user.salutation.ms"}}{{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+{{else if eq .User.Salutation 1}}
+  {{msg $ "user.salutation.mr"}}{{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+{{else}}
+  {{if .User.Title.Valid}} {{.User.Title.String}}{{end}}{{if .User.AcademicTitle.Valid}} {{.User.AcademicTitle.String}}{{end}} {{.User.FirstName}}{{if .User.NameAffix.Valid}} {{.User.NameAffix.String}}{{end}} {{.User.LastName}}
+{{end}}
