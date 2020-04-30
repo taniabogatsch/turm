@@ -2,7 +2,7 @@
 
 Turm2 is an enrollment system allowing users to enroll in courses. There is no official release yet. An older version is currently deployed at [Turm2](https://turm2.tu-ilmenau.de). This project provides a new design as well as extended functionality.
 
-It uses [Go](https://github.com/golang/go), [Revel](https://github.com/revel/), [Bootstrap 4.4.1](https://getbootstrap.com), Bootstrap Icons, [JQuery 3.4.1](https://jquery.com) and the [CKEditor](https://ckeditor.com) in addition to the go packages mentioned below.
+It uses [Go](https://github.com/golang/go), [Revel](https://github.com/revel/), [Bootstrap 4.4.1](https://getbootstrap.com), Bootstrap Icons, [JQuery 3.4.1](https://jquery.com) and the [Quill](https://quilljs.com) editor in addition to the go packages mentioned below.
 
 ## Usage
 
