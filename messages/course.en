@@ -1,0 +1,92 @@
+# -------------------------------------------------------------------------------------------------- #
+# COURSE FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+course.path = Course path
+course.title = Course title
+course.subtitle = Subtitle
+course.fee = Fee
+course.description = Course description
+course.speaker = Speaker
+
+course.clock =
+course.from = From
+course.to = to
+course.enrollment.period = Enrollment period
+course.enrollment.start = Start of the enrollment period
+course.enrollment.end = End of the enrollment period
+course.unsubscribe.end = Unsubscribe end
+course.expiration.date = Expiration date
+
+course.custom.email = Enrollment e-mail
+course.visibility = Visibility
+course.whitelist = Whitelist
+course.blacklist = Blacklist
+
+# -------------------------------------------------------------------------------------------------- #
+# COURSE CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+course.title.change.success = Changed course title to '%s', course ID = %d.
+course.group.change.success = Set the course group, course ID = %d.
+
+course.description.change.success = Changed course description, course ID = %d.
+course.description.delete.success = Deleted course description, course ID = %d.
+course.description.delete.confirm = Confirm deletion of course description.
+course.description.delete.title = Delete course description.
+
+course.customemail.change.success = Changed custom enrollment e-mail, course ID = %d.
+course.customemail.delete.success = Deleted custom enrollment e-mail, course ID = %d.
+course.customemail.delete.confirm = Confirm deletion of custom enrollment e-mail.
+course.customemail.delete.title = Delete enrollment e-mail.
+
+course.speaker.change.success = Changed speaker, course ID = %d.
+course.speaker.delete.success = Deleted speaker, course ID = %d.
+course.speaker.delete.confirm = Confirm deletion of speaker.
+course.speaker.delete.title = Delete speaker.
+
+course.subtitle.change.success = Changed subtitle to '%s', course ID = %d.
+course.subtitle.delete.success = Deleted subtitle, course ID = %d.
+course.subtitle.delete.confirm = Confirm deletion of subtitle '%s'.
+course.subtitle.delete.title = Delete subtitle
+
+course.enrollmentstart.change.success = Set enrollment start to %s, course ID = %d.
+course.enrollmentend.change.success = Set enrollment end to %s, course ID = %d.
+course.expirationdate.change.success = Set expiration date to %s, course ID = %d.
+course.expiration.date.info = After this point the course is no longer active. Lists of participants can still be seen. Enrolled users can still see the course at 'expired courses'.
+
+course.unsubscribe.end.change.success = Set unsubscribe end to %s, course ID = %d.
+course.unsubscribe.end.delete.success = Deleted unsubscribe end, course ID = %d.
+course.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
+course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end %s?
+course.unsubscribe.end.delete.title = Delete unsubscribe end
+
+course.editor.change.success = Added editor: %s, course ID = %d.
+course.editor.delete.success = Deleted editor, course ID = %d.
+course.editor.delete.confirm = Confirm deletion of editor %s.
+course.editor.delete.title = Delete editor
+
+course.instructor.change.success = Added instructor: %s, course ID = %d.
+course.instructor.delete.success = Deleted instructor, course ID = %d.
+course.instructor.delete.confirm = Confirm deletion of instructor %s.
+course.instructor.delete.title = Delete instructor
+
+course.matr.nr.change.success = Updated the matriculation number setting of %s, course ID = %d.
+course.matr.nr.change.title = Matriculation number setting
+course.see.matr.nr.info = This user is allowed to see the matriculation numbers of enrolled users.
+course.not.see.matr.nr.info = This user is <strong>not</strong> allowed to see the matriculation numbers of enrolled users.
+
+course.visibility.public = The course is publicly (without login) visible.
+course.visibility.not.public = The course is <strong>not</strong> publicly (without login) visible.
+course.visibility.change.title = Change visibility
+course.visibility.change.success = Changed visibility, course ID = %d.
+
+course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
+course.whitelist.delete.success = Deleted user from whitelist, course ID = %d.
+course.whitelist.delete.confirm = Confirm deletion of user from whitelist %s.
+course.whitelist.delete.title = Delete user from whitelist
+
+course.blacklist.change.success = Added user to blacklist: %s, course ID = %d.
+course.blacklist.delete.success = Deleted user from blacklist, course ID = %d.
+course.blacklist.delete.confirm = Confirm deletion of user from blacklist %s.
+course.blacklist.delete.title = Delete user from blacklist

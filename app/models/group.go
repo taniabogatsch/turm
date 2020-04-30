@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 	"turm/app"
 
@@ -31,6 +32,7 @@ type Group struct {
 /*Validate Group fields. */
 func (group *Group) Validate(v *revel.Validation) {
 
+	group.Name = strings.TrimSpace(group.Name)
 	v.Check(group.Name,
 		revel.MinSize{3},
 		revel.MaxSize{255},

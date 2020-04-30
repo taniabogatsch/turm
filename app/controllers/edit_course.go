@@ -35,98 +35,6 @@ func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
 	return c.Render(course)
 }
 
-/*ChangeTitle changes the course title.
-- Roles: creator and editors of the course */
-func (c EditCourse) ChangeTitle(ID int, title string) revel.Result {
-
-	c.Log.Debug("change course title", "ID", ID, "title", title)
-
-	//NOTE: the interceptor assures that the course ID is valid
-	title = strings.TrimSpace(title)
-	c.Validation.Check(title,
-		revel.MinSize{3},
-		revel.MaxSize{511},
-	).MessageKey("validation.invalid.title")
-
-	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
-	}
-
-	course := models.Course{ID: ID, Title: title}
-	if err := course.Update("title", course.Title); err != nil {
-		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
-	}
-
-	c.Flash.Success(c.Message("course.title.change.success",
-		course.Title,
-		course.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
-}
-
-/*ChangeSubtitle changes the subtitle.
-- Roles: creator and editors of the course */
-func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
-
-	c.Log.Debug("change subtitle", "ID", ID, "subtitle", subtitle)
-
-	//NOTE: the interceptor assures that the course ID is valid
-	course := models.Course{ID: ID, Subtitle: sql.NullString{"", false}}
-
-	subtitle = strings.TrimSpace(subtitle)
-	if subtitle != "" { //otherwise set subtitle to null
-		c.Validation.Check(subtitle,
-			revel.MinSize{3},
-			revel.MaxSize{511},
-		).MessageKey("validation.invalid.subtitle")
-
-		if c.Validation.HasErrors() {
-			return flashError(
-				errValidation,
-				nil,
-				c.Session["currPath"].(string),
-				c.Controller,
-				"",
-			)
-		}
-		course.Subtitle = sql.NullString{subtitle, true}
-	}
-
-	if err := course.Update("subtitle", course.Subtitle); err != nil {
-		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
-	}
-
-	if course.Subtitle.Valid {
-		c.Flash.Success(c.Message("course.subtitle.change.success",
-			course.Subtitle.String,
-			course.ID,
-		))
-	} else {
-		c.Flash.Success(c.Message("course.subtitle.delete.success",
-			course.ID,
-		))
-	}
-	return c.Redirect(c.Session["currPath"])
-}
-
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
 func (c EditCourse) ChangeTimestamp(ID int, date, time, timestampType string) revel.Result {
@@ -382,6 +290,116 @@ func (c EditCourse) ChangeText(ID int, textType, data string) revel.Result {
 
 	c.Log.Debug("change text field", "ID", ID, "textType", textType, "data", data)
 
+	data = strings.TrimSpace(data)
+	course := models.Course{ID: ID}
+	valid := false
+	var err error
+
+	//NOTE: the interceptor assures that the course ID is valid
+	if data != "" || textType == "title" {
+
+		if textType == "title" {
+			c.Validation.Check(data,
+				revel.MinSize{3},
+				revel.MaxSize{511},
+			).MessageKey("validation.invalid.title")
+
+		} else if textType == "subtitle" {
+			c.Validation.Check(data,
+				revel.MinSize{3},
+				revel.MaxSize{511},
+			).MessageKey("validation.invalid.subtitle")
+
+		} else {
+			c.Validation.Check(data,
+				revel.MinSize{3},
+				revel.MaxSize{50000},
+			).MessageKey("validation.invalid.text.input")
+		}
+
+		if c.Validation.HasErrors() {
+			return flashError(
+				errValidation,
+				nil,
+				c.Session["currPath"].(string),
+				c.Controller,
+				"",
+			)
+		}
+	}
+
+	//update the text
+	switch textType {
+
+	case "description":
+		if data != "" {
+			course.Description = sql.NullString{data, true}
+			valid = true
+		}
+		err = course.Update("description", course.Description)
+
+	case "customemail":
+		if data != "" {
+			course.CustomEMail = sql.NullString{data, true}
+			valid = true
+		}
+		err = course.Update("customemail", course.CustomEMail)
+
+	case "speaker":
+		if data != "" {
+			course.Speaker = sql.NullString{data, true}
+			valid = true
+		}
+		err = course.Update("speaker", course.Speaker)
+
+	case "title":
+		course.Title = data
+		valid = true
+		err = course.Update("title", course.Title)
+
+	case "subtitle":
+		if data != "" {
+			course.Subtitle = sql.NullString{data, true}
+			valid = true
+		}
+		err = course.Update("subtitle", course.Subtitle)
+
+	default:
+		return flashError(
+			errContent,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	if err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	if valid {
+		if textType == "title" || textType == "subtitle" {
+			c.Flash.Success(c.Message("course."+textType+".change.success",
+				data,
+				course.ID,
+			))
+		} else {
+			c.Flash.Success(c.Message("course."+textType+".change.success",
+				course.ID,
+			))
+		}
+	} else {
+		c.Flash.Success(c.Message("course."+textType+".delete.success",
+			course.ID,
+		))
+	}
 	return c.Redirect(c.Session["currPath"])
 }
 

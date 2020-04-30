@@ -2,7 +2,7 @@
 
 modalID:        change-text-modal
 titleID:        change-text-modal-title         html
-formID:         change-text-modal-form          action
+textTypeID:     change-text-modal-type          value
 inputID:        change-text-modal-input         name, value, placeholder, maxlength
 validationID:   change-text-modal-validation    html
 -->
@@ -11,7 +11,7 @@ validationID:   change-text-modal-validation    html
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
-      <form id="change-text-modal-form" accept-charset="UTF-8" method="POST" class="needs-validation" novalidate>
+      <form id="change-text-modal-form" accept-charset="UTF-8" action='{{url "EditCourse.ChangeText"}}' method="POST" class="needs-validation" novalidate>
 
         <!-- modal header -->
         <div class="modal-header background-color-darkblue border-radius-2">
@@ -25,6 +25,9 @@ validationID:   change-text-modal-validation    html
         <div class="modal-body">
           <!-- course ID -->
           <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- input text type -->
+          <input type="hidden" name="textType" id="change-text-modal-type" required>
+
           <!-- text input -->
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -32,7 +35,7 @@ validationID:   change-text-modal-validation    html
                 {{template "icons/pencil.html" .}}
               </span>
             </div>
-            <input id="change-text-modal-input" type="text" class="form-control rounded-right" required minlength="3">
+            <input name="data" id="change-text-modal-input" type="text" class="form-control rounded-right" required minlength="3">
             <div id="change-text-modal-validation" class="invalid-feedback"></div>
           </div>
         </div>

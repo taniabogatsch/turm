@@ -1,7 +1,7 @@
 <!-- change text area fields
 
 modalID:        change-text-area-modal
-titleID:        change-text-modal-title             html
+titleID:        change-text-area-modal-title        html
 typeID:         change-text-area-modal-type         value
 inputID:        change-text-area-modal-content      value
 formID:         change-text-area-modal-form         submit
@@ -26,7 +26,7 @@ formID:         change-text-area-modal-form         submit
           <!-- course ID -->
           <input type="hidden" name="ID" value="{{.ID}}">
           <!-- input text type -->
-          <input type="hidden" name="textType" id="change-text-area-modal-type">
+          <input type="hidden" name="textType" id="change-text-area-modal-type" required>
 
 
           <!-- editor -->
@@ -61,6 +61,20 @@ formID:         change-text-area-modal-form         submit
   $(function() {
     quill = new Quill('#change-text-area-modal-editor', {
       theme: 'snow'
+    });
+
+    //ensure that the form validation behaves correctly
+    quill.on('text-change', function(delta, oldDelta, source) {
+      if (source == 'user') {
+        var textArea = document.getElementById("change-text-area-modal-content");
+        var text = quill.root.innerHTML;
+        if (text != "<p><br></p>") {
+          $('#change-text-area-modal-content').val(text);
+          textArea.setCustomValidity('');
+        } else {
+          textArea.setCustomValidity("Please provide a text.");
+        }
+      }
     });
   });
 </script>

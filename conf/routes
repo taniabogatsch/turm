@@ -44,11 +44,6 @@ GET     /creator/getDrafts                          Creator.GetDrafts
 
 GET     /editCourse/openCourse                      EditCourse.OpenCourse
 
-POST    /editCourse/modals/changeTitle              EditCourse.ChangeTitle
-POST    /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
-GET     /editCourse/modals/changeTitle              EditCourse.ChangeTitle
-GET     /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
-
 POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
 POST    /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
 POST    /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr

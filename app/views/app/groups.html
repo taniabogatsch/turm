@@ -12,23 +12,23 @@
             {{if eq $.session.role "admin"}}
               <!-- delete -->
               {{if not .Groups}}
-                <a href="#" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="btn btn-outline-darkblue float-right margin-left-10">
+                <a href="#no-scroll" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="btn btn-outline-darkblue float-right margin-left-10">
                   {{template "icons/trash.html" . }}
                 </a>
               {{end}}
               <!-- edit -->
-              <a href="#" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="btn btn-outline-darkblue float-right margin-left-10">
+              <a href="#no-scroll" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="btn btn-outline-darkblue float-right margin-left-10">
                 {{template "icons/pencil.html" . }}
               </a>
               <!-- add -->
-              <a href="#" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="btn btn-outline-darkblue float-right margin-left-10">
+              <a href="#no-scroll" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="btn btn-outline-darkblue float-right margin-left-10">
                 {{template "icons/plus.html" . }}
               </a>
             {{end}}
           {{end}}
 
           {{if eq .IDPrefix "creator"}}
-            <a href="#" class="btn btn-outline-darkblue float-right margin-left-10"
+            <a href="#no-scroll" class="btn btn-outline-darkblue float-right margin-left-10"
               onclick='submitChangeGroupModal({{.ID}});'>
               {{msg $ "creator.add.course.here"}}
             </a>

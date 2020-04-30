@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -64,6 +65,7 @@ type NewCourseParam struct {
 /*Validate NewCourseParam fields. */
 func (param *NewCourseParam) Validate(v *revel.Validation) {
 
+	param.Title = strings.TrimSpace(param.Title)
 	v.Check(param.Title,
 		revel.MinSize{3},
 		revel.MaxSize{511},

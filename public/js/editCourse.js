@@ -33,14 +33,13 @@ function submitList(ID) {
 }
 
 //changeTextModal sets all fields of the add/edit text modal
-function changeTextModal(title, action, name, value, maxlength, validation) {
+function changeTextModal(title, textType, value, maxlength, validation) {
 
   //set the modal title
   $('#change-text-modal-title').html(title);
-  //set the action
-  $('#change-text-modal-form').attr("action", action);
+  //set the text type
+  $('#change-text-modal-type').val(textType);
   //set name, value, placeholder, maxlength
-  $('#change-text-modal-input').attr("name", name);
   $('#change-text-modal-input').val(value);
   $('#change-text-modal-input').attr("placeholder", title);
   $('#change-text-modal-input').attr("maxlength", maxlength);
@@ -124,10 +123,18 @@ function openTimestampModal(title, info, type, timestamp) {
   $('#change-timestamp-modal').modal('show');
 }
 
-function openTextAreaModal(title) {
+function openTextAreaModal(title, textType, valid) {
 
   //set the modal title
   $('#change-text-area-modal-title').html(title);
+  //set the text type
+  $('#change-text-area-modal-type').val(textType);
+  //set content
+  if (valid) {
+    quill.root.innerHTML = $('#course-' + textType).html();
+  } else {
+    quill.root.innerHTML = "";
+  }
   //show the modal
   $('#change-text-area-modal').modal('show');
 }
@@ -136,16 +143,23 @@ function openTextAreaModal(title) {
 //according to the content in the quill editor
 function setTextAreaData() {
 
-  const text = quill.root.innerHTML;
-  $('#change-text-area-modal-content').val(text);
-  $('#change-text-area-modal-form').submit();
+  document.getElementById("change-text-area-modal-form").classList.add('was-validated');
+  var textArea = document.getElementById("change-text-area-modal-content");
+
+  var text = quill.root.innerHTML;
+
+  if (text != "<p><br></p>") {
+    $('#change-text-area-modal-content').val(text);
+    textArea.setCustomValidity('');
+    $('#change-text-area-modal-form').submit();
+  } else {
+    textArea.setCustomValidity("Please provide a text.");
+  }
 }
 
 //submitChangeGroupModal sets the parent ID and submits the modal
 function submitChangeGroupModal(parentID) {
 
-  console.log("wazzup");
-  console.log(parentID);
   $('#change-group-modal-parentID').val(parentID);
   $('#change-group-modal-form').submit();
 }

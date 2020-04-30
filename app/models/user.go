@@ -81,16 +81,19 @@ func (user *User) Validate(v *revel.Validation) {
 
 	user.EMail = strings.ToLower(user.EMail)
 
+	user.LastName = strings.TrimSpace(user.LastName)
 	v.Check(user.LastName,
 		revel.Required{},
 		revel.MaxSize{255},
 	).MessageKey("validation.invalid.lastname")
 
+	user.FirstName = strings.TrimSpace(user.FirstName)
 	v.Check(user.FirstName,
 		revel.Required{},
 		revel.MaxSize{255},
 	).MessageKey("validation.invalid.firstname")
 
+	user.EMail = strings.TrimSpace(user.EMail)
 	v.Check(user.EMail,
 		revel.Required{},
 		revel.MaxSize{255},
