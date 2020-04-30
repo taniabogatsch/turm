@@ -1,0 +1,40 @@
+<!-- confirm the deletion of a field
+
+modalID:        delete-field-modal
+titleID:        delete-field-modal-title        html
+formID:         delete-field-modal-form         action
+contentID:      delete-field-modal-content      html
+-->
+
+<div class="modal fade" id="delete-field-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- form -->
+      <form id="delete-field-modal-form" accept-charset="UTF-8" method="POST">
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="delete-field-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal header -->
+        <div class="modal-body" id="delete-field-modal-content">
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+            {{msg $ "button.delete"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

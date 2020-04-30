@@ -12,13 +12,20 @@
   <tbody>
     {{range .users}}
       <tr {{if .OnList}}class="text-muted"{{end}}>
-        <!-- TODO: add text muted if on list -->
-        <td> {{.EMail}} </td>
-        <td>
+        <td> {{.EMail}}
+          {{if .ActivationCode.Valid}}
+            <div class="warning-feedback">
+              {{msg $ "admin.account.inactive"}}
+            </div>
+          {{end}}
+        </td>
+        <td class="text-center">
           {{if not .OnList}}
-            <button type="button" class="btn btn-outline-darkblue" onclick="submitList('{{$.listType}}', {{.UserID}});">
+            <button type="button" class="btn btn-outline-darkblue" onclick="submitList({{.UserID}});">
               +
             </button>
+          {{else}}
+            {{msg $ "search.already.added"}}
           {{end}}
         </td>
       </tr>

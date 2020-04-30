@@ -62,8 +62,10 @@ CREATE TABLE course (
   enrollmentend       timestamp with time zone  NOT NULL,
   unsubscribeend      timestamp with time zone,
   expirationdate      timestamp with time zone  NOT NULL,
+  parentid            integer,
 
-  FOREIGN KEY (creator) REFERENCES users (id)
+  FOREIGN KEY (creator) REFERENCES users (id),
+  FOREIGN KEY (parentid) REFERENCES groups (id)
 );
 
 
@@ -175,14 +177,12 @@ CREATE TABLE unsubscribed (
 CREATE TABLE groups (
   id            serial                    PRIMARY KEY,
   parentid      integer,
-  courseid      integer,
   name          varchar(255)              NOT NULL,
   courselimit   integer,
   creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
   creationdate  timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (courseid) REFERENCES course (id),
   FOREIGN KEY (parentid) REFERENCES groups(id)
 );
 

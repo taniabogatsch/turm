@@ -52,6 +52,7 @@ validation.invalid.subtitle = Der Untertitel muss aus 3 bis 511 Zeichen bestehen
 validation.invalid.date = Bitte geben Sie ein Datum zwischen [jetzt, 2200-01-01] an.
 validation.invalid.time = Bitte geben Sie eine Zeit an.
 validation.invalid.timestamp = Bitte geben Sie ein gültiges Datum und eine Uhrzeit an.
+validation.invalid.text.input = Bitte geben Sie Text an.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR

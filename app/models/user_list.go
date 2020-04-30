@@ -25,12 +25,13 @@ type UserListEntry struct {
 	EMail string `db:"email, unique"`
 
 	//used for showing users properly
-	AcademicTitle sql.NullString `db:"academictitle"`
-	Title         sql.NullString `db:"title"`
-	NameAffix     sql.NullString `db:"nameaffix"`
-	LastName      string         `db:"lastname"`
-	FirstName     string         `db:"firstname"`
-	Salutation    Salutation     `db:"salutation"`
+	AcademicTitle  sql.NullString `db:"academictitle"`
+	Title          sql.NullString `db:"title"`
+	NameAffix      sql.NullString `db:"nameaffix"`
+	LastName       string         `db:"lastname"`
+	FirstName      string         `db:"firstname"`
+	Salutation     Salutation     `db:"salutation"`
+	ActivationCode sql.NullString `db:"activationcode"`
 }
 
 /*Insert the provided user list entry of a course. */
@@ -52,7 +53,7 @@ func (user *UserListEntry) Insert(table string) (err error) {
 			SELECT email
 			FROM users
 			WHERE id = $1
-		)
+		), courseid
 	`
 
 	if table == "editor" || table == "instructor" {
@@ -61,7 +62,48 @@ func (user *UserListEntry) Insert(table string) (err error) {
 		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID)
 	}
 	if err != nil {
-		modelsLog.Error("failed to insert user into user list", "user", user, "error", err.Error())
+		modelsLog.Error("failed to insert user into user list", "user", user,
+			"table", table, "error", err.Error())
+	}
+	return
+}
+
+/*Delete the provided user list entry of a course. */
+func (user *UserListEntry) Delete(table string) (err error) {
+
+	deleteUser := `
+		DELETE FROM ` + table + `
+		WHERE userid = $1
+			AND courseid = $2
+	`
+
+	_, err = app.Db.Exec(deleteUser, user.UserID, user.CourseID)
+	if err != nil {
+		modelsLog.Error("failed to delete user from user list", "user", user,
+			"table", table, "error", err.Error())
+	}
+	return
+}
+
+/*Update updates the ViewMatrNr field of a list entry of a course. */
+func (user *UserListEntry) Update(table string) (err error) {
+
+	updateUser := `
+		UPDATE ` + table + `
+		SET viewmatrnr = $3
+		WHERE userid = $1
+			AND courseid = $2
+		RETURNING (
+			SELECT email
+			FROM users
+			WHERE id = $1
+		), courseid
+	`
+
+	err = app.Db.Get(user, updateUser, user.UserID, user.CourseID, user.ViewMatrNr)
+	if err != nil {
+		modelsLog.Error("failed to update user from user list", "user", user,
+			"table", table, "error", err.Error())
 	}
 	return
 }
@@ -100,7 +142,7 @@ func (users *UserList) Search(value *string, searchInactive *bool, listType *str
 
 	searchUsersSelect := `
 		SELECT
-			id as userid, email,
+			id as userid, email, activationcode,
 			(
 				SELECT EXISTS (
 					SELECT true

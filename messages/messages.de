@@ -36,6 +36,9 @@ button.delete = Löschen
 button.abort = Abbrechen
 button.close = Schließen
 
+button.collapse = Einklappen
+button.show = Anzeigen
+
 # -------------------------------------------------------------------------------------------------- #
 # ERROR
 # -------------------------------------------------------------------------------------------------- #
@@ -56,6 +59,7 @@ user.role = Rolle
 user.role.admin = Admin
 user.role.creator = KursverantwortlicheR
 user.role.editor = EditorIn
+user.role.instructor = OrganisatorIn
 user.role.instructors = OrganisatorInnen
 user.role.user = NutzerIn
 
@@ -120,6 +124,7 @@ search.no.results = Keine Suchergebnisse
 search.limit = Suchergebnisse sind auf <strong>maximal %d Ergebnisse</strong> beschränkt. Sollte Ihr Suchergebnis fehlen, so verfeinern Sie bitte den Suchwert.
 search.criteria = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur ganze Nummer).
 search.inactive.users = Nicht aktivierte Accounts anzeigen
+search.already.added = Bereits hinzugefügt
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE
@@ -239,26 +244,73 @@ admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
 # COURSE
 # -------------------------------------------------------------------------------------------------- #
 
+course.path = Kurspfad
 course.title = Kurstitel
 course.subtitle = Untertitel
 course.fee = Teilnahmegebühr
+course.description = Kursbeschreibung
 
 course.clock = Uhr
 course.from = Von
 course.to = bis
 course.enrollment.period = Einschreibezeitraum
+course.enrollment.start = Anfang Einschreibezeitraum
+course.enrollment.end = Ende Einschreibezeitraum
 course.unsubscribe.end = Austragen bis
+course.expiration.date = Ablaufdatum
+
+course.visibility = Sichtbarkeit
+course.whitelist = Whitelist
+course.blacklist = Blacklist
 
 course.title.change.success = Kurstitel zu '%s' geändert, Kurs ID = %d.
+course.group.change.success = Der Kurs ist nun Teil einer Gruppe, Kurs ID = %d.
+
 course.subtitle.change.success = Untertitel zu '%s' geändert, Kurs ID = %d.
 course.subtitle.delete.success = Untertitel gelöscht, Kurs ID = %d.
-course.unsubscribe.end.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
-course.unsubscribe.end.delete.success = Austragen bis gelöscht, Kurs ID = %d.
+course.subtitle.delete.confirm = Untertitel '%s' wirklich löschen?
+course.subtitle.delete.title = Untertitel löschen
+
+course.enrollmentstart.change.success = NutzerInnen können sich nun ab dem %s Uhr einschreiben, Kurs ID = %d.
+course.enrollmentend.change.success = NutzerInnen können sich nun bis zum %s Uhr einschreiben, Kurs ID = %d.
+course.expirationdate.change.success = Der Kurs läuft nun bis zum %s Uhr, Kurs ID = %d.
+course.expiration.date.info = Ab diesem Zeitpunkt ist der Kurs nicht mehr aktiv. Die Teilnehmerlisten können weiterhin eingesehen werden. Eingeschriebene NutzerInnen finden den Kurs weiterhin unter 'abgelaufene Kurse'.
+
+course.unsubscribeend.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
+course.unsubscribeend.delete.success = Austragen bis gelöscht, Kurs ID = %d.
+course.unsubscribe.end.info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
+course.unsubscribe.end.delete.confirm = Austragen bis zum %s Uhr wirklich löschen?
+course.unsubscribe.end.delete.title = Austragen bis löschen
 
 course.editor.change.success = EditorIn hinzugefügt: %s, Kurs ID = %d.
+course.editor.delete.success = EditorIn entfernt, Kurs ID = %d.
+course.editor.delete.confirm = EditorIn %s wirklich löschen?
+course.editor.delete.title = EditorIn löschen
+
 course.instructor.change.success = OrganisatorIn hinzugefügt: %s, Kurs ID = %d.
+course.instructor.delete.success = OrganisatorIn entfernt, Kurs ID = %d.
+course.instructor.delete.confirm = OrganisatorIn %s wirklich löschen?
+course.instructor.delete.title = OrganisatorIn löschen
+
+course.matr.nr.change.success = Die Matrikelnummereinstellung von %s wurde aktualisiert, Kurs ID = %d.
+course.matr.nr.change.title = Matrikelnummereinstellung
+course.see.matr.nr.info = NutzerIn darf die Matrikelnummern eingeschriebener NutzerInnen sehen.
+course.not.see.matr.nr.info = NutzerIn darf die Matrikelnummern eingeschriebener NutzerInnen <strong>nicht</strong> sehen.
+
+course.visibility.public = Der Kurs ist öffentlich (ohne Anmeldung) sichtbar.
+course.visibility.not.public = Der Kurs ist <strong>nicht</strong> öffentlich (ohne Anmeldung) sichtbar.
+course.visibility.change.title = Sichtbarkeit ändern
+course.visibility.change.success = Sichtbarkeit geändert, Kurs ID = %d.
+
 course.whitelist.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.
+course.whitelist.delete.success = NutzerIn aus Whitelist entfernt, Kurs ID = %d.
+course.whitelist.delete.confirm = NutzerIn %s wirklich aus Whitelist löschen?
+course.whitelist.delete.title = NutzerIn aus Whitelist löschen
+
 course.blacklist.change.success = NutzerIn zu Blacklist hinzugefügt: %s, Kurs ID = %d.
+course.blacklist.delete.success = NutzerIn aus Blacklist entfernt, Kurs ID = %d.
+course.blacklist.delete.confirm = NutzerIn %s wirklich aus Blacklist löschen?
+course.blacklist.delete.title = NutzerIn aus Blacklist löschen
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
@@ -281,12 +333,21 @@ creator.course.draft = Aus Kursen
 creator.course.upload = Kursvorlage hochladen
 
 creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
-creator.unsubscribe.end.info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
+
+creator.more.settings = Weitere Kurseinstellungen
+creator.more.settings.info = Diese Einstellungen sind für die NutzerInnen nicht sichtbar.
+creator.current.path = Bisheriger Pfad
+creator.select.path = Neuen Pfad wählen...
 
 creator.new.blank.success = Neuer leerer Kurs erstellt, ID = %d.
 
+creator.add.course.here = + &nbsp; Kurs
+creator.add.path = + &nbsp; Kurspfad
 creator.add.subtitle = + &nbsp; Untertitel
 creator.add.instructor = + &nbsp; OrganisatorIn
 creator.add.editor = + &nbsp; EditorIn
 creator.add.unsubscribe.end = + &nbsp; Austragen bis
 creator.add.fee = + &nbsp; Teilnahmegebühr
+creator.add.description = + &nbsp; Kursbeschreibung
+creator.add.whitelist = + &nbsp; NutzerIn auf Whitelist
+creator.add.blacklist = + &nbsp; NutzerIn auf Blacklist

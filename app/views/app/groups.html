@@ -3,8 +3,8 @@
 
 <!-- show all children -->
 {{range .Groups}}
-  <div class="card border-0">
-    {{if not .CourseID.Valid}} <!-- group entry -->
+  {{if ne .ID 0}} <!-- group entry -->
+    <div class="card border-0">
       <div id="heading-{{.IDPrefix}}-{{.ID}}">
         <button onclick='changeIcon("{{.IDPrefix}}-{{.ID}}");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#{{.IDPrefix}}-{{.ID}}" aria-expanded="true" aria-controls="{{.IDPrefix}}-{{.ID}}">
 
@@ -25,6 +25,13 @@
                 {{template "icons/plus.html" . }}
               </a>
             {{end}}
+          {{end}}
+
+          {{if eq .IDPrefix "creator"}}
+            <a href="#" class="btn btn-outline-darkblue float-right margin-left-10"
+              onclick='submitChangeGroupModal({{.ID}});'>
+              {{msg $ "creator.add.course.here"}}
+            </a>
           {{end}}
 
           <!-- dropdown and dropright icon and group name-->
@@ -53,7 +60,7 @@
     </div>
   {{else}}
     <!-- TODO: open course, either via redirect or via reload -->
-    <button class="btn btn-block btn-light text-justify list-group-item" type="button">
+    <button class="btn btn-block btn-light text-justify list-group-item" type="button" {{if eq .IDPrefix "creator"}}disabled{{end}}>
       <span class="badge badge-secondary btn-darkblue"> {{msg $ "course"}} </span>
       &nbsp; {{.Name}}
     </button>

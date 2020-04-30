@@ -52,6 +52,7 @@ validation.invalid.subtitle = The subtitle must be between 3 - 511 characters lo
 validation.invalid.date = Please provide a date between [now, 2200-01-01].
 validation.invalid.time = Please provide a time.
 validation.invalid.timestamp = Please provide a valid date and time.
+validation.invalid.text.input = Please provide text.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR

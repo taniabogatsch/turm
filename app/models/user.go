@@ -614,13 +614,17 @@ const (
 		SELECT
 			EXISTS (
 				SELECT true
-				FROM editor
-				WHERE userid = $1
+				FROM editor e, course c
+				WHERE e.userid = $1
+					AND e.courseid = c.id
+					AND c.active
 			) AS iseditor,
 			EXISTS (
 				SELECT true
-				FROM instructor
-				WHERE userid = $1
+				FROM instructor i, course c
+				WHERE i.userid = $1
+					AND i.courseid = c.id
+					AND c.active
 			) AS isinstructor
 	`
 )

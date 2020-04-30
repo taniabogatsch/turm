@@ -83,8 +83,7 @@ func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 	c.Log.Debug("change subtitle", "ID", ID, "subtitle", subtitle)
 
 	//NOTE: the interceptor assures that the course ID is valid
-	course := models.Course{ID: ID}
-	course.Subtitle = sql.NullString{"", false}
+	course := models.Course{ID: ID, Subtitle: sql.NullString{"", false}}
 
 	subtitle = strings.TrimSpace(subtitle)
 	if subtitle != "" { //otherwise set subtitle to null
@@ -128,30 +127,26 @@ func (c EditCourse) ChangeSubtitle(ID int, subtitle string) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*ChangeUnsubscribeEnd changes the unsubscribe end.
+/*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel.Result {
+func (c EditCourse) ChangeTimestamp(ID int, date, time, timestampType string) revel.Result {
 
-	c.Log.Debug("change unsubscribe end", "ID", ID, "date", date, "time", time)
+	c.Log.Debug("change timestamp", "ID", ID, "date", date,
+		"time", time, "timestampType", timestampType)
 
 	//NOTE: the interceptor assures that the course ID is valid
-	course := models.Course{ID: ID}
-	course.UnsubscribeEnd = sql.NullString{"", false}
-
-	if date != "" || time != "" {
+	timestamp := date + " " + time
+	if timestamp != " " || timestampType != "unsubscribeend" { //only the unsubscribeend can be null
 		c.Validation.Required(date).
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
 			MessageKey("validation.invalid.time")
 
-		course.UnsubscribeEnd = sql.NullString{date + " " + time, true}
-		c.Validation.Check(course.UnsubscribeEnd.String,
+		c.Validation.Check(timestamp,
 			models.IsTimestamp{},
 		).MessageKey("validation.invalid.timestamp")
-
 	}
-
-	//TODO: if edit, get course, set new unsubscribe end and validate
+	//TODO: if edit, get course, set new timestamp value and validate
 
 	if c.Validation.HasErrors() {
 		return flashError(
@@ -163,7 +158,42 @@ func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel
 		)
 	}
 
-	if err := course.Update("unsubscribeend", course.UnsubscribeEnd); err != nil {
+	course := models.Course{ID: ID}
+	var err error
+
+	//update the timestamp
+	switch timestampType {
+
+	case "enrollmentstart":
+		course.EnrollmentStart = timestamp
+		err = course.Update("enrollmentstart", course.EnrollmentStart)
+
+	case "enrollmentend":
+		course.EnrollmentEnd = timestamp
+		err = course.Update("enrollmentend", course.EnrollmentEnd)
+
+	case "unsubscribeend":
+		course.UnsubscribeEnd = sql.NullString{timestamp, false}
+		if timestamp != " " {
+			course.UnsubscribeEnd.Valid = true
+		}
+		err = course.Update("unsubscribeend", course.UnsubscribeEnd)
+
+	case "expirationdate":
+		course.ExpirationDate = timestamp
+		err = course.Update("expirationdate", course.ExpirationDate)
+
+	default:
+		return flashError(
+			errContent,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	if err != nil {
 		return flashError(
 			errDB,
 			err,
@@ -172,24 +202,25 @@ func (c EditCourse) ChangeUnsubscribeEnd(ID int, date string, time string) revel
 			"",
 		)
 	}
-	if date != "" || time != "" {
-		c.Flash.Success(c.Message("course.unsubscribe.end.change.success",
-			course.UnsubscribeEnd.String,
+
+	if timestamp != " " {
+		c.Flash.Success(c.Message("course."+timestampType+".change.success",
+			timestamp,
 			course.ID,
 		))
 	} else {
-		c.Flash.Success(c.Message("course.unsubscribe.end.delete.success",
+		c.Flash.Success(c.Message("course."+timestampType+".delete.success",
 			course.ID,
 		))
 	}
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*ChangeUserList changes the users on the specified user list of a course.
+/*ChangeUserList adds a user to the user list of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Result {
+func (c EditCourse) ChangeUserList(ID, userID int, listType string) revel.Result {
 
-	c.Log.Debug("change user list", "ID", ID, "userID", userID, "listType", listType)
+	c.Log.Debug("add user to user list", "ID", ID, "userID", userID, "listType", listType)
 
 	//NOTE: the interceptor assures that the course ID is valid
 	c.Validation.Required(userID).
@@ -199,6 +230,7 @@ func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Re
 		listType != "instructor" && listType != "editor" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
+	//TODO: if edit, get course, set new timestamp value and validate
 
 	if c.Validation.HasErrors() {
 		return flashError(
@@ -221,6 +253,8 @@ func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Re
 		)
 	}
 
+	//NOTE: if the course is active, the user should get a notification e-mail
+
 	c.Flash.Success(c.Message("course."+listType+".change.success",
 		entry.EMail,
 		entry.CourseID,
@@ -228,6 +262,165 @@ func (c EditCourse) ChangeUserList(ID int, userID int, listType string) revel.Re
 	return c.Redirect(c.Session["currPath"])
 }
 
+/*DeleteFromUserList removes a from the user list of a course.
+- Roles: creator and editors of the course */
+func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Result {
+
+	c.Log.Debug("delete user from user list", "ID", ID, "userID", userID, "listType", listType)
+
+	//NOTE: the interceptor assures that the course ID is valid
+	c.Validation.Required(userID).
+		MessageKey("validation.missing.userID")
+
+	if listType != "blacklist" && listType != "whitelist" &&
+		listType != "instructor" && listType != "editor" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	entry := models.UserListEntry{UserID: userID, CourseID: ID}
+	if err := entry.Delete(listType); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	//NOTE: if the course is active, the user should get a notification e-mail
+
+	c.Flash.Success(c.Message("course."+listType+".delete.success",
+		ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
 /*ChangeViewMatrNr toggles the matriculation number restrictions for an editor/instructor.
-- Roles: creators and editors of the course */
-//TODO
+- Roles: creator and editors of the course */
+func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option bool) revel.Result {
+
+	c.Log.Debug("update user in user list", "ID", ID, "userID", userID,
+		"listType", listType, "option", option)
+
+	//NOTE: the interceptor assures that the course ID is valid
+	c.Validation.Required(userID).
+		MessageKey("validation.missing.userID")
+
+	if listType != "instructor" && listType != "editor" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	entry := models.UserListEntry{UserID: userID, CourseID: ID, ViewMatrNr: option}
+	if err := entry.Update(listType); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	//NOTE: if the course is active, the user should get a notification e-mail
+
+	c.Flash.Success(c.Message("course.matr.nr.change.success",
+		entry.EMail,
+		entry.CourseID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*ChangeVisibility toggles the visibility of a course.
+- Roles: creator and editors of the course */
+func (c EditCourse) ChangeVisibility(ID int, option bool) revel.Result {
+
+	c.Log.Debug("update course visibility", "ID", ID, "option", option)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	course := models.Course{ID: ID, Visible: option}
+	if err := course.Update("visible", course.Visible); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	c.Flash.Success(c.Message("course.visibility.change.success",
+		course.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*ChangeText changes the text of the provided column.
+- Roles: creator and editors of the course */
+func (c EditCourse) ChangeText(ID int, textType, data string) revel.Result {
+
+	c.Log.Debug("change text field", "ID", ID, "textType", textType, "data", data)
+
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*ChangeGroup changes the group of a course.
+- Roles: creator and editors of the course. */
+func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
+
+	c.Log.Debug("change group", "ID", ID, "parentID", parentID)
+
+	//NOTE: the interceptor assures that the course ID is valid
+	c.Validation.Required(parentID).
+		MessageKey("validation.invalid.params")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	course := models.Course{
+		ID:       ID,
+		ParentID: sql.NullInt32{Int32: int32(parentID), Valid: true},
+	}
+	if err := course.Update("parentid", course.ParentID); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	c.Flash.Success(c.Message("course.group.change.success",
+		course.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
