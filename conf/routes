@@ -34,7 +34,6 @@ POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
 GET     /creator/activeCourses                      Creator.ActiveCourses
 GET     /creator/drafts                             Creator.Drafts
-GET     /creator/searchUser                         Creator.SearchUser
 
 POST    /creator/newCourse                          Creator.NewCourse
 GET     /creator/newCourseModal                     Creator.NewCourseModal
@@ -43,16 +42,29 @@ GET     /creator/getDrafts                          Creator.GetDrafts
 # ------------------------------- Edit course routes. -------------------------------- #
 
 GET     /editCourse/openCourse                      EditCourse.OpenCourse
+GET     /editCourse/searchUser                      EditCourse.SearchUser
 
-POST    /editCourse/modals/changeTitle              EditCourse.ChangeTitle
-POST    /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
 POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
-POST    /editCourse/modals/changeUnsubscribeEnd     EditCourse.ChangeUnsubscribeEnd
-
-GET     /editCourse/modals/changeTitle              EditCourse.ChangeTitle
-GET     /editCourse/modals/changeSubtitle           EditCourse.ChangeSubtitle
+POST    /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
+POST    /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
 GET     /editCourse/modals/changeUserList           EditCourse.ChangeUserList
-GET     /editCourse/modals/changeUnsubscribeEnd     EditCourse.ChangeUnsubscribeEnd
+GET     /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
+GET     /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
+
+POST    /editCourse/modals/changeVisibility         EditCourse.ChangeVisibility
+GET     /editCourse/modals/changeVisibility         EditCourse.ChangeVisibility
+
+POST    /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
+GET     /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
+
+POST    /editCourse/modals/changeText               EditCourse.ChangeText
+GET     /editCourse/modals/changeText               EditCourse.ChangeText
+
+POST    /editCourse/modals/changeGroup              EditCourse.ChangeGroup
+GET     /editCourse/modals/changeGroup              EditCourse.ChangeGroup
+
+POST    /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
+GET     /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
 
 # ------------------------------- Admin routes. -------------------------------- #
 

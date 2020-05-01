@@ -66,8 +66,8 @@ func (c Admin) SearchUser(value string, searchInactive bool) revel.Result {
 
 	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive)
 
-	trimmedValue := strings.TrimSpace(value)
-	c.Validation.Check(trimmedValue,
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
 		revel.MinSize{3},
 		revel.MaxSize{127},
 	).MessageKey("validation.invalid.searchValue")

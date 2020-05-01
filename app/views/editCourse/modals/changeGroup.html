@@ -1,0 +1,65 @@
+<!-- change-group-modal -->
+
+<div class="modal fade" id="change-group-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <form id="change-group-modal-form" accept-charset="UTF-8" action='{{url "EditCourse.ChangeGroup"}}'
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "course.path"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- parent ID -->
+          <input id="change-group-modal-parentID" type="hidden" name="parentID">
+
+          <!-- current group path, if set -->
+          {{if .Path}}
+            <p>
+              {{msg $ "creator.current.path"}}
+            </p>
+            <ol class="breadcrumb bg-white m-0 p-0 text-muted">
+              {{range .Path}}
+                <li class="breadcrumb-item">{{.Name}}</li>
+              {{end}}
+            </ol>
+            <hr>
+          {{end}}
+
+          <!-- render the groups tree -->
+          <p>
+            {{msg $ "creator.select.path"}}
+          </p>
+          <div id="groups">
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    getGroups("creator", '#groups');
+  });
+</script>

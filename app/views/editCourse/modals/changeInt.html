@@ -1,0 +1,57 @@
+<!-- change-int-modal
+
+titleID:      change-int-modal-title      html
+fieldID:      change-int-modal-field      value
+valueID:      change-int-modal-value      value
+
+formID:       change-int-modal-form       action
+-->
+
+<div class="modal fade" id="change-int-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-int-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-int-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-int-modal-field">
+
+          <!-- value -->
+          <small class="form-text text-muted" id="change-int-modal-info">
+          </small>
+          <input min="1" type="number" name="value" class="form-control"
+            id="change-int-modal-value" required>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.int"}}
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

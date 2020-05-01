@@ -36,6 +36,9 @@ button.delete = Delete
 button.abort = Abbrechen
 button.close = Close
 
+button.collapse = Collapse
+button.show = Show
+
 # -------------------------------------------------------------------------------------------------- #
 # ERROR
 # -------------------------------------------------------------------------------------------------- #
@@ -56,6 +59,7 @@ user.role = Role
 user.role.admin = Admin
 user.role.creator = Creator
 user.role.editor = Editor
+user.role.instructor = Instructor
 user.role.instructors = Instructors
 user.role.user = User
 
@@ -120,6 +124,7 @@ search.no.results = No results
 search.limit = Search results are limited to a <strong>maximum of %d results</strong>. If your result is missing, please refine your search value.
 search.criteria = Search criteria are: last name, first name, e-mail address, matriculation number (only entire numbers).
 search.inactive.users = Show not activated accounts
+search.already.added = Already added
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE
@@ -234,59 +239,3 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
-
-# -------------------------------------------------------------------------------------------------- #
-# COURSE
-# -------------------------------------------------------------------------------------------------- #
-
-course.title = Course title
-course.subtitle = Subtitle
-course.fee = Fee
-
-course.clock =
-course.from = From
-course.to = to
-course.enrollment.period = Enrollment period
-course.unsubscribe.end = Unsubscribe end
-
-course.title.change.success = Changed course title to '%s', course ID = %d.
-course.subtitle.change.success = Changed subtitle to '%s', course ID = %d.
-course.subtitle.delete.success = Deleted subtitle, course ID = %d.
-course.unsubscribe.end.change.success = Set unsubscribe end to %s, course ID = %d.
-course.unsubscribe.end.delete.success = Deleted unsubscribe end, course ID = %d.
-
-course.editor.change.success = Added editor: %s, course ID = %d.
-course.instructor.change.success = Added instructor: %s, course ID = %d.
-course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
-course.blacklist.change.success = Added user to blacklist: %s, course ID = %d.
-
-# -------------------------------------------------------------------------------------------------- #
-# CREATOR
-# -------------------------------------------------------------------------------------------------- #
-
-creator.tab = Course management
-creator.page = Course management
-
-creator.course.is.open = Opened course
-creator.course.open = Open course
-creator.course.new = New course
-creator.drafts = Drafts
-creator.courses.active = Active courses
-creator.courses.expired = Expired courses
-
-creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
-creator.draft = Draft
-creator.course.blank = Blank course
-creator.course.draft = Load course data
-creator.course.upload = Upload course data
-
-creator.title.working.info = Working course title. Can be edited later.
-creator.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
-
-creator.new.blank.success = Created new blank course, ID = %d.
-
-creator.add.subtitle = + &nbsp; Subtitle
-creator.add.instructor = + &nbsp; Instructor
-creator.add.editor = + &nbsp; Editor
-creator.add.unsubscribe.end = + &nbsp; Unsubscribe end
-creator.add.fee = + &nbsp; Fee

@@ -30,6 +30,7 @@ type Course struct {
 	EnrollmentEnd     string          `db:"enrollmentend"`
 	UnsubscribeEnd    sql.NullString  `db:"unsubscribeend"`
 	ExpirationDate    string          `db:"expirationdate"`
+	ParentID          sql.NullInt32   `db:"parentid"`
 	Events            Events          ``
 	Editors           UserList        ``
 	Instructors       UserList        ``
@@ -39,6 +40,8 @@ type Course struct {
 
 	//additional information required when displaying the course
 	CreatorData User ``
+	//path to the course entry in the groups tree
+	Path Groups ``
 }
 
 /*Validate all Course fields. */
@@ -89,6 +92,7 @@ func (course *Course) Validate(v *revel.Validation) {
 	}
 
 	//TODO: all the other fields
+	//TODO: must have entry in groups tree
 }
 
 /*Update the specified column in the course table. */
@@ -110,6 +114,9 @@ func (course *Course) Get() (err error) {
 		modelsLog.Error("failed to get course", "course ID", course.ID, "error", err.Error())
 		tx.Rollback()
 		return
+	}
+	if course.Fee.Valid {
+		course.Fee.Float64 = math.Round(course.Fee.Float64*100) / 100
 	}
 	if err = course.Events.Get(tx, &course.ID); err != nil {
 		return
@@ -137,6 +144,11 @@ func (course *Course) Get() (err error) {
 		}
 	}
 
+	//get the path of the course in the groups tree
+	if err = course.Path.GetPath(&course.ID, tx); err != nil {
+		return
+	}
+
 	tx.Commit()
 	return
 }
@@ -154,12 +166,13 @@ func (course *Course) NewBlank(creatorID *int, title *string) (err error) {
 	return
 }
 
-var feePattern = regexp.MustCompile("^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?")
+//FeePattern is the regular expression of accepted course fees
+var FeePattern = regexp.MustCompile("^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?")
 
 const (
 	stmtSelectCourse = `
 		SELECT
-			id, title, creator, subtitle, visible, active, onlyldap,
+			id, title, creator, subtitle, visible, active, onlyldap, parentid,
 			description, fee, customemail, enrolllimitevents, speaker,
 			TO_CHAR (creationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as creationdate,
 			TO_CHAR (enrollmentstart AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as enrollmentstart,

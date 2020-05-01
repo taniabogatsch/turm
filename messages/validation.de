@@ -46,12 +46,15 @@ validation.invalid.searchValue = Der Suchwert muss aus 3 bis 127 Zeichen bestehe
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.courseID = Bitte geben Sie eine gültige Kurs ID an.
-validation.invalid.title = Der Kurstitel muss aus 3 bis 511 Zeichen bestehen.
-validation.invalid.subtitle = Der Untertitel muss aus 3 bis 511 Zeichen bestehen.
 
 validation.invalid.date = Bitte geben Sie ein Datum zwischen [jetzt, 2200-01-01] an.
 validation.invalid.time = Bitte geben Sie eine Zeit an.
 validation.invalid.timestamp = Bitte geben Sie ein gültiges Datum und eine Uhrzeit an.
+validation.invalid.text = Die Eingabe muss aus 3 bis 511 Zeichen bestehen.
+validation.invalid.text.area = Bitte geben Sie Textinhalt an.
+validation.invalid.int = Bitte geben Sie eine natürliche positive Zahl an.
+
+validation.invalid.fee = Bitte geben Sie eine gültige Teilnahmegebühr an.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR

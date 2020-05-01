@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"strconv"
-	"strings"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -135,30 +134,4 @@ func (c Creator) NewCourse(param models.NewCourseParam, msg string) revel.Result
 	}
 
 	return c.Redirect(EditCourse.OpenCourse, course.ID, msg)
-}
-
-/*SearchUser searches for users for the different user lists.
-- Roles: creator and editors. */
-func (c Creator) SearchUser(value string, searchInactive bool, listType string) revel.Result {
-
-	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
-
-	trimmedValue := strings.TrimSpace(value)
-	c.Validation.Check(trimmedValue,
-		revel.MinSize{3},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
-
-	if c.Validation.HasErrors() {
-		c.Validation.Keep()
-		return c.Render()
-	}
-
-	var users models.UserList
-	if err := users.Search(&value, &searchInactive, &listType); err != nil {
-		renderQuietError(errDB, err, c.Controller)
-		return c.Render()
-	}
-
-	return c.Render(users, listType)
 }

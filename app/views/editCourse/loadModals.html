@@ -1,39 +1,11 @@
 
-{{template "editCourse/modals/changeTitle.html" dict_addLocale $.currentLocale "ID" .course.ID "Title" .course.Title}}
-{{template "editCourse/modals/changeSubtitle.html" dict_addLocale $.currentLocale "ID" .course.ID "Subtitle" .course.Subtitle.String}}
-{{template "editCourse/modals/changeEditors.html" dict_addLocale $.currentLocale "ID" .course.ID "Editors" .course.Editors}}
-{{template "editCourse/modals/changeUnsubscribeEnd.html" dict_addLocale $.currentLocale "ID" .course.ID "UnsubscribeEnd" .course.UnsubscribeEnd "EnrollmentEnd" .course.EnrollmentEnd}}
+{{template "editCourse/modals/changeBool.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeGroup.html" dict_addLocale $.currentLocale "ID" .course.ID "Path" .course.Path}}
+{{template "editCourse/modals/changeInt.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeText.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeTextArea.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeTimestamp.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeUserList.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/deleteField.html" dict_addLocale $.currentLocale}}
 
-<script>
-  //call if the search value changes of the 'inactive users'-checkbox is changed
-  function reactToListInput(listType) {
-    document.getElementById("search-form-" + listType).classList.add('was-validated');
-    const value = $('#user-search-input-' + listType).val();
-    if (value.length > 2) { //search matching users
-      const searchInactive = $('#search-inactive-' + listType).is(':checked');
-      searchForList(value, searchInactive, listType);
-    } else if (value.length == 0) {
-      $('#user-search-results-' + listType).html("");
-      document.getElementById("search-form-" + listType).classList.remove('was-validated');
-    } else {
-      $('#user-search-results-' + listType).html("");
-    }
-  }
-
-  //renders all users matching value
-  function searchForList(value, searchInactive, listType) {
-    $.get("{{url "Creator.SearchUser"}}", {
-      "value": value,
-      "searchInactive": searchInactive,
-      "listType": listType
-    }, function(data) {
-      $('#user-search-results-' + listType).html(data);
-    });
-  }
-
-  function submitList(listType, ID) {
-    //set the user ID
-    $('#input-list-' + listType).attr("value", ID);
-    $('#search-form-' + listType).submit();
-  }
-</script>
+<script src="/public/js/editCourse.js"></script>

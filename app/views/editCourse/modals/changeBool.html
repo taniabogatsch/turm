@@ -1,0 +1,79 @@
+<!-- change-bool-modal
+
+titleID:        change-bool-modal-title         html
+option1-ID:     change-bool-modal-option-1      html
+option2-ID:     change-bool-modal-option-2      html
+checkboxID:     change-bool-modal-checkbox      value
+
+formID:         change-bool-modal-form          action
+
+- optional:
+userID:         change-bool-modal-user          value
+listType:       change-bool-modal-list          value
+-->
+
+<div class="modal fade" id="change-bool-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-bool-modal-form" accept-charset="UTF-8" method="POST">
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-bool-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- user ID -->
+          <input id="change-bool-modal-user" type="hidden" name="userID">
+          <!-- list type -->
+          <input id="change-bool-modal-list" type="hidden" name="listType">
+
+          <!-- boolean value -->
+          <div class="form-group">
+            <div class="form-check">
+              <input id="change-bool-modal-checkbox" class="form-check-input" type="checkbox"
+                value="true" name="option">
+              <label class="form-check-label" id="change-bool-modal-option-1"></label>
+              <label class="form-check-label" id="change-bool-modal-option-2"></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //react to user input
+    $('#change-bool-modal-checkbox').change(function() {
+      if($("#change-bool-modal-checkbox").is(':checked')) {
+        $('#change-bool-modal-option-1').removeClass("display-none");
+        $('#change-bool-modal-option-2').addClass("display-none");
+      } else {
+        $('#change-bool-modal-option-1').addClass("display-none");
+        $('#change-bool-modal-option-2').removeClass("display-none");
+      }
+    });
+  });
+</script>

@@ -1,0 +1,43 @@
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tab = Course management
+creator.page = Course management
+
+creator.course.is.open = Opened course
+creator.course.draft.is.open = Opened course draft
+creator.course.open = Open course
+creator.course.new = New course
+creator.drafts = Drafts
+creator.courses.active = Active courses
+creator.courses.expired = Expired courses
+
+creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
+creator.draft = Draft
+creator.course.blank = Blank course
+creator.course.draft = Load course data
+creator.course.upload = Upload course data
+
+creator.title.working.info = Working course title. Can be edited later.
+
+creator.more.settings = More course settings
+creator.more.settings.info = These settings are not visible to the user.
+creator.current.path = Current path
+creator.select.path = Select a new path...
+
+creator.new.blank.success = Created new blank course, ID = %d.
+
+creator.add.course.here = + &nbsp; Add
+creator.add.path = + &nbsp; Course path
+creator.add.subtitle = + &nbsp; Subtitle
+creator.add.instructor = + &nbsp; Instructor
+creator.add.editor = + &nbsp; Editor
+creator.add.unsubscribe.end = + &nbsp; Unsubscribe end
+creator.add.fee = + &nbsp; Fee
+creator.add.description = + &nbsp; Course description
+creator.add.speaker = + &nbsp; Speaker
+creator.add.custom.email = + &nbsp; Enrollment e-mail
+creator.add.whitelist = + &nbsp; Add user to Whitelist
+creator.add.blacklist = + &nbsp; Add user to Blacklist
+creator.add.enroll.limit = + &nbsp; Enroll limit

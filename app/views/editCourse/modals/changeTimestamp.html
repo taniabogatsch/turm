@@ -1,43 +1,58 @@
-<!-- change unsubscribe end modal -->
+<!-- change-timestamp-modal
 
-<div class="modal fade" id="change-unsubscribe-end-modal" tabindex="-1" role="dialog" aria-hidden="true">
+titleID:      change-timestamp-modal-title      html
+fieldID:      change-timestamp-modal-field      value
+infoID:       change-timestamp-modal-info       html
+
+dateID:       change-timestamp-modal-date       value
+timeID:       change-timestamp-modal-time       value
+-->
+
+<div class="modal fade" id="change-timestamp-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
-      <!-- modal header -->
-      <div class="modal-header background-color-darkblue border-radius-2">
-        <h5 class="modal-title text-white">
-          {{msg $ "course.unsubscribe.end"}}
-        </h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+      <form id="change-timestamp-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
 
-      <form accept-charset="UTF-8" action='{{url "EditCourse.ChangeUnsubscribeEnd"}}' method="POST" class="needs-validation" novalidate>
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-timestamp-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
 
+        <!-- modal body -->
         <div class="modal-body">
+
           <!-- course ID -->
           <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-timestamp-modal-field">
 
-          <small class="form-text text-muted">
-            {{msg $ "creator.unsubscribe.end.info"}}
+          <!-- value -->
+          <small class="form-text text-muted" id="change-timestamp-modal-info">
           </small>
           <div class="row">
+
+            <!-- date -->
             <div class="col">
-              <!-- unsubscribe end date -->
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
                     {{template "icons/calendar.html" .}}
                   </span>
                 </div>
-                <input id="unsub-date" type="date" max='2200-01-01' name="date" class="form-control rounded-right" required>
+                <input id="change-timestamp-modal-date" type="date" max='2200-01-01'
+                  min="1980-01-01" name="date" class="form-control rounded-right" required>
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.date"}}
                 </div>
               </div>
             </div>
+
+            <!-- time -->
             <div class="col">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -45,7 +60,8 @@
                     {{template "icons/clock.html" .}}
                   </span>
                 </div>
-                <input id="unsub-time" type="time" name="time" class="form-control rounded-right" required>
+                <input id="change-timestamp-modal-time" type="time" name="time"
+                  class="form-control rounded-right" required>
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.time"}}
                 </div>
@@ -63,23 +79,8 @@
             {{msg $ "button.save"}}
           </button>
         </div>
+        
       </form>
     </div>
   </div>
 </div>
-
-<script>
-  $(function() {
-    if ({{.UnsubscribeEnd.Valid}}) {
-      const str = '{{.UnsubscribeEnd.String}}';
-      const timestamp = str.split(" ");
-      $('#unsub-date').val(timestamp[0]);
-      $('#unsub-time').val(timestamp[1]);
-    }
-
-    //set the minimum date
-    const strEnroll = '{{.EnrollmentEnd}}';
-    const timestampEnroll = strEnroll.split(" ");
-    $('#unsub-date').attr("min", timestampEnroll[0]);
-  });
-</script>

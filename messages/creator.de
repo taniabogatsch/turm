@@ -1,0 +1,43 @@
+# -------------------------------------------------------------------------------------------------- #
+# CREATOR
+# -------------------------------------------------------------------------------------------------- #
+
+creator.tab = Kursverwaltung
+creator.page = Kursverwaltung
+
+creator.course.is.open = Kurs geöffnet
+creator.course.draft.is.open = Kursentwurf geöffnet
+creator.course.open = Kurs öffnen
+creator.course.new = Neuer Kurs
+creator.drafts = Entwürfe
+creator.courses.active = Aktive Kurse
+creator.courses.expired = Abgelaufene Kurse
+
+creator.drafts.info = Kursvorlagen erlauben es Ihnen Kursdaten aus vorherigen Kursen zu importieren.
+creator.draft = Vorlage
+creator.course.blank = Leerer Kurs
+creator.course.draft = Aus Kursen
+creator.course.upload = Kursvorlage hochladen
+
+creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
+
+creator.more.settings = Weitere Kurseinstellungen
+creator.more.settings.info = Diese Einstellungen sind für die NutzerInnen nicht sichtbar.
+creator.current.path = Bisheriger Pfad
+creator.select.path = Neuen Pfad wählen...
+
+creator.new.blank.success = Neuer leerer Kurs erstellt, ID = %d.
+
+creator.add.course.here = + &nbsp; Kurs
+creator.add.path = + &nbsp; Kurspfad
+creator.add.subtitle = + &nbsp; Untertitel
+creator.add.instructor = + &nbsp; OrganisatorIn
+creator.add.editor = + &nbsp; EditorIn
+creator.add.unsubscribe.end = + &nbsp; Austragen bis
+creator.add.fee = + &nbsp; Teilnahmegebühr
+creator.add.description = + &nbsp; Kursbeschreibung
+creator.add.speaker = + &nbsp; ReferentIn
+creator.add.custom.email = + &nbsp; Willkommensemail
+creator.add.whitelist = + &nbsp; NutzerIn auf Whitelist
+creator.add.blacklist = + &nbsp; NutzerIn auf Blacklist
+creator.add.enroll.limit = + &nbsp; Einschreibelimit

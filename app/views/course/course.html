@@ -8,7 +8,10 @@
     <td colspan="2">
       <h4>
         {{.course.Title}}
-        <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-title-modal">
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openChangeModal({{msg $ "course.title"}}, "title", {{.course.Title}},
+            true, {{url "EditCourse.ChangeText"}}, "text", "511",
+            {{msg $ "course.title.change.info"}});'>
           {{template "icons/pencil.html" . }}
         </a>
       </h4>
@@ -21,10 +24,17 @@
       <td colspan="2">
         <h5>
           {{.course.Subtitle.String}}
-          <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-subtitle-modal">
+          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+            onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
+              {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
+              {{url "EditCourse.ChangeText"}}, "text", "511",
+              {{msg $ "course.subtitle.change.info"}});'>
             {{template "icons/pencil.html" . }}
           </a>
-          <a href='{{url "EditCourse.ChangeSubtitle" .course.ID}}' class="badge btn-outline-darkblue preview-hide">
+          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+            onclick='openDeleteFieldModal({{msg $ "course.subtitle.delete.title"}},
+              {{msg $ "course.subtitle.delete.confirm" .course.Subtitle.String}},
+              {{url "EditCourse.ChangeText" .course.ID "subtitle" ""}});'>
             {{template "icons/trash.html" . }}
           </a>
         </h5>
@@ -33,7 +43,11 @@
   {{else}}
     <tr class="preview-hide">
       <td colspan="2">
-        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-subtitle-modal">
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
+            {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
+            {{url "EditCourse.ChangeText"}}, "text", "511",
+            {{msg $ "course.subtitle.change.info"}});'>
           {{msg $ "creator.add.subtitle"}}
         </button>
       </td>
@@ -72,18 +86,42 @@
             {{msg $ "user.role.editor"}}
             |
             {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
-            <a href="#" class="badge btn-outline-darkblue">
-              {{template "icons/pencil.html" . }} <!-- TODO -->
+            <a href="#no-scroll" class="badge btn-outline-darkblue"
+              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, {{url "EditCourse.ChangeViewMatrNr"}}, {{msg $ "course.see.matr.nr.info"}},
+                {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "editor");'>
+              {{template "icons/pencil.html" . }}
             </a>
             |
-            <a href="#" class="badge btn-outline-darkblue">
-              {{template "icons/trash.html" . }} <!-- TODO -->
+            <a href="#no-scroll" class="badge btn-outline-darkblue"
+              onclick='openDeleteFieldModal({{msg $ "course.editor.delete.title"}}, {{msg $ "course.editor.delete.confirm" .EMail}},
+                {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "editor"}});'>
+              {{template "icons/trash.html" . }}
             </a>
           </div>
         {{end}}
         {{range $key, $user := .course.Instructors}}
           {{if $.course.Editors}}<br>{{else if ne $key 0}}<br>{{end}}
-          <!-- TODO -->
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+          <a href="mailto:{{.EMail}}" target="_top">
+            {{template "icons/envelope.html" .}}
+            {{.EMail}}
+          </a>
+          <div class="preview-hide text-muted">
+            {{msg $ "user.role.instructor"}}
+            |
+            {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
+            <a href="#no-scroll" class="badge btn-outline-darkblue"
+              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, {{url "EditCourse.ChangeViewMatrNr"}}, {{msg $ "course.see.matr.nr.info"}},
+                {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "instructor");'>
+              {{template "icons/pencil.html" . }}
+            </a>
+            |
+            <a href="#no-scroll" class="badge btn-outline-darkblue"
+              onclick='openDeleteFieldModal({{msg $ "course.instructor.delete.title"}}, {{msg $ "course.instructor.delete.confirm" .EMail}},
+                {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "instructor"}});'>
+              {{template "icons/trash.html" . }}
+            </a>
+          </div>
         {{end}}
       </td>
     </tr>
@@ -91,11 +129,13 @@
   <tr class="preview-hide">
     <td></td>
     <td>
-      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-editors-modal">
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openUserListModal({{msg $ "creator.add.editor"}}, "editor");'>
         {{msg $ "creator.add.editor"}}
       </button>
-      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-instructors-modal">
-        {{msg $ "creator.add.instructor"}} <!-- TODO -->
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openUserListModal({{msg $ "creator.add.instructor"}}, "instructor");'>
+        {{msg $ "creator.add.instructor"}}
       </button>
     </td>
   </tr>
@@ -106,10 +146,20 @@
       {{msg $ "course.enrollment.period"}}:
     </td>
     <td>
-      {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}} <br>
+      {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}}
+      <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+        onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollmentstart",
+          {{.course.EnrollmentStart}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          "timestamp", "", {{msg $ "course.enrollment.start.change.info"}});'>
+        {{template "icons/pencil.html" . }}
+      </a>
+      <br>
       {{msg $ "course.to"}} {{.course.EnrollmentEnd}} {{msg $ "course.clock"}}
-      <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-enrollment-period-modal">
-        {{template "icons/pencil.html" . }} <!-- TODO -->
+      <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+        onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollmentend",
+          {{.course.EnrollmentEnd}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          "timestamp", "", {{msg $ "course.enrollment.end.change.info"}});'>
+        {{template "icons/pencil.html" . }}
       </a>
     </td>
   </tr>
@@ -122,10 +172,17 @@
       </td>
       <td>
         {{.course.UnsubscribeEnd.String}} {{msg $ "course.clock"}}
-        <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-unsubscribe-end-modal">
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribeend",
+            {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
+            {{url "EditCourse.ChangeTimestamp"}}, "timestamp", "",
+            {{msg $ "course.unsubscribe.end.info"}});'>
           {{template "icons/pencil.html" . }}
         </a>
-        <a href='{{url "EditCourse.ChangeUnsubscribeEnd" .course.ID}}' class="badge btn-outline-darkblue preview-hide">
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openDeleteFieldModal({{msg $ "course.unsubscribe.end.delete.title"}},
+            {{msg $ "course.unsubscribe.end.delete.confirm" .course.UnsubscribeEnd.String}},
+            {{url "EditCourse.ChangeTimestamp" .course.ID "unsubscribeend" "" ""}});'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -134,14 +191,16 @@
     <tr class="preview-hide">
       <td></td>
       <td>
-        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-unsubscribe-end-modal">
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribeend",
+            {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
+            {{url "EditCourse.ChangeTimestamp"}}, "timestamp", "",
+            {{msg $ "course.unsubscribe.end.info"}});'>
           {{msg $ "creator.add.unsubscribe.end"}}
         </button>
       </td>
     </tr>
   {{end}}
-
-  <!-- TODO: only show expiration date at course management page -->
 
   <!-- show fee if there is one -->
   {{if .course.Fee.Valid}}
@@ -151,11 +210,18 @@
        </td>
        <td>
          {{.course.Fee.Float64}}€
-         <a href="#" class="badge btn-outline-darkblue preview-hide" data-toggle="modal" data-target="#change-fee-modal">
-           {{template "icons/pencil.html" . }} <!-- TODO -->
+         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+           onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
+             {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
+             {{url "EditCourse.ChangeText"}}, "text", "",
+             {{msg $ "course.fee.change.info"}});'>
+           {{template "icons/pencil.html" . }}
          </a>
-         <a href='#' class="badge btn-outline-darkblue preview-hide">
-           {{template "icons/trash.html" . }} <!-- TODO -->
+         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+           onclick='openDeleteFieldModal({{msg $ "course.fee.delete.title"}},
+             {{msg $ "course.fee.delete.confirm" .course.Fee.Float64}},
+             {{url "EditCourse.ChangeText" .course.ID "fee" ""}});'>
+           {{template "icons/trash.html" . }}
          </a>
        </td>
     </tr>
@@ -163,13 +229,330 @@
     <tr class="preview-hide">
       <td></td>
       <td>
-        <!-- TODO -->
-        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" data-target="#change-fee-modal">
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
+            {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
+            {{url "EditCourse.ChangeText"}}, "text", "",
+            {{msg $ "course.fee.change.info"}});'>
           {{msg $ "creator.add.fee"}}
         </button>
       </td>
     </tr>
   {{end}}
+
+  <!-- description -->
+  {{if .course.Description.Valid}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "course.description"}}:
+        <br>
+        <a data-toggle="collapse" href="#course-description" role="button"
+          aria-expanded="true" aria-controls="course-description"
+          id="course-description-btn">
+          {{msg $ "button.collapse"}}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openTextAreaModal({{msg $ "course.description"}},
+            "description", {{.course.Description.Valid}},
+            {{url "EditCourse.ChangeText"}}, {{msg $ "course.description.change.info"}});'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openDeleteFieldModal({{msg $ "course.description.delete.title"}},
+            {{msg $ "course.description.delete.confirm"}},
+            {{url "EditCourse.ChangeText" .course.ID  "description" ""}});'>
+          {{template "icons/trash.html" . }}
+        </a>
+      </td>
+      <td>
+        <div class="collapse show" id="course-description">
+        </div>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openTextAreaModal({{msg $ "course.description"}},
+            "description", {{.course.Description.Valid}},
+            {{url "EditCourse.ChangeText"}}, {{msg $ "course.description.change.info"}});'>
+          {{msg $ "creator.add.description"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- speaker -->
+  {{if .course.Speaker.Valid}}
+    <tr>
+      <td class="text-muted">
+        {{msg $ "course.speaker"}}:
+        <br>
+        <a data-toggle="collapse" href="#course-speaker" role="button"
+          aria-expanded="true" aria-controls="course-speaker"
+          id="course-speaker-btn">
+          {{msg $ "button.collapse"}}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openTextAreaModal({{msg $ "course.speaker"}},
+            "speaker", {{.course.Speaker.Valid}}, {{url "EditCourse.ChangeText"}},
+            {{msg $ "course.speaker.change.info"}});'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openDeleteFieldModal({{msg $ "course.speaker.delete.title"}},
+            {{msg $ "course.speaker.delete.confirm"}},
+            {{url "EditCourse.ChangeText" .course.ID  "speaker" ""}});'>
+          {{template "icons/trash.html" . }}
+        </a>
+      </td>
+      <td>
+        <div class="collapse show" id="course-speaker">
+        </div>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openTextAreaModal({{msg $ "course.speaker"}},
+            "speaker", {{.course.Speaker.Valid}}, {{url "EditCourse.ChangeText"}},
+            {{msg $ "course.speaker.change.info"}});'>
+          {{msg $ "creator.add.speaker"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- more settings -->
+  <tr class="preview-hide">
+    <td colspan="2">
+      <h5>
+        <br>
+        <br>
+        {{template "icons/tools.html" .}}
+        &nbsp; {{msg $ "creator.more.settings"}}
+      </h5>
+      <small class="text-muted">
+        {{msg $ "creator.more.settings.info"}}
+      </small>
+    </td>
+  </tr>
+
+  <!-- course path -->
+  <tr class="preview-hide">
+    <td class="text-muted">
+      {{msg $ "course.path"}}
+    </td>
+    <td>
+      {{if .course.Path}}
+        <ol class="breadcrumb bg-white m-0 p-0">
+          {{range .course.Path}}
+            <li class="breadcrumb-item">{{.Name}}</li>
+            {{if eq .Name $.course.Title}}
+              &nbsp;
+              <a href="#no-scroll" class="badge btn-outline-darkblue float-right"
+                data-toggle="modal" data-target="#change-group-modal">
+                {{template "icons/pencil.html" . }}
+              </a>
+            {{end}}
+          {{end}}
+        </ol>
+      {{else}}
+        <button type="button" class="btn btn-outline-darkblue"
+          data-toggle="modal" data-target="#change-group-modal">
+          {{msg $ "creator.add.path"}}
+        </button>
+      {{end}}
+    </td>
+  </tr>
+
+  <!-- visibility -->
+  <tr class="preview-hide">
+    <td class="text-muted">
+      {{msg $ "course.visibility"}}:
+    </td>
+    <td>
+      {{if .course.Visible}}
+        {{msg $ "course.visibility.public"}}
+      {{else}}
+        {{msg $ "course.visibility.not.public"}}
+      {{end}}
+      <a href="#no-scroll" class="badge btn-outline-darkblue"
+        onclick='openBoolModal({{msg $ "course.visibility.change.title"}},
+          {{url "EditCourse.ChangeVisibility"}}, {{msg $ "course.visibility.public"}},
+          {{msg $ "course.visibility.not.public"}}, {{.course.Visible}}, "", "");'>
+        {{template "icons/pencil.html" . }}
+      </a>
+    </td>
+  </tr>
+
+  <!-- expiration date -->
+  <tr class="preview-hide">
+    <td class="text-muted">
+      {{msg $ "course.expiration.date"}}:
+    </td>
+    <td>
+      {{.course.ExpirationDate}} {{msg $ "course.clock"}}
+      <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+        onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expirationdate",
+          {{.course.ExpirationDate}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          "timestamp", "", {{msg $ "course.expiration.date.change.info"}});'>
+        {{template "icons/pencil.html" . }}
+      </a>
+    </td>
+  </tr>
+
+  <!-- custom e-mail -->
+  {{if .course.CustomEMail.Valid}}
+    <tr class="preview-hide">
+      <td class="text-muted">
+        {{msg $ "course.custom.email"}}:
+        <br>
+        <a data-toggle="collapse" href="#course-customemail" role="button"
+          aria-expanded="true" aria-controls="course-customemail"
+          id="course-customemail-btn">
+          {{msg $ "button.collapse"}}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openTextAreaModal({{msg $ "course.custom.email"}},
+            "customemail", {{.course.CustomEMail.Valid}},
+            {{url "EditCourse.ChangeText"}}, {{msg $ "course.custom.email.change.info"}});'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openDeleteFieldModal({{msg $ "course.customemail.delete.title"}},
+            {{msg $ "course.customemail.delete.confirm"}},
+            {{url "EditCourse.ChangeText" .course.ID  "customemail" ""}});'>
+          {{template "icons/trash.html" . }}
+        </a>
+      </td>
+      <td>
+        <div class="collapse show" id="course-customemail">
+        </div>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openTextAreaModal({{msg $ "course.custom.email"}},
+            "customemail", {{.course.CustomEMail.Valid}},
+            {{url "EditCourse.ChangeText"}}, {{msg $ "course.custom.email.change.info"}});'>
+          {{msg $ "creator.add.custom.email"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- enrollment limit events -->
+  {{if .course.EnrollLimitEvents.Valid}}
+    <tr class="preview-hide">
+      <td class="text-muted">
+        {{msg $ "course.enroll.limit.events"}}:
+      </td>
+      <td>
+        {{.course.EnrollLimitEvents.Int32}} {{msg $ "course.events"}}
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enrolllimitevents",
+            {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
+            {{url "EditCourse.ChangeEnrollLimit"}}, "int", "",
+            {{msg $ "course.enroll.limit.events.change.info"}});'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+          onclick='openDeleteFieldModal({{msg $ "course.enroll.limit.events.delete.title"}},
+            {{msg $ "course.enroll.limit.events.delete.confirm" .course.EnrollLimitEvents.Int32}},
+            {{url "EditCourse.ChangeEnrollLimit" .course.ID "enrolllimitevents" ""}});'>
+          {{template "icons/trash.html" . }}
+        </a>
+      </td>
+    </tr>
+  {{else}}
+    <tr class="preview-hide">
+      <td></td>
+      <td>
+        <button type="button" class="btn btn-outline-darkblue"
+        onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enrolllimitevents",
+          {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
+          {{url "EditCourse.ChangeEnrollLimit"}}, "int", "",
+          {{msg $ "course.enroll.limit.events.change.info"}});'>
+          {{msg $ "creator.add.enroll.limit"}}
+        </button>
+      </td>
+    </tr>
+  {{end}}
+
+  <!-- whitelist -->
+  {{if .course.Whitelist}}
+    <tr class="preview-hide">
+      <td class="text-muted">
+        {{msg $ "course.whitelist"}}:
+      </td>
+      <td>
+        {{range $key, $user := .course.Whitelist}}
+          {{if ne $key 0}}<br>{{end}}
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+          <a href="mailto:{{.EMail}}" target="_top">
+            {{template "icons/envelope.html" .}}
+            {{.EMail}}
+          </a>
+          |
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openDeleteFieldModal({{msg $ "course.whitelist.delete.title"}}, {{msg $ "course.whitelist.delete.confirm" .EMail}},
+              {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "whitelist"}});'>
+            {{template "icons/trash.html" . }}
+          </a>
+        {{end}}
+      </td>
+    </tr>
+  {{end}}
+  <tr class="preview-hide">
+    <td></td>
+    <td>
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openUserListModal({{msg $ "creator.add.whitelist"}}, "whitelist");'>
+        {{msg $ "creator.add.whitelist"}}
+      </button>
+    </td>
+  </tr>
+
+  <!-- blacklist -->
+  {{if .course.Blacklist}}
+    <tr class="preview-hide">
+      <td class="text-muted">
+        {{msg $ "course.blacklist"}}:
+      </td>
+      <td>
+        {{range $key, $user := .course.Blacklist}}
+          {{if ne $key 0}}<br>{{end}}
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+          <a href="mailto:{{.EMail}}" target="_top">
+            {{template "icons/envelope.html" .}}
+            {{.EMail}}
+          </a>
+          |
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openDeleteFieldModal({{msg $ "course.blacklist.delete.title"}}, {{msg $ "course.blacklist.delete.confirm" .EMail}},
+              {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "blacklist"}});'>
+            {{template "icons/trash.html" . }}
+          </a>
+        {{end}}
+      </td>
+    </tr>
+  {{end}}
+  <tr class="preview-hide">
+    <td></td>
+    <td>
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openUserListModal({{msg $ "creator.add.blacklist"}}, "blacklist");'>
+        {{msg $ "creator.add.blacklist"}}
+      </button>
+    </td>
+  </tr>
 </table>
 
 <script>
@@ -187,4 +570,31 @@
     $('#preview-btn').attr("onclick", "showPreview();");
     $('#preview-btn').html("Preview");
   }
+
+  $(function() {
+    $('#course-description').html('{{.course.Description.String}}');
+    $('#course-speaker').html('{{.course.Speaker.String}}');
+    $('#course-customemail').html('{{.course.CustomEMail.String}}');
+
+    $('#course-description').on('hidden.bs.collapse', function () {
+      $('#course-description-btn').html('{{msg $ "button.show"}}');
+    })
+    $('#course-description').on('shown.bs.collapse', function () {
+      $('#course-description-btn').html('{{msg $ "button.collapse"}}');
+    })
+
+    $('#course-speaker').on('hidden.bs.collapse', function () {
+      $('#course-speaker-btn').html('{{msg $ "button.show"}}');
+    })
+    $('#course-speaker').on('shown.bs.collapse', function () {
+      $('#course-speaker-btn').html('{{msg $ "button.collapse"}}');
+    })
+
+    $('#course-customemail').on('hidden.bs.collapse', function () {
+      $('#course-customemail-btn').html('{{msg $ "button.show"}}');
+    })
+    $('#course-customemail').on('shown.bs.collapse', function () {
+      $('#course-customemail-btn').html('{{msg $ "button.collapse"}}');
+    })
+  });
 </script>

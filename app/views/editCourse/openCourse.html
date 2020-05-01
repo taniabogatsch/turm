@@ -9,7 +9,11 @@
 
     <h4>
       {{template "icons/folder.html" . }}
-      &nbsp; {{msg $ "creator.course.is.open"}}
+      {{if .course.Active}}
+        &nbsp; {{msg $ "creator.course.is.open"}}
+      {{else}}
+        &nbsp; {{msg $ "creator.course.draft.is.open"}}
+      {{end}}
 
       <button type="button" class="btn btn-outline-darkblue float-right">
         {{template "icons/trash.html"}}

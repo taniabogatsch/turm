@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 	"turm/app"
 
@@ -15,7 +16,6 @@ import (
 type Group struct {
 	ID          int           `db:"id, primarykey, autoincrement"`
 	ParentID    sql.NullInt32 `db:"parentid"`
-	CourseID    sql.NullInt32 `db:"courseid"`
 	Name        string        `db:"name"`
 	CourseLimit sql.NullInt32 `db:"courselimit"`
 	LastEditor  sql.NullInt32 `db:"lasteditor"`
@@ -32,6 +32,7 @@ type Group struct {
 /*Validate Group fields. */
 func (group *Group) Validate(v *revel.Validation) {
 
+	group.Name = strings.TrimSpace(group.Name)
 	v.Check(group.Name,
 		revel.MinSize{3},
 		revel.MaxSize{255},
@@ -59,8 +60,6 @@ func (group *Group) Validate(v *revel.Validation) {
 	if group.ParentID.Int32 != 0 {
 		group.ParentID.Valid = true
 	}
-
-	//NOTE: the DB statement ensures that no courses are edited
 }
 
 /*Add a new group to the groups table. */
@@ -169,6 +168,18 @@ func (groups *Groups) Get(prefix *string) (err error) {
 	return
 }
 
+/*GetPath returns the path of a course in the groups tree. */
+func (groups *Groups) GetPath(courseID *int, tx *sqlx.Tx) (err error) {
+
+	err = tx.Select(groups, stmtGetPath, *courseID)
+	if err != nil {
+		modelsLog.Error("failed to get path", "courseID", *courseID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+	return
+}
+
 /*GetByUser gets all groups created by a user. */
 func (groups *Groups) GetByUser(userID *int, tx *sqlx.Tx) (err error) {
 
@@ -205,7 +216,7 @@ func getChildren(tx *sqlx.Tx, group *Group) (hasLimits bool, err error) {
 		}
 
 		//only get the children if the entry is a group
-		if !(group.Groups[key]).CourseID.Valid {
+		if group.Groups[key].ID != 0 {
 
 			hasLimitsTemp, err := getChildren(tx, &group.Groups[key])
 			if err != nil {
@@ -361,28 +372,47 @@ const (
 			/* select all active courses */
 			SELECT true
 			FROM groups, course
-			WHERE groups.courseid = course.id
+			WHERE groups.id = course.parentid
 				AND NOT course.active
-				AND groups.parentid = $1
+				AND groups.id = $1
 
 			UNION
 
 			/* select all subgroups */
 			SELECT true
 			FROM groups
-			WHERE courseid IS NULL
-				AND parentid = $1
+			WHERE parentid = $1
 
 		) AS noActiveChildren
 	`
 
-	//TODO: order: first groups by name, then courses by name, both ascending
-	//TODO: only show active courses
-	//TODO: union courses to get only active courses
+	//TODO: do not show expired courses
 	stmtGetChildren = `
-		SELECT id, parentid, courseid, name, courselimit
-		FROM groups
-		WHERE parentid = $1
+		/* get all groups */
+		(
+			SELECT id, parentid, name::text AS name, courselimit
+			FROM groups
+			WHERE parentid = $1
+			ORDER BY name ASC
+		)
+
+		UNION ALL
+
+		/* get all courses */
+		(
+			SELECT 0 AS id, parentid, title::text AS name,
+				(
+					SELECT g.courselimit
+					FROM groups g, course c
+					WHERE g.id = c.parentid
+				) AS courselimit
+
+			FROM course
+			WHERE parentid = $1
+				AND active
+				/* TODO: and not expired */
+			ORDER BY name ASC
+		)
 	`
 
 	stmtInsertGroup = `
@@ -396,12 +426,11 @@ const (
 		UPDATE groups
 		SET name = $1, courselimit = $2, lasteditor = $3, lastedited = $4
 		WHERE id = $5
-			AND courseid IS NULL /* courses must be edited differently */
 		RETURNING id, name
 	`
 
 	stmtMoveInactiveCourses = `
-		UPDATE groups
+		UPDATE course
 		SET parentid = (
 			SELECT parentid FROM groups WHERE id = $1
 		) WHERE parentid = $1
@@ -410,11 +439,10 @@ const (
 	stmtDeleteGroup = `
 		DELETE FROM groups
 		WHERE id = $1
-			AND courseid IS NULL
 	`
 
 	stmtGetRootGroups = `
-		SELECT id, parentid, courseid, name, courselimit
+		SELECT id, parentid, name, courselimit
 		FROM groups
 		WHERE parentid IS NULL
 		ORDER BY name ASC
@@ -426,7 +454,31 @@ const (
 			TO_CHAR (lastedited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastedited
 		FROM groups
 		WHERE lasteditor = $2
-			AND courseid IS NULL
 		ORDER BY name ASC
+	`
+
+	stmtGetPath = `
+		WITH RECURSIVE path (parentid, name, id)
+			AS (
+				/* starting entry */
+				SELECT parentid, title::text AS name,
+					(
+						SELECT MAX(id) + 1
+						FROM groups
+					) AS id
+				FROM course
+				WHERE id = $1
+					AND parentid IS NOT NULL
+
+				UNION ALL
+
+				/* construct path */
+				SELECT g.parentid, g.name::text AS name, g.id
+				FROM groups g, path p
+				WHERE p.parentid = g.id
+			)
+
+		/* select the root element of the constructed path */
+		SELECT id, parentid, name FROM path ORDER BY id ASC
 	`
 )

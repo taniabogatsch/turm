@@ -1,0 +1,70 @@
+<!-- change-text-modal
+
+titleID:        change-text-modal-title         html
+fieldID:        change-text-modal-field         value
+valueID:        change-text-modal-value         value, maxlength
+infoID:         change-text-modal-info          html
+
+formID:         change-text-modal-form          action
+iconID:         change-text-modal-icon          html
+validationID:   change-text-modal-validation    html
+-->
+
+<div class="modal fade" id="change-text-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-text-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-text-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-text-modal-field" required>
+
+          <!-- value -->
+          <small class="form-text text-muted" id="change-text-modal-info">
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="change-text-modal-icon">
+              </span>
+            </div>
+            <input name="value" id="change-text-modal-value" type="text"
+              class="form-control rounded-right" required minlength="3">
+            <div class="invalid-feedback" id="change-text-modal-validation">
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="change-text-icon-pencil" class="display-none"> {{template "icons/pencil.html" .}} </div>
+<div id="change-text-icon-euro" class="display-none"> € </div>
+<div id="change-text-validation-fee" class="display-none"> {{msg $ "validation.invalid.fee"}} </div>
+<div id="change-text-validation-text" class="display-none"> {{msg $ "validation.invalid.text"}} </div>

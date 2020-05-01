@@ -36,8 +36,8 @@
           {{end}}
         </td>
         <td class="text-right">
-          <a href="#" onclick="userDetails({{.ID}})" class="badge badge-secondary btn-darkblue">
-            {{template "icons/tools.html"}}
+          <a href="#no-scroll" onclick="userDetails({{.ID}})" class="btn btn-outline-darkblue">
+            {{template "icons/tools.html" . }}
           </a>
         </td>
       </tr>
