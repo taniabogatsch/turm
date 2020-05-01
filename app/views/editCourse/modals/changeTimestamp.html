@@ -1,8 +1,9 @@
-<!-- change timestamp modal
+<!-- change-timestamp-modal
 
 titleID:      change-timestamp-modal-title      html
+fieldID:      change-timestamp-modal-field      value
 infoID:       change-timestamp-modal-info       html
-typeID:       change-timestamp-modal-type       value
+
 dateID:       change-timestamp-modal-date       value
 timeID:       change-timestamp-modal-time       value
 -->
@@ -11,39 +12,47 @@ timeID:       change-timestamp-modal-time       value
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
-      <!-- modal header -->
-      <div class="modal-header background-color-darkblue border-radius-2">
-        <h5 class="modal-title text-white" id="change-timestamp-modal-title"></h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+      <form id="change-timestamp-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
 
-      <form accept-charset="UTF-8" action='{{url "EditCourse.ChangeTimestamp"}}' method="POST" class="needs-validation" novalidate>
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-timestamp-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
 
+        <!-- modal body -->
         <div class="modal-body">
+
           <!-- course ID -->
           <input type="hidden" name="ID" value="{{.ID}}">
-          <!-- timestampType -->
-          <input type="hidden" name="timestampType" id="change-timestamp-modal-type">
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-timestamp-modal-field">
 
+          <!-- value -->
           <small class="form-text text-muted" id="change-timestamp-modal-info">
           </small>
           <div class="row">
+
+            <!-- date -->
             <div class="col">
-              <!-- date -->
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
                     {{template "icons/calendar.html" .}}
                   </span>
                 </div>
-                <input id="change-timestamp-modal-date" type="date" max='2200-01-01' min="1980-01-01" name="date" class="form-control rounded-right" required>
+                <input id="change-timestamp-modal-date" type="date" max='2200-01-01'
+                  min="1980-01-01" name="date" class="form-control rounded-right" required>
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.date"}}
                 </div>
               </div>
             </div>
+
+            <!-- time -->
             <div class="col">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -51,7 +60,8 @@ timeID:       change-timestamp-modal-time       value
                     {{template "icons/clock.html" .}}
                   </span>
                 </div>
-                <input id="change-timestamp-modal-time" type="time" name="time" class="form-control rounded-right" required>
+                <input id="change-timestamp-modal-time" type="time" name="time"
+                  class="form-control rounded-right" required>
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.time"}}
                 </div>
@@ -69,6 +79,7 @@ timeID:       change-timestamp-modal-time       value
             {{msg $ "button.save"}}
           </button>
         </div>
+        
       </form>
     </div>
   </div>

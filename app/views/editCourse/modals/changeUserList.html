@@ -1,29 +1,38 @@
-<!-- change user list modal
+<!-- change-user-list-modal
 
-modalID:      change-user-list-modal
 titleID:      change-user-list-modal-title      html
 listID:       change-user-list-modal-list       value
+userID:       change-user-list-modal-user       value
+
+searchID:     change-user-list-modal-search
+checkboxID:   change-user-list-modal-checkbox
+resultsID:    change-user-list-modal-results
 -->
 
 <div class="modal fade" id="change-user-list-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
-      <!-- modal header -->
-      <div class="modal-header background-color-darkblue border-radius-2">
-        <h5 class="modal-title text-white" id="change-user-list-modal-title"></h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+      <!-- form -->
+      <form id="change-user-list-modal-form" accept-charset="UTF-8"
+        action='{{url "EditCourse.ChangeUserList"}}' method="POST"
+        class="needs-validation" novalidate>
 
-      <form id="change-user-list-modal-form" accept-charset="UTF-8" action='{{url "EditCourse.ChangeUserList"}}' method="POST" class="needs-validation" novalidate>
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-user-list-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
         <div class="modal-body">
 
           <!-- course ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
+          <input id="change-user-list-modal-courseID" type="hidden" name="ID" value="{{.ID}}">
           <!-- user ID -->
-          <input id="change-user-list-modal-input" type="hidden" name="userID">
+          <input id="change-user-list-modal-user" type="hidden" name="userID">
           <!-- list type -->
           <input id="change-user-list-modal-list" type="hidden" name="listType">
 
@@ -38,7 +47,9 @@ listID:       change-user-list-modal-list       value
                   {{template "icons/search.html" . }}
                 </span>
               </div>
-              <input id="change-user-list-modal-search" type="text" class="form-control rounded-right" placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3">
+              <input id="change-user-list-modal-search" type="text"
+                class="form-control rounded-right" placeholder='{{msg $ "search.user"}}'
+                required maxlength="127" minlength="3">
               <div class="invalid-feedback">
                 {{msg $ "validation.invalid.searchValue"}}
               </div>
@@ -54,14 +65,15 @@ listID:       change-user-list-modal-list       value
           <br>
           <div id="change-user-list-modal-results"></div>
         </div>
-      </form>
 
-      <!-- modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-darkblue" data-dismiss="modal">
-          {{msg $ "button.close"}}
-        </button>
-      </div>
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
 </div>
@@ -72,9 +84,20 @@ listID:       change-user-list-modal-list       value
     $('#change-user-list-modal-search').keyup(function() {
       reactToListInput();
     });
-
     $('#change-user-list-modal-checkbox').change(function() {
       reactToListInput();
     });
   });
+
+  //renders all users matching value
+  function searchForList(value, searchInactive, listType, courseID) {
+    $.get("{{url "EditCourse.SearchUser"}}", {
+      "value": value,
+      "searchInactive": searchInactive,
+      "listType": listType,
+      "ID": courseID
+    }, function(data) {
+      $('#change-user-list-modal-results').html(data);
+    });
+  }
 </script>

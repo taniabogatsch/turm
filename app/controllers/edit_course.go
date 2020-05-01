@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"database/sql"
+	"errors"
+	"strconv"
 	"strings"
 	"turm/app/models"
 
@@ -37,14 +39,15 @@ func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
 
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeTimestamp(ID int, date, time, timestampType string) revel.Result {
+func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 
 	c.Log.Debug("change timestamp", "ID", ID, "date", date,
-		"time", time, "timestampType", timestampType)
+		"time", time, "fieldID", fieldID)
 
 	//NOTE: the interceptor assures that the course ID is valid
 	timestamp := date + " " + time
-	if timestamp != " " || timestampType != "unsubscribeend" { //only the unsubscribeend can be null
+	valid := (timestamp != " ")
+	if valid || fieldID != "unsubscribeend" { //only the unsubscribeend can be null
 		c.Validation.Required(date).
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
@@ -66,39 +69,24 @@ func (c EditCourse) ChangeTimestamp(ID int, date, time, timestampType string) re
 		)
 	}
 
-	course := models.Course{ID: ID}
-	var err error
-
-	//update the timestamp
-	switch timestampType {
-
-	case "enrollmentstart":
-		course.EnrollmentStart = timestamp
-		err = course.Update("enrollmentstart", course.EnrollmentStart)
-
-	case "enrollmentend":
-		course.EnrollmentEnd = timestamp
-		err = course.Update("enrollmentend", course.EnrollmentEnd)
-
-	case "unsubscribeend":
-		course.UnsubscribeEnd = sql.NullString{timestamp, false}
-		if timestamp != " " {
-			course.UnsubscribeEnd.Valid = true
-		}
-		err = course.Update("unsubscribeend", course.UnsubscribeEnd)
-
-	case "expirationdate":
-		course.ExpirationDate = timestamp
-		err = course.Update("expirationdate", course.ExpirationDate)
-
-	default:
+	if fieldID != "enrollmentstart" && fieldID != "enrollmentend" &&
+		fieldID != "unsubscribeend" && fieldID != "expirationdate" {
 		return flashError(
 			errContent,
-			err,
+			errors.New("invalid column value"),
 			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
+	}
+
+	course := models.Course{ID: ID}
+	var err error
+
+	if fieldID == "unsubscribeend" {
+		err = course.Update(fieldID, sql.NullString{timestamp, valid})
+	} else {
+		err = course.Update(fieldID, timestamp)
 	}
 
 	if err != nil {
@@ -111,13 +99,13 @@ func (c EditCourse) ChangeTimestamp(ID int, date, time, timestampType string) re
 		)
 	}
 
-	if timestamp != " " {
-		c.Flash.Success(c.Message("course."+timestampType+".change.success",
+	if valid {
+		c.Flash.Success(c.Message("course."+fieldID+".change.success",
 			timestamp,
 			course.ID,
 		))
 	} else {
-		c.Flash.Success(c.Message("course."+timestampType+".delete.success",
+		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
 			course.ID,
 		))
 	}
@@ -206,7 +194,7 @@ func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Re
 		)
 	}
 
-	//NOTE: if the course is active, the user should get a notification e-mail
+	//TODO: if the course is active, the user should get a notification e-mail
 
 	c.Flash.Success(c.Message("course."+listType+".delete.success",
 		ID,
@@ -250,7 +238,7 @@ func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option boo
 		)
 	}
 
-	//NOTE: if the course is active, the user should get a notification e-mail
+	//TODO: if the course is active, the user should get a notification e-mail
 
 	c.Flash.Success(c.Message("course.matr.nr.change.success",
 		entry.EMail,
@@ -286,35 +274,31 @@ func (c EditCourse) ChangeVisibility(ID int, option bool) revel.Result {
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeText(ID int, textType, data string) revel.Result {
+func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 
-	c.Log.Debug("change text field", "ID", ID, "textType", textType, "data", data)
+	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
-	data = strings.TrimSpace(data)
-	course := models.Course{ID: ID}
-	valid := false
-	var err error
+	value = strings.TrimSpace(value)
+	valid := (value != "")
 
 	//NOTE: the interceptor assures that the course ID is valid
-	if data != "" || textType == "title" {
+	if value != "" || fieldID == "title" {
 
-		if textType == "title" {
-			c.Validation.Check(data,
+		if fieldID == "title" || fieldID == "subtitle" {
+			c.Validation.Check(value,
 				revel.MinSize{3},
 				revel.MaxSize{511},
-			).MessageKey("validation.invalid.title")
+			).MessageKey("validation.invalid.text")
 
-		} else if textType == "subtitle" {
-			c.Validation.Check(data,
-				revel.MinSize{3},
-				revel.MaxSize{511},
-			).MessageKey("validation.invalid.subtitle")
+		} else if fieldID == "fee" {
+			c.Validation.Match(value, models.FeePattern).
+				MessageKey("validation.invalid.fee")
 
 		} else {
-			c.Validation.Check(data,
+			c.Validation.Check(value,
 				revel.MinSize{3},
 				revel.MaxSize{50000},
-			).MessageKey("validation.invalid.text.input")
+			).MessageKey("validation.invalid.text.area")
 		}
 
 		if c.Validation.HasErrors() {
@@ -328,50 +312,37 @@ func (c EditCourse) ChangeText(ID int, textType, data string) revel.Result {
 		}
 	}
 
-	//update the text
-	switch textType {
-
-	case "description":
-		if data != "" {
-			course.Description = sql.NullString{data, true}
-			valid = true
-		}
-		err = course.Update("description", course.Description)
-
-	case "customemail":
-		if data != "" {
-			course.CustomEMail = sql.NullString{data, true}
-			valid = true
-		}
-		err = course.Update("customemail", course.CustomEMail)
-
-	case "speaker":
-		if data != "" {
-			course.Speaker = sql.NullString{data, true}
-			valid = true
-		}
-		err = course.Update("speaker", course.Speaker)
-
-	case "title":
-		course.Title = data
-		valid = true
-		err = course.Update("title", course.Title)
-
-	case "subtitle":
-		if data != "" {
-			course.Subtitle = sql.NullString{data, true}
-			valid = true
-		}
-		err = course.Update("subtitle", course.Subtitle)
-
-	default:
+	if fieldID != "description" && fieldID != "customemail" &&
+		fieldID != "speaker" && fieldID != "title" &&
+		fieldID != "subtitle" && fieldID != "fee" {
 		return flashError(
 			errContent,
-			err,
+			errors.New("invalid column value"),
 			c.Session["currPath"].(string),
 			c.Controller,
 			"",
 		)
+	}
+
+	course := models.Course{ID: ID}
+	var err error
+
+	if fieldID == "fee" && valid {
+		value = strings.ReplaceAll(value, ",", ".")
+		fee, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return flashError(
+				errContent,
+				err,
+				c.Session["currPath"].(string),
+				c.Controller,
+				"",
+			)
+		}
+		err = course.Update(fieldID, sql.NullFloat64{fee, valid})
+
+	} else {
+		err = course.Update(fieldID, sql.NullString{value, valid})
 	}
 
 	if err != nil {
@@ -385,18 +356,18 @@ func (c EditCourse) ChangeText(ID int, textType, data string) revel.Result {
 	}
 
 	if valid {
-		if textType == "title" || textType == "subtitle" {
-			c.Flash.Success(c.Message("course."+textType+".change.success",
-				data,
+		if fieldID == "title" || fieldID == "subtitle" || fieldID == "fee" {
+			c.Flash.Success(c.Message("course."+fieldID+".change.success",
+				value,
 				course.ID,
 			))
 		} else {
-			c.Flash.Success(c.Message("course."+textType+".change.success",
+			c.Flash.Success(c.Message("course."+fieldID+".change.success",
 				course.ID,
 			))
 		}
 	} else {
-		c.Flash.Success(c.Message("course."+textType+".delete.success",
+		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
 			course.ID,
 		))
 	}
@@ -441,4 +412,83 @@ func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
 		course.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
+}
+
+/*ChangeEnrollLimit changes the enrollment limit of a course.
+- Roles: creator and editors of the course */
+func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result {
+
+	c.Log.Debug("change enrollment limit", "ID", ID, "fieldID", fieldID, "value", value)
+
+	//NOTE: the interceptor assures that the course ID is valid
+	//NOTE: no validation is required; set to null, if value is 0
+
+	valid := (value != 0)
+
+	if fieldID != "enrolllimitevents" {
+		return flashError(
+			errContent,
+			errors.New("invalid column value"),
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	course := models.Course{ID: ID}
+	err := course.Update(fieldID, sql.NullInt32{int32(value), valid})
+	if err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	if valid {
+		c.Flash.Success(c.Message("course."+fieldID+".change.success",
+			value,
+			course.ID,
+		))
+	} else {
+		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
+			course.ID,
+		))
+	}
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*SearchUser searches for users for the different user lists.
+- Roles: creator and editors of the course. */
+func (c EditCourse) SearchUser(ID int, value, listType string, searchInactive bool) revel.Result {
+
+	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
+
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
+		revel.MinSize{3},
+		revel.MaxSize{127},
+	).MessageKey("validation.invalid.searchValue")
+
+	if listType != "blacklist" && listType != "whitelist" &&
+		listType != "instructor" && listType != "editor" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	if c.Validation.HasErrors() {
+		c.Validation.Keep()
+		return c.Render()
+	}
+
+	var users models.UserList
+	if err := users.Search(&value, &listType, &searchInactive, &ID); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(users, listType)
 }

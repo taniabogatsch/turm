@@ -18,42 +18,61 @@ course.enrollment.end = End of the enrollment period
 course.unsubscribe.end = Unsubscribe end
 course.expiration.date = Expiration date
 
+course.enroll.limit.events = Enroll limit
 course.custom.email = Enrollment e-mail
 course.visibility = Visibility
 course.whitelist = Whitelist
 course.blacklist = Blacklist
+
+course.events = Events
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
 
 course.title.change.success = Changed course title to '%s', course ID = %d.
+course.title.change.info = The course title is the public name of the course. Course title should concise.
+
 course.group.change.success = Set the course group, course ID = %d.
+
+course.fee.change.success = Changes course fee to %s€, course ID = %d.
+course.fee.delete.success = Deleted course fee, course ID = %d.
+course.fee.delete.confirm = Please confirm the deletion of the course fee of %g€, course ID = %d.
+course.fee.delete.title = Delete course fee
+course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15,00 or 15 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
 
 course.description.change.success = Changed course description, course ID = %d.
 course.description.delete.success = Deleted course description, course ID = %d.
 course.description.delete.confirm = Confirm deletion of course description.
 course.description.delete.title = Delete course description.
+course.description.change.info = Here, you can provide detailed information about the course. You can also add links to external material.
 
 course.customemail.change.success = Changed custom enrollment e-mail, course ID = %d.
 course.customemail.delete.success = Deleted custom enrollment e-mail, course ID = %d.
 course.customemail.delete.confirm = Confirm deletion of custom enrollment e-mail.
 course.customemail.delete.title = Delete enrollment e-mail.
+course.custom.email.change.info = The custom welcome e-mail is send to each user that enrolls in the course.
 
 course.speaker.change.success = Changed speaker, course ID = %d.
 course.speaker.delete.success = Deleted speaker, course ID = %d.
 course.speaker.delete.confirm = Confirm deletion of speaker.
 course.speaker.delete.title = Delete speaker.
+course.speaker.change.info = Here, you can provide detailed information about the speaker. You can link to the website of the speaker and list detailed qualifications.
 
 course.subtitle.change.success = Changed subtitle to '%s', course ID = %d.
 course.subtitle.delete.success = Deleted subtitle, course ID = %d.
 course.subtitle.delete.confirm = Confirm deletion of subtitle '%s'.
 course.subtitle.delete.title = Delete subtitle
+course.subtitle.change.info = The subtitle can contain further information about the course title.
 
 course.enrollmentstart.change.success = Set enrollment start to %s, course ID = %d.
+course.enrollment.start.change.info = After this point users can enroll in the course.
+
 course.enrollmentend.change.success = Set enrollment end to %s, course ID = %d.
+course.enrollment.end.change.info = After this point usres can no longer enroll in the course.
+
 course.expirationdate.change.success = Set expiration date to %s, course ID = %d.
-course.expiration.date.info = After this point the course is no longer active. Lists of participants can still be seen. Enrolled users can still see the course at 'expired courses'.
+course.expiration.date.change.info = After this point the course is no longer active. Lists of participants can still be seen. Enrolled users can still see the course at 'expired courses'.
 
 course.unsubscribe.end.change.success = Set unsubscribe end to %s, course ID = %d.
 course.unsubscribe.end.delete.success = Deleted unsubscribe end, course ID = %d.
@@ -84,9 +103,15 @@ course.visibility.change.success = Changed visibility, course ID = %d.
 course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
 course.whitelist.delete.success = Deleted user from whitelist, course ID = %d.
 course.whitelist.delete.confirm = Confirm deletion of user from whitelist %s.
-course.whitelist.delete.title = Delete user from whitelist
+course.whitelist.delete.title = Delete from whitelist
 
 course.blacklist.change.success = Added user to blacklist: %s, course ID = %d.
 course.blacklist.delete.success = Deleted user from blacklist, course ID = %d.
 course.blacklist.delete.confirm = Confirm deletion of user from blacklist %s.
-course.blacklist.delete.title = Delete user from blacklist
+course.blacklist.delete.title = Delete from blacklist
+
+course.enrolllimitevents.change.success = Set enroll limit for events to %d, course ID = %d.
+course.enrolllimitevents.delete.success = Deleted enroll limit for events, course ID = %d.
+course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit for events of %d.
+course.enroll.limit.events.delete.title = Delete enroll limit
+course.enroll.limit.events.change.info = The enrollment limit for events is the maximum number of events in which a user can enroll in this course.

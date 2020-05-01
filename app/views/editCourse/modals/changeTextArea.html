@@ -1,17 +1,20 @@
-<!-- change text area fields
+<!-- change-text-area-modal
 
-modalID:        change-text-area-modal
 titleID:        change-text-area-modal-title        html
-typeID:         change-text-area-modal-type         value
-inputID:        change-text-area-modal-content      value
-formID:         change-text-area-modal-form         submit
+fieldID:        change-text-area-modal-field        value
+valueID:        change-text-area-modal-value        value
+infoID:         change-text-area-modal-info              html
+
+formID:         change-text-area-modal-form         action
 -->
 
 <div class="modal fade" id="change-text-area-modal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
-      <form id="change-text-area-modal-form" accept-charset="UTF-8" action='{{url "EditCourse.ChangeText"}}' method="POST" class="needs-validation" novalidate>
+      <!-- form -->
+      <form id="change-text-area-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
 
         <!-- modal header -->
         <div class="modal-header background-color-darkblue border-radius-2">
@@ -23,21 +26,23 @@ formID:         change-text-area-modal-form         submit
 
         <!-- modal body -->
         <div class="modal-body">
+
           <!-- course ID -->
           <input type="hidden" name="ID" value="{{.ID}}">
-          <!-- input text type -->
-          <input type="hidden" name="textType" id="change-text-area-modal-type" required>
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-text-area-modal-field" required>
 
-
+          <small class="form-text text-muted" id="change-text-area-modal-info">
+          </small>
           <!-- editor -->
           <div id="change-text-area-modal-editor">
           </div>
 
           <!-- hidden text area -->
-          <textarea class="display-none" id="change-text-area-modal-content" name="data" required>
+          <textarea class="display-none" id="change-text-area-modal-value" name="value" required>
           </textarea>
           <div class="invalid-feedback">
-            {{msg $ "validation.invalid.text.input"}}
+            {{msg $ "validation.invalid.text.area"}}
           </div>
         </div>
 
@@ -46,10 +51,11 @@ formID:         change-text-area-modal-form         submit
           <button type="button" class="btn btn-darkblue" data-dismiss="modal">
             {{msg $ "button.close"}}
           </button>
-          <button type="button" class="btn btn-darkblue" onclick="setTextAreaData();">
+          <button type="button" class="btn btn-darkblue" onclick="submitTextArea();">
             {{msg $ "button.save"}}
           </button>
         </div>
+
       </form>
     </div>
   </div>
@@ -66,10 +72,10 @@ formID:         change-text-area-modal-form         submit
     //ensure that the form validation behaves correctly
     quill.on('text-change', function(delta, oldDelta, source) {
       if (source == 'user') {
-        var textArea = document.getElementById("change-text-area-modal-content");
+        var textArea = document.getElementById("change-text-area-modal-value");
         var text = quill.root.innerHTML;
         if (text != "<p><br></p>") {
-          $('#change-text-area-modal-content').val(text);
+          $('#change-text-area-modal-value').val(text);
           textArea.setCustomValidity('');
         } else {
           textArea.setCustomValidity("Please provide a text.");

@@ -1,6 +1,5 @@
-<!-- confirm the deletion of a field
+<!-- delete-field-modal
 
-modalID:        delete-field-modal
 titleID:        delete-field-modal-title        html
 formID:         delete-field-modal-form         action
 contentID:      delete-field-modal-content      html
@@ -9,6 +8,7 @@ contentID:      delete-field-modal-content      html
 <div class="modal fade" id="delete-field-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
+
       <!-- form -->
       <form id="delete-field-modal-form" accept-charset="UTF-8" method="POST">
 
@@ -20,7 +20,7 @@ contentID:      delete-field-modal-content      html
           </button>
         </div>
 
-        <!-- modal header -->
+        <!-- modal body -->
         <div class="modal-body" id="delete-field-modal-content">
         </div>
 
@@ -33,8 +33,8 @@ contentID:      delete-field-modal-content      html
             {{msg $ "button.delete"}}
           </button>
         </div>
-      </form>
 
+      </form>
     </div>
   </div>
 </div>

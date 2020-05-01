@@ -18,42 +18,61 @@ course.enrollment.end = Ende Einschreibezeitraum
 course.unsubscribe.end = Austragen bis
 course.expiration.date = Ablaufdatum
 
+course.enroll.limit.events = Einschreibelimit
 course.custom.email = Willkommensemail
 course.visibility = Sichtbarkeit
 course.whitelist = Whitelist
 course.blacklist = Blacklist
+
+course.events = Veranstaltungen
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
 
 course.title.change.success = Kurstitel zu '%s' geändert, Kurs ID = %d.
+course.title.change.info = Der Kurstitel ist der öffentliche Name des Kurses. Kurstitel sollten kurz und bündig sein.
+
 course.group.change.success = Der Kurs ist nun Teil einer Gruppe, Kurs ID = %d.
+
+course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
+course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
+course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr von %g€ löschen wollen?
+course.fee.delete.title = Teilnahmegebühr löschen
+course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15,00 oder 15 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
 course.description.change.success = Kursbeschreibung geändert, Kurs ID = %d.
 course.description.delete.success = Kursbeschreibung gelöscht, Kurs ID = %d.
 course.description.delete.confirm = Kursbeschreibung wirklich löschen?
 course.description.delete.title = Kursbeschreibung löschen.
+course.description.change.info = Hier können Sie eine detaillierte Beschreibung des Kurses angeben. Außerdem können Sie weitere Materialien verlinken.
 
 course.customemail.change.success = Individuelle Willkommensemail geändert, Kurs ID = %d.
 course.customemail.delete.success = Individuelle Willkommensemail gelöscht, Kurs ID = %d.
 course.customemail.delete.confirm = Individuelle Willkommensemail wirklich löschen?
 course.customemail.delete.title = Willkommensemail löschen.
+course.custom.email.change.info = Die individuelle Willkommensemail wird an die NutzerInnen des Kurses gesendet, wenn diese sich einschreiben.
 
 course.speaker.change.success = ReferentIn geändert, Kurs ID = %d.
 course.speaker.delete.success = ReferentIn gelöscht, Kurs ID = %d.
 course.speaker.delete.confirm = ReferentIn wirklich löschen?
 course.speaker.delete.title = ReferentIn löschen.
+course.speaker.change.info = Hier können Sie eine detaillierte Beschreibung zur/zum ReferentIn angeben. Sie können zur Website der/des ReferentIn verweisen und Qualifikationen auflisten.
 
 course.subtitle.change.success = Untertitel zu '%s' geändert, Kurs ID = %d.
 course.subtitle.delete.success = Untertitel gelöscht, Kurs ID = %d.
 course.subtitle.delete.confirm = Untertitel '%s' wirklich löschen?
 course.subtitle.delete.title = Untertitel löschen
+course.subtitle.change.info = Der Untertitel kann den Titel näher spezifizieren.
 
 course.enrollmentstart.change.success = NutzerInnen können sich nun ab dem %s Uhr einschreiben, Kurs ID = %d.
+course.enrollment.start.change.info = Ab diesem Zeitpunkt können sich NutzerInnen in den Kurs einschreiben.
+
 course.enrollmentend.change.success = NutzerInnen können sich nun bis zum %s Uhr einschreiben, Kurs ID = %d.
+course.enrollment.end.change.info = Ab diesem Zeitpunkt können sich NutzerInnen nicht länger in den Kurs einschreiben.
+
 course.expirationdate.change.success = Der Kurs läuft nun bis zum %s Uhr, Kurs ID = %d.
-course.expiration.date.info = Ab diesem Zeitpunkt ist der Kurs nicht mehr aktiv. Die Teilnehmerlisten können weiterhin eingesehen werden. Eingeschriebene NutzerInnen finden den Kurs weiterhin unter 'abgelaufene Kurse'.
+course.expiration.date.change.info = Ab diesem Zeitpunkt ist der Kurs nicht mehr aktiv. Die Teilnehmerlisten können weiterhin eingesehen werden. Eingeschriebene NutzerInnen finden den Kurs weiterhin unter 'abgelaufene Kurse'.
 
 course.unsubscribeend.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
 course.unsubscribeend.delete.success = Austragen bis gelöscht, Kurs ID = %d.
@@ -90,3 +109,9 @@ course.blacklist.change.success = NutzerIn zu Blacklist hinzugefügt: %s, Kurs I
 course.blacklist.delete.success = NutzerIn aus Blacklist entfernt, Kurs ID = %d.
 course.blacklist.delete.confirm = NutzerIn %s wirklich aus Blacklist löschen?
 course.blacklist.delete.title = NutzerIn aus Blacklist löschen
+
+course.enrolllimitevents.change.success = Das Einschreibelimit für Veranstaltungen ist nun %d, Kurs ID = %d.
+course.enrolllimitevents.delete.success = Einschreibelimit für Veranstaltungen gelöscht, Kurs ID = %d.
+course.enroll.limit.events.delete.confirm = Wollen Sie das Einschreibelimit von %d für Veranstaltungen wirklich löschen?
+course.enroll.limit.events.delete.title = Einschreibelimit löschen
+course.enroll.limit.events.change.info = Das Einschreibelimit für Veranstaltungen gibt die maximale Anzahl an Veranstaltungen an, in die sich einE NutzerIn in diesem Kurs einschreiben darf.

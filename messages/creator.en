@@ -40,3 +40,4 @@ creator.add.speaker = + &nbsp; Speaker
 creator.add.custom.email = + &nbsp; Enrollment e-mail
 creator.add.whitelist = + &nbsp; Add user to Whitelist
 creator.add.blacklist = + &nbsp; Add user to Blacklist
+creator.add.enroll.limit = + &nbsp; Enroll limit

@@ -138,7 +138,7 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 }
 
 /*Search for a user and identify whether that user is already on a user list. */
-func (users *UserList) Search(value *string, searchInactive *bool, listType *string) (err error) {
+func (users *UserList) Search(value, listType *string, searchInactive *bool, courseID *int) (err error) {
 
 	searchUsersSelect := `
 		SELECT
@@ -146,9 +146,9 @@ func (users *UserList) Search(value *string, searchInactive *bool, listType *str
 			(
 				SELECT EXISTS (
 					SELECT true
-					FROM ` + *listType + ` t, users us
-					WHERE t.userid = us.id
-						AND us.id = u.id
+					FROM ` + *listType + ` t
+					WHERE t.userid = u.id
+						AND t.courseid = $4
 				)
 			) AS onlist
 	`
@@ -162,7 +162,7 @@ func (users *UserList) Search(value *string, searchInactive *bool, listType *str
 	//the value can be the matriculation number
 	matrNr, _ := strconv.Atoi(*value) //matrNr is 0 if there is an error
 
-	err = app.Db.Select(users, stmt, values, matrNr, *searchInactive)
+	err = app.Db.Select(users, stmt, values, matrNr, *searchInactive, *courseID)
 	if err != nil {
 		modelsLog.Error("failed to search users", "values", values,
 			"matrNr", matrNr, "error", err.Error())

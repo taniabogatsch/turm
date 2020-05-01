@@ -1,22 +1,11 @@
 
-{{template "editCourse/modals/changeGroupModal.html" dict_addLocale $.currentLocale "ID" .course.ID "Path" .course.Path}}
+{{template "editCourse/modals/changeBool.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeGroup.html" dict_addLocale $.currentLocale "ID" .course.ID "Path" .course.Path}}
+{{template "editCourse/modals/changeInt.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 {{template "editCourse/modals/changeText.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 {{template "editCourse/modals/changeTextArea.html" dict_addLocale $.currentLocale "ID" .course.ID}}
-{{template "editCourse/modals/changeUserList.html" dict_addLocale $.currentLocale "ID" .course.ID}}
-{{template "editCourse/modals/changeBool.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 {{template "editCourse/modals/changeTimestamp.html" dict_addLocale $.currentLocale "ID" .course.ID}}
+{{template "editCourse/modals/changeUserList.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 {{template "editCourse/modals/deleteField.html" dict_addLocale $.currentLocale}}
 
 <script src="/public/js/editCourse.js"></script>
-<script>
-  //renders all users matching value
-  function searchForList(value, searchInactive, listType) {
-    $.get("{{url "Creator.SearchUser"}}", {
-      "value": value,
-      "searchInactive": searchInactive,
-      "listType": listType
-    }, function(data) {
-      $('#change-user-list-modal-results').html(data);
-    });
-  }
-</script>
