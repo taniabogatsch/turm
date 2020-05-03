@@ -13,6 +13,9 @@ creator.drafts = Entwürfe
 creator.courses.active = Aktive Kurse
 creator.courses.expired = Abgelaufene Kurse
 
+creator.event.new = Neue Veranstaltung
+creator.title.event.working.info = Vorläufiger Veranstaltungstitel. Kann später bearbeitet werden.
+
 creator.drafts.info = Kursvorlagen erlauben es Ihnen Kursdaten aus vorherigen Kursen zu importieren.
 creator.draft = Vorlage
 creator.course.blank = Leerer Kurs
@@ -41,3 +44,7 @@ creator.add.custom.email = + &nbsp; Willkommensemail
 creator.add.whitelist = + &nbsp; NutzerIn auf Whitelist
 creator.add.blacklist = + &nbsp; NutzerIn auf Blacklist
 creator.add.enroll.limit = + &nbsp; Einschreibelimit
+creator.add.restriction = + &nbsp; Studiengangbeschränkung
+
+creator.add.event = + &nbsp; Veranstaltung
+creator.add.meeting = + &nbsp; Termin

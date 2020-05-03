@@ -1,0 +1,156 @@
+<!-- edit-meeting-single -->
+
+<div class="modal fade" id="edit-meeting-single" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form accept-charset="UTF-8" action='{{url "EditMeeting.Edit"}}'
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "meeting.single.edit"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- meeting ID -->
+          <input type="hidden" name="ID" id="edit-meeting-single-ID">
+          <input type="hidden" name="meeting.MeetingInterval" value="0">
+
+          <!-- start -->
+          <p>
+            {{msg $ "meeting.start"}}:
+          </p>
+          <small class="form-text text-muted">
+            {{msg $ "meeting.start.info"}}
+          </small>
+          <div class="row">
+            <!-- start date -->
+            <div class="col">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingStart"
+                  class="form-control rounded-right" required id="single-start-date">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+            <!-- start time -->
+            <div class="col">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="meeting.MeetingStartTime" id="single-start-time"
+                  class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- end -->
+          <p>
+            {{msg $ "meeting.end"}}:
+          </p>
+          <small class="form-text text-muted">
+            {{msg $ "meeting.end.info"}}
+          </small>
+          <div class="row">
+            <!-- end date -->
+            <div class="col">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingEnd"
+                  class="form-control rounded-right" required id="single-end-date">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+            <!-- time -->
+            <div class="col">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="meeting.MeetingEndTime" id="single-end-time"
+                  class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- place -->
+          <small class="form-text text-muted">
+            {{msg $ "meeting.place.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/geoAlt.html" .}}
+              </span>
+            </div>
+            <input name="meeting.Place.String" id="meeting-single-place" type="text" maxlength="255"
+              class="form-control rounded-right" required minlength="3" placeholder='{{msg $ "meeting.place"}}'>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+
+          <!-- annotation -->
+          <small class="form-text text-muted">
+            {{msg $ "meeting.annotation.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/chatSquare.html" .}}
+              </span>
+            </div>
+            <input name="meeting.Annotation.String" id="meeting-single-annotation" type="text" maxlength="255"
+              class="form-control rounded-right" required minlength="3" placeholder='{{msg $ "meeting.annotation"}}'>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

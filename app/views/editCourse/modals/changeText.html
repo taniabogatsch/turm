@@ -5,6 +5,7 @@ fieldID:        change-text-modal-field         value
 valueID:        change-text-modal-value         value, maxlength
 infoID:         change-text-modal-info          html
 
+ID:             change-text-modal-ID            value
 formID:         change-text-modal-form          action
 iconID:         change-text-modal-icon          html
 validationID:   change-text-modal-validation    html
@@ -29,8 +30,8 @@ validationID:   change-text-modal-validation    html
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- course ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- course/event/meeting ID -->
+          <input type="hidden" name="ID" id="change-text-modal-ID">
           <!-- fieldID -->
           <input type="hidden" name="fieldID" id="change-text-modal-field" required>
 
@@ -54,8 +55,7 @@ validationID:   change-text-modal-validation    html
           <button type="button" class="btn btn-darkblue" data-dismiss="modal">
             {{msg $ "button.close"}}
           </button>
-          <button type="submit" class="btn btn-darkblue">
-            {{msg $ "button.save"}}
+          <button type="submit" class="btn btn-darkblue" id="change-text-modal-btn">
           </button>
         </div>
 
@@ -68,3 +68,5 @@ validationID:   change-text-modal-validation    html
 <div id="change-text-icon-euro" class="display-none"> € </div>
 <div id="change-text-validation-fee" class="display-none"> {{msg $ "validation.invalid.fee"}} </div>
 <div id="change-text-validation-text" class="display-none"> {{msg $ "validation.invalid.text"}} </div>
+<div id="change-text-save" class="display-none"> {{msg $ "button.save"}} </div>
+<div id="change-text-add" class="display-none"> {{msg $ "button.add"}} </div>

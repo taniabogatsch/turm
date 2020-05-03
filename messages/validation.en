@@ -51,6 +51,7 @@ validation.invalid.date = Please provide a date between [now, 2200-01-01].
 validation.invalid.time = Please provide a time.
 validation.invalid.timestamp = Please provide a valid date and time.
 validation.invalid.text = The provided text must be between 3 - 511 characters.
+validation.invalid.text.short = The provided text must be between 3 - 255 characters.
 validation.invalid.text.area = Please provide text.
 validation.invalid.int = Please provide a natural number bigger than one.
 

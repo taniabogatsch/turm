@@ -1,0 +1,188 @@
+<!-- edit-meeting-weekly -->
+
+<div class="modal fade" id="edit-meeting-weekly" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form accept-charset="UTF-8" action='{{url "EditMeeting.Edit"}}'
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "meeting.weekly.edit"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- meeting ID -->
+          <input type="hidden" name="ID" id="edit-meeting-weekly-ID">
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text border-right-0"> {{msg $ "meeting.interval"}} </label>
+            </div>
+            <select name="meeting.MeetingInterval" class="custom-select rounded-right" id="meeting-weekly-interval">
+              <option value="1"> {{msg $ "meeting.interval.weekly"}} </option>
+              <option value="2"> {{msg $ "meeting.interval.even"}} </option>
+              <option value="3"> {{msg $ "meeting.interval.odd"}} </option>
+            </select>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.option"}}
+            </div>
+          </div>
+
+          <!-- dates -->
+          <div class="row">
+            <!-- start date -->
+            <div class="col">
+              <small class="form-text text-muted">
+                {{msg $ "meeting.from"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingStart"
+                  class="form-control rounded-right" required id="weekly-start-date">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+            <!-- end date -->
+            <div class="col">
+              <small class="form-text text-muted">
+                {{msg $ "meeting.to"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingEnd"
+                  class="form-control rounded-right" required id="weekly-end-date">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- weekday -->
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text border-right-0"> {{msg $ "meeting.always"}} </label>
+            </div>
+            <select name="meeting.WeekDay.Int32" class="custom-select rounded-right" id="meeting-weekly-weekday">
+              <option value="0"> {{msg $ "meeting.mondays"}} </option>
+              <option value="1"> {{msg $ "meeting.tuesdays"}} </option>
+              <option value="2"> {{msg $ "meeting.wednesdays"}} </option>
+              <option value="3"> {{msg $ "meeting.thursdays"}} </option>
+              <option value="4"> {{msg $ "meeting.fridays"}} </option>
+              <option value="5"> {{msg $ "meeting.saturdays"}} </option>
+              <option value="6"> {{msg $ "meeting.sundays"}} </option>
+            </select>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.option"}}
+            </div>
+          </div>
+
+          <!-- time -->
+          <div class="row">
+            <!-- time start -->
+            <div class="col">
+              <small class="form-text text-muted">
+                {{msg $ "meeting.from.time"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="meeting.MeetingStartTime" id="weekly-start-time"
+                  class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+            <!-- time end -->
+            <div class="col">
+              <small class="form-text text-muted">
+                {{msg $ "meeting.to.time"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="meeting.MeetingEndTime" id="weekly-end-time"
+                  class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- place -->
+          <small class="form-text text-muted">
+            {{msg $ "meeting.place.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/geoAlt.html" .}}
+              </span>
+            </div>
+            <input name="meeting.Place.String" id="meeting-weekly-place" type="text" maxlength="255"
+              class="form-control rounded-right" required minlength="3" placeholder='{{msg $ "meeting.place"}}'>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+
+          <!-- annotation -->
+          <small class="form-text text-muted">
+            {{msg $ "meeting.annotation.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/chatSquare.html" .}}
+              </span>
+            </div>
+            <input name="meeting.Annotation.String" id="meeting-weekly-annotation" type="text" maxlength="255"
+              class="form-control rounded-right" required minlength="3" placeholder='{{msg $ "meeting.annotation"}}'>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

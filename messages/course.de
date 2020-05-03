@@ -8,6 +8,9 @@ course.subtitle = Untertitel
 course.fee = Teilnahmegebühr
 course.description = Kursbeschreibung
 course.speaker = ReferentIn
+course.audience = Zielgruppe
+course.only.ldap = NutzerInnen mit Universitätsaccount.
+course.not.only.ldap = NutzerInnen mit Externem- sowie Universitätsaccount.
 
 course.clock = Uhr
 course.from = Von
@@ -25,6 +28,95 @@ course.whitelist = Whitelist
 course.blacklist = Blacklist
 
 course.events = Veranstaltungen
+course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
+
+# -------------------------------------------------------------------------------------------------- #
+# EVENT FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+event.title = Veranstaltungstitel
+event.annotation = Anmerkung
+event.waitlist.yes = Warteliste vorhanden
+event.waitlist.no = Keine Warteliste vorhanden
+
+# -------------------------------------------------------------------------------------------------- #
+# MEETING FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+meeting.interval = Intervall
+meeting.interval.info = Einzeltermine finden einmalig statt. Sie bestehen aus einem Anfangsdatum und einer Anfangsuhrzeit sowie einem Endedatum und einer Endeuhrzeit. Wöchentliche Termine finden jede Woche statt. Zusätzlich können Termine jede gerade Woche oder jede ungerade Woche stattfinden. Diese wiederkehrenden Termine bestehen aus einer Anfangsuhrzeit sowie einer Endeuhrzeit.
+meeting.interval.single = Einzeltermin
+meeting.interval.weekly = Wöchentlich
+meeting.interval.even = Jede gerade Woche
+meeting.interval.odd = Jede ungerade Woche
+
+meeting.start = Beginn
+meeting.end = Ende
+meeting.start.info = Geben Sie das Datum und die Uhrzeit an, zu der der Termin beginnen soll. Termine können auch über mehrere Tage gehen, z.Bsp. bei Wochenendseminaren.
+meeting.end.info = Geben Sie das Datum und die Uhrzeit an, bis zu der der Termin stattfinden soll.
+
+meeting.place = Ort
+meeting.place.info = Der Ort, an dem der Termin stattfindet. Kann leer gelassen werden.
+
+meeting.annotation = Anmerkung
+meeting.annotation.info = Zusätzliche Informationen zu diesem Termin.
+
+meeting.from = Ab dem
+meeting.to = Bis zum
+meeting.from.time = Von
+meeting.to.time = Bis
+
+meeting.weekday = Wochentag
+meeting.always = Immer
+meeting.mondays = Montags
+meeting.tuesdays = Dienstags
+meeting.wednesdays = Mittwochs
+meeting.thursdays = Donnerstags
+meeting.fridays = Freitags
+meeting.saturdays = Samstags
+meeting.sundays = Sonntags
+
+# -------------------------------------------------------------------------------------------------- #
+# MEETING CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+meeting.new.success = Neuen Termin erstellt, ID = %d.
+meeting.new.title = Neuen Termin erstellen
+
+meeting.delete.success = Termin gelöscht, ID = %d.
+meeting.delete.confirm = Termin wirklich löschen?
+meeting.delete.title = Termin löschen
+
+meeting.update.success = Termin aktualisiert, ID = %d.
+
+meeting.single.edit = Einzeltermin bearbeiten
+meeting.weekly.edit = Wiederkehrenden Termin bearbeiten
+
+# -------------------------------------------------------------------------------------------------- #
+# EVENT CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+event.new.success = Veranstaltung '%s' hinzugefügt, Kurs ID = %d.
+
+event.delete.success = Veranstaltung gelöscht, ID = %d.
+event.delete.confirm = Veranstaltung '%s' wirklich löschen?
+event.delete.title = Veranstaltung löschen
+
+event.capacity = Teilnehmeranzahl
+event.capacity.change.info = Die Teilnehmeranzahl ist die maximale Anzahl an TeilnehmerInnen, die sich in diese Veranstaltung einschreiben dürfen.
+event.capacity.change.success = Teilnehmeranzahl zu %d geändert.
+
+event.title.change.info = Der Veranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Einleitung', 'Thema 1', ...
+event.title.change.success = Veranstaltungstitel zu '%s' geändert.
+
+event.annotation.change.info = Hier können Sie zusätzliche Informationen zur Veranstaltung angeben, um diese näher zu spezifizieren.
+event.annotation.change.success = Anmerkung zu '%s' geändert.
+event.annotation.delete.success = Anmerkung gelöscht.
+event.annotation.delete.confirm = Anmerkung '%s' wirklich löschen?
+event.annotation.delete.title = Anmerkung löschen
+
+event.waitlist.change.success = Wartelistenoption angepasst.
+event.waitlist.change.title = Wartelistenoption ändern.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
@@ -39,7 +131,7 @@ course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
 course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
 course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr von %g€ löschen wollen?
 course.fee.delete.title = Teilnahmegebühr löschen
-course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15,00 oder 15 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
+course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15,00 oder 15.00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
 course.description.change.success = Kursbeschreibung geändert, Kurs ID = %d.
 course.description.delete.success = Kursbeschreibung gelöscht, Kurs ID = %d.
@@ -98,7 +190,10 @@ course.not.see.matr.nr.info = NutzerIn darf die Matrikelnummern eingeschriebener
 course.visibility.public = Der Kurs ist öffentlich (ohne Anmeldung) sichtbar.
 course.visibility.not.public = Der Kurs ist <strong>nicht</strong> öffentlich (ohne Anmeldung) sichtbar.
 course.visibility.change.title = Sichtbarkeit ändern
-course.visibility.change.success = Sichtbarkeit geändert, Kurs ID = %d.
+course.visible.change.success = Sichtbarkeit geändert, Kurs ID = %d.
+
+course.only.ldap.change.title = Zielgruppe ändern
+course.onlyldap.change.success = Zielgruppe geändert, Kurs ID = %d.
 
 course.whitelist.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.
 course.whitelist.delete.success = NutzerIn aus Whitelist entfernt, Kurs ID = %d.

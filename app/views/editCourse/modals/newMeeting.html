@@ -1,0 +1,63 @@
+<!-- new-meeting-modal
+
+ID:             new-meeting-modal-ID            value
+-->
+
+<div class="modal fade" id="new-meeting-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form accept-charset="UTF-8" action='{{url "EditEvent.NewMeeting"}}'
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header background-color-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "meeting.new.title"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- event ID -->
+          <input type="hidden" name="ID" id="new-meeting-modal-ID">
+
+          <!-- load option -->
+          <small class="form-text text-muted">
+            {{msg $ "meeting.interval.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text border-right-0"> {{msg $ "meeting.interval"}} </label>
+            </div>
+            <select name="option" class="custom-select rounded-right">
+              <option value="0" selected> {{msg $ "meeting.interval.single"}}</option>
+              <option value="1"> {{msg $ "meeting.interval.weekly"}} </option>
+              <option value="2"> {{msg $ "meeting.interval.even"}} </option>
+              <option value="3"> {{msg $ "meeting.interval.odd"}} </option>
+            </select>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.option"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.add"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

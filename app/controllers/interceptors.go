@@ -110,50 +110,54 @@ func (c Creator) authCreator() revel.Result {
 //authEditCourse prevents unauthorized access to controllers of type EditCourse.
 func (c EditCourse) authEditCourse() revel.Result {
 
-	if c.Session["role"] != nil && c.Session["notActivated"] == nil &&
-		c.Session["userID"] != nil { //prevent nil references
+	if authorized, err := evalEditAuth(c.Controller, "course"); err == nil && authorized {
+		return nil
+	} else if err != nil {
+		return flashError(
+			errTypeConv,
+			err,
+			"/",
+			c.Controller,
+			"",
+		)
+	}
 
-		//authorize admins
-		if c.Session["role"].(string) == models.ADMIN.String() {
-			return nil
-		}
+	c.Flash.Error(c.Message("intercept.invalid.action"))
+	return c.Redirect(App.Index)
+}
 
-		courseIDStr := c.Params.Query.Get("ID") //GET request
-		if courseIDStr == "" {
-			courseIDStr = c.Params.Form.Get("ID") //POST request
-		}
+//authEditEvent prevents unauthorized access to controllers of type EditEvent.
+func (c EditEvent) authEditEvent() revel.Result {
 
-		//get the course ID
-		courseID, err := strconv.Atoi(courseIDStr)
-		if err != nil {
-			c.Log.Error("failed to parse courseID from parameter",
-				"parameter", c.Params.Query.Get("ID"), "error", err.Error())
-			return flashError(
-				errTypeConv,
-				err,
-				"/",
-				c.Controller,
-				"",
-			)
-		}
+	if authorized, err := evalEditAuth(c.Controller, "event"); err == nil && authorized {
+		return nil
+	} else if err != nil {
+		return flashError(
+			errTypeConv,
+			err,
+			"/",
+			c.Controller,
+			"",
+		)
+	}
 
-		//only creators and editors of the specified course are allowed to edit it
-		var user models.User
-		userID := c.Session["userID"].(string)
-		authorized, err := user.AuthorizedToEdit(&userID, &courseID)
-		if err != nil {
-			return flashError(
-				errTypeConv,
-				err,
-				"/",
-				c.Controller,
-				"",
-			)
-		}
+	c.Flash.Error(c.Message("intercept.invalid.action"))
+	return c.Redirect(App.Index)
+}
 
-		if authorized {
-			return nil
-		}
+//authEditMeeting prevents unauthorized access to controllers of type EditMeeting.
+func (c EditMeeting) authEditMeeting() revel.Result {
+
+	if authorized, err := evalEditAuth(c.Controller, "meeting"); err == nil && authorized {
+		return nil
+	} else if err != nil {
+		return flashError(
+			errTypeConv,
+			err,
+			"/",
+			c.Controller,
+			"",
+		)
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))
@@ -196,4 +200,39 @@ func (c User) authUser() revel.Result {
 	}
 	c.Flash.Error(c.Message("intercept.invalid.action"))
 	return c.Redirect(App.Index)
+}
+
+//evalEditAuth evaluates if a user is authorized to edit a course/event/meeting.
+func evalEditAuth(c *revel.Controller, table string) (authorized bool, err error) {
+
+	if c.Session["role"] != nil && c.Session["notActivated"] == nil &&
+		c.Session["userID"] != nil { //prevent nil references
+
+		//authorize admins
+		if c.Session["role"].(string) == models.ADMIN.String() {
+			return true, nil
+		}
+
+		IDStr := c.Params.Query.Get("ID") //GET request
+		if IDStr == "" {
+			IDStr = c.Params.Form.Get("ID") //POST request
+		}
+
+		//get the ID
+		ID, err := strconv.Atoi(IDStr)
+		if err != nil {
+			c.Log.Error("failed to parse ID from parameter", "query",
+				c.Params.Query.Get("ID"), "form", c.Params.Form.Get("ID"),
+				"error", err.Error())
+			return false, err
+		}
+
+		//only creators and editors of the specified course are allowed to edit it
+		var user models.User
+		userID := c.Session["userID"].(string)
+
+		authorized, err = user.AuthorizedToEdit(&userID, &table, &ID)
+		return authorized, err
+	}
+	return
 }

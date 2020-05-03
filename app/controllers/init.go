@@ -15,5 +15,7 @@ func init() {
 	revel.InterceptMethod(App.authApp, revel.BEFORE)
 	revel.InterceptMethod(Creator.authCreator, revel.BEFORE)
 	revel.InterceptMethod(EditCourse.authEditCourse, revel.BEFORE)
+	revel.InterceptMethod(EditEvent.authEditEvent, revel.BEFORE)
+	revel.InterceptMethod(EditMeeting.authEditMeeting, revel.BEFORE)
 	revel.InterceptMethod(User.authUser, revel.BEFORE)
 }

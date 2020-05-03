@@ -44,6 +44,8 @@ GET     /creator/getDrafts                          Creator.GetDrafts
 GET     /editCourse/openCourse                      EditCourse.OpenCourse
 GET     /editCourse/searchUser                      EditCourse.SearchUser
 
+POST    /editCourse/modals/newEvent                 EditCourse.NewEvent
+
 POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
 POST    /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
 POST    /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
@@ -51,8 +53,8 @@ GET     /editCourse/modals/changeUserList           EditCourse.ChangeUserList
 GET     /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
 GET     /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
 
-POST    /editCourse/modals/changeVisibility         EditCourse.ChangeVisibility
-GET     /editCourse/modals/changeVisibility         EditCourse.ChangeVisibility
+POST    /editCourse/modals/changeBool               EditCourse.ChangeBool
+GET     /editCourse/modals/changeBool               EditCourse.ChangeBool
 
 POST    /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
 GET     /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
@@ -65,6 +67,15 @@ GET     /editCourse/modals/changeGroup              EditCourse.ChangeGroup
 
 POST    /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
 GET     /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
+
+
+POST    /edit/event/delete                          EditEvent.Delete
+POST    /edit/event/newMeeting                      EditEvent.NewMeeting
+POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
+POST    /edit/event/changeText                      EditEvent.ChangeText
+POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
+
+POST    /edit/meeting/change                        EditMeeting.Edit
 
 # ------------------------------- Admin routes. -------------------------------- #
 

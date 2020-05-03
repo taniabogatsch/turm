@@ -1,0 +1,123 @@
+<!-- template rendering all events of a course -->
+
+<tr>
+  <td colspan="2">
+    <ul class="list-group">
+
+      <script>
+        var fromMsg = '{{msg $ "meeting.from"}}';
+        var clockMsg = '{{msg $ "course.clock"}}';
+      </script>
+
+      {{range .course.Events}}
+        <li class="list-group-item">
+
+          <!-- delete event -->
+          <a class="btn btn-outline-darkblue float-right margin-left-20 preview-hide" href='#no-scroll' role="button"
+            onclick='openDeleteFieldModal({{msg $ "event.delete.title"}},
+              {{msg $ "event.delete.confirm" .Title}}, {{url "EditEvent.Delete" .ID}});'>
+            {{template "icons/trash.html" . }}
+          </a>
+
+          <!-- disabled enroll button -->
+          <button class="btn btn-outline-darkblue float-right margin-left-20" href='#no-scroll' role="button" disabled>
+            {{msg $ "button.enroll"}}
+          </button>
+
+          <!-- fullness and capacity -->
+          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-right"
+            onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", {{.Capacity}}, true,
+              {{url "EditEvent.ChangeCapacity"}}, "int", "", {{msg $ "event.capacity.change.info"}}, {{.ID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          <small class="float-right">
+            {{.Fullness}} / {{.Capacity}}
+          </small>
+
+          <!-- progress bar -->
+          <div class="progress float-right margin-right-20" style="width: 8rem;">
+            <div class="progress-bar background-color-darkblue" role="progressbar" style="width: {{.Percentage}}%;"
+              aria-valuenow="{{.Fullness}}" aria-valuemin="0" aria-valuemax="{{.Capacity}}">
+              {{.Percentage}}%
+            </div>
+          </div>
+
+          <!-- event title -->
+          {{.Title}}
+          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
+            onclick='openChangeModal({{msg $ "event.title"}}, "title", {{.Title}},
+              true, {{url "EditEvent.ChangeText"}}, "text", "255",
+              {{msg $ "event.title.change.info"}}, {{.ID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          <br>
+
+          <!-- waiting list information -->
+          <small class="form-text text-muted float-left">
+            {{template "icons/listUL.html" . }} &nbsp;
+            {{if .HasWaitlist}}
+              {{msg $ "event.waitlist.yes"}}
+            {{else}}
+              {{msg $ "event.waitlist.no"}}
+            {{end}}
+          </small>
+          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
+            onclick='openBoolModal({{msg $ "event.waitlist.change.title"}},
+              {{url "EditEvent.ChangeWaitlist"}}, {{msg $ "event.waitlist.yes"}},
+              {{msg $ "event.waitlist.no"}}, {{.HasWaitlist}}, "", "", {{.ID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          <br>
+
+          <!-- annotation -->
+          {{if .Annotation.Valid}}
+            <small class="form-text text-muted float-left">
+              {{template "icons/infoSquare.html" . }} &nbsp; {{.Annotation.String}}
+            </small>
+            <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
+              onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
+                {{.Annotation.String}}, {{.Annotation.Valid}}, {{url "EditEvent.ChangeText"}},
+                "text", "255", {{msg $ "event.annotation.change.info"}}, {{.ID}});'>
+              {{template "icons/pencil.html" . }}
+            </a>
+            <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
+              onclick='openDeleteFieldModal({{msg $ "event.annotation.delete.title"}},
+                {{msg $ "event.annotation.delete.confirm" .Annotation.String}},
+                {{url "EditEvent.ChangeText" .ID "annotation" ""}});'>
+              {{template "icons/trash.html" . }}
+            </a>
+            <br>
+          {{end}}
+
+          <!-- meetings -->
+          {{template "course/meetings.html" dict_addLocale $.currentLocale "eventID" .ID "Meetings" .Meetings}}
+
+          <!-- add a new meeting -->
+          {{if .Meetings}}
+            <br class="preview-hide">
+          {{end}}
+          <br class="preview-hide">
+          <button type="button" class="btn btn-outline-darkblue preview-hide"
+            onclick='openNewMeetingModal({{.ID}});'>
+            {{msg $ "creator.add.meeting"}}
+          </button>
+
+          {{if not .Annotation.Valid}}
+            <!-- add annotation button -->
+            <button type="button" class="btn btn-outline-darkblue preview-hide"
+              onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
+                {{.Annotation.String}}, {{.Annotation.Valid}}, {{url "EditEvent.ChangeText"}},
+                "text", "255", {{msg $ "event.annotation.change.info"}}, {{.ID}});'>
+              + &nbsp; {{msg $ "event.annotation"}}
+            </button>
+          {{end}}
+
+          <button type="button" class="btn btn-outline-darkblue preview-hide">
+            + &nbsp; Einschreibeschlüssel
+          </button>
+        </li>
+      {{end}}
+
+    </ul>
+  </td>
+</tr>

@@ -37,6 +37,49 @@ func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
 	return c.Render(course)
 }
 
+/*NewEvent creates a new blank event in a course.
+- Roles: creator and editors of this course. */
+func (c EditCourse) NewEvent(ID int, fieldID, value string) revel.Result {
+
+	c.Log.Debug("create a new event", "ID", ID, "fieldID", fieldID, "value", value)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
+		revel.MinSize{3},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.text.short")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	event := models.Event{CourseID: ID, Title: value}
+	err := event.NewBlank()
+	if err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	c.Flash.Success(c.Message("event.new.success",
+		event.Title,
+		event.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
 func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
@@ -247,16 +290,26 @@ func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option boo
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*ChangeVisibility toggles the visibility of a course.
+/*ChangeBool toggles the provided boolean value of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeVisibility(ID int, option bool) revel.Result {
+func (c EditCourse) ChangeBool(ID int, listType string, option bool) revel.Result {
 
-	c.Log.Debug("update course visibility", "ID", ID, "option", option)
+	c.Log.Debug("update bool", "ID", ID, "listType", listType, "option", option)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	course := models.Course{ID: ID, Visible: option}
-	if err := course.Update("visible", course.Visible); err != nil {
+	if listType != "visible" && listType != "onlyldap" {
+		return flashError(
+			errContent,
+			errors.New("invalid column value"),
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	course := models.Course{ID: ID}
+	if err := course.Update(listType, option); err != nil {
 		return flashError(
 			errDB,
 			err,
@@ -266,7 +319,7 @@ func (c EditCourse) ChangeVisibility(ID int, option bool) revel.Result {
 		)
 	}
 
-	c.Flash.Success(c.Message("course.visibility.change.success",
+	c.Flash.Success(c.Message("course."+listType+".change.success",
 		course.ID,
 	))
 	return c.Redirect(c.Session["currPath"])

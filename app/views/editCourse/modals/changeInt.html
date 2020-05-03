@@ -4,6 +4,7 @@ titleID:      change-int-modal-title      html
 fieldID:      change-int-modal-field      value
 valueID:      change-int-modal-value      value
 
+ID:           change-int-modal-ID         value
 formID:       change-int-modal-form       action
 -->
 
@@ -26,8 +27,8 @@ formID:       change-int-modal-form       action
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- course ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- course/event ID -->
+          <input type="hidden" name="ID" id="change-int-modal-ID">
           <!-- fieldID -->
           <input type="hidden" name="fieldID" id="change-int-modal-field">
 

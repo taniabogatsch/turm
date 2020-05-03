@@ -1,0 +1,100 @@
+<!-- template rendering all meetings of an event -->
+
+{{range $key, $value := .Meetings}}
+
+  {{if ne $key 0}}
+    <br>
+    <br>
+  {{end}}
+
+  <small class="form-text text-muted float-left">
+
+    {{if eq .MeetingInterval 0}} <!-- single meeting -->
+
+      <!-- time -->
+      {{template "icons/calendar.html" .}} &nbsp;
+      <strong>{{.MeetingStart}}</strong> {{msg $ "course.clock"}} - <strong>{{.MeetingEnd}}</strong> {{msg $ "course.clock"}}
+
+    {{else}} <!-- weekly, even or odd meeting -->
+
+      <div class="float-left"> {{template "icons/calendar.html" .}} &nbsp; </div>
+      <div class="float-left">
+        <strong>
+        {{if eq .WeekDay.Int32 0}}
+          {{msg $ "meeting.mondays"}}
+        {{else if eq .WeekDay.Int32 1}}
+          {{msg $ "meeting.tuesdays"}}
+        {{else if eq .WeekDay.Int32 2}}
+          {{msg $ "meeting.wednesdays"}}
+        {{else if eq .WeekDay.Int32 3}}
+          {{msg $ "meeting.thursdays"}}
+        {{else if eq .WeekDay.Int32 4}}
+          {{msg $ "meeting.fridays"}}
+        {{else if eq .WeekDay.Int32 5}}
+          {{msg $ "meeting.saturdays"}}
+        {{else}}
+          {{msg $ "meeting.sundays"}}
+        {{end}}
+        </strong>,
+
+        <strong>
+          {{if eq .MeetingInterval 1}}
+            {{msg $ "meeting.interval.weekly"}}
+          {{else if eq .MeetingInterval 2}}
+            {{msg $ "meeting.interval.even"}}
+          {{else}}
+            {{msg $ "meeting.interval.odd"}}
+          {{end}}
+        </strong>, &nbsp;
+      </div>
+      <div class="float-left" id="meeting-{{.ID}}-time"></div>
+      <script>
+        $(function() {
+          const start = '{{.MeetingStart}}';
+          const end = '{{.MeetingEnd}}';
+          const startParts = start.split(" ");
+          const endParts = end.split(" ");
+
+          const date = startParts[0] + " - " + endParts[0];
+          const time = "<strong>" + startParts[1] + "</strong> " + clockMsg + " - <strong>" + endParts[1] + "</strong> " + clockMsg;
+          $('#meeting-{{.ID}}-time').html(time + ", " + date);
+        });
+      </script>
+    {{end}}
+    <br>
+
+    <!-- place -->
+    {{if .Place.Valid}}
+      &nbsp; {{template "icons/geoAlt.html" .}}
+      {{.Place.String}}
+    {{end}}
+
+    <!-- annotation -->
+    {{if .Annotation.Valid}}
+      &nbsp; {{template "icons/chatSquare.html" .}}
+      {{.Annotation.String}}
+    {{end}}
+  </small>
+
+  <!-- edit single meeting -->
+  {{if eq .MeetingInterval 0}}
+    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left margin-left-20"
+      onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}},
+      {{.Place.String}}, {{.Annotation.String}}, 0, {{.MeetingInterval}});'>
+      {{template "icons/pencil.html" . }}
+    </a>
+
+  {{else}} <!-- edit weekly meeting -->
+    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left margin-left-20"
+      onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}}, {{.Place.String}},
+      {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}});'>
+      {{template "icons/pencil.html" . }}
+    </a>
+  {{end}}
+
+  <!-- delete meeting -->
+  <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
+    onclick=''> <!-- TODO -->
+    {{template "icons/trash.html" . }}
+  </a>
+{{end}}

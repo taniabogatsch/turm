@@ -18,8 +18,9 @@ function submitChangeGroupModal(parentID) {
   $('#change-group-modal-form').submit();
 }
 
-function openChangeModal(title, field, value, valid, action, modal, max, info) {
+function openChangeModal(title, field, value, valid, action, modal, max, info, ID) {
 
+  $('#change-' + modal + '-modal-ID').val(ID);
   $('#change-' + modal + '-modal-title').html(title);
   $('#change-' + modal + '-modal-field').val(field);
   $('#change-' + modal + '-modal-form').attr("action", action);
@@ -41,6 +42,9 @@ function openChangeModal(title, field, value, valid, action, modal, max, info) {
       $('#change-timestamp-modal-time').val("");
     } else {
       $('#change-' + modal + '-modal-value').val("");
+      if (field == "event") {
+        title = value;
+      }
       $('#change-' + modal + '-modal-value').attr("placeholder", title);
     }
   }
@@ -60,6 +64,12 @@ function openChangeModal(title, field, value, valid, action, modal, max, info) {
     $('#change-text-modal-icon').html($('#change-text-icon-pencil').html());
     $('#change-text-modal-value').removeAttr("pattern");
     $('#change-text-modal-validation').html($('#change-text-validation-text').html());
+  }
+
+  if (field == "event") {
+    $('#change-text-modal-btn').html($('#change-text-add').html());
+  } else {
+    $('#change-text-modal-btn').html($('#change-text-save').html());
   }
 
   //show the modal
@@ -110,8 +120,9 @@ function submitList(ID) {
   $('#change-user-list-modal-form').submit();
 }
 
-function openBoolModal(title, action, option1, option2, value, userID, listType) {
+function openBoolModal(title, action, option1, option2, value, userID, listType, ID) {
 
+  $('#change-bool-modal-ID').val(ID);
   $('#change-bool-modal-title').html(title);
   $('#change-bool-modal-form').attr("action", action);
 
@@ -167,4 +178,38 @@ function submitTextArea() {
   } else {
     textArea.setCustomValidity("Please provide a text.");
   }
+}
+
+function openNewMeetingModal(eventID) {
+
+  $('#new-meeting-modal-ID').val(eventID);
+  $('#new-meeting-modal').modal('show');
+}
+
+function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval) {
+
+  var meetingType = "single";
+  if (interval != 0) {
+    meetingType = "weekly";
+    //$('#meeting-weekly-interval').val(interval); //TODO
+    //$('#meeting-weekly-weekday').val(weekday); //TODO
+  }
+
+  $('#edit-meeting-' + meetingType + '-ID').val(meetingID);
+
+  if (start != "") {
+    const startParts = start.split(" ");
+    $('#' + meetingType + '-start-date').val(startParts[0]);
+    $('#' + meetingType + '-start-time').val(startParts[1]);
+  }
+  if (end != "") {
+    const endParts = end.split(" ");
+    $('#' + meetingType + '-end-date').val(endParts[0]);
+    $('#' + meetingType + '-end-time').val(endParts[1]);
+  }
+
+  $('#meeting-' + meetingType + '-place').val(place);
+  $('#meeting-' + meetingType + '-annotation').val(annotation);
+
+  $('#edit-meeting-' + meetingType + '').modal('show');
 }

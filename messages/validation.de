@@ -51,6 +51,7 @@ validation.invalid.date = Bitte geben Sie ein Datum zwischen [jetzt, 2200-01-01]
 validation.invalid.time = Bitte geben Sie eine Zeit an.
 validation.invalid.timestamp = Bitte geben Sie ein gültiges Datum und eine Uhrzeit an.
 validation.invalid.text = Die Eingabe muss aus 3 bis 511 Zeichen bestehen.
+validation.invalid.text.short = Die Eingabe muss aus 3 bis 255 Zeichen bestehen.
 validation.invalid.text.area = Bitte geben Sie Textinhalt an.
 validation.invalid.int = Bitte geben Sie eine natürliche positive Zahl an.
 

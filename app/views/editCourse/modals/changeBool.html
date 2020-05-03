@@ -5,6 +5,7 @@ option1-ID:     change-bool-modal-option-1      html
 option2-ID:     change-bool-modal-option-2      html
 checkboxID:     change-bool-modal-checkbox      value
 
+ID:             change-bool-modal-ID            value
 formID:         change-bool-modal-form          action
 
 - optional:
@@ -30,8 +31,8 @@ listType:       change-bool-modal-list          value
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- course ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- course/event ID -->
+          <input type="hidden" name="ID" id="change-bool-modal-ID">
           <!-- user ID -->
           <input id="change-bool-modal-user" type="hidden" name="userID">
           <!-- list type -->

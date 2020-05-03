@@ -13,6 +13,9 @@ creator.drafts = Drafts
 creator.courses.active = Active courses
 creator.courses.expired = Expired courses
 
+creator.event.new = New event
+creator.title.event.working.info = Working event title. Can be edited later.
+
 creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
 creator.draft = Draft
 creator.course.blank = Blank course
@@ -41,3 +44,7 @@ creator.add.custom.email = + &nbsp; Enrollment e-mail
 creator.add.whitelist = + &nbsp; Add user to Whitelist
 creator.add.blacklist = + &nbsp; Add user to Blacklist
 creator.add.enroll.limit = + &nbsp; Enroll limit
+creator.add.restriction = + &nbsp; Restriction to course of studies
+
+creator.add.event = + &nbsp; Event
+creator.add.meeting = + &nbsp; Meeting

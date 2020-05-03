@@ -409,8 +409,8 @@ func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 	return data.IsEditor, data.IsInstructor, err
 }
 
-/*AuthorizedToEdit returns whether a user is authorized to edit a specific course or not. */
-func (user *User) AuthorizedToEdit(userIDSession *string, courseID *int) (authorized bool, err error) {
+/*AuthorizedToEdit returns whether a user is authorized to edit a course or not. */
+func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (authorized bool, err error) {
 
 	user.ID, err = strconv.Atoi(*userIDSession)
 	if err != nil {
@@ -419,10 +419,17 @@ func (user *User) AuthorizedToEdit(userIDSession *string, courseID *int) (author
 		return
 	}
 
-	err = app.Db.Get(&authorized, stmtAuthorizedToEdit, user.ID, *courseID)
+	if *table == "course" {
+		err = app.Db.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
+	} else if *table == "event" {
+		err = app.Db.Get(&authorized, stmtAuthorizedToEditEvent, user.ID, *ID)
+	} else { //meeting
+		err = app.Db.Get(&authorized, stmtAuthorizedToEditMeeting, user.ID, *ID)
+	}
+
 	if err != nil {
 		modelsLog.Error("failed to retrieve whether the user is authorized or not", "userID", user.ID,
-			"courseID", *courseID, "error", err.Error())
+			"ID", *ID, "error", err.Error())
 	}
 	return
 }
@@ -597,7 +604,7 @@ const (
 			academictitle, email, nameaffix, salutation, title
 	`
 
-	stmtAuthorizedToEdit = `
+	stmtAuthorizedToEditCourse = `
 		SELECT EXISTS (
 			SELECT true
 			FROM course
@@ -610,6 +617,47 @@ const (
 			FROM editor
 			WHERE userid = $1
 				AND courseid = $2
+
+		) AS authorized
+	`
+
+	stmtAuthorizedToEditEvent = `
+		SELECT EXISTS (
+			SELECT true
+			FROM course c, event e
+			WHERE e.id = $2
+				AND c.creator = $1
+				AND c.id = e.courseid
+
+			UNION
+
+			SELECT true
+			FROM editor ed, event e
+			WHERE e.id = $2
+				AND ed.userid = $1
+				AND e.courseid = ed.courseid
+
+		) AS authorized
+	`
+
+	stmtAuthorizedToEditMeeting = `
+		SELECT EXISTS (
+			SELECT true
+			FROM meeting m, event e, course c
+			WHERE m.id = $2
+				AND c.creator = $1
+				AND e.id = m.eventid
+				AND e.courseid = c.id
+
+			UNION
+
+			SELECT true
+			FROM editor ed, meeting m, event e
+			WHERE m.id = $2
+				AND ed.userid = $1
+				AND m.eventid = e.id
+				AND e.courseid = ed.courseid
+
 		) AS authorized
 	`
 

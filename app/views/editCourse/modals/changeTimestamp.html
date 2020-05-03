@@ -4,6 +4,7 @@ titleID:      change-timestamp-modal-title      html
 fieldID:      change-timestamp-modal-field      value
 infoID:       change-timestamp-modal-info       html
 
+ID:           change-timestamp-modal-ID         value
 dateID:       change-timestamp-modal-date       value
 timeID:       change-timestamp-modal-time       value
 -->
@@ -26,8 +27,8 @@ timeID:       change-timestamp-modal-time       value
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- course ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- course/meeting ID -->
+          <input type="hidden" name="ID" id="change-timestamp-modal-ID">
           <!-- fieldID -->
           <input type="hidden" name="fieldID" id="change-timestamp-modal-field">
 
@@ -79,7 +80,7 @@ timeID:       change-timestamp-modal-time       value
             {{msg $ "button.save"}}
           </button>
         </div>
-        
+
       </form>
     </div>
   </div>

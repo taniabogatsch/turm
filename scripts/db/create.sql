@@ -75,8 +75,8 @@ CREATE TABLE event (
   capacity          integer       NOT NULL,
   haswaitlist       boolean       NOT NULL,
   title             varchar(255)  NOT NULL,
-  description       text,
-  enrollmentkey     varchar(512),
+  annotation        varchar(255),
+  enrollmentkey     varchar(511),
 
   FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
 );

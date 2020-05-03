@@ -8,6 +8,9 @@ course.subtitle = Subtitle
 course.fee = Fee
 course.description = Course description
 course.speaker = Speaker
+course.audience = Audience
+course.only.ldap = Users with an university account.
+course.not.only.ldap = Users with both an external or an university account.
 
 course.clock =
 course.from = From
@@ -25,6 +28,95 @@ course.whitelist = Whitelist
 course.blacklist = Blacklist
 
 course.events = Events
+course.events.info = A course can have a multitude of events. You can enroll in these events.
+
+# -------------------------------------------------------------------------------------------------- #
+# EVENT FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+event.title = Event title
+event.annotation = Annotation
+event.waitlist.yes = A waiting list exists
+event.waitlist.no = There is no waiting list
+
+# -------------------------------------------------------------------------------------------------- #
+# MEETING FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+meeting.interval = Interval
+meeting.interval.info = Single meetings happen once. They consist of a starting date and time and an ending date and time. Weekly meetings take place every week, even meetings every even week and odd meetings every odd week. These consist of a starting time and an ending time.
+meeting.interval.single = Single
+meeting.interval.weekly = Weekly
+meeting.interval.even = Every even week
+meeting.interval.odd = Every odd week
+
+meeting.start = Begin
+meeting.end = End
+meeting.start.info = Please enter the beginning date and time of the meeting. A meeting can span several day, e.g. if its a weekend seminar.
+meeting.end.info = Please enter the ending date and time of the meeting.
+
+meeting.place = Place
+meeting.place.info = The place of the meeting.
+
+meeting.annotation = Annotation
+meeting.annotation.info = Additional information about this meeting.
+
+meeting.from = From the
+meeting.to = To the
+meeting.from.time = From
+meeting.to.time = To
+
+meeting.weekday = Day of week
+meeting.always = On
+meeting.mondays = Mondays
+meeting.tuesdays = Tuesdays
+meeting.wednesdays = Wednesdays
+meeting.thursdays = Thursdays
+meeting.fridays = Fridays
+meeting.saturdays = Saturdays
+meeting.sundays = Sundays
+
+# -------------------------------------------------------------------------------------------------- #
+# MEETING CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+meeting.new.success = Added meeting, ID = %d.
+meeting.new.title = Add new meeting
+
+meeting.delete.success = Deleted meeting, ID = %d.
+meeting.delete.confirm = Please confirm the deletion of the meeting.
+meeting.delete.title = Delete meeting
+
+meeting.update.success = Updated meeting, ID = %d.
+
+meeting.single.edit = Edit single meeting
+meeting.weekly.edit = Edit weekly meeting
+
+# -------------------------------------------------------------------------------------------------- #
+# EVENT CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+event.new.success = Added event '%s', course ID = %d.
+
+event.delete.success = Deleted event, ID = %d.
+event.delete.confirm = Please confirm the deletion of event '%s'.
+event.delete.title = Delete event
+
+event.capacity = Number of participants
+event.capacity.change.info = The number of participants is the maximum number of users that are allowed to enroll in this event.
+event.capacity.change.success = Changed the number of participants to %d.
+
+event.title.change.info = The event title comprises the purpose of the event, e.g. 'Introduction', 'Topic 1', ...
+event.title.change.success = Changed event title to '%s'.
+
+event.annotation.change.info = Here, you can provide additional information to further specify the event's purpose.
+event.annotation.change.success = Changed annotation to '%s'.
+event.annotation.delete.success = Deleted annotation.
+event.annotation.delete.confirm = Please confirm the deletion of the annotation '%s'.
+event.annotation.delete.title = Delete annotation
+
+event.waitlist.change.success = Changed waiting list option.
+event.waitlist.change.title = Change waiting list option.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
@@ -39,7 +131,7 @@ course.fee.change.success = Changes course fee to %s€, course ID = %d.
 course.fee.delete.success = Deleted course fee, course ID = %d.
 course.fee.delete.confirm = Please confirm the deletion of the course fee of %g€, course ID = %d.
 course.fee.delete.title = Delete course fee
-course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15,00 or 15 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
+course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15,00 or 15.00 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
 
 course.description.change.success = Changed course description, course ID = %d.
 course.description.delete.success = Deleted course description, course ID = %d.
@@ -98,7 +190,10 @@ course.not.see.matr.nr.info = This user is <strong>not</strong> allowed to see t
 course.visibility.public = The course is publicly (without login) visible.
 course.visibility.not.public = The course is <strong>not</strong> publicly (without login) visible.
 course.visibility.change.title = Change visibility
-course.visibility.change.success = Changed visibility, course ID = %d.
+course.visible.change.success = Changed visibility, course ID = %d.
+
+course.only.ldap.change.title = Change audience
+course.onlyldap.change.success = Changed audience, course ID = %d.
 
 course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
 course.whitelist.delete.success = Deleted user from whitelist, course ID = %d.
