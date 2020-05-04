@@ -57,9 +57,23 @@ validation.invalid.int = Bitte geben Sie eine natürliche positive Zahl an.
 
 validation.invalid.fee = Bitte geben Sie eine gültige Teilnahmegebühr an.
 
+validation.invalid.enrollment.start = Der Beginn des Einschreibezeitraums darf nicht vor der aktuellen Systemzeit liegen.
+validation.invalid.enrollment.end = Das Ende des Einschreibezeitraums muss nach dessen Anfang liegen.
+validation.invalid.unsubscribe.end = Das Ende des Ausschreibezeitraums muss nach dem Ende des Einschreibezeitraums liegen.
+validation.invalid.unsubscribe.expiration = Das Ende des Ausschreibezeitraums muss vor dem Ablaufdatum des Kurses liegen.
+validation.invalid.expiration.date = Das Ablaufdatum des Kurses muss nach dem Ende des Einschreibezeitraums lieben.
+validation.invalid.parent = Der Kurs muss Teil einer Gruppe sein.
+
+validation.invalid.meeting.start = Termine dürfen nicht vor dem Anfang des Einschreibezeitraums liegen.
+validation.invalid.meeting.end = Das Ende von Terminen muss nach deren Anfang liegen.
+
+validation.invalid.len.events = Kurse müssen mindestens eine Veranstaltung besitzen.
+
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.option = Bitte geben Sie eine gültige Option an.
 validation.invalid.params = Bitte geben Sie gültige Parameter an.
+
+validation.invalid.delete.course = Nur inaktive oder abgelaufene Kurse können gelöscht werden.

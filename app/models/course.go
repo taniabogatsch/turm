@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"math"
 	"regexp"
-	"strings"
+	"strconv"
 	"time"
 	"turm/app"
 
@@ -31,68 +31,77 @@ type Course struct {
 	UnsubscribeEnd    sql.NullString  `db:"unsubscribeend"`
 	ExpirationDate    string          `db:"expirationdate"`
 	ParentID          sql.NullInt32   `db:"parentid"`
-	Events            Events          ``
-	Editors           UserList        ``
-	Instructors       UserList        ``
-	Blacklist         UserList        ``
-	Whitelist         UserList        ``
-	Restrictions      []Restriction   ``
+
+	//course data of different tables
+	Events       Events        ``
+	Editors      UserList      ``
+	Instructors  UserList      ``
+	Blacklist    UserList      ``
+	Whitelist    UserList      ``
+	Restrictions []Restriction ``
 
 	//additional information required when displaying the course
 	CreatorData User ``
 	//path to the course entry in the groups tree
 	Path Groups ``
+	//used for correct template rendering
+	CreatorID string
 }
 
 /*Validate all Course fields. */
 func (course *Course) Validate(v *revel.Validation) {
 
-	v.Required(course.ID).
-		MessageKey("validation.invalid.courseID")
+	now := time.Now().Format(revel.TimeFormats[0])
 
-	course.Title = strings.TrimSpace(course.Title)
-	v.Check(course.Title,
-		revel.MinSize{3},
-		revel.MaxSize{511},
-	).MessageKey("validation.invalid.title")
-
-	//TODO: how to validate the creator?
-
-	course.Subtitle.String = strings.TrimSpace(course.Subtitle.String)
-	if course.Subtitle.String != "" {
-		v.Check(course.Subtitle.String,
-			revel.MinSize{3},
-			revel.MaxSize{511},
-		).MessageKey("validation.invalid.subtitle")
-		course.Subtitle.Valid = true
+	//now < EnrollmentStart
+	if now >= course.EnrollmentStart {
+		v.ErrorKey("validation.invalid.enrollment.start")
 	}
 
-	if len(course.Restrictions) != 0 {
-		v.Required(course.OnlyLDAP).
-			MessageKey("validation.invalid.onlyLDAP")
+	//EnrollmentStart < EnrollmentEnd
+	if course.EnrollmentStart >= course.EnrollmentEnd {
+		v.ErrorKey("validation.invalid.enrollment.end")
 	}
 
-	if course.Description.String != "" {
-		//TODO
-		//v.Check(course.Description.String,
-		//NoScript{}
-		//).MessageKey("validation.invalid.description")
+	if course.UnsubscribeEnd.Valid {
+		//if UnsubscribeEnd, then EnrollmentEnd <= UnsubscribeEnd
+		if course.EnrollmentEnd > course.UnsubscribeEnd.String {
+			v.ErrorKey("validation.invalid.unsubscribe.end")
+		}
+		//if UnsubscribeEnd, then UnsubscribeEnd <= ExpirationDate
+		if course.ExpirationDate > course.UnsubscribeEnd.String {
+			v.ErrorKey("validation.invalid.unsubscribe.expiration")
+		}
 	}
 
-	if course.Speaker.String != "" {
-		//TODO
-		//v.Check(course.Speaker.String,
-		//NoScript{}
-		//).MessageKey("validation.invalid.speaker")
+	//EnrollmentEnd <= ExpirationDate
+	if course.EnrollmentEnd > course.ExpirationDate {
+		v.ErrorKey("validation.invalid.expiration.date")
 	}
 
-	if course.Fee.Float64 != 0.0 {
-		course.Fee.Float64 = math.Round(course.Fee.Float64*100) / 100
-		course.Fee.Valid = true
+	//ParentID not null
+	v.Required(course.ParentID.Valid).
+		MessageKey("validation.invalid.parent")
+
+	//for all meetings
+	for _, event := range course.Events {
+		for _, meeting := range event.Meetings {
+
+			//EnrollmentStart <= MeetingStart
+			if course.EnrollmentStart > meeting.MeetingStart {
+				v.ErrorKey("validation.invalid.meeting.start")
+			}
+
+			//MeetingStart < MeetingEnd
+			if meeting.MeetingStart >= meeting.MeetingEnd {
+				v.ErrorKey("validation.invalid.meeting.end")
+			}
+		}
 	}
 
-	//TODO: all the other fields
-	//TODO: must have entry in groups tree
+	if len(course.Events) == 0 {
+		v.ErrorKey("validation.invalid.len.events")
+	}
 }
 
 /*Update the specified column in the course table. */
@@ -149,6 +158,8 @@ func (course *Course) Get() (err error) {
 		return
 	}
 
+	course.CreatorID = strconv.Itoa(int(course.Creator.Int32))
+
 	tx.Commit()
 	return
 }
@@ -163,6 +174,82 @@ func (course *Course) NewBlank(creatorID *int, title *string) (err error) {
 		modelsLog.Error("failed to insert blank course", "now", now,
 			"creator ID", *creatorID, "error", err.Error())
 	}
+	return
+}
+
+/*Delete a course. Courses must be inactive or expired to be deleted. */
+func (course *Course) Delete() (valid bool, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		modelsLog.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(&valid, stmtCourseIsInactiveOrExpired, course.ID)
+	if err != nil {
+		modelsLog.Error("failed to get validity of course deletion", "course ID", course.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if valid {
+		_, err = tx.Exec(stmtDeleteCourse, course.ID)
+		if err != nil {
+			modelsLog.Error("failed to delete course", "course ID", course.ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
+	tx.Commit()
+	return
+}
+
+/*Duplicate a course. */
+func (course *Course) Duplicate() (err error) {
+
+	now := time.Now().Format(revel.TimeFormats[0])
+	courseIDOld := course.ID
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		modelsLog.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//duplicate general course data
+	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title, now)
+	if err != nil {
+		modelsLog.Error("failed to duplicate course", "course ID", course.ID, "title",
+			course.Title, "now", now, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate events and meetings
+	if err = course.Events.Duplicate(tx, &course.ID, &courseIDOld); err != nil {
+		return
+	}
+
+	//duplicate user lists
+	if err = course.Editors.Duplicate(tx, &course.ID, &courseIDOld, "editor"); err != nil {
+		return
+	}
+	if err = course.Instructors.Duplicate(tx, &course.ID, &courseIDOld, "instructor"); err != nil {
+		return
+	}
+	if err = course.Whitelist.Duplicate(tx, &course.ID, &courseIDOld, "whitelist"); err != nil {
+		return
+	}
+	if err = course.Blacklist.Duplicate(tx, &course.ID, &courseIDOld, "blacklist"); err != nil {
+		return
+	}
+
+	//TODO: duplicate restrictions
+
+	tx.Commit()
 	return
 }
 
@@ -185,13 +272,44 @@ const (
 
 	stmtInsertBlankCourse = `
 		INSERT INTO course (
-				title, creator, visible, active, onlyldap, creationdate,
-				enrollmentstart, enrollmentend, expirationdate
-			)
-		VALUES (
-				$3, $2, false, false, false, $1, '2006-01-01',
-				'2006-01-01', '2007-01-01'
+			title, creator, visible, active, onlyldap, creationdate,
+			enrollmentstart, enrollmentend, expirationdate
 		)
-		RETURNING id
+		VALUES (
+			$3, $2, false, false, false, $1, '2006-01-01',
+			'2006-01-01', '2007-01-01'
+		)
+		RETURNING id, title
+	`
+
+	stmtCourseIsInactiveOrExpired = `
+		SELECT true AS valid
+		FROM course
+		WHERE id = $1
+			AND (
+				active = false
+				OR
+				(current_timestamp > expirationdate)
+			)
+	`
+
+	stmtDeleteCourse = `
+		DELETE FROM course
+		WHERE id = $1
+	`
+
+	stmtDuplicateCourse = `
+		INSERT INTO course (
+			title, subtitle, active, creationdate, creator, customemail, description, enrolllimitevents, enrollmentend,
+			enrollmentstart, expirationdate, fee, onlyldap, parentid, speaker, unsubscribeend, visible
+		)
+		(
+			SELECT
+					$2 AS title, subtitle, active, $3 AS creationdate, creator, customemail, description, enrolllimitevents, enrollmentend,
+					enrollmentstart, expirationdate, fee, onlyldap, parentid, speaker, unsubscribeend, visible
+			FROM course
+			WHERE id = $1
+		)
+		RETURNING id, title
 	`
 )

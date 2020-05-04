@@ -12,21 +12,17 @@
         {{template "icons/folderPlus.html" . }}
         &nbsp; {{msg $ "creator.course.new"}}
       </a>
-      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-new-tab" href='#' role="tab">
-        {{template "icons/folder.html" . }}
-        &nbsp; {{msg $ "creator.course.open"}}
-      </a>
 
-      <a class="dropdown-divider display-none admin creator editor"></a>
+      <a class="dropdown-divider display-none admin creator"></a>
 
-      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-drafts-tab" href='{{url "Creator.Drafts"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-drafts-tab" href='{{url "ManageCourses.Drafts"}}' role="tab">
         {{template "icons/paperclip.html" . }}
         &nbsp; {{msg $ "creator.drafts"}}
       </a>
 
       <a class="dropdown-divider display-none admin creator editor"></a>
 
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-active-tab" href='{{url "Creator.ActiveCourses"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-active-tab" href='{{url "ManageCourses.ActiveCourses"}}' role="tab">
         {{template "icons/layoutTextSidebarReversed.html" . }}
         &nbsp; {{msg $ "creator.courses.active"}}
       </a>
@@ -48,10 +44,11 @@
   </div>
 </div>
 
-<script>
+{{template "manageCourses/templates/downloadCourseModal.html" dict_addLocale $.currentLocale}}
 
+<script>
   function showNewCourseModal() {
-    $.get("{{url "Creator.NewCourseModal"}}", {
+    $.get("{{url "ManageCourses.NewCourseModal"}}", {
     }, function(data) {
       $('#new-course-modal-content').html(data);
     });
@@ -64,4 +61,9 @@
       showErrorToast($('#flash-errors').html());
     }
   });
+
+  function openDownloadModal(ID) {
+    $('#download-course-modal-ID').val(ID);
+    $('#download-course-modal').modal('show');
+  }
 </script>

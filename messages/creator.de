@@ -5,31 +5,79 @@
 creator.tab = Kursverwaltung
 creator.page = Kursverwaltung
 
-creator.course.is.open = Kurs geöffnet
-creator.course.draft.is.open = Kursentwurf geöffnet
+creator.of = KursverantwortlicheR von
+editor.of = EditorIn von
+instructor.of = OrganisatorIn von
+
+
+# --- left navigation
 creator.course.open = Kurs öffnen
 creator.course.new = Neuer Kurs
 creator.drafts = Entwürfe
 creator.courses.active = Aktive Kurse
 creator.courses.expired = Abgelaufene Kurse
 
-creator.event.new = Neue Veranstaltung
-creator.title.event.working.info = Vorläufiger Veranstaltungstitel. Kann später bearbeitet werden.
 
+# --- drafts
+creator.drafts.none = Noch keine Entwürfe erstellt.
+creator.drafts.editor.none = Noch keinE EditorIn eines Entwurfs.
+
+
+# --- active
+creator.active.none = Noch keine aktiven Kurse erstellt.
+creator.active.editor.none = Noch keinE EditorIn eines aktiven Kurses.
+creator.active.instructor.none = Noch keinE OrganisatorIn eines aktiven Kurses.
+
+
+# --- course options
+creator.course.activate = Freischalten
+creator.course.expire = Abgelaufen
+creator.course.validate = Validieren
+creator.course.preview = Vorschau
+creator.course.edit = Bearbeiten
+
+
+# --- course option feedback
+
+creator.course.activated = Der Kurs '%s' wurde freigeschaltet, Kurs ID = %d.
+
+creator.course.deleted = Kurs gelöscht, Kurs ID = %d.
+creator.course.delete.draft.confirm = Wollen Sie den Kursentwurf '%s' wirklich löschen?
+creator.course.delete.draft.title = Kursentwurf löschen
+
+creator.course.duplicated = Kursentwurf dupliziert: '%s', Kurs ID = %d.
+creator.course.duplicate.confirm = Kursentwurf '%s' wirklich duplizieren?
+creator.course.duplicate.title = Entwurf duplizieren
+
+creator.course.download.title = Kurs herunterladen
+creator.course.download.filename.info = Die Angabe eines Dateinamen ist optional.
+creator.course.download.filename = Dateiname
+
+
+# --- new course modal
 creator.drafts.info = Kursvorlagen erlauben es Ihnen Kursdaten aus vorherigen Kursen zu importieren.
 creator.draft = Vorlage
 creator.course.blank = Leerer Kurs
 creator.course.draft = Aus Kursen
 creator.course.upload = Kursvorlage hochladen
-
 creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
+creator.opened.new.course = Neuer Kurs '%s' geöffnet, Kurs ID = %d.
+
+
+# --- edit course
+
+creator.course.is.open = Kurs geöffnet
+creator.course.draft.is.open = Kursentwurf geöffnet
 
 creator.more.settings = Weitere Kurseinstellungen
 creator.more.settings.info = Diese Einstellungen sind für die NutzerInnen nicht sichtbar.
 creator.current.path = Bisheriger Pfad
 creator.select.path = Neuen Pfad wählen...
 
-creator.new.blank.success = Neuer leerer Kurs erstellt, ID = %d.
+creator.course.valid = Keine fehlerhaften Felder gefunden.
+
+creator.event.new = Neue Veranstaltung
+creator.title.event.working.info = Vorläufiger Veranstaltungstitel. Kann später bearbeitet werden.
 
 creator.add.course.here = + &nbsp; Kurs
 creator.add.path = + &nbsp; Kurspfad
@@ -48,3 +96,14 @@ creator.add.restriction = + &nbsp; Studiengangbeschränkung
 
 creator.add.event = + &nbsp; Veranstaltung
 creator.add.meeting = + &nbsp; Termin
+
+
+# --- side info
+
+creator.info.drafts = Entwürfe sind Kurse, die noch nicht freigegeben wurden. D.h., dass diese Kurse nur für die/den KursverantwortlicheN sowie alle hinzugefügten EditorInnen sichtbar sind.
+creator.info.draft.edit = Sie können Entwürfe beliebig <strong>bearbeiten</strong>.
+creator.info.draft.download = Entwürfe können <strong>heruntergeladen</strong> werden.
+creator.info.draft.duplicate = Falls Sie aus einem Entwurf mehrere Kurse erstellen möchten, so können Sie diesen <strong>duplizieren</strong>.
+creator.info.draft.delete = Sollten Sie einen Entwurf nicht länger benötigen, so können Sie diesen <strong>endgültig löschen</strong>.
+
+creator.info.activate = Sobald Sie mit einem Kursentwurf zufrieden sind können Sie diesen <strong>freischalten</strong>.

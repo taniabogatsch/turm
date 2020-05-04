@@ -1,10 +1,15 @@
 package controllers
 
 import (
+	"bufio"
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -14,9 +19,9 @@ import (
 
 /*OpenCourse opens an already existing course for modification, etc.
 - Roles: creator and editors of this course. */
-func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
+func (c EditCourse) OpenCourse(ID int) revel.Result {
 
-	c.Log.Debug("course management: open course", "ID", ID, "msg", msg)
+	c.Log.Debug("course management: open course", "ID", ID)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -33,8 +38,116 @@ func (c EditCourse) OpenCourse(ID int, msg string) revel.Result {
 	c.ViewArgs["tabName"] = c.Message("creator.tab")
 
 	c.Log.Debug("loaded course", "course", course)
-	c.Flash.Success(c.Message(msg))
 	return c.Render(course)
+}
+
+/*Download a course as JSON.
+- Roles: creator of the course */
+func (c EditCourse) Download(ID int, filename string) revel.Result {
+
+	c.Log.Debug("download course", "ID", ID, "filename", filename)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	course := models.Course{ID: ID}
+	if err := course.Get(); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+	//reset some values
+	course.CreatorData = models.User{}
+	course.Path = models.Groups{}
+
+	//marshal the course data into json format
+	json, err := json.Marshal(course)
+	if err != nil {
+		return flashError(
+			errTypeConv,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+	jsonString := string(json[:])
+
+	//if the user did not provide a custom file name
+	if filename == "" {
+		now := time.Now().Format(revel.TimeFormats[1])
+		filename = strings.ReplaceAll(now+"_"+course.Title, " ", "_")
+	}
+
+	//filepath
+	filepath := filepath.Join("/tmp", filename+".json")
+
+	//create the file
+	file, err := os.Create(filepath)
+	if err != nil {
+		return flashError(
+			errContent,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+	defer file.Close()
+
+	//write data to the file
+	writer := bufio.NewWriter(file)
+	_, err = writer.WriteString(jsonString)
+	if err != nil {
+		return flashError(
+			errContent,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+	defer writer.Flush()
+
+	//render the file
+	return c.RenderFileName(filepath, revel.Attachment)
+}
+
+/*Validate all course data.
+- Roles: creator and editors of this course. */
+func (c EditCourse) Validate(ID int) revel.Result {
+
+	c.Log.Debug("validate course", "ID", ID)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	course := models.Course{ID: ID}
+	if err := course.Get(); err != nil {
+		return flashError(
+			errDB,
+			err,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	course.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
+
+	c.Flash.Success(c.Message("creator.course.valid"))
+	return c.Redirect(c.Session["currPath"])
 }
 
 /*NewEvent creates a new blank event in a course.

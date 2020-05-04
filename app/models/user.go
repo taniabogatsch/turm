@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -406,6 +407,7 @@ func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 			user.ID, "error", err.Error())
 		tx.Rollback()
 	}
+	fmt.Println(data)
 	return data.IsEditor, data.IsInstructor, err
 }
 
@@ -419,12 +421,17 @@ func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (autho
 		return
 	}
 
-	if *table == "course" {
+	switch *table {
+	case "course":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
-	} else if *table == "event" {
+	case "event":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditEvent, user.ID, *ID)
-	} else { //meeting
+	case "meeting":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditMeeting, user.ID, *ID)
+	case "onlyCreator":
+		err = app.Db.Get(&authorized, stmtIsCreator, user.ID, *ID)
+	default:
+		return false, nil
 	}
 
 	if err != nil {
@@ -665,10 +672,8 @@ const (
 		SELECT
 			EXISTS (
 				SELECT true
-				FROM editor e, course c
+				FROM editor e
 				WHERE e.userid = $1
-					AND e.courseid = c.id
-					AND c.active
 			) AS iseditor,
 			EXISTS (
 				SELECT true
@@ -677,5 +682,12 @@ const (
 					AND i.courseid = c.id
 					AND c.active
 			) AS isinstructor
+	`
+
+	stmtIsCreator = `
+		SELECT true AS authorized
+		FROM course
+		WHERE id = $2
+			AND creator = $1
 	`
 )

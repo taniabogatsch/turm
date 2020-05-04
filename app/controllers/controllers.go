@@ -32,6 +32,11 @@ type Creator struct {
 	*revel.Controller
 }
 
+/*ManageCourses implements the course management page. */
+type ManageCourses struct {
+	*revel.Controller
+}
+
 /*Admin implements logic to CRUD data for admin functions. */
 type Admin struct {
 	*revel.Controller

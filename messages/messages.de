@@ -21,6 +21,8 @@ button.search = Suchen
 button.send = Senden
 button.save = Speichern
 button.load = Laden
+button.confirm = Bestätigen
+button.download = Herunterladen
 
 button.login = Anmelden
 button.logout = Abmelden

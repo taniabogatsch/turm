@@ -1,17 +1,5 @@
 /* This file comprises js functions required to load the different modals for editing a course. */
 
-function openDeleteFieldModal(title, content, action) {
-
-  //set the modal title
-  $('#delete-field-modal-title').html(title);
-  //set the action
-  $('#delete-field-modal-form').attr("action", action);
-  //set the content
-  $('#delete-field-modal-content').html(content);
-  //show the modal
-  $('#delete-field-modal').modal('show');
-}
-
 function submitChangeGroupModal(parentID) {
 
   $('#change-group-modal-parentID').val(parentID);

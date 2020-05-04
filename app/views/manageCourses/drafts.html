@@ -2,7 +2,7 @@
 
 {{template "header.html" .}}
 
-{{template "creator/leftNav.html" . }}
+{{template "manageCourses/templates/leftNav.html" . }}
 
 <div class="page page-middle">
   <div class="tab-content">
@@ -19,13 +19,14 @@
   </div>
 </div>
 
-{{template "creator/rightNav.html" . }}
+<div class="page page-side page-side-right page-padding-left">
+  {{template "toast.html" .}}
+  {{template "manageCourses/legends/drafts.html"  dict_addLocale $.currentLocale}}
+</div>
 
 <script>
-
-  //loads the groups template
   function getDrafts() {
-    $.get('{{url "Creator.GetDrafts"}}', {
+    $.get('{{url "ManageCourses.GetDrafts"}}', {
     }, function(data) {
       $('#get-drafts').html(data);
     })

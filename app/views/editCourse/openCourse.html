@@ -2,12 +2,13 @@
 
 {{template "header.html" .}}
 
-{{template "creator/leftNav.html" . }}
+{{template "manageCourses/templates/leftNav.html" . }}
 
 <div class="page page-middle">
   <div class="tab-content">
 
     <h4>
+      <!-- show either an open draft or an open course -->
       {{template "icons/folder.html" . }}
       {{if .course.Active}}
         &nbsp; {{msg $ "creator.course.is.open"}}
@@ -15,17 +16,45 @@
         &nbsp; {{msg $ "creator.course.draft.is.open"}}
       {{end}}
 
-      <button type="button" class="btn btn-outline-darkblue float-right">
-        {{template "icons/trash.html"}}
-      </button>
-      <button type="button" class="btn btn-outline-darkblue float-right margin-right-20">
-        Activate
-      </button>
-      <button type="button" class="btn btn-outline-darkblue float-right margin-right-20">
-        Validate
-      </button>
+      {{if eq .session.role "admin"}}
+        {{if not .course.Active}}
+          <!-- activate the course -->
+          <button type="button" class="btn btn-outline-darkblue float-right">
+            {{msg $ "creator.course.activate"}} <!-- TODO -->
+          </button>
+        {{else}}
+          <!-- expire the course -->
+          <button type="button" class="btn btn-outline-darkblue float-right">
+            {{msg $ "creator.course.expire"}} <!-- TODO -->
+          </button>
+        {{end}}
+      {{else}}
+        {{if eq .course.CreatorID .session.userID}}
+          {{if not .course.Active}}
+            <!-- activate the course -->
+            <form class="float-right" action='{{url "Creator.Activate" .course.ID}}' method="POST">
+              <button type="submit" class="btn btn-outline-darkblue">
+                {{msg $ "creator.course.activate"}} <!-- TODO -->
+              </button>
+            </form>
+          {{else}}
+            <!-- expire the course -->
+            <button type="button" class="btn btn-outline-darkblue float-right">
+              {{msg $ "creator.course.expire"}} <!-- TODO -->
+            </button>
+          {{end}}
+        {{end}}
+      {{end}}
+
+      <!-- validate course -->
+      <form class="float-right margin-right-20" action='{{url "EditCourse.Validate" .course.ID}}' method="POST">
+        <button type="submit" class="btn btn-outline-darkblue">
+          {{msg $ "creator.course.validate"}}
+        </button>
+      </form>
+
       <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-right margin-right-20" onclick="showPreview();">
-        Preview
+        {{msg $ "creator.course.preview"}}
       </button>
     </h4>
     <hr>
@@ -42,6 +71,6 @@
   </div>
 </div>
 
-{{template "creator/rightNav.html" . }}
+{{template "manageCourses/templates/rightNav.html" . }}
 
 {{template "footer.html" .}}

@@ -400,16 +400,18 @@ const (
 
 		/* get all courses */
 		(
-			SELECT 0 AS id, parentid, title::text AS name,
+			SELECT 0 AS id, co.parentid, co.title::text AS name,
 				(
 					SELECT g.courselimit
 					FROM groups g, course c
 					WHERE g.id = c.parentid
+						AND g.id = $1
+						AND c.id = co.id
 				) AS courselimit
 
-			FROM course
-			WHERE parentid = $1
-				AND active
+			FROM course co
+			WHERE co.parentid = $1
+				AND co.active
 				/* TODO: and not expired */
 			ORDER BY name ASC
 		)

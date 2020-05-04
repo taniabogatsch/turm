@@ -77,8 +77,8 @@ func (c App) authApp() revel.Result {
 	return nil
 }
 
-//authCreator prevents unauthorized access to controllers of type Creator.
-func (c Creator) authCreator() revel.Result {
+//authManageCourses prevents unauthorized access to controllers of type ManageCourses.
+func (c ManageCourses) authManageCourses() revel.Result {
 
 	if c.Session["role"] != nil && c.Session["notActivated"] == nil &&
 		c.Session["userID"] != nil && c.Session["isEditor"] != nil &&
@@ -96,11 +96,31 @@ func (c Creator) authCreator() revel.Result {
 				return nil
 			}
 
-			//instructors are allowed to only see active and inactive courses
-			if c.Session["isInstructor"].(string) == "true" && c.MethodName == "ActiveCourses" {
+			//instructors are only allowed to see active and inactive courses
+			if c.Session["isInstructor"].(string) == "true" && (c.MethodName == "ActiveCourses" ||
+				c.MethodName == "GetActiveCourses") {
 				return nil
 			}
 		}
+	}
+
+	c.Flash.Error(c.Message("intercept.invalid.action"))
+	return c.Redirect(App.Index)
+}
+
+//authCreator prevents unauthorized access to controllers of type Creator.
+func (c Creator) authCreator() revel.Result {
+
+	if authorized, err := evalEditAuth(c.Controller, "onlyCreator"); err == nil && authorized {
+		return nil
+	} else if err != nil {
+		return flashError(
+			errTypeConv,
+			err,
+			"/",
+			c.Controller,
+			"",
+		)
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))

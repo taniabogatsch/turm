@@ -5,31 +5,79 @@
 creator.tab = Course management
 creator.page = Course management
 
-creator.course.is.open = Opened course
-creator.course.draft.is.open = Opened course draft
+creator.of = Creator of
+editor.of = Editor of
+instructor.of = Instructor of
+
+
+# --- left navigation
 creator.course.open = Open course
 creator.course.new = New course
 creator.drafts = Drafts
 creator.courses.active = Active courses
 creator.courses.expired = Expired courses
 
-creator.event.new = New event
-creator.title.event.working.info = Working event title. Can be edited later.
 
+# --- drafts
+creator.drafts.none = No drafts created yet.
+creator.drafts.editor.none = Not yet an editor of a draft.
+
+
+# --- active
+creator.active.none = No active courses yet.
+creator.active.editor.none = Not yet an editor of an active course.
+creator.active.instructor.none = Not yet an instructor of an active course.
+
+
+# --- course options
+creator.course.activate = Activate
+creator.course.expire = Expire
+creator.course.validate = Validate
+creator.course.preview = Preview
+creator.course.edit = Edit
+
+
+# --- course option feedback
+
+creator.course.activated = Activated course '%s', course ID = %d.
+
+creator.course.deleted = Deleted course, course ID = %d.
+creator.course.delete.draft.confirm = Please confirm the deletion of the course draft '%s'.
+creator.course.delete.draft.title = Delete course draft
+
+creator.course.duplicated = Duplicated course draft: '%s', course ID = %d.
+creator.course.duplicate.confirm = Please confirm the duplication of the course draft '%s'.
+creator.course.duplicate.title = Duplicate course draft
+
+creator.course.download.title = Download course
+creator.course.download.filename.info = Providing a filename is optional.
+creator.course.download.filename = Filename
+
+
+# --- new course modal
 creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
 creator.draft = Draft
 creator.course.blank = Blank course
 creator.course.draft = Load course data
 creator.course.upload = Upload course data
-
 creator.title.working.info = Working course title. Can be edited later.
+creator.opened.new.course = Opened new course '%s', course ID = %d.
+
+
+# --- edit course
+
+creator.course.is.open = Opened course
+creator.course.draft.is.open = Opened course draft
 
 creator.more.settings = More course settings
 creator.more.settings.info = These settings are not visible to the user.
 creator.current.path = Current path
 creator.select.path = Select a new path...
 
-creator.new.blank.success = Created new blank course, ID = %d.
+creator.course.valid = No invalid fields found.
+
+creator.event.new = New event
+creator.title.event.working.info = Working event title. Can be edited later.
 
 creator.add.course.here = + &nbsp; Add
 creator.add.path = + &nbsp; Course path
@@ -48,3 +96,14 @@ creator.add.restriction = + &nbsp; Restriction to course of studies
 
 creator.add.event = + &nbsp; Event
 creator.add.meeting = + &nbsp; Meeting
+
+
+# --- side info
+
+creator.info.drafts = Drafts are courses that are not activated yet. I.e., they are only visible to the creator and all added editors.
+creator.info.draft.edit = You can <strong>edit</strong> course drafts arbitrarily.
+creator.info.draft.download = Drafts can be <strong>downloaded</strong>.
+creator.info.draft.duplicate = If you want to create multiple courses from one draft, you can <strong>duplicate</strong> that draft.
+creator.info.draft.delete = If you do no longer need a course draft, you can <strong>delete</strong> that draft <strong>irrevocably</strong>.
+
+creator.info.activate = Once you are happy with a course draft, you can <strong>activate</strong> that course.

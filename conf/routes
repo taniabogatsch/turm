@@ -5,13 +5,17 @@
 module:testrunner
 module:jobs
 
-# ------------------------------- App routes. -------------------------------- #
+# ---------------------------------------------------------------------------- #
+# App
+# ---------------------------------------------------------------------------- #
 
 GET     /                                           App.Index
 GET     /app/changeLanguage                         App.ChangeLanguage
 GET     /app/groups                                 App.Groups
 
-# ------------------------------- User routes. -------------------------------- #
+# ---------------------------------------------------------------------------- #
+# User
+# ---------------------------------------------------------------------------- #
 
 GET     /user/loginPage                             User.LoginPage
 POST    /user/login                                 User.Login
@@ -30,21 +34,38 @@ GET     /user/newActivationCode                     User.NewActivationCode
 GET     /user/prefLanguagePage                      User.PrefLanguagePage
 POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
-# ------------------------------- Creator routes. -------------------------------- #
+# ---------------------------------------------------------------------------- #
+# Manage Course
+# ---------------------------------------------------------------------------- #
 
-GET     /creator/activeCourses                      Creator.ActiveCourses
-GET     /creator/drafts                             Creator.Drafts
+GET     /manageCourses/activeCourses                ManageCourses.ActiveCourses
+GET     /manageCourses/getActiveCourses             ManageCourses.GetActiveCourses
 
-POST    /creator/newCourse                          Creator.NewCourse
-GET     /creator/newCourseModal                     Creator.NewCourseModal
-GET     /creator/getDrafts                          Creator.GetDrafts
+GET     /manageCourses/drafts                       ManageCourses.Drafts
+GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
 
-# ------------------------------- Edit course routes. -------------------------------- #
+POST    /manageCourses/newCourse                    ManageCourses.NewCourse
+GET     /manageCourses/newCourseModal               ManageCourses.NewCourseModal
+
+# ---------------------------------------------------------------------------- #
+# Creator
+# ---------------------------------------------------------------------------- #
+
+POST    /creator/activate                           Creator.Activate
+POST    /creator/delete                             Creator.Delete
+POST    /creator/duplicate                          Creator.Duplicate
+
+# ---------------------------------------------------------------------------- #
+# Edit course (course, event, meeting)
+# ---------------------------------------------------------------------------- #
 
 GET     /editCourse/openCourse                      EditCourse.OpenCourse
 GET     /editCourse/searchUser                      EditCourse.SearchUser
 
-POST    /editCourse/modals/newEvent                 EditCourse.NewEvent
+POST    /edit/course/validate                       EditCourse.Validate
+POST    /edit/course/download                       EditCourse.Download
+
+POST    /edit/course/newEvent                       EditCourse.NewEvent
 
 POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
 POST    /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
@@ -76,8 +97,11 @@ POST    /edit/event/changeText                      EditEvent.ChangeText
 POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
 
 POST    /edit/meeting/change                        EditMeeting.Edit
+POST    /edit/meeting/delete                        EditMeeting.Delete
 
-# ------------------------------- Admin routes. -------------------------------- #
+# ---------------------------------------------------------------------------- #
+# Admin
+# ---------------------------------------------------------------------------- #
 
 GET     /admin/userManagement                       Admin.UserManagement
 GET     /admin/roleManagement                       Admin.RoleManagement
@@ -90,6 +114,10 @@ POST    /admin/deleteGroup                          Admin.DeleteGroup
 GET     /admin/searchUser                           Admin.SearchUser
 GET     /admin/userDetails                          Admin.UserDetails
 POST    /admin/changeRole                           Admin.ChangeRole
+
+# ---------------------------------------------------------------------------- #
+# Else
+# ---------------------------------------------------------------------------- #
 
 # Ignore favicon requests
 GET     /favicon.ico                                404

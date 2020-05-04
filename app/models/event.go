@@ -5,7 +5,6 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/revel/revel"
 )
 
 /*Event is a model of the event table. */
@@ -23,11 +22,6 @@ type Event struct {
 	Fullness int ``
 	//Percentage is (Fullness * 100) / Capacity
 	Percentage int ``
-}
-
-/*Validate event fields. */
-func (event *Event) Validate(v *revel.Validation) {
-	//TODO
 }
 
 /*NewBlank creates a new blank event. */
@@ -80,6 +74,39 @@ func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
 	return
 }
 
+/*Duplicate all events of a course. */
+func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err error) {
+
+	//get all event IDs
+	err = tx.Select(events, stmtGetEventIDs, *courseIDOld)
+	if err != nil {
+		modelsLog.Error("failed to get all events for duplication", "course ID old",
+			*courseIDOld, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate each event and its meetings
+	for _, event := range *events {
+
+		var newID int
+		err = tx.Get(&newID, stmtDuplicateEvent, *courseIDNew, event.ID)
+		if err != nil {
+			modelsLog.Error("failed to duplicate event", "course ID new",
+				*courseIDNew, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		//duplicate all meetings of this event
+		if err = event.Meetings.Duplicate(tx, &newID, &event.ID); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 const (
 	stmtSelectEvents = `
 		SELECT
@@ -109,5 +136,23 @@ const (
 	stmtDeleteEvent = `
 		DELETE FROM event
 		WHERE id = $1
+	`
+
+	stmtDuplicateEvent = `
+		INSERT INTO event
+			(annotation, capacity, courseid, enrollmentkey, haswaitlist, title)
+		(
+			SELECT
+				annotation, capacity, $1 AS courseid, enrollmentkey, haswaitlist, title
+			FROM event
+			WHERE id = $2
+		)
+		RETURNING id AS newid
+	`
+
+	stmtGetEventIDs = `
+		SELECT id
+		FROM event
+		WHERE courseid = $1
 	`
 )

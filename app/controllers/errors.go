@@ -35,17 +35,11 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 
 	switch errType {
 
-	case errValidation:
+	case errValidation, errAuth:
 		c.Validation.Keep()
-		return c.Redirect(url)
 
 	case errDB:
 		c.Flash.Error(c.Message("error.db"))
-		return c.Redirect(url)
-
-	case errAuth:
-		c.Validation.Keep()
-		return c.Redirect(url)
 
 	case errEMail:
 		email, parsed := i.(string)
@@ -53,17 +47,17 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 			c.Log.Error("error parsing e-mail", "email", email)
 		}
 		c.Flash.Error(c.Message("error.email", email))
-		return c.Redirect(url)
 
 	case errTypeConv:
 		c.Flash.Error(c.Message("error.typeConv"))
-		return c.Redirect(url)
 
 	default:
 		c.Log.Error("undefined error type", "error type", errType)
 		c.Flash.Error(c.Message("error.undefined"))
 		return c.Redirect(App.Index)
 	}
+
+	return c.Redirect(url)
 }
 
 //renderError renders a template containing the error.

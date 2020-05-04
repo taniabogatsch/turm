@@ -2,7 +2,7 @@
 
 {{template "header.html" .}}
 
-{{template "creator/leftNav.html" . }}
+{{template "manageCourses/templates/leftNav.html" . }}
 
 <div class="page page-middle">
   <div class="tab-content">
@@ -13,15 +13,26 @@
     </h4>
     <hr>
 
+    <div id="get-active-courses">
+    </div>
+
   </div>
 </div>
 
-{{template "creator/rightNav.html" . }}
+{{template "manageCourses/templates/rightNav.html" . }}
 
 <script>
+  function getActiveCourses() {
+    $.get('{{url "ManageCourses.GetActiveCourses"}}', {
+    }, function(data) {
+      $('#get-active-courses').html(data);
+    })
+  }
+
   $(function() {
     //adjust the nav pills
     $('#v-pills-active-tab').addClass("active");
+    getActiveCourses();
   });
 </script>
 

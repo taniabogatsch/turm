@@ -123,7 +123,6 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 	c.Flash.Success(c.Message("event.capacity.change.success",
 		event.Capacity,
-		event.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
 }

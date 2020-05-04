@@ -14,7 +14,7 @@
 
           <!-- delete event -->
           <a class="btn btn-outline-darkblue float-right margin-left-20 preview-hide" href='#no-scroll' role="button"
-            onclick='openDeleteFieldModal({{msg $ "event.delete.title"}},
+            onclick='confirmPOSTModal({{msg $ "event.delete.title"}},
               {{msg $ "event.delete.confirm" .Title}}, {{url "EditEvent.Delete" .ID}});'>
             {{template "icons/trash.html" . }}
           </a>
@@ -81,7 +81,7 @@
               {{template "icons/pencil.html" . }}
             </a>
             <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
-              onclick='openDeleteFieldModal({{msg $ "event.annotation.delete.title"}},
+              onclick='confirmPOSTModal({{msg $ "event.annotation.delete.title"}},
                 {{msg $ "event.annotation.delete.confirm" .Annotation.String}},
                 {{url "EditEvent.ChangeText" .ID "annotation" ""}});'>
               {{template "icons/trash.html" . }}

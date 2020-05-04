@@ -137,6 +137,33 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 	return
 }
 
+/*Duplicate the user list of a course. */
+func (users *UserList) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int, table string) (err error) {
+
+	//construct SQL
+	colViewMatrNr := ""
+	if table == "editor" || table == "instructor" {
+		colViewMatrNr = ", viewmatrnr"
+	}
+	stmtDuplicateList := `
+		INSERT INTO ` + table + `
+			(courseid, userid` + colViewMatrNr + `)
+		(
+			SELECT $2 AS courseid, userid` + colViewMatrNr + `
+			FROM ` + table + `
+			WHERE courseid = $1
+		)
+	`
+
+	_, err = tx.Exec(stmtDuplicateList, *courseIDOld, *courseIDNew)
+	if err != nil {
+		modelsLog.Error("failed to duplicate user list", "table", table, "course ID old",
+			*courseIDOld, "course ID new", *courseIDNew, "error", err.Error())
+		tx.Rollback()
+	}
+	return
+}
+
 /*Search for a user and identify whether that user is already on a user list. */
 func (users *UserList) Search(value, listType *string, searchInactive *bool, courseID *int) (err error) {
 

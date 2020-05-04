@@ -1,0 +1,38 @@
+<h4>
+  <br>
+</h4>
+<hr>
+
+<p> {{msg $ "creator.drafts"}} </p>
+<small class="form-text text-muted">
+  {{msg $ "creator.info.drafts"}}
+  <hr>
+
+  <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
+    {{template "icons/pencil.html" . }}
+  </a>
+  {{msg $ "creator.info.draft.edit"}}
+  {{msg $ "creator.info.activate"}}
+  <hr>
+
+  <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
+    {{template "icons/download.html" . }}
+  </a>
+  {{msg $ "creator.info.draft.download"}}
+  <hr>
+
+  <div class="display-none admin creator">
+    <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
+      {{template "icons/files.html" . }}
+    </a>
+    {{msg $ "creator.info.draft.duplicate"}}
+    <hr>
+  </div>
+
+  <div class="display-none admin creator">
+    <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
+      {{template "icons/trash.html" . }}
+    </a>
+    {{msg $ "creator.info.draft.delete"}}
+  </div>
+</small>

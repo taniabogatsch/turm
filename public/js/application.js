@@ -55,6 +55,17 @@ function showSuccessToast(content) {
   $("#feedback-toast").toast('show');
 }
 
+//confirmPOSTModal confirms the execution of a POST action
+function confirmPOSTModal(title, content, action) {
+
+  $('#confirm-POST-modal-title').html(title);
+  $('#confirm-POST-modal-form').attr("action", action);
+  $('#confirm-POST-modal-content').html(content);
+
+  //show the modal
+  $('#confirm-POST-modal').modal('show');
+}
+
 //openGroupsNav shows the groups modal of the navigation bar
 function openGroupsNav() {
   getGroups("nav", '#nav-groups-modal-content');

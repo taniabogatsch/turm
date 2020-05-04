@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"strings"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -70,6 +71,7 @@ func (meeting *Meeting) Validate(v *revel.Validation) {
 
 	if meeting.Place.String != "" {
 
+		meeting.Place.String = strings.TrimSpace(meeting.Place.String)
 		v.Check(meeting.Place.String,
 			revel.MinSize{3},
 			revel.MaxSize{255},
@@ -80,6 +82,7 @@ func (meeting *Meeting) Validate(v *revel.Validation) {
 
 	if meeting.Annotation.String != "" {
 
+		meeting.Annotation.String = strings.TrimSpace(meeting.Annotation.String)
 		v.Check(meeting.Annotation.String,
 			revel.MinSize{3},
 			revel.MaxSize{255},
@@ -143,6 +146,19 @@ func (meetings *Meetings) Get(tx *sqlx.Tx, eventID *int) (err error) {
 	return
 }
 
+/*Duplicate all meetings of an event. */
+func (meetings *Meetings) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
+
+	_, err = tx.Exec(stmtDuplicateMeeting, *eventIDNew, *eventIDOld)
+	if err != nil {
+		modelsLog.Error("failed to duplicate event", "event ID new",
+			*eventIDNew, "event ID old", *eventIDOld, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+	return
+}
+
 const (
 	stmtSelectMeetings = `
 		SELECT
@@ -181,5 +197,16 @@ const (
 	stmtDeleteMeeting = `
 		DELETE FROM meeting
 		WHERE id = $1
+	`
+
+	stmtDuplicateMeeting = `
+		INSERT INTO meeting
+			(annotation, eventid, meetingend, meetingstart, meetinginterval, place, weekday)
+		(
+			SELECT
+				annotation, $1 AS eventid, meetingend, meetingstart, meetinginterval, place, weekday
+			FROM meeting
+			WHERE eventid = $2
+		)
 	`
 )

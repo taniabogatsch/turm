@@ -57,9 +57,23 @@ validation.invalid.int = Please provide a natural number bigger than one.
 
 validation.invalid.fee = Please provide a valid fee.
 
+validation.invalid.enrollment.start = The start of the enrollment period must not be before the current time.
+validation.invalid.enrollment.end = The end of the enrollment period must not be before its beginning.
+validation.invalid.unsubscribe.end = The unsubscribe end must be after the end of the enrollment period.
+validation.invalid.unsubscribe.expiration = The unsubscribe end must be before the expiration date.
+validation.invalid.expiration.date = The expiration date must be after the end of the enrollment period.
+validation.invalid.parent = The course must be part of a group.
+
+validation.invalid.meeting.start = Meetings must be after the start of the enrollment period.
+validation.invalid.meeting.end = Meetings must start before they end.
+
+validation.invalid.len.events = There must be at least one event.
+
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
 
 validation.invalid.option = Please provide a valid option.
 validation.invalid.params = Please provide valid parameters.
+
+validation.invalid.delete.course = Only inactive or expired courses can be deleted.
