@@ -127,7 +127,7 @@ func (c Creator) Expire(ID int) revel.Result {
 	now := time.Now().Add(-time.Minute * 1).Format(revel.TimeFormats[0])
 
 	course := models.Course{ID: ID}
-	if err := course.Update("expirationdate", now); err != nil {
+	if err := course.Update("expiration_date", now); err != nil {
 		return flashError(
 			errDB,
 			err,

@@ -50,40 +50,40 @@ func (users *Users) Search(value *string, searchInactive *bool) (err error) {
 
 const (
 	stmtSearchUsers = `
-    SELECT id, lastname, firstname, email, salutation, role, title, academictitle, nameaffix,
-      TO_CHAR (lastlogin AT TIME ZONE $3, 'YYYY-MM-DD HH24:MI') as lastlogin
+    SELECT id, last_name, first_name, email, salutation, role, title, academic_title, name_affix,
+      TO_CHAR (last_login AT TIME ZONE $3, 'YYYY-MM-DD HH24:MI') as last_login
     FROM users
     WHERE (
-				(activationcode IS NOT NULL) = $4
-				OR activationcode IS NULL
+				(activation_code IS NOT NULL) = $4
+				OR activation_code IS NULL
 			)
       AND (
-        /* all combinations having a nameaffix */
-        title || academictitle || firstname || nameaffix || lastname ILIKE $1
-        OR title || firstname || nameaffix || lastname ILIKE $1
-        OR academictitle || firstname || nameaffix || lastname ILIKE $1
-        OR firstname || nameaffix || lastname ILIKE $1
+        /* all combinations having a name_affix */
+        title || academic_title || first_name || name_affix || last_name ILIKE $1
+        OR title || first_name || name_affix || last_name ILIKE $1
+        OR academic_title || first_name || name_affix || last_name ILIKE $1
+        OR first_name || name_affix || last_name ILIKE $1
 
-        /* all combinations without a nameaffix */
-        OR title || academictitle || firstname || lastname ILIKE $1
-        OR title || firstname || lastname ILIKE $1
-        OR academictitle || firstname || lastname ILIKE $1
-        OR firstname || lastname ILIKE $1
+        /* all combinations without a name_affix */
+        OR title || academic_title || first_name || last_name ILIKE $1
+        OR title || first_name || last_name ILIKE $1
+        OR academic_title || first_name || last_name ILIKE $1
+        OR first_name || last_name ILIKE $1
 
         /* others */
         OR email ILIKE $1
-        OR matrnr = $2
+        OR matr_nr = $2
       )
-    ORDER BY lastname, firstname, id
+    ORDER BY last_name, first_name, id
     LIMIT 5
   `
 
 	stmtSelectUsers = `
-		SELECT id, lastname, firstname, email, salutation, title, academictitle, nameaffix,
-			TO_CHAR (lastlogin AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as lastlogin
+		SELECT id, last_name, first_name, email, salutation, title, academic_title, name_affix,
+			TO_CHAR (last_login AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as last_login
 		FROM users
 		WHERE role = $1
-			AND activationcode IS NULL
-		ORDER BY lastname, firstname, id
+			AND activation_code IS NULL
+		ORDER BY last_name, first_name, id
 	`
 )

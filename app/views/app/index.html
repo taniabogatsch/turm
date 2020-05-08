@@ -32,7 +32,6 @@
     {{msg $ "groups"}}
   </h4>
   <!-- 'Add Group'-button -->
-  <!-- TODO: only show this if role is admin -->
   <br>
   {{if $.session.userID}}
     {{if eq $.session.role "admin"}}

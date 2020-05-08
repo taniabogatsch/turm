@@ -14,24 +14,24 @@ which are: editors, instructors, blacklist, whitelist.
 It is also used to render users for the different user
 searches at the course management page. */
 type UserListEntry struct {
-	UserID     int  `db:"userid, primarykey"`
-	CourseID   int  `db:"courseid, primarykey"`
-	ViewMatrNr bool `db:"viewmatrnr"` //only a field in the tables editor and instructor
+	UserID     int  `db:"user_id, primarykey"`
+	CourseID   int  `db:"course_id, primarykey"`
+	ViewMatrNr bool `db:"view_matr_nr"` //only a field in the tables editor and instructor
 
 	//identifies whether a user is already on a user list
-	OnList bool `db:"onlist"`
+	OnList bool `db:"on_list"`
 
 	//used for showing users at user searches
 	EMail string `db:"email, unique"`
 
 	//used for showing users properly
-	AcademicTitle  sql.NullString `db:"academictitle"`
+	AcademicTitle  sql.NullString `db:"academic_title"`
 	Title          sql.NullString `db:"title"`
-	NameAffix      sql.NullString `db:"nameaffix"`
-	LastName       string         `db:"lastname"`
-	FirstName      string         `db:"firstname"`
+	NameAffix      sql.NullString `db:"name_affix"`
+	LastName       string         `db:"last_name"`
+	FirstName      string         `db:"first_name"`
 	Salutation     Salutation     `db:"salutation"`
-	ActivationCode sql.NullString `db:"activationcode"`
+	ActivationCode sql.NullString `db:"activation_code"`
 }
 
 /*Insert the provided user list entry of a course. */
@@ -40,23 +40,23 @@ func (user *UserListEntry) Insert(table string) (err error) {
 	//construct SQL
 	colViewMatrNr := ""
 	colViewMatrNrValue := ""
-	if table == "editor" || table == "instructor" {
-		colViewMatrNr = ", viewmatrnr"
+	if table == "editors" || table == "instructors" {
+		colViewMatrNr = ", view_matr_nr"
 		colViewMatrNrValue = ", $3"
 	}
 
 	insertUser := `
 		INSERT INTO ` + table + `
-			(userid, courseid` + colViewMatrNr + `)
+			(user_id, course_id` + colViewMatrNr + `)
 		VALUES ($1, $2` + colViewMatrNrValue + `)
 		RETURNING (
 			SELECT email
 			FROM users
 			WHERE id = $1
-		), courseid
+		), course_id
 	`
 
-	if table == "editor" || table == "instructor" {
+	if table == "editors" || table == "instructors" {
 		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID, true)
 	} else {
 		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID)
@@ -73,8 +73,8 @@ func (user *UserListEntry) Delete(table string) (err error) {
 
 	deleteUser := `
 		DELETE FROM ` + table + `
-		WHERE userid = $1
-			AND courseid = $2
+		WHERE user_id = $1
+			AND course_id = $2
 	`
 
 	_, err = app.Db.Exec(deleteUser, user.UserID, user.CourseID)
@@ -90,14 +90,14 @@ func (user *UserListEntry) Update(table string) (err error) {
 
 	updateUser := `
 		UPDATE ` + table + `
-		SET viewmatrnr = $3
-		WHERE userid = $1
-			AND courseid = $2
+		SET view_matr_nr = $3
+		WHERE user_id = $1
+			AND course_id = $2
 		RETURNING (
 			SELECT email
 			FROM users
 			WHERE id = $1
-		), courseid
+		), course_id
 	`
 
 	err = app.Db.Get(user, updateUser, user.UserID, user.CourseID, user.ViewMatrNr)
@@ -116,17 +116,17 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 
 	//construct SQL
 	colViewMatrNr := ""
-	if table == "editor" || table == "instructor" {
-		colViewMatrNr = "l.viewmatrnr,"
+	if table == "editors" || table == "instructors" {
+		colViewMatrNr = "l.view_matr_nr,"
 	}
 	selectUsers := `
 		SELECT
-			l.userid, l.courseid, ` + colViewMatrNr + `
-			u.firstname, u.lastname, u.email, u.salutation,
-			u.title, u.academictitle, u.nameaffix
+			l.user_id, l.course_id, ` + colViewMatrNr + `
+			u.first_name, u.last_name, u.email, u.salutation,
+			u.title, u.academic_title, u.name_affix
 		FROM ` + table + ` l, users u
-		WHERE l.userid = u.id
-			AND l.courseid = $1
+		WHERE l.user_id = u.id
+			AND l.course_id = $1
 	`
 	err = tx.Select(users, selectUsers, *courseID)
 	if err != nil {
@@ -142,16 +142,16 @@ func (users *UserList) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int, tab
 
 	//construct SQL
 	colViewMatrNr := ""
-	if table == "editor" || table == "instructor" {
-		colViewMatrNr = ", viewmatrnr"
+	if table == "editors" || table == "instructors" {
+		colViewMatrNr = ", view_matr_nr"
 	}
 	stmtDuplicateList := `
 		INSERT INTO ` + table + `
-			(courseid, userid` + colViewMatrNr + `)
+			(course_id, user_id` + colViewMatrNr + `)
 		(
-			SELECT $2 AS courseid, userid` + colViewMatrNr + `
+			SELECT $2 AS course_id, user_id` + colViewMatrNr + `
 			FROM ` + table + `
-			WHERE courseid = $1
+			WHERE course_id = $1
 		)
 	`
 
@@ -169,15 +169,15 @@ func (users *UserList) Search(value, listType *string, searchInactive *bool, cou
 
 	searchUsersSelect := `
 		SELECT
-			id as userid, email, activationcode,
+			id as user_id, email, activation_code,
 			(
 				SELECT EXISTS (
 					SELECT true
 					FROM ` + *listType + ` t
-					WHERE t.userid = u.id
-						AND t.courseid = $4
+					WHERE t.user_id = u.id
+						AND t.course_id = $4
 				)
-			) AS onlist
+			) AS on_list
 	`
 	stmt := searchUsersSelect + " " + stmtUsersWhere
 
@@ -202,19 +202,19 @@ func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err err
 
 	stmt := `
 		INSERT INTO ` + table + `
-			(userid, courseid, viewmatrnr)
+			(user_id, course_id, view_matr_nr)
 		VALUES ($1, $2, $3)
 	`
-	if table != "editor" && table != "instructor" {
+	if table != "editors" && table != "instructors" {
 		stmt = `
 			INSERT INTO ` + table + `
-				(userid, courseid)
+				(user_id, course_id)
 			VALUES ($1, $2)
 		`
 	}
 
 	for _, user := range *users {
-		if table != "editor" && table != "instructor" {
+		if table != "editors" && table != "instructors" {
 			_, err = tx.Exec(stmt, user.UserID, *courseID)
 		} else {
 			_, err = tx.Exec(stmt, user.UserID, *courseID, user.ViewMatrNr)
@@ -233,27 +233,27 @@ const (
 	stmtUsersWhere = `
 		FROM users u
 		WHERE (
-				(u.activationcode IS NOT NULL) = $3
-				OR u.activationcode IS NULL
+				(u.activation_code IS NOT NULL) = $3
+				OR u.activation_code IS NULL
 			)
 			AND (
-				/* all combinations having a nameaffix */
-				u.title || u.academictitle || u.firstname || u.nameaffix || u.lastname ILIKE $1
-				OR u.title || u.firstname || u.nameaffix || u.lastname ILIKE $1
-				OR u.academictitle || u.firstname || u.nameaffix || u.lastname ILIKE $1
-				OR u.firstname || u.nameaffix || u.lastname ILIKE $1
+				/* all combinations having a name_affix */
+				u.title || u.academic_title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.academic_title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.first_name || u.name_affix || u.last_name ILIKE $1
 
-				/* all combinations without a nameaffix */
-				OR u.title || u.academictitle || u.firstname || u.lastname ILIKE $1
-				OR u.title || u.firstname || u.lastname ILIKE $1
-				OR u.academictitle || u.firstname || u.lastname ILIKE $1
-				OR u.firstname || u.lastname ILIKE $1
+				/* all combinations without a name_affix */
+				OR u.title || u.academic_title || u.first_name || u.last_name ILIKE $1
+				OR u.title || u.first_name || u.last_name ILIKE $1
+				OR u.academic_title || u.first_name || u.last_name ILIKE $1
+				OR u.first_name || u.last_name ILIKE $1
 
 				/* others */
 				OR u.email ILIKE $1
-				OR u.matrnr = $2
+				OR u.matr_nr = $2
 			)
-		ORDER BY u.lastname, u.firstname, u.id
+		ORDER BY u.last_name, u.first_name, u.id
 		LIMIT 5
 	`
 )

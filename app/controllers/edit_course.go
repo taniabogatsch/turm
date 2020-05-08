@@ -203,7 +203,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 	//NOTE: the interceptor assures that the course ID is valid
 	timestamp := date + " " + time
 	valid := (timestamp != " ")
-	if valid || fieldID != "unsubscribeend" { //only the unsubscribeend can be null
+	if valid || fieldID != "unsubscribe_end" { //only the unsubscribeend can be null
 		c.Validation.Required(date).
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
@@ -225,8 +225,8 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 		)
 	}
 
-	if fieldID != "enrollmentstart" && fieldID != "enrollmentend" &&
-		fieldID != "unsubscribeend" && fieldID != "expirationdate" {
+	if fieldID != "enrollment_start" && fieldID != "enrollment_end" &&
+		fieldID != "unsubscribe_end" && fieldID != "expiration_date" {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
@@ -239,7 +239,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 	course := models.Course{ID: ID}
 	var err error
 
-	if fieldID == "unsubscribeend" {
+	if fieldID == "unsubscribe_end" {
 		err = course.Update(fieldID, sql.NullString{timestamp, valid})
 	} else {
 		err = course.Update(fieldID, timestamp)
@@ -278,8 +278,8 @@ func (c EditCourse) ChangeUserList(ID, userID int, listType string) revel.Result
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "blacklist" && listType != "whitelist" &&
-		listType != "instructor" && listType != "editor" {
+	if listType != "blacklists" && listType != "whitelists" &&
+		listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 	//TODO: if edit, get course, set new timestamp value and validate
@@ -324,8 +324,8 @@ func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Re
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "blacklist" && listType != "whitelist" &&
-		listType != "instructor" && listType != "editor" {
+	if listType != "blacklists" && listType != "whitelists" &&
+		listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -369,7 +369,7 @@ func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option boo
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "instructor" && listType != "editor" {
+	if listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -411,7 +411,7 @@ func (c EditCourse) ChangeBool(ID int, listType string, option bool) revel.Resul
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	if listType != "visible" && listType != "onlyldap" {
+	if listType != "visible" && listType != "only_ldap" {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
@@ -478,7 +478,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 		}
 	}
 
-	if fieldID != "description" && fieldID != "customemail" &&
+	if fieldID != "description" && fieldID != "custom_email" &&
 		fieldID != "speaker" && fieldID != "title" &&
 		fieldID != "subtitle" && fieldID != "fee" {
 		return flashError(
@@ -564,7 +564,7 @@ func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
 		ID:       ID,
 		ParentID: sql.NullInt32{Int32: int32(parentID), Valid: true},
 	}
-	if err := course.Update("parentid", course.ParentID); err != nil {
+	if err := course.Update("parent_id", course.ParentID); err != nil {
 		return flashError(
 			errDB,
 			err,
@@ -591,7 +591,7 @@ func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.R
 
 	valid := (value != 0)
 
-	if fieldID != "enrolllimitevents" {
+	if fieldID != "enroll_limit_events" {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
@@ -638,8 +638,8 @@ func (c EditCourse) SearchUser(ID int, value, listType string, searchInactive bo
 		revel.MaxSize{127},
 	).MessageKey("validation.invalid.searchValue")
 
-	if listType != "blacklist" && listType != "whitelist" &&
-		listType != "instructor" && listType != "editor" {
+	if listType != "blacklists" && listType != "whitelists" &&
+		listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 

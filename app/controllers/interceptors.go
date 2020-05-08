@@ -144,9 +144,9 @@ func (c Creator) authCreator() revel.Result {
 //authEditCourse prevents unauthorized access to controllers of type EditCourse.
 func (c EditCourse) authEditCourse() revel.Result {
 
-	c.Log.Debug("executing auth edit course interceptor")
+	c.Log.Debug("executing auth edit courses interceptor")
 
-	if authorized, err := evalEditAuth(c.Controller, "course"); err == nil && authorized {
+	if authorized, err := evalEditAuth(c.Controller, "courses"); err == nil && authorized {
 		return nil
 	} else if err != nil {
 		return flashError(
@@ -165,9 +165,9 @@ func (c EditCourse) authEditCourse() revel.Result {
 //authEditEvent prevents unauthorized access to controllers of type EditEvent.
 func (c EditEvent) authEditEvent() revel.Result {
 
-	c.Log.Debug("executing auth edit event interceptor")
+	c.Log.Debug("executing auth edit events interceptor")
 
-	if authorized, err := evalEditAuth(c.Controller, "event"); err == nil && authorized {
+	if authorized, err := evalEditAuth(c.Controller, "events"); err == nil && authorized {
 		return nil
 	} else if err != nil {
 		return flashError(
@@ -186,9 +186,9 @@ func (c EditEvent) authEditEvent() revel.Result {
 //authEditMeeting prevents unauthorized access to controllers of type EditMeeting.
 func (c EditMeeting) authEditMeeting() revel.Result {
 
-	c.Log.Debug("executing auth edit meeting interceptor")
+	c.Log.Debug("executing auth edit meetings interceptor")
 
-	if authorized, err := evalEditAuth(c.Controller, "meeting"); err == nil && authorized {
+	if authorized, err := evalEditAuth(c.Controller, "meetings"); err == nil && authorized {
 		return nil
 	} else if err != nil {
 		return flashError(

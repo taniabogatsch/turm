@@ -20,18 +20,18 @@ type Course struct {
 	Subtitle          sql.NullString  `db:"subtitle"`
 	Visible           bool            `db:"visible"`
 	Active            bool            `db:"active"`
-	OnlyLDAP          bool            `db:"onlyldap"`
-	CreationDate      string          `db:"creationdate"`
+	OnlyLDAP          bool            `db:"only_ldap"`
+	CreationDate      string          `db:"creation_date"`
 	Description       sql.NullString  `db:"description"`
 	Speaker           sql.NullString  `db:"speaker"`
 	Fee               sql.NullFloat64 `db:"fee"`
-	CustomEMail       sql.NullString  `db:"customemail"`
-	EnrollLimitEvents sql.NullInt32   `db:"enrolllimitevents"`
-	EnrollmentStart   string          `db:"enrollmentstart"`
-	EnrollmentEnd     string          `db:"enrollmentend"`
-	UnsubscribeEnd    sql.NullString  `db:"unsubscribeend"`
-	ExpirationDate    string          `db:"expirationdate"`
-	ParentID          sql.NullInt32   `db:"parentid"`
+	CustomEMail       sql.NullString  `db:"custom_email"`
+	EnrollLimitEvents sql.NullInt32   `db:"enroll_limit_events"`
+	EnrollmentStart   string          `db:"enrollment_start"`
+	EnrollmentEnd     string          `db:"enrollment_end"`
+	UnsubscribeEnd    sql.NullString  `db:"unsubscribe_end"`
+	ExpirationDate    string          `db:"expiration_date"`
+	ParentID          sql.NullInt32   `db:"parent_id"`
 
 	//course data of different tables
 	Events       Events        ``
@@ -71,7 +71,7 @@ func (course *Course) Validate(v *revel.Validation) {
 			v.ErrorKey("validation.invalid.unsubscribe.end")
 		}
 		//if UnsubscribeEnd, then UnsubscribeEnd <= ExpirationDate
-		if course.ExpirationDate > course.UnsubscribeEnd.String {
+		if course.ExpirationDate < course.UnsubscribeEnd.String {
 			v.ErrorKey("validation.invalid.unsubscribe.expiration")
 		}
 	}
@@ -108,7 +108,7 @@ func (course *Course) Validate(v *revel.Validation) {
 
 /*Update the specified column in the course table. */
 func (course *Course) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, course.ID, "course", course)
+	return updateByID(column, value, course.ID, "courses", course)
 }
 
 /*Get all course data. */
@@ -132,16 +132,16 @@ func (course *Course) Get() (err error) {
 	if err = course.Events.Get(tx, &course.ID); err != nil {
 		return
 	}
-	if err = course.Editors.Get(tx, &course.ID, "editor"); err != nil {
+	if err = course.Editors.Get(tx, &course.ID, "editors"); err != nil {
 		return
 	}
-	if err = course.Instructors.Get(tx, &course.ID, "instructor"); err != nil {
+	if err = course.Instructors.Get(tx, &course.ID, "instructors"); err != nil {
 		return
 	}
-	if err = course.Blacklist.Get(tx, &course.ID, "blacklist"); err != nil {
+	if err = course.Blacklist.Get(tx, &course.ID, "blacklists"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Get(tx, &course.ID, "whitelist"); err != nil {
+	if err = course.Whitelist.Get(tx, &course.ID, "whitelists"); err != nil {
 		return
 	}
 
@@ -236,16 +236,16 @@ func (course *Course) Duplicate() (err error) {
 	}
 
 	//duplicate user lists
-	if err = course.Editors.Duplicate(tx, &course.ID, &courseIDOld, "editor"); err != nil {
+	if err = course.Editors.Duplicate(tx, &course.ID, &courseIDOld, "editors"); err != nil {
 		return
 	}
-	if err = course.Instructors.Duplicate(tx, &course.ID, &courseIDOld, "instructor"); err != nil {
+	if err = course.Instructors.Duplicate(tx, &course.ID, &courseIDOld, "instructors"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Duplicate(tx, &course.ID, &courseIDOld, "whitelist"); err != nil {
+	if err = course.Whitelist.Duplicate(tx, &course.ID, &courseIDOld, "whitelists"); err != nil {
 		return
 	}
-	if err = course.Blacklist.Duplicate(tx, &course.ID, &courseIDOld, "blacklist"); err != nil {
+	if err = course.Blacklist.Duplicate(tx, &course.ID, &courseIDOld, "blacklists"); err != nil {
 		return
 	}
 
@@ -300,16 +300,16 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 	if err = course.Events.Insert(tx, &course.ID); err != nil {
 		return
 	}
-	if err = course.Editors.Insert(tx, &course.ID, "editor"); err != nil {
+	if err = course.Editors.Insert(tx, &course.ID, "editors"); err != nil {
 		return
 	}
-	if err = course.Instructors.Insert(tx, &course.ID, "instructor"); err != nil {
+	if err = course.Instructors.Insert(tx, &course.ID, "instructors"); err != nil {
 		return
 	}
-	if err = course.Blacklist.Insert(tx, &course.ID, "blacklist"); err != nil {
+	if err = course.Blacklist.Insert(tx, &course.ID, "blacklists"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Insert(tx, &course.ID, "whitelist"); err != nil {
+	if err = course.Whitelist.Insert(tx, &course.ID, "whitelists"); err != nil {
 		return
 	}
 
@@ -325,22 +325,22 @@ var FeePattern = regexp.MustCompile("^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?")
 const (
 	stmtSelectCourse = `
 		SELECT
-			id, title, creator, subtitle, visible, active, onlyldap, parentid,
-			description, fee, customemail, enrolllimitevents, speaker,
-			TO_CHAR (creationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS creationdate,
-			TO_CHAR (enrollmentstart AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollmentstart,
-			TO_CHAR (enrollmentend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollmentend,
-			TO_CHAR (unsubscribeend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribeend,
-			TO_CHAR (expirationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expirationdate,
-			(current_timestamp >= expirationdate) AS expired
-		FROM course
+			id, title, creator, subtitle, visible, active, only_ldap, parent_id,
+			description, fee, custom_email, enroll_limit_events, speaker,
+			TO_CHAR (creation_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS creation_date,
+			TO_CHAR (enrollment_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_start,
+			TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end,
+			TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribe_end,
+			TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date,
+			(current_timestamp >= expiration_date) AS expired
+		FROM courses
 		WHERE id = $1
 	`
 
 	stmtInsertBlankCourse = `
-		INSERT INTO course (
-			title, creator, visible, active, onlyldap, creationdate,
-			enrollmentstart, enrollmentend, expirationdate
+		INSERT INTO courses (
+			title, creator, visible, active, only_ldap, creation_date,
+			enrollment_start, enrollment_end, expiration_date
 		)
 		VALUES (
 			$3, $2, false, false, false, $1, '2006-01-01',
@@ -351,39 +351,39 @@ const (
 
 	stmtCourseIsInactiveOrExpired = `
 		SELECT true AS valid
-		FROM course
+		FROM courses
 		WHERE id = $1
 			AND (
 				active = false
 				OR
-				(current_timestamp > expirationdate)
+				(current_timestamp > expiration_date)
 			)
 	`
 
 	stmtDeleteCourse = `
-		DELETE FROM course
+		DELETE FROM courses
 		WHERE id = $1
 	`
 
 	stmtDuplicateCourse = `
-		INSERT INTO course (
-			title, subtitle, active, creationdate, creator, customemail, description, enrolllimitevents, enrollmentend,
-			enrollmentstart, expirationdate, fee, onlyldap, parentid, speaker, unsubscribeend, visible
+		INSERT INTO courses (
+			title, subtitle, active, creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end,
+			enrollment_start, expiration_date, fee, only_ldap, parent_id, speaker, unsubscribe_end, visible
 		)
 		(
 			SELECT
-					$2 AS title, subtitle, active, $3 AS creationdate, creator, customemail, description, enrolllimitevents, enrollmentend,
-					enrollmentstart, expirationdate, fee, onlyldap, parentid, speaker, unsubscribeend, visible
-			FROM course
+					$2 AS title, subtitle, active, $3 AS creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end,
+					enrollment_start, expiration_date, fee, only_ldap, parent_id, speaker, unsubscribe_end, visible
+			FROM courses
 			WHERE id = $1
 		)
 		RETURNING id, title
 	`
 
 	stmtInsertCourse = `
-		INSERT INTO course
-			(active, creationdate, creator, customemail, description, enrolllimitevents, enrollmentend, enrollmentstart,
-			expirationdate, fee, onlyldap, speaker, subtitle, title, unsubscribeend, visible)
+		INSERT INTO courses
+			(active, creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end, enrollment_start,
+			expiration_date, fee, only_ldap, speaker, subtitle, title, unsubscribe_end, visible)
 		VALUES
 			(false, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 		RETURNING id, title

@@ -199,5 +199,5 @@ function openEditMeeting(meetingID, start, end, place, annotation, weekday, inte
   $('#meeting-' + meetingType + '-place').val(place);
   $('#meeting-' + meetingType + '-annotation').val(annotation);
 
-  $('#edit-meeting-' + meetingType + '').modal('show');
+  $('#edit-meeting-' + meetingType).modal('show');
 }

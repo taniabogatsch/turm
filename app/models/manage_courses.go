@@ -8,7 +8,7 @@ import (
 type CourseListInfo struct {
 	ID           int    `db:"id, primarykey, autoincrement"`
 	Title        string `db:"title"`
-	CreationDate string `db:"creationdate"`
+	CreationDate string `db:"creation_date"`
 	EMail        string `db:"email"` //e-mail address of either the creator or the editor
 }
 
@@ -21,37 +21,37 @@ func (list *CourseList) GetByUserID(userID *int, userType string, active, expire
 	//construct SQL
 	stmtSelect := `
 		SELECT c.id, c.title, u.email,
-			TO_CHAR (c.creationdate AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creationdate
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
 	`
 	stmtWhere := `
 			AND c.active = $3
-			AND (current_timestamp >= c.expirationdate) = $4
-		ORDER BY c.creationdate DESC
+			AND (current_timestamp >= c.expiration_date) = $4
+		ORDER BY c.creation_date DESC
 	`
 	if !expired && !active {
 		stmtWhere = `
 				AND c.active = $3
 				AND (
-					(current_timestamp < c.expirationdate) = $4
+					(current_timestamp < c.expiration_date) = $4
 					OR
-					(current_timestamp >= c.expirationdate) = $4
+					(current_timestamp >= c.expiration_date) = $4
 				)
-			ORDER BY c.creationdate DESC
+			ORDER BY c.creation_date DESC
 		`
 	}
 	stmt := ``
 	if userType == "creator" { //get all created courses
 		stmt = `
-		 	FROM course c, users u
+		 	FROM courses c, users u
 		 	WHERE c.creator = u.id
 		 		AND u.id = $2
 		`
 	} else { //get all edit/instruct privilege courses
 		stmt = `
-			FROM course c, users u, ` + userType + ` l
-			WHERE c.id = l.courseid
+			FROM courses c, users u, ` + userType + ` l
+			WHERE c.id = l.course_id
 				AND u.id = $2
-				AND u.id = l.userid
+				AND u.id = l.user_id
 		`
 	}
 
@@ -72,8 +72,8 @@ func (list *CourseList) GetByUserID(userID *int, userType string, active, expire
 const (
 	stmtAllCoursesAdmin = `
 		SELECT c.id, c.title,
-			TO_CHAR (c.creationdate AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creationdate
-		FROM course c
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
+		FROM courses c
 		WHERE $2 = 0
 	`
 )

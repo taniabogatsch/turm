@@ -10,12 +10,12 @@ import (
 /*Event is a model of the event table. */
 type Event struct {
 	ID            int            `db:"id, primarykey, autoincrement"`
-	CourseID      int            `db:"courseid"`
+	CourseID      int            `db:"course_id"`
 	Capacity      int            `db:"capacity"`
-	HasWaitlist   bool           `db:"haswaitlist"`
+	HasWaitlist   bool           `db:"has_waitlist"`
 	Title         string         `db:"title"`
 	Annotation    sql.NullString `db:"annotation"`
-	EnrollmentKey sql.NullString `db:"enrollmentkey"`
+	EnrollmentKey sql.NullString `db:"enrollment_key"`
 	Meetings      Meetings       ``
 
 	//Fullness is the number of users that enrolled in this event
@@ -37,7 +37,7 @@ func (event *Event) NewBlank() (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, event.ID, "event", event)
+	return updateByID(column, value, event.ID, "events", event)
 }
 
 /*Delete an event. */
@@ -130,22 +130,22 @@ func (events *Events) Insert(tx *sqlx.Tx, courseID *int) (err error) {
 const (
 	stmtSelectEvents = `
 		SELECT
-			e.id, e.courseid, e.capacity, e.haswaitlist,
-			e.title, e.annotation, e.enrollmentkey,
+			e.id, e.course_id, e.capacity, e.has_waitlist,
+			e.title, e.annotation, e.enrollment_key,
 			(
-				SELECT COUNT(en.userid)
+				SELECT COUNT(en.user_id)
 				FROM enrolled en
-				WHERE en.eventid = e.id
+				WHERE en.event_id = e.id
 					AND status != 1 /*on waitlist*/
 			) AS fullness
-		FROM event e
-		WHERE courseid = $1
+		FROM events e
+		WHERE course_id = $1
 		ORDER BY id ASC
 	`
 
 	stmtInsertBlankEvent = `
-		INSERT INTO event (
-				courseid, title, capacity, haswaitlist
+		INSERT INTO events (
+				course_id, title, capacity, has_waitlist
 			)
 		VALUES (
 				$1, $2, 1, false
@@ -154,31 +154,31 @@ const (
 	`
 
 	stmtDeleteEvent = `
-		DELETE FROM event
+		DELETE FROM events
 		WHERE id = $1
 	`
 
 	stmtDuplicateEvent = `
-		INSERT INTO event
-			(annotation, capacity, courseid, enrollmentkey, haswaitlist, title)
+		INSERT INTO events
+			(annotation, capacity, course_id, enrollment_key, has_waitlist, title)
 		(
 			SELECT
-				annotation, capacity, $1 AS courseid, enrollmentkey, haswaitlist, title
-			FROM event
+				annotation, capacity, $1 AS course_id, enrollment_key, has_waitlist, title
+			FROM events
 			WHERE id = $2
 		)
-		RETURNING id AS newid
+		RETURNING id AS new_id
 	`
 
 	stmtGetEventIDs = `
 		SELECT id
-		FROM event
-		WHERE courseid = $1
+		FROM events
+		WHERE course_id = $1
 	`
 
 	stmtInsertEvent = `
-		INSERT INTO event
-			(annotation, capacity, courseid, enrollmentkey, haswaitlist, title)
+		INSERT INTO events
+			(annotation, capacity, course_id, enrollment_key, has_waitlist, title)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
 	`

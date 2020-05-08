@@ -113,11 +113,11 @@ func (c ManageCourses) getCourseLists(active, expired bool) (
 	if err = creator.GetByUserID(&userID, "creator", active, expired); err != nil {
 		return
 	}
-	if err = editor.GetByUserID(&userID, "editor", active, expired); err != nil {
+	if err = editor.GetByUserID(&userID, "editors", active, expired); err != nil {
 		return
 	}
 	if active { //instructors are not part of drafts
-		err = instructor.GetByUserID(&userID, "instructor", active, expired)
+		err = instructor.GetByUserID(&userID, "instructors", active, expired)
 	}
 	return
 }

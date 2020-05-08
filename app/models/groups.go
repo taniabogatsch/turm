@@ -15,11 +15,11 @@ import (
 /*Group is a model of the groups table. */
 type Group struct {
 	ID          int           `db:"id, primarykey, autoincrement"`
-	ParentID    sql.NullInt32 `db:"parentid"`
+	ParentID    sql.NullInt32 `db:"parent_id"`
 	Name        string        `db:"name"`
-	CourseLimit sql.NullInt32 `db:"courselimit"`
-	LastEditor  sql.NullInt32 `db:"lasteditor"`
-	LastEdited  string        `db:"lastedited"`
+	CourseLimit sql.NullInt32 `db:"course_limit"`
+	LastEditor  sql.NullInt32 `db:"last_editor"`
+	LastEdited  string        `db:"last_edited"`
 	Groups      []Group       `` //not a field in the respective table
 
 	//used to ensure unique IDs if more than one group tree is present at a page
@@ -321,49 +321,49 @@ func (noneActive NoActiveChildren) DefaultMessage() string {
 
 const (
 	stmtParentHasCourseLimit = `
-		WITH RECURSIVE path (id, parentid)
+		WITH RECURSIVE path (id, parent_id)
 			AS (
 				/* starting entry */
-				SELECT id, parentid
+				SELECT id, parent_id
 				FROM groups
 				WHERE id = $1
-					AND courselimit IS NULL
+					AND course_limit IS NULL
 
 				UNION ALL
 
 				/* construct path */
-				SELECT g.id, g.parentid
+				SELECT g.id, g.parent_id
 				FROM groups g, path p
-				WHERE p.parentid = g.id
-					AND g.courselimit IS NULL
+				WHERE p.parent_id = g.id
+					AND g.course_limit IS NULL
 			)
 
 		/* select the root element of the constructed path */
-		SELECT id, parentid FROM path ORDER BY parentid DESC LIMIT 1
+		SELECT id, parent_id FROM path ORDER BY parent_id DESC LIMIT 1
 	`
 
 	stmtChildHasCourseLimit = `
-		WITH RECURSIVE path (id, parentid, courselimit)
+		WITH RECURSIVE path (id, parent_id, course_limit)
 			AS (
 				/* starting entries */
-				SELECT id, parentid, courselimit
+				SELECT id, parent_id, course_limit
 				FROM groups
-				WHERE parentid = $1
+				WHERE parent_id = $1
 
 				UNION ALL
 
 				/* collect all children */
-				SELECT g.id, g.parentid, g.courselimit
+				SELECT g.id, g.parent_id, g.course_limit
 				FROM groups g, path p
-				WHERE p.id = g.parentid
+				WHERE p.id = g.parent_id
 			)
 
 		/* determine whether any child has a course limit */
 		SELECT EXISTS (
 			SELECT true
 			FROM path
-			WHERE courselimit IS NOT NULL
-		) AS childHasCourseLimit
+			WHERE course_limit IS NOT NULL
+		) AS child_has_course_limit
 	`
 
 	stmtNoActiveChildren = `
@@ -371,9 +371,9 @@ const (
 
 			/* select all active courses */
 			SELECT true
-			FROM groups, course
-			WHERE groups.id = course.parentid
-				AND NOT course.active
+			FROM groups, courses
+			WHERE groups.id = courses.parent_id
+				AND NOT courses.active
 				AND groups.id = $1
 
 			UNION
@@ -381,17 +381,17 @@ const (
 			/* select all subgroups */
 			SELECT true
 			FROM groups
-			WHERE parentid = $1
+			WHERE parent_id = $1
 
-		) AS noActiveChildren
+		) AS no_active_children
 	`
 
 	stmtGetChildren = `
 		/* get all groups */
 		(
-			SELECT id, parentid, name::text AS name, courselimit
+			SELECT id, parent_id, name::text AS name, course_limit
 			FROM groups
-			WHERE parentid = $1
+			WHERE parent_id = $1
 			ORDER BY name ASC
 		)
 
@@ -399,42 +399,42 @@ const (
 
 		/* get all courses */
 		(
-			SELECT 0 AS id, co.parentid, co.title::text AS name,
+			SELECT 0 AS id, co.parent_id, co.title::text AS name,
 				(
-					SELECT g.courselimit
-					FROM groups g, course c
-					WHERE g.id = c.parentid
+					SELECT g.course_limit
+					FROM groups g, courses c
+					WHERE g.id = c.parent_id
 						AND g.id = $1
 						AND c.id = co.id
-				) AS courselimit
+				) AS course_limit
 
-			FROM course co
-			WHERE co.parentid = $1
+			FROM courses co
+			WHERE co.parent_id = $1
 				AND co.active
-				AND (current_timestamp < co.expirationdate)
+				AND (current_timestamp < co.expiration_date)
 			ORDER BY name ASC
 		)
 	`
 
 	stmtInsertGroup = `
 		INSERT INTO groups
-			(parentid, name, courselimit, lasteditor, lastedited)
+			(parent_id, name, course_limit, last_editor, last_edited)
 		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, name
 	`
 
 	stmtUpdateGroup = `
 		UPDATE groups
-		SET name = $1, courselimit = $2, lasteditor = $3, lastedited = $4
+		SET name = $1, course_limit = $2, last_editor = $3, last_edited = $4
 		WHERE id = $5
 		RETURNING id, name
 	`
 
 	stmtMoveInactiveCourses = `
-		UPDATE course
-		SET parentid = (
-			SELECT parentid FROM groups WHERE id = $1
-		) WHERE parentid = $1
+		UPDATE courses
+		SET parent_id = (
+			SELECT parent_id FROM groups WHERE id = $1
+		) WHERE parent_id = $1
 	`
 
 	stmtDeleteGroup = `
@@ -443,43 +443,43 @@ const (
 	`
 
 	stmtGetRootGroups = `
-		SELECT id, parentid, name, courselimit
+		SELECT id, parent_id, name, course_limit
 		FROM groups
-		WHERE parentid IS NULL
+		WHERE parent_id IS NULL
 		ORDER BY name ASC
 	`
 
 	stmtSelectGroups = `
 		SELECT
-			id, parentid, name, courselimit,
-			TO_CHAR (lastedited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastedited
+			id, parent_id, name, course_limit,
+			TO_CHAR (last_edited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as last_edited
 		FROM groups
-		WHERE lasteditor = $2
+		WHERE last_editor = $2
 		ORDER BY name ASC
 	`
 
 	stmtGetPath = `
-		WITH RECURSIVE path (parentid, name, id)
+		WITH RECURSIVE path (parent_id, name, id)
 			AS (
 				/* starting entry */
-				SELECT parentid, title::text AS name,
+				SELECT parent_id, title::text AS name,
 					(
 						SELECT MAX(id) + 1
 						FROM groups
 					) AS id
-				FROM course
+				FROM courses
 				WHERE id = $1
-					AND parentid IS NOT NULL
+					AND parent_id IS NOT NULL
 
 				UNION ALL
 
 				/* construct path */
-				SELECT g.parentid, g.name::text AS name, g.id
+				SELECT g.parent_id, g.name::text AS name, g.id
 				FROM groups g, path p
-				WHERE p.parentid = g.id
+				WHERE p.parent_id = g.id
 			)
 
 		/* select the root element of the constructed path */
-		SELECT id, parentid, name FROM path ORDER BY id ASC
+		SELECT id, parent_id, name FROM path ORDER BY id ASC
 	`
 )

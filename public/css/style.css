@@ -127,11 +127,17 @@
 .color-danger {
   color: #dc3545;
 }
+.color-darkblue {
+  color: #292961;
+}
 .warning-feedback {
   width: 100%;
   margin-top: 0.25rem;
   font-size: 80%;
   color: #dc3545;
+}
+.to-front {
+  z-index: 5000;
 }
 .menu {
   background-color: #292961;

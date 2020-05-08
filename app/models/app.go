@@ -12,7 +12,7 @@ type Category struct {
 	ID           int           `db:"id, primarykey, autoincrement"`
 	Name         string        `db:"name"`
 	Creator      sql.NullInt32 `db:"creator"`
-	CreationDate string        `db:"creationdate"`
+	CreationDate string        `db:"creation_date"`
 }
 
 /*Validate Category fields. */
@@ -24,10 +24,10 @@ func (category *Category) Validate(v *revel.Validation) {
 type FAQ struct {
 	ID           int           `db:"id, primarykey, autoincrement"`
 	Creator      sql.NullInt32 `db:"creator"`
-	CategoryID   int           `db:"categoryid"`
+	CategoryID   int           `db:"category_id"`
 	Question     string        `db:"question"`
 	Answer       string        `db:"answer"`
-	CreationDate string        `db:"creationdate"`
+	CreationDate string        `db:"creation_date"`
 }
 
 /*Validate FAQ fields. */
@@ -39,9 +39,9 @@ func (faq *FAQ) Validate(v *revel.Validation) {
 type NewsFeed struct {
 	ID           int           `db:"id, primarykey, autoincrement"`
 	Creator      sql.NullInt32 `db:"creator"`
-	CategoryID   int           `db:"categoryid"`
+	CategoryID   int           `db:"category_id"`
 	Content      string        `db:"content"`
-	CreationDate string        `db:"creationdate"`
+	CreationDate string        `db:"creation_date"`
 }
 
 /*Validate NewsFeed fields. */

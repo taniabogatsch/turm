@@ -30,13 +30,13 @@ func (interval MeetingInterval) String() string {
 /*Meeting is a model of the meeting table. */
 type Meeting struct {
 	ID              int             `db:"id, primarykey, autoincrement"`
-	EventID         int             `db:"eventid"`
-	MeetingInterval MeetingInterval `db:"meetinginterval"`
+	EventID         int             `db:"event_id"`
+	MeetingInterval MeetingInterval `db:"meeting_interval"`
 	WeekDay         sql.NullInt32   `db:"weekday"`
 	Place           sql.NullString  `db:"place"`
 	Annotation      sql.NullString  `db:"annotation"`
-	MeetingStart    string          `db:"meetingstart"`
-	MeetingEnd      string          `db:"meetingend"`
+	MeetingStart    string          `db:"meeting_start"`
+	MeetingEnd      string          `db:"meeting_end"`
 
 	//used to get the front end values
 	MeetingStartTime string ``
@@ -178,17 +178,17 @@ func (meetings *Meetings) Insert(tx *sqlx.Tx, eventID *int) (err error) {
 const (
 	stmtSelectMeetings = `
 		SELECT
-			id, eventid, meetinginterval, weekday, place, annotation,
-			TO_CHAR (meetingstart AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meetingstart,
-			TO_CHAR (meetingend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meetingend
-		FROM meeting
-		WHERE eventid = $1
+			id, event_id, meeting_interval, weekday, place, annotation,
+			TO_CHAR (meeting_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_start,
+			TO_CHAR (meeting_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_end
+		FROM meetings
+		WHERE event_id = $1
 		ORDER BY id ASC
 	`
 
 	stmtInsertBlankMeeting = `
-		INSERT INTO meeting (
-				eventid, meetingstart, meetingend, meetinginterval
+		INSERT INTO meetings (
+				event_id, meeting_start, meeting_end, meeting_interval
 			)
 		VALUES (
 				$1, '2006-01-01 10:00', '2006-01-01 11:00', $2
@@ -197,38 +197,38 @@ const (
 	`
 
 	stmtUpdateSingleMeeting = `
-		UPDATE meeting
-		SET place = $1, annotation = $2, meetingstart = $3, meetingend = $4
+		UPDATE meetings
+		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4
 		WHERE id = $5
 		RETURNING id
 	`
 
 	stmtUpdateWeeklyMeeting = `
-		UPDATE meeting
-		SET place = $1, annotation = $2, meetingstart = $3, meetingend = $4, weekday = $6
+		UPDATE meetings
+		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4, weekday = $6
 		WHERE id = $5
 		RETURNING id
 	`
 
 	stmtDeleteMeeting = `
-		DELETE FROM meeting
+		DELETE FROM meetings
 		WHERE id = $1
 	`
 
 	stmtDuplicateMeeting = `
-		INSERT INTO meeting
-			(annotation, eventid, meetingend, meetingstart, meetinginterval, place, weekday)
+		INSERT INTO meetings
+			(annotation, event_id, meeting_end, meeting_start, meeting_interval, place, weekday)
 		(
 			SELECT
-				annotation, $1 AS eventid, meetingend, meetingstart, meetinginterval, place, weekday
-			FROM meeting
-			WHERE eventid = $2
+				annotation, $1 AS event_id, meeting_end, meeting_start, meeting_interval, place, weekday
+			FROM meetings
+			WHERE event_id = $2
 		)
 	`
 
 	stmtInsertMeeting = `
-		INSERT INTO meeting
-			(annotation, eventid, meetingend, meetinginterval, meetingstart, place, weekday)
+		INSERT INTO meetings
+			(annotation, event_id, meeting_end, meeting_interval, meeting_start, place, weekday)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 )

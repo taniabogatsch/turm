@@ -141,8 +141,8 @@ course.description.delete.confirm = Confirm deletion of course description.
 course.description.delete.title = Delete course description.
 course.description.change.info = Here, you can provide detailed information about the course. You can also add links to external material.
 
-course.customemail.change.success = Changed custom enrollment e-mail, course ID = %d.
-course.customemail.delete.success = Deleted custom enrollment e-mail, course ID = %d.
+course.custom_email.change.success = Changed custom enrollment e-mail, course ID = %d.
+course.custom_email.delete.success = Deleted custom enrollment e-mail, course ID = %d.
 course.customemail.delete.confirm = Confirm deletion of custom enrollment e-mail.
 course.customemail.delete.title = Delete enrollment e-mail.
 course.custom.email.change.info = The custom welcome e-mail is send to each user that enrolls in the course.
@@ -159,28 +159,28 @@ course.subtitle.delete.confirm = Confirm deletion of subtitle '%s'.
 course.subtitle.delete.title = Delete subtitle
 course.subtitle.change.info = The subtitle can contain further information about the course title.
 
-course.enrollmentstart.change.success = Set enrollment start to %s, course ID = %d.
+course.enrollment_start.change.success = Set enrollment start to %s, course ID = %d.
 course.enrollment.start.change.info = After this point users can enroll in the course.
 
-course.enrollmentend.change.success = Set enrollment end to %s, course ID = %d.
+course.enrollment_end.change.success = Set enrollment end to %s, course ID = %d.
 course.enrollment.end.change.info = After this point usres can no longer enroll in the course.
 
-course.expirationdate.change.success = Set expiration date to %s, course ID = %d.
+course.expiration_date.change.success = Set expiration date to %s, course ID = %d.
 course.expiration.date.change.info = After this point the course is no longer active. Lists of participants can still be seen. Enrolled users can still see the course at 'expired courses'.
 
-course.unsubscribe.end.change.success = Set unsubscribe end to %s, course ID = %d.
-course.unsubscribe.end.delete.success = Deleted unsubscribe end, course ID = %d.
+course.unsubscribe_end.change.success = Set unsubscribe end to %s, course ID = %d.
+course.unsubscribe_end.delete.success = Deleted unsubscribe end, course ID = %d.
 course.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
 course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end %s?
 course.unsubscribe.end.delete.title = Delete unsubscribe end
 
-course.editor.change.success = Added editor: %s, course ID = %d.
-course.editor.delete.success = Deleted editor, course ID = %d.
+course.editors.change.success = Added editor: %s, course ID = %d.
+course.editors.delete.success = Deleted editor, course ID = %d.
 course.editor.delete.confirm = Confirm deletion of editor %s.
 course.editor.delete.title = Delete editor
 
-course.instructor.change.success = Added instructor: %s, course ID = %d.
-course.instructor.delete.success = Deleted instructor, course ID = %d.
+course.instructors.change.success = Added instructor: %s, course ID = %d.
+course.instructors.delete.success = Deleted instructor, course ID = %d.
 course.instructor.delete.confirm = Confirm deletion of instructor %s.
 course.instructor.delete.title = Delete instructor
 
@@ -195,20 +195,20 @@ course.visibility.change.title = Change visibility
 course.visible.change.success = Changed visibility, course ID = %d.
 
 course.only.ldap.change.title = Change audience
-course.onlyldap.change.success = Changed audience, course ID = %d.
+course.only_ldap.change.success = Changed audience, course ID = %d.
 
-course.whitelist.change.success = Added user to whitelist: %s, course ID = %d.
-course.whitelist.delete.success = Deleted user from whitelist, course ID = %d.
+course.whitelists.change.success = Added user to whitelist: %s, course ID = %d.
+course.whitelists.delete.success = Deleted user from whitelist, course ID = %d.
 course.whitelist.delete.confirm = Confirm deletion of user from whitelist %s.
 course.whitelist.delete.title = Delete from whitelist
 
-course.blacklist.change.success = Added user to blacklist: %s, course ID = %d.
-course.blacklist.delete.success = Deleted user from blacklist, course ID = %d.
+course.blacklists.change.success = Added user to blacklist: %s, course ID = %d.
+course.blacklists.delete.success = Deleted user from blacklist, course ID = %d.
 course.blacklist.delete.confirm = Confirm deletion of user from blacklist %s.
 course.blacklist.delete.title = Delete from blacklist
 
-course.enrolllimitevents.change.success = Set enroll limit for events to %d, course ID = %d.
-course.enrolllimitevents.delete.success = Deleted enroll limit for events, course ID = %d.
+course.enroll_limit_events.change.success = Set enroll limit for events to %d, course ID = %d.
+course.enroll_limit_events.delete.success = Deleted enroll limit for events, course ID = %d.
 course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit for events of %d.
 course.enroll.limit.events.delete.title = Delete enroll limit
 course.enroll.limit.events.change.info = The enrollment limit for events is the maximum number of events in which a user can enroll in this course.

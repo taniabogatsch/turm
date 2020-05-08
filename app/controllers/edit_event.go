@@ -200,7 +200,7 @@ func (c EditEvent) ChangeWaitlist(ID int, option bool) revel.Result {
 	//and there are users enrolled in the event
 
 	event := models.Event{ID: ID, HasWaitlist: option}
-	if err := event.Update("haswaitlist", event.HasWaitlist); err != nil {
+	if err := event.Update("has_waitlist", event.HasWaitlist); err != nil {
 		return flashError(
 			errDB,
 			err,

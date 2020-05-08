@@ -3,230 +3,230 @@
 
 CREATE TABLE users (
   id              serial                    PRIMARY KEY,
-  lastname        varchar(255)              NOT NULL,
-  firstname       varchar(255)              NOT NULL,
+  last_name       varchar(255)              NOT NULL,
+  first_name      varchar(255)              NOT NULL,
   email           varchar(255)              UNIQUE NOT NULL,
   salutation      integer                   NOT NULL,
   role            integer                   NOT NULL,
-  lastlogin       timestamp with time zone  NOT NULL,
-  firstlogin      timestamp with time zone  NOT NULL,
+  last_login      timestamp with time zone  NOT NULL,
+  first_login     timestamp with time zone  NOT NULL,
   language        varchar(63),
-  matrnr          integer                   UNIQUE,
+  matr_nr         integer                   UNIQUE,
   affiliations    varchar(127)[],
-  academictitle   varchar(127),
+  academic_title  varchar(127),
   title           varchar(127),
-  nameaffix       varchar(127),
+  name_affix      varchar(127),
   password        varchar(511),
-  activationcode  varchar(255)
+  activation_code varchar(255)
 );
 
 
-CREATE TABLE degree (
+CREATE TABLE degrees (
   id    serial        PRIMARY KEY,
   name  varchar(255)  NOT NULL UNIQUE
 );
-CREATE TABLE courseofstudies (
+CREATE TABLE courses_of_studies (
   id    serial        PRIMARY KEY,
   name  varchar(511)  NOT NULL UNIQUE
 );
 
 
 CREATE TABLE studies (
-  userid              integer   NOT NULL,
-  semester            integer   NOT NULL,
-  degreeid            integer   NOT NULL,
-  courseofstudiesid   integer   NOT NULL,
+  user_id                 integer   NOT NULL,
+  semester                integer   NOT NULL,
+  degree_id               integer   NOT NULL,
+  course_of_studies_id    integer   NOT NULL,
 
-  PRIMARY KEY (userid, degreeid, courseofstudiesid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (degreeid) REFERENCES degree (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseofstudiesid) REFERENCES courseofstudies (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE course (
-  id                  serial                    PRIMARY KEY,
-  title               varchar(511)              NOT NULL,
-  creator             integer, /* Set to null if user data is deleted due to data policy requirements. */
-  subtitle            varchar(511),
-  visible             boolean                   NOT NULL,
-  active              boolean                   NOT NULL,
-  onlyldap            boolean                   NOT NULL,
-  creationdate        timestamp with time zone  NOT NULL,
-  description         text,
-  speaker             text,
-  fee                 real,
-  customemail         text,
-  enrolllimitevents   integer,
-  enrollmentstart     timestamp with time zone  NOT NULL,
-  enrollmentend       timestamp with time zone  NOT NULL,
-  unsubscribeend      timestamp with time zone,
-  expirationdate      timestamp with time zone  NOT NULL,
-  parentid            integer,
-
-  FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (parentid) REFERENCES groups (id)
-);
-
-
-CREATE TABLE event (
-  id                serial        PRIMARY KEY,
-  courseid          integer       NOT NULL,
-  capacity          integer       NOT NULL,
-  haswaitlist       boolean       NOT NULL,
-  title             varchar(255)  NOT NULL,
-  annotation        varchar(255),
-  enrollmentkey     varchar(511),
-
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE meeting (
-  id              serial                    PRIMARY KEY,
-  eventid         integer                   NOT NULL,
-  meetinginterval integer                   NOT NULL,
-  weekday         integer,
-  place           varchar(255),
-  annotation      varchar(255),
-  meetingstart    timestamp with time zone  NOT NULL,
-  meetingend      timestamp with time zone  NOT NULL,
-
-  FOREIGN KEY (eventid) REFERENCES event (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE editor (
-  userid      integer   NOT NULL,
-  courseid    integer   NOT NULL,
-  viewmatrnr  boolean   NOT NULL,
-
-  PRIMARY KEY (userid, courseid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE instructor (
-  userid      integer   NOT NULL,
-  courseid    integer   NOT NULL,
-  viewmatrnr  boolean   NOT NULL,
-
-  PRIMARY KEY (userid, courseid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE blacklist (
-  userid    integer   NOT NULL,
-  courseid  integer   NOT NULL,
-
-  PRIMARY KEY (userid, courseid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE whitelist (
-  userid    integer   NOT NULL,
-  courseid  integer   NOT NULL,
-
-  PRIMARY KEY (userid, courseid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE enrollment_restrictions (
-  id                  serial    PRIMARY KEY,
-  courseid            integer   NOT NULL,
-  minimumsemester     integer   NOT NULL,
-  degreeid            integer   NOT NULL,
-  courseofstudiesid   integer   NOT NULL,
-
-  FOREIGN KEY (courseid) REFERENCES course (id) ON DELETE CASCADE,
-  FOREIGN KEY (degreeid) REFERENCES degree (id) ON DELETE CASCADE,
-  FOREIGN KEY (courseofstudiesid) REFERENCES courseofstudies (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE enrolled (
-  userid            integer                   NOT NULL,
-  eventid           integer                   NOT NULL,
-  status            integer                   NOT NULL,
-  emailtraffic      boolean                   NOT NULL,
-  timeofenrollment  timestamp with time zone  NOT NULL,
-
-  PRIMARY KEY(userid, eventid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (eventid) REFERENCES event (id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE unsubscribed (
-  userid    integer   NOT NULL,
-  eventid   integer   NOT NULL,
-
-  PRIMARY KEY (userid, eventid),
-  FOREIGN KEY (userid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (eventid) REFERENCES event (id) ON DELETE CASCADE
+  PRIMARY KEY (user_id, degree_id, course_of_studies_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (degree_id) REFERENCES degrees (id) ON DELETE CASCADE,
+  FOREIGN KEY (course_of_studies_id) REFERENCES courses_of_studies (id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE groups (
-  id            serial                    PRIMARY KEY,
-  parentid      integer,
-  name          varchar(255)              NOT NULL,
-  courselimit   integer,
-  creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creationdate  timestamp with time zone  NOT NULL,
+  id              serial                    PRIMARY KEY,
+  parent_id       integer,
+  name            varchar(255)              NOT NULL,
+  course_limit    integer,
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_edited     timestamp with time zone  NOT NULL,
+
+  FOREIGN KEY (last_editor) REFERENCES users (id),
+  FOREIGN KEY (parent_id) REFERENCES groups (id)
+);
+
+
+CREATE TABLE courses (
+  id                    serial                    PRIMARY KEY,
+  title                 varchar(511)              NOT NULL,
+  creator               integer, /* Set to null if user data is deleted due to data policy requirements. */
+  subtitle              varchar(511),
+  visible               boolean                   NOT NULL,
+  active                boolean                   NOT NULL,
+  only_ldap             boolean                   NOT NULL,
+  creation_date         timestamp with time zone  NOT NULL,
+  description           text,
+  speaker               text,
+  fee                   real,
+  custom_email          text,
+  enroll_limit_events   integer,
+  enrollment_start      timestamp with time zone  NOT NULL,
+  enrollment_end        timestamp with time zone  NOT NULL,
+  unsubscribe_end       timestamp with time zone,
+  expiration_date       timestamp with time zone  NOT NULL,
+  parent_id             integer,
 
   FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (parentid) REFERENCES groups(id)
+  FOREIGN KEY (parent_id) REFERENCES groups (id)
+);
+
+
+CREATE TABLE events (
+  id                serial        PRIMARY KEY,
+  course_id         integer       NOT NULL,
+  capacity          integer       NOT NULL,
+  has_waitlist      boolean       NOT NULL,
+  title             varchar(255)  NOT NULL,
+  annotation        varchar(255),
+  enrollment_key    varchar(511),
+
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE meetings (
+  id                serial                    PRIMARY KEY,
+  event_id          integer                   NOT NULL,
+  meeting_interval  integer                   NOT NULL,
+  weekday           integer,
+  place             varchar(255),
+  annotation        varchar(255),
+  meeting_start     timestamp with time zone  NOT NULL,
+  meeting_end       timestamp with time zone  NOT NULL,
+
+  FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE editors (
+  user_id         integer   NOT NULL,
+  course_id       integer   NOT NULL,
+  view_matr_nr    boolean   NOT NULL,
+
+  PRIMARY KEY (user_id, course_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE instructors (
+  user_id         integer   NOT NULL,
+  course_id       integer   NOT NULL,
+  view_matr_nr    boolean   NOT NULL,
+
+  PRIMARY KEY (user_id, course_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE blacklists (
+  user_id    integer   NOT NULL,
+  course_id  integer   NOT NULL,
+
+  PRIMARY KEY (user_id, course_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE whitelists (
+  user_id    integer   NOT NULL,
+  course_id  integer   NOT NULL,
+
+  PRIMARY KEY (user_id, course_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE enrollment_restrictions (
+  id                        serial    PRIMARY KEY,
+  course_id                 integer   NOT NULL,
+  minimum_semester          integer   NOT NULL,
+  degree_id                 integer   NOT NULL,
+  courses_of_studies_id     integer   NOT NULL,
+
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
+  FOREIGN KEY (degree_id) REFERENCES degrees (id) ON DELETE CASCADE,
+  FOREIGN KEY (courses_of_studies_id) REFERENCES courses_of_studies (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE enrolled (
+  user_id               integer                   NOT NULL,
+  event_id              integer                   NOT NULL,
+  status                integer                   NOT NULL,
+  email_traffic         boolean                   NOT NULL,
+  time_of_enrollment    timestamp with time zone  NOT NULL,
+
+  PRIMARY KEY(user_id, event_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE unsubscribed (
+  user_id    integer   NOT NULL,
+  event_id   integer   NOT NULL,
+
+  PRIMARY KEY (user_id, event_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 );
 
 
 CREATE TABLE faq_category (
-  id            serial                    PRIMARY KEY,
-  name          varchar(255)              NOT NULL,
-  creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creationdate  timestamp with time zone  NOT NULL,
+  id              serial                    PRIMARY KEY,
+  name            varchar(255)              NOT NULL,
+  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  creation_date   timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id)
 );
 
 
-CREATE TABLE faq (
-  id            serial                    PRIMARY KEY,
-  creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
-  categoryid    integer                   NOT NULL,
-  question      varchar(511)              NOT NULL,
-  answer        text                      NOT NULL,
-  creationdate  timestamp with time zone  NOT NULL,
+CREATE TABLE faqs (
+  id              serial                    PRIMARY KEY,
+  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  category_id     integer                   NOT NULL,
+  question        varchar(511)              NOT NULL,
+  answer          text                      NOT NULL,
+  creation_date   timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (categoryid) REFERENCES faq_category (id)
+  FOREIGN KEY (category_id) REFERENCES faq_category (id)
 );
 
 
 CREATE TABLE news_feed_category (
-  id            serial                    PRIMARY KEY,
-  name          varchar(255)              NOT NULL,
-  creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creationdate  timestamp with time zone  NOT NULL,
+  id              serial                    PRIMARY KEY,
+  name            varchar(255)              NOT NULL,
+  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  creation_date   timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id)
 );
 
 
 CREATE TABLE news_feed (
-  id            serial                    PRIMARY KEY,
-  creator       integer, /* Set to null if user data is deleted due to data policy requirements. */
-  categoryid    integer                   NOT NULL,
-  content       text                      NOT NULL,
-  creationdate  timestamp with time zone  NOT NULL,
+  id              serial                    PRIMARY KEY,
+  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  category_id     integer                   NOT NULL,
+  content         text                      NOT NULL,
+  creation_date   timestamp with time zone  NOT NULL,
 
   FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (categoryid) REFERENCES news_feed_category (id)
+  FOREIGN KEY (category_id) REFERENCES news_feed_category (id)
 );

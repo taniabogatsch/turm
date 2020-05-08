@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -50,27 +49,27 @@ func (u Role) String() string {
 /*User is a model of the users table. */
 type User struct {
 	ID         int            `db:"id, primarykey, autoincrement"`
-	LastName   string         `db:"lastname"`
-	FirstName  string         `db:"firstname"`
+	LastName   string         `db:"last_name"`
+	FirstName  string         `db:"first_name"`
 	EMail      string         `db:"email, unique"`
 	Salutation Salutation     `db:"salutation"`
 	Role       Role           `db:"role"`
-	LastLogin  string         `db:"lastlogin"`
-	FirstLogin string         `db:"firstlogin"`
+	LastLogin  string         `db:"last_login"`
+	FirstLogin string         `db:"first_login"`
 	Language   sql.NullString `db:"language"`
 
 	//ldap user fields
-	MatrNr        sql.NullInt32    `db:"matrnr, unique"`
-	AcademicTitle sql.NullString   `db:"academictitle"`
+	MatrNr        sql.NullInt32    `db:"matr_nr, unique"`
+	AcademicTitle sql.NullString   `db:"academic_title"`
 	Title         sql.NullString   `db:"title"`
-	NameAffix     sql.NullString   `db:"nameaffix"`
+	NameAffix     sql.NullString   `db:"name_affix"`
 	Affiliations  NullAffiliations `db:"affiliations"`
 	Studies       []Studies        ``
 
 	//external user fields
 	Password       sql.NullString `db:"password"`
 	PasswordRepeat string         `` //not a field in the respective table
-	ActivationCode sql.NullString `db:"activationcode"`
+	ActivationCode sql.NullString `db:"activation_code"`
 
 	//not a field in the resprective table
 	IsEditor     bool
@@ -186,12 +185,12 @@ func (credentials *Credentials) Validate(v *revel.Validation) {
 
 /*Studies is a model of the studies table. */
 type Studies struct {
-	UserID            int    `db:"userid, primarykey"`
+	UserID            int    `db:"user_id, primarykey"`
 	Semester          int    `db:"semester"`
-	DegreeID          int    `db:"degreeid, primarykey"`
-	CourseOfStudiesID int    `db:"courseofstudiesid, primarykey"`
-	Degree            string `db:"degree"`          //not a field in the studies table
-	CourseOfStudies   string `db:"courseofstudies"` //not a field in the studies table
+	DegreeID          int    `db:"degree_id, primarykey"`
+	CourseOfStudiesID int    `db:"course_of_studies_id, primarykey"`
+	Degree            string `db:"degree"`            //not a field in the studies table
+	CourseOfStudies   string `db:"course_of_studies"` //not a field in the studies table
 }
 
 /*Validate Studies fields when loaded from the user enrollment file. */
@@ -396,8 +395,8 @@ func (user *User) ChangeRole() (err error) {
 func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 
 	type bools struct {
-		IsEditor     bool
-		IsInstructor bool
+		IsEditor     bool `db:"is_editor"`
+		IsInstructor bool `db:"is_instructor"`
 	}
 	var data bools
 
@@ -407,7 +406,6 @@ func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 			user.ID, "error", err.Error())
 		tx.Rollback()
 	}
-	fmt.Println(data)
 	return data.IsEditor, data.IsInstructor, err
 }
 
@@ -422,11 +420,11 @@ func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (autho
 	}
 
 	switch *table {
-	case "course":
+	case "courses":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
-	case "event":
+	case "events":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditEvent, user.ID, *ID)
-	case "meeting":
+	case "meetings":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditMeeting, user.ID, *ID)
 	case "onlyCreator":
 		err = app.Db.Get(&authorized, stmtIsCreator, user.ID, *ID)
@@ -510,50 +508,50 @@ func (affiliations *NullAffiliations) Scan(value interface{}) error {
 const (
 	stmtLoginLdap = `
 		INSERT INTO users (
-			firstname, lastname, email, salutation, role, lastlogin,
-			firstlogin, matrnr, academictitle, title, nameaffix, affiliations
+			first_name, last_name, email, salutation, role, last_login,
+			first_login, matr_nr, academic_title, title, name_affix, affiliations
 		)
 		VALUES ($1, $2, $3, $4, 0, $5, $6, $7, $8, $9, $10, $11)
 		ON CONFLICT (email)
 		DO UPDATE
 			SET
-				firstname = $1, lastname = $2, salutation = $4, lastlogin = $5,
-				matrnr = $7, academictitle = $8, title = $9, nameaffix = $10, affiliations = $11
-		RETURNING id, lastname, firstname, email, role, matrnr, language,
-			TO_CHAR (firstlogin AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI:SS') as firstlogin
+				first_name = $1, last_name = $2, salutation = $4, last_login = $5,
+				matr_nr = $7, academic_title = $8, title = $9, name_affix = $10, affiliations = $11
+		RETURNING id, last_name, first_name, email, role, matr_nr, language,
+			TO_CHAR (first_login AT TIME ZONE $12, 'YYYY-MM-DD HH24:MI:SS') as first_login
 	`
 
 	stmtLoginExtern = `
 		UPDATE users
-		SET lastlogin = $1
+		SET last_login = $1
 		WHERE email = $2
 			AND password = crypt($3, password)
-		RETURNING id, lastname, firstname, email, role, activationcode, language
+		RETURNING id, last_name, first_name, email, role, activation_code, language
 	`
 
 	stmtRegisterExtern = `
 		INSERT INTO users (
-			firstname, lastname, email, salutation, role, lastlogin,
-			firstlogin, password, activationcode, language
+			first_name, last_name, email, salutation, role, last_login,
+			first_login, password, activation_code, language
 		)
 		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')), $9)
 		RETURNING
 			/* data to send notification e-mail containing the activation */
-			id, lastname, firstname, email, role, language, salutation
+			id, last_name, first_name, email, role, language, salutation
 	`
 
 	stmtGetUser = `
 		SELECT
-			id, lastname, firstname, email, salutation, role, activationcode,
-			language, matrnr, academictitle, title, nameaffix, affiliations,
-			TO_CHAR (lastlogin AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as lastlogin,
-			TO_CHAR (firstlogin AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as firstlogin
+			id, last_name, first_name, email, salutation, role, activation_code,
+			language, matr_nr, academic_title, title, name_affix, affiliations,
+			TO_CHAR (last_login AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as last_login,
+			TO_CHAR (first_login AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as first_login
 		FROM users
 		WHERE id = $2
 	`
 
 	stmtSelectUser = `
-		SELECT id, email, firstname, lastname, salutation, title, academictitle, nameaffix
+		SELECT id, email, first_name, last_name, salutation, title, academic_title, name_affix
 		FROM users WHERE id = $1
 	`
 
@@ -563,7 +561,7 @@ const (
 		WHERE email = $2
 		RETURNING
 			/* data to send notification e-mail containing the new password */
-			id, lastname, firstname, email, language, salutation
+			id, last_name, first_name, email, language, salutation
 	`
 
 	stmtSelectCode = `
@@ -572,26 +570,26 @@ const (
 			FROM users
 			WHERE id = $2
 				AND (
-					activationcode = CRYPT($1, activationcode)
+					activation_code = CRYPT($1, activation_code)
 					OR
-					activationcode IS NULL
+					activation_code IS NULL
 				)
 		) AS success
 	`
 
 	stmtUpdateCode = `
 		UPDATE users
-		SET activationcode = NULL
+		SET activation_code = NULL
 		WHERE id = $1
 	`
 
 	stmtUpdateCodeReturningData = `
 		UPDATE users
-		SET activationcode = crypt($1, gen_salt('bf'))
+		SET activation_code = crypt($1, gen_salt('bf'))
 		WHERE id = $2
 		RETURNING
 			/* data to send notification e-mail containing the new code */
-			id, lastname, firstname, email, language, salutation
+			id, last_name, first_name, email, language, salutation
 	`
 
 	stmtUpdateLanguage = `
@@ -607,23 +605,23 @@ const (
 		WHERE id = $2
 		RETURNING
 			/* data to send notification e-mail about the new role */
-			id, firstname, lastname, role, language,
-			academictitle, email, nameaffix, salutation, title
+			id, first_name, last_name, role, language,
+			academic_title, email, name_affix, salutation, title
 	`
 
 	stmtAuthorizedToEditCourse = `
 		SELECT EXISTS (
 			SELECT true
-			FROM course
+			FROM courses
 			WHERE id = $2
 				AND creator = $1
 
 			UNION
 
 			SELECT true
-			FROM editor
-			WHERE userid = $1
-				AND courseid = $2
+			FROM editors
+			WHERE user_id = $1
+				AND course_id = $2
 
 		) AS authorized
 	`
@@ -631,18 +629,18 @@ const (
 	stmtAuthorizedToEditEvent = `
 		SELECT EXISTS (
 			SELECT true
-			FROM course c, event e
+			FROM courses c, events e
 			WHERE e.id = $2
 				AND c.creator = $1
-				AND c.id = e.courseid
+				AND c.id = e.course_id
 
 			UNION
 
 			SELECT true
-			FROM editor ed, event e
+			FROM editors ed, events e
 			WHERE e.id = $2
-				AND ed.userid = $1
-				AND e.courseid = ed.courseid
+				AND ed.user_id = $1
+				AND e.course_id = ed.course_id
 
 		) AS authorized
 	`
@@ -650,20 +648,20 @@ const (
 	stmtAuthorizedToEditMeeting = `
 		SELECT EXISTS (
 			SELECT true
-			FROM meeting m, event e, course c
+			FROM meetings m, events e, courses c
 			WHERE m.id = $2
 				AND c.creator = $1
-				AND e.id = m.eventid
-				AND e.courseid = c.id
+				AND e.id = m.event_id
+				AND e.course_id = c.id
 
 			UNION
 
 			SELECT true
-			FROM editor ed, meeting m, event e
+			FROM editors ed, meetings m, events e
 			WHERE m.id = $2
-				AND ed.userid = $1
-				AND m.eventid = e.id
-				AND e.courseid = ed.courseid
+				AND ed.user_id = $1
+				AND m.event_id = e.id
+				AND e.course_id = ed.course_id
 
 		) AS authorized
 	`
@@ -672,21 +670,19 @@ const (
 		SELECT
 			EXISTS (
 				SELECT true
-				FROM editor e
-				WHERE e.userid = $1
-			) AS iseditor,
+				FROM editors e
+				WHERE e.user_id = $1
+			) AS is_editor,
 			EXISTS (
 				SELECT true
-				FROM instructor i, course c
-				WHERE i.userid = $1
-					AND i.courseid = c.id
-					AND c.active
-			) AS isinstructor
+				FROM instructors i
+				WHERE i.user_id = $1
+			) AS is_instructor
 	`
 
 	stmtIsCreator = `
 		SELECT true AS authorized
-		FROM course
+		FROM courses
 		WHERE id = $2
 			AND creator = $1
 	`

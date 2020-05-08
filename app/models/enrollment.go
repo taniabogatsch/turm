@@ -26,11 +26,11 @@ func (status EnrollmentStatus) String() string {
 
 /*Enrolled is a model of the enrolled table. */
 type Enrolled struct {
-	UserID           int              `db:"userid, primarykey"`
-	EventID          int              `db:"eventid, primarykey"`
+	UserID           int              `db:"user_id, primarykey"`
+	EventID          int              `db:"event_id, primarykey"`
 	Status           EnrollmentStatus `db:"status"`
-	EMailTraffic     bool             `db:"emailtraffic"`
-	TimeOfEnrollment string           `db:"timeofenrollment"`
+	EMailTraffic     bool             `db:"email_traffic"`
+	TimeOfEnrollment string           `db:"time_of_enrollment"`
 }
 
 /*Validate Enrolled fields. */
@@ -40,8 +40,8 @@ func (enrolled *Enrolled) Validate(v *revel.Validation) {
 
 /*Unsubscribed is a model of the unsubscribed table. */
 type Unsubscribed struct {
-	UserID  int `db:"userid, primarykey"`
-	EventID int `db:"eventid, primarykey"`
+	UserID  int `db:"user_id, primarykey"`
+	EventID int `db:"event_id, primarykey"`
 }
 
 /*Validate Unsubscribed fields. */
