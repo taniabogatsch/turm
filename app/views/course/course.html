@@ -1,7 +1,17 @@
 <!-- course shows all course information -->
 
-<!-- general course information -->
 <table class="table table-borderless">
+
+  <!-- general course information -->
+  <tr class="preview-hide" id="general-data">
+    <td colspan="2">
+      <h5>
+        {{template "icons/infoSquare.html" .}}
+        &nbsp; {{msg $ "creator.general.data"}}
+      </h5>
+      <hr>
+    </td>
+  </tr>
 
   <!-- title -->
   <tr>
@@ -10,7 +20,7 @@
         {{.course.Title}}
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openChangeModal({{msg $ "course.title"}}, "title", {{.course.Title}},
-            true, {{url "EditCourse.ChangeText"}}, "text", "511",
+            true, "{{url "EditCourse.ChangeText"}}#general-data", "text", "511",
             {{msg $ "course.title.change.info"}}, {{.course.ID}});'>
           {{template "icons/pencil.html" . }}
         </a>
@@ -27,14 +37,14 @@
           <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
             onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
               {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
-              {{url "EditCourse.ChangeText"}}, "text", "511",
+              "{{url "EditCourse.ChangeText"}}#general-data", "text", "511",
               {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
             {{template "icons/pencil.html" . }}
           </a>
           <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
             onclick='confirmPOSTModal({{msg $ "course.subtitle.delete.title"}},
               {{msg $ "course.subtitle.delete.confirm" .course.Subtitle.String}},
-              {{url "EditCourse.ChangeText" .course.ID "subtitle" ""}});'>
+              "{{url "EditCourse.ChangeText" .course.ID "subtitle" ""}}#general-data");'>
             {{template "icons/trash.html" . }}
           </a>
         </h5>
@@ -46,7 +56,7 @@
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
             {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
-            {{url "EditCourse.ChangeText"}}, "text", "511",
+            "{{url "EditCourse.ChangeText"}}#general-data", "text", "511",
             {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
           {{msg $ "creator.add.subtitle"}}
         </button>
@@ -87,14 +97,14 @@
             |
             {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
             <a href="#no-scroll" class="badge btn-outline-darkblue"
-              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, {{url "EditCourse.ChangeViewMatrNr"}}, {{msg $ "course.see.matr.nr.info"}},
+              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "EditCourse.ChangeViewMatrNr"}}#general-data", {{msg $ "course.see.matr.nr.info"}},
                 {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "editor", {{$.course.ID}});'>
               {{template "icons/pencil.html" . }}
             </a>
             |
             <a href="#no-scroll" class="badge btn-outline-darkblue"
               onclick='confirmPOSTModal({{msg $ "course.editor.delete.title"}}, {{msg $ "course.editor.delete.confirm" .EMail}},
-                {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "editor"}});'>
+                "{{url "EditCourse.DeleteFromUserList" .CourseID .UserID "editor"}}#general-data");'>
               {{template "icons/trash.html" . }}
             </a>
           </div>
@@ -111,14 +121,14 @@
             |
             {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
             <a href="#no-scroll" class="badge btn-outline-darkblue"
-              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, {{url "EditCourse.ChangeViewMatrNr"}}, {{msg $ "course.see.matr.nr.info"}},
+              onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "EditCourse.ChangeViewMatrNr"}}#general-data", {{msg $ "course.see.matr.nr.info"}},
                 {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "instructor", {{$.course.ID}});'>
               {{template "icons/pencil.html" . }}
             </a>
             |
             <a href="#no-scroll" class="badge btn-outline-darkblue"
               onclick='confirmPOSTModal({{msg $ "course.instructor.delete.title"}}, {{msg $ "course.instructor.delete.confirm" .EMail}},
-                {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "instructor"}});'>
+                "{{url "EditCourse.DeleteFromUserList" .CourseID .UserID "instructor"}}#general-data");'>
               {{template "icons/trash.html" . }}
             </a>
           </div>
@@ -141,7 +151,7 @@
   </tr>
 
   <!-- registration period -->
-  <tr>
+  <tr id="course-registration-period">
     <td class="text-muted">
       {{msg $ "course.enrollment.period"}}:
     </td>
@@ -149,7 +159,7 @@
       {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
         onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollmentstart",
-          {{.course.EnrollmentStart}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          {{.course.EnrollmentStart}}, true, "{{url "EditCourse.ChangeTimestamp"}}#general-data",
           "timestamp", "", {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
@@ -157,7 +167,7 @@
       {{msg $ "course.to"}} {{.course.EnrollmentEnd}} {{msg $ "course.clock"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
         onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollmentend",
-          {{.course.EnrollmentEnd}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          {{.course.EnrollmentEnd}}, true, "{{url "EditCourse.ChangeTimestamp"}}#general-data",
           "timestamp", "", {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
@@ -175,14 +185,14 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribeend",
             {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
-            {{url "EditCourse.ChangeTimestamp"}}, "timestamp", "",
+            "{{url "EditCourse.ChangeTimestamp"}}#general-data", "timestamp", "",
             {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='confirmPOSTModal({{msg $ "course.unsubscribe.end.delete.title"}},
             {{msg $ "course.unsubscribe.end.delete.confirm" .course.UnsubscribeEnd.String}},
-            {{url "EditCourse.ChangeTimestamp" .course.ID "unsubscribeend" "" ""}});'>
+            "{{url "EditCourse.ChangeTimestamp" .course.ID "unsubscribeend" "" ""}}#general-data");'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -194,7 +204,7 @@
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribeend",
             {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
-            {{url "EditCourse.ChangeTimestamp"}}, "timestamp", "",
+            "{{url "EditCourse.ChangeTimestamp"}}#general-data", "timestamp", "",
             {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
           {{msg $ "creator.add.unsubscribe.end"}}
         </button>
@@ -213,14 +223,14 @@
          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
            onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
              {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
-             {{url "EditCourse.ChangeText"}}, "text", "",
+             "{{url "EditCourse.ChangeText"}}#general-data", "text", "",
              {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
            {{template "icons/pencil.html" . }}
          </a>
          <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
            onclick='confirmPOSTModal({{msg $ "course.fee.delete.title"}},
              {{msg $ "course.fee.delete.confirm" .course.Fee.Float64}},
-             {{url "EditCourse.ChangeText" .course.ID "fee" ""}});'>
+             "{{url "EditCourse.ChangeText" .course.ID "fee" ""}}#general-data");'>
            {{template "icons/trash.html" . }}
          </a>
        </td>
@@ -232,7 +242,7 @@
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
             {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
-            {{url "EditCourse.ChangeText"}}, "text", "",
+            "{{url "EditCourse.ChangeText"}}#general-data", "text", "",
             {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
           {{msg $ "creator.add.fee"}}
         </button>
@@ -254,13 +264,14 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openTextAreaModal({{msg $ "course.description"}},
             "description", {{.course.Description.Valid}},
-            {{url "EditCourse.ChangeText"}}, {{msg $ "course.description.change.info"}});'>
+            "{{url "EditCourse.ChangeText"}}#course-registration-period",
+            {{msg $ "course.description.change.info"}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='confirmPOSTModal({{msg $ "course.description.delete.title"}},
             {{msg $ "course.description.delete.confirm"}},
-            {{url "EditCourse.ChangeText" .course.ID  "description" ""}});'>
+            "{{url "EditCourse.ChangeText" .course.ID  "description" ""}}#course-registration-period");'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -276,7 +287,8 @@
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openTextAreaModal({{msg $ "course.description"}},
             "description", {{.course.Description.Valid}},
-            {{url "EditCourse.ChangeText"}}, {{msg $ "course.description.change.info"}});'>
+            "{{url "EditCourse.ChangeText"}}#course-registration-period",
+            {{msg $ "course.description.change.info"}});'>
           {{msg $ "creator.add.description"}}
         </button>
       </td>
@@ -296,14 +308,15 @@
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openTextAreaModal({{msg $ "course.speaker"}},
-            "speaker", {{.course.Speaker.Valid}}, {{url "EditCourse.ChangeText"}},
+            "speaker", {{.course.Speaker.Valid}},
+            "{{url "EditCourse.ChangeText"}}#course-registration-period",
             {{msg $ "course.speaker.change.info"}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='confirmPOSTModal({{msg $ "course.speaker.delete.title"}},
             {{msg $ "course.speaker.delete.confirm"}},
-            {{url "EditCourse.ChangeText" .course.ID  "speaker" ""}});'>
+            "{{url "EditCourse.ChangeText" .course.ID  "speaker" ""}}#course-registration-period");'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -318,7 +331,8 @@
       <td>
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openTextAreaModal({{msg $ "course.speaker"}},
-            "speaker", {{.course.Speaker.Valid}}, {{url "EditCourse.ChangeText"}},
+            "speaker", {{.course.Speaker.Valid}},
+            "{{url "EditCourse.ChangeText"}}#course-registration-period",
             {{msg $ "course.speaker.change.info"}});'>
           {{msg $ "creator.add.speaker"}}
         </button>
@@ -339,7 +353,7 @@
       {{end}}
       <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
         onclick='openBoolModal({{msg $ "course.only.ldap.change.title"}},
-          {{url "EditCourse.ChangeBool"}}, {{msg $ "course.only.ldap"}},
+          "{{url "EditCourse.ChangeBool"}}#course-registration-period", {{msg $ "course.only.ldap"}},
           {{msg $ "course.not.only.ldap"}}, {{.course.OnlyLDAP}}, "",
           "onlyldap", {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
@@ -348,7 +362,7 @@
   </tr>
   <tr class="preview-hide">
     <td></td>
-    <td> <!-- TODO -->
+    <td> <!-- TODO: restrictions -->
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openRestrictionModal();'>
         {{msg $ "creator.add.restriction"}}
@@ -356,12 +370,18 @@
     </td>
   </tr>
 
+  <tr class="preview-hide" id="events">
+    <td colspan="2">
+      <br>
+      <hr>
+      <br>
+    </td>
+  </tr>
+
   <!-- events -->
   <tr>
     <td colspan="2">
       <h5>
-        <br>
-        <br>
         {{template "icons/people.html" .}}
         &nbsp; {{msg $ "course.events"}}
       </h5>
@@ -376,7 +396,7 @@
     <td colspan="2">
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openChangeModal({{msg $ "creator.event.new"}}, "event",
-          {{msg $ "event.title"}}, false, "{{url "EditCourse.NewEvent"}}",
+          {{msg $ "event.title"}}, false, "{{url "EditCourse.NewEvent"}}#events",
           "text", "255", {{msg $ "creator.title.event.working.info"}},
           {{.course.ID}});'>
         {{msg $ "creator.add.event"}}
@@ -387,12 +407,18 @@
   <!-- event list -->
   {{template "course/events.html" dict_addLocale $.currentLocale "course" .course}}
 
-  <!-- more settings -->
   <tr class="preview-hide">
     <td colspan="2">
+      <br>
+      <hr>
+      <br>
+    </td>
+  </tr>
+
+  <!-- more settings -->
+  <tr class="preview-hide" id="more-settings">
+    <td colspan="2">
       <h5>
-        <br>
-        <br>
         {{template "icons/tools.html" .}}
         &nbsp; {{msg $ "creator.more.settings"}}
       </h5>
@@ -443,7 +469,7 @@
       {{end}}
       <a href="#no-scroll" class="badge btn-outline-darkblue"
         onclick='openBoolModal({{msg $ "course.visibility.change.title"}},
-          {{url "EditCourse.ChangeBool"}}, {{msg $ "course.visibility.public"}},
+          "{{url "EditCourse.ChangeBool"}}#more-settings", {{msg $ "course.visibility.public"}},
           {{msg $ "course.visibility.not.public"}}, {{.course.Visible}}, "",
           "visible", {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
@@ -460,7 +486,7 @@
       {{.course.ExpirationDate}} {{msg $ "course.clock"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
         onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expirationdate",
-          {{.course.ExpirationDate}}, true, {{url "EditCourse.ChangeTimestamp"}},
+          {{.course.ExpirationDate}}, true, "{{url "EditCourse.ChangeTimestamp"}}#more-settings",
           "timestamp", "", {{msg $ "course.expiration.date.change.info"}},
           {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
@@ -482,13 +508,13 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openTextAreaModal({{msg $ "course.custom.email"}},
             "customemail", {{.course.CustomEMail.Valid}},
-            {{url "EditCourse.ChangeText"}}, {{msg $ "course.custom.email.change.info"}});'>
+            "{{url "EditCourse.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='confirmPOSTModal({{msg $ "course.customemail.delete.title"}},
             {{msg $ "course.customemail.delete.confirm"}},
-            {{url "EditCourse.ChangeText" .course.ID  "customemail" ""}});'>
+            "{{url "EditCourse.ChangeText" .course.ID  "customemail" ""}}#more-settings");'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -504,7 +530,7 @@
         <button type="button" class="btn btn-outline-darkblue"
           onclick='openTextAreaModal({{msg $ "course.custom.email"}},
             "customemail", {{.course.CustomEMail.Valid}},
-            {{url "EditCourse.ChangeText"}}, {{msg $ "course.custom.email.change.info"}});'>
+            "{{url "EditCourse.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}});'>
           {{msg $ "creator.add.custom.email"}}
         </button>
       </td>
@@ -522,14 +548,14 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enrolllimitevents",
             {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
-            {{url "EditCourse.ChangeEnrollLimit"}}, "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
+            "{{url "EditCourse.ChangeEnrollLimit"}}#more-settings", "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
             {{.course.ID}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide"
           onclick='confirmPOSTModal({{msg $ "course.enroll.limit.events.delete.title"}},
             {{msg $ "course.enroll.limit.events.delete.confirm" .course.EnrollLimitEvents.Int32}},
-            {{url "EditCourse.ChangeEnrollLimit" .course.ID "enrolllimitevents" ""}});'>
+            "{{url "EditCourse.ChangeEnrollLimit" .course.ID "enrolllimitevents" ""}}#more-settings");'>
           {{template "icons/trash.html" . }}
         </a>
       </td>
@@ -541,7 +567,7 @@
         <button type="button" class="btn btn-outline-darkblue"
         onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enrolllimitevents",
           {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
-          {{url "EditCourse.ChangeEnrollLimit"}}, "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
+          "{{url "EditCourse.ChangeEnrollLimit"}}#more-settings", "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
           {{.course.ID}});'>
           {{msg $ "creator.add.enroll.limit"}}
         </button>
@@ -566,7 +592,7 @@
           |
           <a href="#no-scroll" class="badge btn-outline-darkblue"
             onclick='confirmPOSTModal({{msg $ "course.whitelist.delete.title"}}, {{msg $ "course.whitelist.delete.confirm" .EMail}},
-              {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "whitelist"}});'>
+              "{{url "EditCourse.DeleteFromUserList" .CourseID .UserID "whitelist"}}#more-settings");'>
             {{template "icons/trash.html" . }}
           </a>
         {{end}}
@@ -600,7 +626,7 @@
           |
           <a href="#no-scroll" class="badge btn-outline-darkblue"
             onclick='confirmPOSTModal({{msg $ "course.blacklist.delete.title"}}, {{msg $ "course.blacklist.delete.confirm" .EMail}},
-              {{url "EditCourse.DeleteFromUserList" .CourseID .UserID "blacklist"}});'>
+              "{{url "EditCourse.DeleteFromUserList" .CourseID .UserID "blacklist"}}#more-settings");'>
             {{template "icons/trash.html" . }}
           </a>
         {{end}}

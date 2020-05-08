@@ -19,39 +19,51 @@
       {{if eq .session.role "admin"}}
         {{if not .course.Active}}
           <!-- activate the course -->
-          <button type="button" class="btn btn-outline-darkblue float-right">
-            {{msg $ "creator.course.activate"}} <!-- TODO -->
+          <button type="button" class="btn btn-outline-darkblue float-right"
+            onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
+              {{msg $ "creator.course.activate.confirm" .course.Title}},
+              {{url "Creator.Activate" .course.ID}});'>
+            {{msg $ "creator.course.activate"}}
           </button>
         {{else}}
           <!-- expire the course -->
-          <button type="button" class="btn btn-outline-darkblue float-right">
-            {{msg $ "creator.course.expire"}} <!-- TODO -->
+          <button type="button" class="btn btn-outline-darkblue float-right"
+            onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
+              {{msg $ "creator.course.expire.confirm" .course.Title}},
+              {{url "Creator.Expire" .course.ID}});'>
+            {{msg $ "creator.course.expire"}}
           </button>
         {{end}}
       {{else}}
         {{if eq .course.CreatorID .session.userID}}
           {{if not .course.Active}}
             <!-- activate the course -->
-            <form class="float-right" action='{{url "Creator.Activate" .course.ID}}' method="POST">
-              <button type="submit" class="btn btn-outline-darkblue">
-                {{msg $ "creator.course.activate"}} <!-- TODO -->
-              </button>
-            </form>
+            <button type="button" class="btn btn-outline-darkblue float-right"
+              onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
+                {{msg $ "creator.course.activate.confirm" .course.Title}},
+                {{url "Creator.Activate" .course.ID}});'>
+              {{msg $ "creator.course.activate"}}
+            </button>
           {{else}}
             <!-- expire the course -->
-            <button type="button" class="btn btn-outline-darkblue float-right">
-              {{msg $ "creator.course.expire"}} <!-- TODO -->
+            <button type="button" class="btn btn-outline-darkblue float-right"
+              onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
+                {{msg $ "creator.course.expire.confirm" .course.Title}},
+                {{url "Creator.Expire" .course.ID}});'>
+              {{msg $ "creator.course.expire"}}
             </button>
           {{end}}
         {{end}}
       {{end}}
 
-      <!-- validate course -->
-      <form class="float-right margin-right-20" action='{{url "EditCourse.Validate" .course.ID}}' method="POST">
-        <button type="submit" class="btn btn-outline-darkblue">
-          {{msg $ "creator.course.validate"}}
-        </button>
-      </form>
+      {{if not .course.Active}}
+        <!-- validate course -->
+        <form class="float-right margin-right-20" action='{{url "EditCourse.Validate" .course.ID}}' method="POST">
+          <button type="submit" class="btn btn-outline-darkblue">
+            {{msg $ "creator.course.validate"}}
+          </button>
+        </form>
+      {{end}}
 
       <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-right margin-right-20" onclick="showPreview();">
         {{msg $ "creator.course.preview"}}
@@ -71,6 +83,32 @@
   </div>
 </div>
 
-{{template "manageCourses/templates/rightNav.html" . }}
+<div class="page page-side page-side-right page-padding-left">
+  <div class="position-fixed border-left page-padding-left-small page-side-right page-add-scroll">
+    {{template "toast.html" .}}
+    {{template "editCourse/catalog.html"  dict_addLocale $.currentLocale "active" .course.Active "expired" .course.Expired}}
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //adjust the nav pills
+    {{if not .course.Active}}
+      $('#pills-opened-draft').removeClass("display-none");
+      $('#pills-opened-active').addClass("display-none");
+      $('#pills-opened-expired').addClass("display-none");
+    {{else}}
+      {{if not .course.Expired}}
+        $('#pills-opened-draft').addClass("display-none");
+        $('#pills-opened-active').removeClass("display-none");
+        $('#pills-opened-expired').addClass("display-none");
+      {{else}}
+        $('#pills-opened-draft').addClass("display-none");
+        $('#pills-opened-active').addClass("display-none");
+        $('#pills-opened-expired').removeClass("display-none");
+      {{end}}
+    {{end}}
+  });
+</script>
 
 {{template "footer.html" .}}

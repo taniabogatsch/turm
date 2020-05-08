@@ -1,4 +1,4 @@
-<!-- template containing an overview over all users with elevated roles -->
+<!-- template containing all activated -->
 
 {{template "header.html" .}}
 
@@ -19,11 +19,16 @@
   </div>
 </div>
 
-{{template "manageCourses/templates/rightNav.html" . }}
+<div class="page page-side page-side-right page-padding-left">
+  <div class="position-fixed border-left page-padding-left-small page-side-right page-add-scroll">
+    {{template "toast.html" .}}
+    {{template "manageCourses/legends/active.html"  dict_addLocale $.currentLocale}}
+  </div>
+</div>
 
 <script>
   function getActiveCourses() {
-    $.get('{{url "ManageCourses.GetActiveCourses"}}', {
+    $.get('{{url "ManageCourses.GetActive"}}', {
     }, function(data) {
       $('#get-active-courses').html(data);
     })

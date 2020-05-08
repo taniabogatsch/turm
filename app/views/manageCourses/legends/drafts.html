@@ -1,5 +1,5 @@
 <h4>
-  <br>
+  {{msg $ "creator.catalog"}}
 </h4>
 <hr>
 
@@ -8,31 +8,23 @@
   {{msg $ "creator.info.drafts"}}
   <hr>
 
-  <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
-    {{template "icons/pencil.html" . }}
-  </a>
+  {{template "icons/pencil.html" . }} &nbsp;
   {{msg $ "creator.info.draft.edit"}}
   {{msg $ "creator.info.activate"}}
   <hr>
 
-  <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
-    {{template "icons/download.html" . }}
-  </a>
+  {{template "icons/download.html" . }} &nbsp;
   {{msg $ "creator.info.draft.download"}}
   <hr>
 
   <div class="display-none admin creator">
-    <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
-      {{template "icons/files.html" . }}
-    </a>
+    {{template "icons/files.html" . }} &nbsp;
     {{msg $ "creator.info.draft.duplicate"}}
     <hr>
   </div>
 
   <div class="display-none admin creator">
-    <a class="btn btn-outline-darkblue float-left margin-right-20" href='#' role="button">
-      {{template "icons/trash.html" . }}
-    </a>
+    {{template "icons/trash.html" . }} &nbsp;
     {{msg $ "creator.info.draft.delete"}}
   </div>
 </small>

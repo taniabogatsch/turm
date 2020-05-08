@@ -107,6 +107,26 @@ func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err
 	return
 }
 
+/*Insert all events of a course struct. */
+func (events *Events) Insert(tx *sqlx.Tx, courseID *int) (err error) {
+
+	for _, event := range *events {
+		err = tx.Get(&event, stmtInsertEvent, event.Annotation, event.Capacity, *courseID,
+			event.EnrollmentKey, event.HasWaitlist, event.Title)
+		if err != nil {
+			modelsLog.Error("failed to insert event of course", "course ID", *courseID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		if err = event.Meetings.Insert(tx, &event.ID); err != nil {
+			return
+		}
+	}
+	return
+}
+
 const (
 	stmtSelectEvents = `
 		SELECT
@@ -154,5 +174,12 @@ const (
 		SELECT id
 		FROM event
 		WHERE courseid = $1
+	`
+
+	stmtInsertEvent = `
+		INSERT INTO event
+			(annotation, capacity, courseid, enrollmentkey, haswaitlist, title)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id
 	`
 )

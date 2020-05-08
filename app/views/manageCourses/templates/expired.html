@@ -1,0 +1,43 @@
+<!-- renders all admin/creator privilege expired courses -->
+
+{{range .entries}}
+  <li class="list-group-item">
+
+    <!-- delete -->
+    <button type="button" class="btn btn-outline-darkblue float-right"
+      onclick='confirmPOSTModal({{msg $ "creator.course.delete.title"}},
+        {{msg $ "creator.course.delete.confirm" .Title}},
+        {{url "Creator.Delete" .ID}});'>
+      {{template "icons/trash.html" . }}
+    </button>
+
+    <!-- TODO: participants -->
+    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll" role="button">
+      {{template "icons/people.html" . }}
+    </a>
+
+    <!-- download -->
+    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll"
+      onclick='openDownloadModal({{.ID}});' role="button">
+      {{template "icons/download.html" . }}
+    </a>
+
+    <!-- TODO: go to -->
+    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll" role="button">
+      {{template "icons/eye.html" . }}
+    </a>
+
+    <a class="text-body" href='#'> <!-- TODO: go to -->
+      {{.Title}}
+    </a>
+
+    <small class="form-text text-muted">
+      {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+    </small>
+  </li>
+
+{{else}} <!-- not yet editor of any expired courses -->
+  <small class="form-text text-muted">
+    {{msg $ "creator.expired.none"}}
+  </small>
+{{end}}

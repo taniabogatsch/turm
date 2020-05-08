@@ -53,6 +53,8 @@ func general(c *revel.Controller) revel.Result {
 //authAdmin prevents unauthorized access to controllers of type Admin.
 func (c Admin) authAdmin() revel.Result {
 
+	c.Log.Debug("executing auth admin interceptor")
+
 	//authorizes all ADMINs with activated accounts
 	if c.Session["role"] != nil && c.Session["notActivated"] == nil {
 		if c.Session["role"].(string) == models.ADMIN.String() {
@@ -67,6 +69,8 @@ func (c Admin) authAdmin() revel.Result {
 //authApp prevents unauthorized access to controllers of type App.
 func (c App) authApp() revel.Result {
 
+	c.Log.Debug("executing auth app interceptor")
+
 	if c.Session["notActivated"] != nil {
 		if c.MethodName != "ChangeLanguage" {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
@@ -80,6 +84,8 @@ func (c App) authApp() revel.Result {
 //authManageCourses prevents unauthorized access to controllers of type ManageCourses.
 func (c ManageCourses) authManageCourses() revel.Result {
 
+	c.Log.Debug("executing auth manage courses interceptor")
+
 	if c.Session["role"] != nil && c.Session["notActivated"] == nil &&
 		c.Session["userID"] != nil && c.Session["isEditor"] != nil &&
 		c.Session["isInstructor"] != nil { //prevent nil references
@@ -91,16 +97,14 @@ func (c ManageCourses) authManageCourses() revel.Result {
 		}
 
 		//editors and instructors are not authorized to create new courses
-		if c.MethodName != "NewCourseModal" && c.MethodName != "NewCourse" {
-			if c.Session["isEditor"].(string) == "true" {
-				return nil
-			}
+		if c.Session["isEditor"].(string) == "true" {
+			return nil
+		}
 
-			//instructors are only allowed to see active and inactive courses
-			if c.Session["isInstructor"].(string) == "true" && (c.MethodName == "ActiveCourses" ||
-				c.MethodName == "GetActiveCourses") {
-				return nil
-			}
+		//instructors are only allowed to see active and inactive courses
+		if c.Session["isInstructor"].(string) == "true" && (c.MethodName == "Active" ||
+			c.MethodName == "GetActive" || c.MethodName == "Expired" || c.MethodName == "GetExpired") {
+			return nil
 		}
 	}
 
@@ -110,6 +114,16 @@ func (c ManageCourses) authManageCourses() revel.Result {
 
 //authCreator prevents unauthorized access to controllers of type Creator.
 func (c Creator) authCreator() revel.Result {
+
+	c.Log.Debug("executing auth creator interceptor")
+
+	//admins and creators are authorized to create new courses
+	if c.MethodName == "New" && c.Session["role"] != nil {
+		if c.Session["role"] == models.ADMIN.String() ||
+			c.Session["role"] == models.CREATOR.String() {
+			return nil
+		}
+	}
 
 	if authorized, err := evalEditAuth(c.Controller, "onlyCreator"); err == nil && authorized {
 		return nil
@@ -130,6 +144,8 @@ func (c Creator) authCreator() revel.Result {
 //authEditCourse prevents unauthorized access to controllers of type EditCourse.
 func (c EditCourse) authEditCourse() revel.Result {
 
+	c.Log.Debug("executing auth edit course interceptor")
+
 	if authorized, err := evalEditAuth(c.Controller, "course"); err == nil && authorized {
 		return nil
 	} else if err != nil {
@@ -148,6 +164,8 @@ func (c EditCourse) authEditCourse() revel.Result {
 
 //authEditEvent prevents unauthorized access to controllers of type EditEvent.
 func (c EditEvent) authEditEvent() revel.Result {
+
+	c.Log.Debug("executing auth edit event interceptor")
 
 	if authorized, err := evalEditAuth(c.Controller, "event"); err == nil && authorized {
 		return nil
@@ -168,6 +186,8 @@ func (c EditEvent) authEditEvent() revel.Result {
 //authEditMeeting prevents unauthorized access to controllers of type EditMeeting.
 func (c EditMeeting) authEditMeeting() revel.Result {
 
+	c.Log.Debug("executing auth edit meeting interceptor")
+
 	if authorized, err := evalEditAuth(c.Controller, "meeting"); err == nil && authorized {
 		return nil
 	} else if err != nil {
@@ -186,6 +206,8 @@ func (c EditMeeting) authEditMeeting() revel.Result {
 
 //authUser prevents unauthorized access to controllers of type User.
 func (c User) authUser() revel.Result {
+
+	c.Log.Debug("executing auth user interceptor")
 
 	//all
 	if c.MethodName == "Logout" || c.MethodName == "NewPassword" ||

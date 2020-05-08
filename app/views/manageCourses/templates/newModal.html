@@ -1,0 +1,157 @@
+<!-- template rendering the new course modal -->
+
+<!-- new course modal -->
+<div class="modal fade" id="new-course-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <!-- content is loaded into this div -->
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header background-color-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "creator.course.new"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="new-course-form" enctype="multipart/form-data" action='{{url "Creator.New"}}' method="POST" class="needs-validation" novalidate>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- title -->
+          <small class="form-text text-muted">
+            {{msg $ "creator.title.working.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input type="text" class="form-control rounded-right" name="param.Title" placeholder='{{msg $ "course.title"}}' required minlength="3" maxlength="511">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+
+          <!-- load option -->
+          <small class="form-text text-muted">
+            {{msg $ "creator.drafts.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text border-right-0"> {{msg $ "creator.draft"}} </label>
+            </div>
+            <select name="param.Option" class="custom-select rounded-right" id="select-option">
+              <option value="0" selected> {{msg $ "creator.course.blank"}}</option>
+              <option value="1"> {{msg $ "creator.course.draft"}} </option>
+              <option value="2"> {{msg $ "creator.course.upload"}} </option>
+            </select>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.option"}}
+            </div>
+          </div>
+
+          <div id="file-upload-section" class="display-none">
+            <small class="form-text text-muted">
+              {{msg $ "creator.upload.info"}}
+            </small>
+            <div class="input-group mb-3">
+              <div class="custom-file">
+                <input id="custom-file-upload" type="file" accept="application/json" data-max-size="512000" name="file" class="custom-file-input" onchange="uploadFeedback();">
+                <label class="custom-file-label">
+                  {{msg $ "creator.upload.file"}}
+                </label>
+              </div>
+            </div>
+            <div class="color-success display-none" id="file-upload-success">
+            </div>
+          </div>
+
+          <div id="search-draft-section" class="display-none">
+            <small class="form-text text-muted">
+              {{msg $ "creator.course.draft.info"}}
+            </small>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text border-right-0">
+                  {{template "icons/search.html" . }}
+                </span>
+              </div>
+              <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}' maxlength="127" minlength="3">
+              <div class="invalid-feedback">
+                {{msg $ "validation.invalid.searchValue"}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.load"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const uploadMsg = '{{msg $ "creator.uploaded.file"}}';
+
+  function uploadFeedback() {
+    const filepath = $('#custom-file-upload').val();
+    let path = filepath.split("/");
+    if (filepath.includes("\\")) {
+      path = filepath.split("\\");
+    }
+    $('#file-upload-success').removeClass("display-none");
+    $('#file-upload-success').html(uploadMsg + " " + path[path.length - 1]);
+  }
+
+  $(function() {
+    //add submit listener to the new modal form
+    const form = document.getElementById('new-course-form');
+    form.addEventListener('submit', function(event) {
+      if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+
+    //add listener for selected option
+    $("#select-option").change(function() {
+      showChosenOption();
+    });
+
+    //set the correct option after reload
+    showChosenOption();
+  });
+
+  function showChosenOption() {
+    let option = $('#select-option').children("option:selected").val();
+    //show additional content depending on the chosen option
+    if (option == 1) {
+      $('#file-upload-section').addClass("display-none");
+      $('#search-draft-section').removeClass("display-none");
+      $("#custom-file-upload").prop('required', false);
+    } else if (option == 2) {
+      $('#file-upload-section').removeClass("display-none");
+      $('#search-draft-section').addClass("display-none");
+      $("#custom-file-upload").prop('required', true);
+    } else {
+      $('#file-upload-section').addClass("display-none");
+      $('#search-draft-section').addClass("display-none");
+      $("#custom-file-upload").prop('required', false);
+    }
+  }
+</script>

@@ -11,7 +11,7 @@ function openChangeModal(title, field, value, valid, action, modal, max, info, I
   $('#change-' + modal + '-modal-ID').val(ID);
   $('#change-' + modal + '-modal-title').html(title);
   $('#change-' + modal + '-modal-field').val(field);
-  $('#change-' + modal + '-modal-form').attr("action", action);
+  $('#change-' + modal + '-modal-form').attr('action', action);
   $('#change-' + modal + '-modal-info').html(info);
 
   //set the value

@@ -77,3 +77,5 @@ validation.invalid.option = Bitte geben Sie eine gültige Option an.
 validation.invalid.params = Bitte geben Sie gültige Parameter an.
 
 validation.invalid.delete.course = Nur inaktive oder abgelaufene Kurse können gelöscht werden.
+validation.invalid.file = Ungültige Datei.
+validation.invalid.json = Bitte laden Sie eine Datei im JSON-Format hoch.

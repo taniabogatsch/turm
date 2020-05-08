@@ -1,4 +1,4 @@
-<!-- template containing the new course creation -->
+<!-- template containing all expired courses -->
 
 {{template "header.html" .}}
 
@@ -8,12 +8,12 @@
   <div class="tab-content">
 
     <h4>
-      {{template "icons/paperclip.html" . }}
-      &nbsp; {{msg $ "creator.drafts"}}
+      {{template "icons/archive.html" . }}
+      &nbsp; {{msg $ "creator.courses.expired"}}
     </h4>
     <hr>
 
-    <div id="get-drafts">
+    <div id="get-expired-courses">
     </div>
 
   </div>
@@ -22,22 +22,22 @@
 <div class="page page-side page-side-right page-padding-left">
   <div class="position-fixed border-left page-padding-left-small page-side-right page-add-scroll">
     {{template "toast.html" .}}
-    {{template "manageCourses/legends/drafts.html"  dict_addLocale $.currentLocale}}
+    {{template "manageCourses/legends/expired.html"  dict_addLocale $.currentLocale}}
   </div>
 </div>
 
 <script>
-  function getDrafts() {
-    $.get('{{url "ManageCourses.GetDrafts"}}', {
+  function getExpiredCourses() {
+    $.get('{{url "ManageCourses.GetExpired"}}', {
     }, function(data) {
-      $('#get-drafts').html(data);
+      $('#get-expired-courses').html(data);
     })
   }
 
   $(function() {
     //adjust the nav pills
-    $('#v-pills-drafts-tab').addClass("active");
-    getDrafts();
+    $('#v-pills-expired-tab').addClass("active");
+    getExpiredCourses();
   });
 </script>
 

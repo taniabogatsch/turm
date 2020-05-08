@@ -153,7 +153,7 @@ func (groups *Groups) Get(prefix *string) (err error) {
 		(*groups)[key].IDPrefix = *prefix
 		(*groups)[key].InheritsLimits = (*groups)[key].CourseLimit.Valid
 
-		(*groups)[key].ChildHasLimits, err = getChildren(tx, &(*groups)[key])
+		(*groups)[key].ChildHasLimits, err = (&(*groups)[key]).getChildren(tx)
 		if err != nil {
 			tx.Rollback()
 			return
@@ -192,7 +192,7 @@ func (groups *Groups) GetByUser(userID *int, tx *sqlx.Tx) (err error) {
 }
 
 //getChildren recursively returns all children of the current group.
-func getChildren(tx *sqlx.Tx, group *Group) (hasLimits bool, err error) {
+func (group *Group) getChildren(tx *sqlx.Tx) (hasLimits bool, err error) {
 
 	err = tx.Select(&group.Groups, stmtGetChildren, group.ID)
 	if err != nil {
@@ -218,7 +218,7 @@ func getChildren(tx *sqlx.Tx, group *Group) (hasLimits bool, err error) {
 		//only get the children if the entry is a group
 		if group.Groups[key].ID != 0 {
 
-			hasLimitsTemp, err := getChildren(tx, &group.Groups[key])
+			hasLimitsTemp, err := (&group.Groups[key]).getChildren(tx)
 			if err != nil {
 				return false, err
 			}
@@ -386,7 +386,6 @@ const (
 		) AS noActiveChildren
 	`
 
-	//TODO: do not show expired courses
 	stmtGetChildren = `
 		/* get all groups */
 		(
@@ -412,7 +411,7 @@ const (
 			FROM course co
 			WHERE co.parentid = $1
 				AND co.active
-				/* TODO: and not expired */
+				AND (current_timestamp < co.expirationdate)
 			ORDER BY name ASC
 		)
 	`

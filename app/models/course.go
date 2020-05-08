@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"math"
 	"regexp"
 	"strconv"
@@ -46,6 +47,7 @@ type Course struct {
 	Path Groups ``
 	//used for correct template rendering
 	CreatorID string
+	Expired   bool
 }
 
 /*Validate all Course fields. */
@@ -253,6 +255,70 @@ func (course *Course) Duplicate() (err error) {
 	return
 }
 
+/*Load a course from a JSON file. The JSON can have the struct of the old Turm2. */
+func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err error) {
+
+	if !oldStruct {
+		//unmarshal into the course struct
+		err = json.Unmarshal(*data, &course)
+		if err != nil {
+			modelsLog.Error("failed to unmarshal into new struct", "data",
+				*data, "error", err.Error())
+			return
+		}
+
+	} else {
+		//unmarshal the struct into the old layout
+		//then transfer the data to the new course struct
+		//TODO
+	}
+
+	return
+}
+
+/*Insert a new course from a provided course struct. */
+func (course *Course) Insert(creatorID *int, title *string) (err error) {
+
+	now := time.Now().Format(revel.TimeFormats[0])
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		modelsLog.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(course, stmtInsertCourse, now, *creatorID, course.CustomEMail, course.Description,
+		course.EnrollLimitEvents, course.EnrollmentEnd, course.EnrollmentStart, course.ExpirationDate,
+		course.Fee, course.OnlyLDAP, course.Speaker, course.Subtitle, title, course.UnsubscribeEnd, course.Visible)
+	if err != nil {
+		modelsLog.Error("failed to insert general course data", "creator ID", *creatorID,
+			"title", *title, "now", now, "course", *course, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if err = course.Events.Insert(tx, &course.ID); err != nil {
+		return
+	}
+	if err = course.Editors.Insert(tx, &course.ID, "editor"); err != nil {
+		return
+	}
+	if err = course.Instructors.Insert(tx, &course.ID, "instructor"); err != nil {
+		return
+	}
+	if err = course.Blacklist.Insert(tx, &course.ID, "blacklist"); err != nil {
+		return
+	}
+	if err = course.Whitelist.Insert(tx, &course.ID, "whitelist"); err != nil {
+		return
+	}
+
+	//TODO: insert restrictions
+
+	tx.Commit()
+	return
+}
+
 //FeePattern is the regular expression of accepted course fees
 var FeePattern = regexp.MustCompile("^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?")
 
@@ -261,11 +327,12 @@ const (
 		SELECT
 			id, title, creator, subtitle, visible, active, onlyldap, parentid,
 			description, fee, customemail, enrolllimitevents, speaker,
-			TO_CHAR (creationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as creationdate,
-			TO_CHAR (enrollmentstart AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as enrollmentstart,
-			TO_CHAR (enrollmentend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as enrollmentend,
-			TO_CHAR (unsubscribeend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as unsubscribeend,
-			TO_CHAR (expirationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as expirationdate
+			TO_CHAR (creationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS creationdate,
+			TO_CHAR (enrollmentstart AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollmentstart,
+			TO_CHAR (enrollmentend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollmentend,
+			TO_CHAR (unsubscribeend AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribeend,
+			TO_CHAR (expirationdate AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expirationdate,
+			(current_timestamp >= expirationdate) AS expired
 		FROM course
 		WHERE id = $1
 	`
@@ -310,6 +377,15 @@ const (
 			FROM course
 			WHERE id = $1
 		)
+		RETURNING id, title
+	`
+
+	stmtInsertCourse = `
+		INSERT INTO course
+			(active, creationdate, creator, customemail, description, enrolllimitevents, enrollmentend, enrollmentstart,
+			expirationdate, fee, onlyldap, speaker, subtitle, title, unsubscribeend, visible)
+		VALUES
+			(false, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 		RETURNING id, title
 	`
 )

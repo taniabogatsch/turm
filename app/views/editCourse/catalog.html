@@ -1,0 +1,49 @@
+<h4>
+  {{msg $ "creator.catalog"}}
+</h4>
+<hr>
+
+<nav class="nav flex-column">
+  <a class="nav-link" href="#general-data">
+    {{template "icons/infoSquare.html" .}}
+    &nbsp; {{msg $ "creator.general.data"}}
+  </a>
+  <a class="nav-link" href="#events">
+    {{template "icons/people.html" .}}
+    &nbsp; {{msg $ "course.events"}}
+  </a>
+  <a class="nav-link" href="#more-settings">
+    {{template "icons/tools.html" .}}
+    &nbsp; {{msg $ "creator.more.settings"}}
+  </a>
+</nav>
+
+<hr>
+
+<small class="form-text text-muted">
+
+  <strong> {{msg $ "creator.course.preview"}} / {{msg $ "creator.course.edit"}}: </strong>
+  {{msg $ "creator.info.preview"}}
+
+  {{if not .active}}
+
+    <!-- validate -->
+    <hr>
+    <strong> {{msg $ "creator.course.validate"}}: </strong>
+    {{msg $ "creator.info.validate"}}
+
+    <!-- activate -->
+    <hr>
+    <strong> {{msg $ "creator.course.activate"}}: </strong>
+    {{msg $ "creator.info.activate"}}
+
+  {{else}}
+    <!-- expire -->
+    {{if not .expired}}
+      <hr>
+      <strong> {{msg $ "creator.course.expire"}}: </strong>
+      {{msg $ "creator.info.expire"}}
+    {{end}}
+  {{end}}
+
+</small>

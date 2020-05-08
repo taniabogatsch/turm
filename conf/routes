@@ -5,6 +5,7 @@
 module:testrunner
 module:jobs
 
+
 # ---------------------------------------------------------------------------- #
 # App
 # ---------------------------------------------------------------------------- #
@@ -12,6 +13,7 @@ module:jobs
 GET     /                                           App.Index
 GET     /app/changeLanguage                         App.ChangeLanguage
 GET     /app/groups                                 App.Groups
+
 
 # ---------------------------------------------------------------------------- #
 # User
@@ -34,18 +36,20 @@ GET     /user/newActivationCode                     User.NewActivationCode
 GET     /user/prefLanguagePage                      User.PrefLanguagePage
 POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
+
 # ---------------------------------------------------------------------------- #
-# Manage Course
+# Manage Courses
 # ---------------------------------------------------------------------------- #
 
-GET     /manageCourses/activeCourses                ManageCourses.ActiveCourses
-GET     /manageCourses/getActiveCourses             ManageCourses.GetActiveCourses
+GET     /manageCourses/active                       ManageCourses.Active
+GET     /manageCourses/getActive                    ManageCourses.GetActive
 
 GET     /manageCourses/drafts                       ManageCourses.Drafts
 GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
 
-POST    /manageCourses/newCourse                    ManageCourses.NewCourse
-GET     /manageCourses/newCourseModal               ManageCourses.NewCourseModal
+GET     /manageCourses/expired                      ManageCourses.Expired
+GET     /manageCourses/getExpired                   ManageCourses.GetExpired
+
 
 # ---------------------------------------------------------------------------- #
 # Creator
@@ -54,6 +58,9 @@ GET     /manageCourses/newCourseModal               ManageCourses.NewCourseModal
 POST    /creator/activate                           Creator.Activate
 POST    /creator/delete                             Creator.Delete
 POST    /creator/duplicate                          Creator.Duplicate
+POST    /creator/expire                             Creator.Expire
+POST    /creator/new                                Creator.New
+
 
 # ---------------------------------------------------------------------------- #
 # Edit course (course, event, meeting)
@@ -99,6 +106,7 @@ POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
 POST    /edit/meeting/change                        EditMeeting.Edit
 POST    /edit/meeting/delete                        EditMeeting.Delete
 
+
 # ---------------------------------------------------------------------------- #
 # Admin
 # ---------------------------------------------------------------------------- #
@@ -114,6 +122,7 @@ POST    /admin/deleteGroup                          Admin.DeleteGroup
 GET     /admin/searchUser                           Admin.SearchUser
 GET     /admin/userDetails                          Admin.UserDetails
 POST    /admin/changeRole                           Admin.ChangeRole
+
 
 # ---------------------------------------------------------------------------- #
 # Else

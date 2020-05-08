@@ -95,7 +95,7 @@
   <!-- delete meeting -->
   <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left"
     onclick='confirmPOSTModal({{msg $ "meeting.delete.title"}}, {{msg $ "meeting.delete.confirm"}},
-      {{url "EditMeeting.Delete" .ID}});'>
+      "{{url "EditMeeting.Delete" .ID}}#events");'>
     {{template "icons/trash.html" . }}
   </a>
 {{end}}

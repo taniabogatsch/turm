@@ -1,0 +1,30 @@
+<h4>
+  {{msg $ "creator.catalog"}}
+</h4>
+<hr>
+
+<p> {{msg $ "creator.courses.active"}} </p>
+<small class="form-text text-muted">
+  {{msg $ "creator.info.active"}}
+  <hr>
+
+  {{template "icons/eye.html" . }} &nbsp;
+  {{msg $ "creator.info.active.goto"}}
+  <hr>
+
+  <div class="display-none admin creator editor">
+    {{template "icons/pencil.html" . }} &nbsp;
+    {{msg $ "creator.info.active.edit"}}
+    <hr>
+  </div>
+
+  <div class="display-none admin creator editor">
+    {{template "icons/download.html" . }} &nbsp;
+    {{msg $ "creator.info.active.download"}}
+    <hr>
+  </div>
+
+  {{template "icons/people.html" . }} &nbsp;
+  {{msg $ "creator.info.active.user"}}
+
+</small>

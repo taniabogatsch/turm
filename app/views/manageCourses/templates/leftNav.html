@@ -1,60 +1,60 @@
 <!-- navigate to the different pages for course management -->
 
-<div class="page page-side page-side-left">
-  <h4>
-    {{msg $ "creator.page"}}
-  </h4>
-  <hr>
-  <div class="login-width">
+<div class="page page-side page-side-left page-padding-right">
+  <div class="position-fixed border-right page-padding-right-small">
+    <h4>
+      {{msg $ "creator.page"}}
+    </h4>
+    <hr>
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 
-      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator" id="v-pills-new-tab" href='#' onclick="showNewCourseModal();" role="tab">
+      <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator" id="v-pills-new-tab" href='#' onclick="$('#new-course-modal').modal('show');" role="tab">
         {{template "icons/folderPlus.html" . }}
         &nbsp; {{msg $ "creator.course.new"}}
       </a>
 
       <a class="dropdown-divider display-none admin creator"></a>
 
+      <!-- drafts -->
       <a class="nav-link btn-outline-darkblue margin-5 display-none admin creator editor" id="v-pills-drafts-tab" href='{{url "ManageCourses.Drafts"}}' role="tab">
         {{template "icons/paperclip.html" . }}
         &nbsp; {{msg $ "creator.drafts"}}
       </a>
+      <a class="nav-link disabled display-none" href="#" tabindex="-1" id="pills-opened-draft">
+        {{template "icons/arrowReturnRight.html" .}} &nbsp;
+        {{msg $ "creator.course.draft.is.open"}}
+      </a>
 
       <a class="dropdown-divider display-none admin creator editor"></a>
 
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-active-tab" href='{{url "ManageCourses.ActiveCourses"}}' role="tab">
+      <!-- active courses -->
+      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-active-tab" href='{{url "ManageCourses.Active"}}' role="tab">
         {{template "icons/layoutTextSidebarReversed.html" . }}
         &nbsp; {{msg $ "creator.courses.active"}}
       </a>
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-inactive-tab" href='#' role="tab">
+      <a class="nav-link disabled display-none" href="#" tabindex="-1" id="pills-opened-active">
+        {{template "icons/arrowReturnRight.html" .}} &nbsp;
+        {{msg $ "creator.course.is.open"}}
+      </a>
+
+      <!-- expired courses -->
+      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-expired-tab" href='{{url "ManageCourses.Expired"}}' role="tab">
         {{template "icons/archive.html" . }}
         &nbsp; {{msg $ "creator.courses.expired"}}
+      </a>
+      <a class="nav-link disabled display-none" href="#" tabindex="-1" id="pills-opened-expired">
+        {{template "icons/arrowReturnRight.html" .}} &nbsp;
+        {{msg $ "creator.course.is.open"}}
       </a>
 
     </div>
   </div>
 </div>
 
-<!-- new course modal -->
-<div class="modal fade" id="new-course-modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <!-- content is loaded into this div -->
-    <div class="modal-content" id="new-course-modal-content">
-    </div>
-  </div>
-</div>
-
-{{template "manageCourses/templates/downloadCourseModal.html" dict_addLocale $.currentLocale}}
+{{template "manageCourses/templates/newModal.html" dict_addLocale $.currentLocale}}
+{{template "manageCourses/templates/downloadModal.html" dict_addLocale $.currentLocale}}
 
 <script>
-  function showNewCourseModal() {
-    $.get("{{url "ManageCourses.NewCourseModal"}}", {
-    }, function(data) {
-      $('#new-course-modal-content').html(data);
-    });
-    $('#new-course-modal').modal('show');
-  }
-
   $(function() {
     //detect validation error
     if ({{if .errors}}true{{else}}false{{end}}) {

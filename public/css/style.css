@@ -89,6 +89,9 @@
   .margin-left-20 {
     margin-left: 20px;
   }
+  .position-fixed {
+    position: fixed;
+  }
 }
 .float-right {
   float: right;
@@ -132,6 +135,9 @@
 }
 .menu {
   background-color: #292961;
+  position: fixed;
+  z-index: 500;
+  width: 100%;
 }
 .menu-icon {
   height: 40px;
@@ -164,6 +170,19 @@
 @media only screen and (min-width: 768px) {
   .page-padding-left {
     padding-left: 12rem;
+  }
+  .page-padding-left-small {
+    padding-left: 2rem;
+  }
+  .page-padding-right {
+    padding-right: 12rem;
+  }
+  .page-padding-right-small {
+    padding-right: 2rem;
+  }
+  .page-add-scroll {
+    overflow-y: scroll;
+    height: 75%;
   }
 }
 @media only screen and (max-width:767px) {

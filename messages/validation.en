@@ -77,3 +77,5 @@ validation.invalid.option = Please provide a valid option.
 validation.invalid.params = Please provide valid parameters.
 
 validation.invalid.delete.course = Only inactive or expired courses can be deleted.
+validation.invalid.file = Invalid file.
+validation.invalid.json = Please provide a file with JSON formatting.

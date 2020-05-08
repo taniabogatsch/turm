@@ -159,6 +159,22 @@ func (meetings *Meetings) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (e
 	return
 }
 
+/*Insert all meetings of an event. */
+func (meetings *Meetings) Insert(tx *sqlx.Tx, eventID *int) (err error) {
+
+	for _, meeting := range *meetings {
+		_, err = tx.Exec(stmtInsertMeeting, meeting.Annotation, *eventID, meeting.MeetingEnd,
+			meeting.MeetingInterval, meeting.MeetingStart, meeting.Place, meeting.WeekDay)
+		if err != nil {
+			modelsLog.Error("failed to insert meeting of event", "event ID", *eventID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+	return
+}
+
 const (
 	stmtSelectMeetings = `
 		SELECT
@@ -208,5 +224,11 @@ const (
 			FROM meeting
 			WHERE eventid = $2
 		)
+	`
+
+	stmtInsertMeeting = `
+		INSERT INTO meeting
+			(annotation, eventid, meetingend, meetinginterval, meetingstart, place, weekday)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 )

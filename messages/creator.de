@@ -9,6 +9,9 @@ creator.of = KursverantwortlicheR von
 editor.of = EditorIn von
 instructor.of = OrganisatorIn von
 
+creator.general.data = Allgemeine Kursdaten
+creator.catalog = Verzeichnis
+
 
 # --- left navigation
 creator.course.open = Kurs öffnen
@@ -19,14 +22,20 @@ creator.courses.expired = Abgelaufene Kurse
 
 
 # --- drafts
-creator.drafts.none = Noch keine Entwürfe erstellt.
+creator.drafts.none = Noch keine Entwürfe.
 creator.drafts.editor.none = Noch keinE EditorIn eines Entwurfs.
 
 
 # --- active
-creator.active.none = Noch keine aktiven Kurse erstellt.
+creator.active.none = Noch keine aktiven Kurse.
 creator.active.editor.none = Noch keinE EditorIn eines aktiven Kurses.
 creator.active.instructor.none = Noch keinE OrganisatorIn eines aktiven Kurses.
+
+
+# --- expired
+creator.expired.none = Noch keine abgelaufenen Kurse.
+creator.expired.editor.none = Noch keinE EditorIn eines abgelaufenen Kurses.
+creator.expired.instructor.none = Noch keinE OrganisatorIn eines abgelaufenen Kurses.
 
 
 # --- course options
@@ -39,9 +48,9 @@ creator.course.edit = Bearbeiten
 
 # --- course option feedback
 
-creator.course.activated = Der Kurs '%s' wurde freigeschaltet, Kurs ID = %d.
-
 creator.course.deleted = Kurs gelöscht, Kurs ID = %d.
+creator.course.delete.title = Kurs löschen
+creator.course.delete.confirm = Wollen Sie den Kurs '%s' <strong> und dessen Teilnehmerlisten endgültig löschen</strong>?
 creator.course.delete.draft.confirm = Wollen Sie den Kursentwurf '%s' wirklich löschen?
 creator.course.delete.draft.title = Kursentwurf löschen
 
@@ -53,15 +62,31 @@ creator.course.download.title = Kurs herunterladen
 creator.course.download.filename.info = Die Angabe eines Dateinamen ist optional.
 creator.course.download.filename = Dateiname
 
+creator.course.activated = Der Kurs '%s' wurde freigeschaltet, Kurs ID = %d.
+creator.course.activate.title = Kurs freischalten
+creator.course.activate.confirm = Wollen Sie den Kurs '%s' wirklich freischalten?
+
+creator.course.expired = Der Kurs wurde auf abgelaufen gesetzt, Kurs ID = %d.
+creator.course.expire.title = Auf abgelaufen setzen
+creator.course.expire.confirm = Wollen Sie den Kurs '%s' wirklich auf abgelaufen setzen?
+
 
 # --- new course modal
+
 creator.drafts.info = Kursvorlagen erlauben es Ihnen Kursdaten aus vorherigen Kursen zu importieren.
 creator.draft = Vorlage
-creator.course.blank = Leerer Kurs
-creator.course.draft = Aus Kursen
-creator.course.upload = Kursvorlage hochladen
 creator.title.working.info = Vorläufiger Kurstitel. Kann später geändert werden.
 creator.opened.new.course = Neuer Kurs '%s' geöffnet, Kurs ID = %d.
+
+creator.course.blank = Leerer Kurs
+
+creator.course.draft = Aus Kursen
+creator.course.draft.info = Hier können Sie in Ihren Kursen suchen, um diese als Kursvorlage zu verwenden. <br> Geben Sie dazu den Kurstitel an.
+
+creator.course.upload = Kursvorlage hochladen
+creator.upload.file = Datei hochladen...
+creator.uploaded.file = Datei hochgeladen
+creator.upload.info = Laden Sie bitte eine Kursdatei im JSON-Format hoch.
 
 
 # --- edit course
@@ -98,7 +123,7 @@ creator.add.event = + &nbsp; Veranstaltung
 creator.add.meeting = + &nbsp; Termin
 
 
-# --- side info
+# --- side info course lists
 
 creator.info.drafts = Entwürfe sind Kurse, die noch nicht freigegeben wurden. D.h., dass diese Kurse nur für die/den KursverantwortlicheN sowie alle hinzugefügten EditorInnen sichtbar sind.
 creator.info.draft.edit = Sie können Entwürfe beliebig <strong>bearbeiten</strong>.
@@ -106,4 +131,21 @@ creator.info.draft.download = Entwürfe können <strong>heruntergeladen</strong>
 creator.info.draft.duplicate = Falls Sie aus einem Entwurf mehrere Kurse erstellen möchten, so können Sie diesen <strong>duplizieren</strong>.
 creator.info.draft.delete = Sollten Sie einen Entwurf nicht länger benötigen, so können Sie diesen <strong>endgültig löschen</strong>.
 
-creator.info.activate = Sobald Sie mit einem Kursentwurf zufrieden sind können Sie diesen <strong>freischalten</strong>.
+creator.info.active = Aktive Kurse sind für alle NutzerInnen sichtbar. Sobald der Einschreibezeitraum beginnt können sich NutzerInnen in diese Kurse einschreiben.
+creator.info.active.goto = Zur Kursansicht für normale NutzerInnen weitergeleitet werden.
+creator.info.active.edit = Sie können aktive Kurse <strong>bearbeiten</strong>. Sollten bereits NutzerInnen in den Kurs eingeschrieben sein, so werden diese über das Bearbeiten via E-Mail benachrichtigt.
+creator.info.active.download = Aktive Kurse können <strong>heruntergeladen</strong> werden.
+creator.info.active.user = Die <strong>Teilnehmerverwaltung</strong> erlaubt das Verwalten der in einen Kurs eingeschriebenen NutzerInnen.
+
+creator.info.expired.goto = Zur Kursansicht weitergeleitet werden. Der Kurs kann nicht länger bearbeitet werden.
+creator.info.expired.download = Abgelaufene Kurse können <strong>heruntergeladen</strong> werden.
+creator.info.expired.user = Öffnet die <strong>Teilnehmerverwaltung</strong>. NutzerInnen können nicht länger verwaltet werden, Teilnehmerlisten stehen allerdings weiterhin zum Download zur Verfügung.
+creator.info.expired.delete = Sollten Sie einen abgelaufenen Kurs nicht länger benötigen, so können Sie diesen <strong>endgültig löschen</strong>. Bitte bedenken Sie, dass dann auch die Teilnehmerlisten nicht länger zur Verfügung stehen.
+
+
+# --- side info course edit
+
+creator.info.preview = Mit dieser Option können Sie zwischen der Kursvorschau und dem Bearbeiten des Kurses wechseln.
+creator.info.validate = Diese Option erlaubt es Ihnen die eingegebenen Kursdaten auf Gültigkeit zu überprüfen.
+creator.info.activate = Ein Kurs ist für alle NutzerInnen sichtbar, sobald dieser aktiviert wurde und noch nicht abgelaufen ist. Wenn Sie aktivierte Kurse bearbeiten, dann wird eine Informations-E-Mail an alle eingeschriebenen NutzerInnen gesendet.
+creator.info.expire = Abgelaufene Kurse sind nicht länger über die Gruppen- oder Kurssuche zu finden. Sie können die Teilnehmerlisten abgelaufener Kurse wie gewohnt weiterhin einsehen oder diese endgültig löschen. Eingeschriebene NutzerInnen sehen diesen Kurs weiterhin unter 'abgelaufene Kurse'. <strong>Kurse werden 5 Jahre nach deren Ablauf automatisch gelöscht.</strong>

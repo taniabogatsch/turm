@@ -9,6 +9,8 @@ creator.of = Creator of
 editor.of = Editor of
 instructor.of = Instructor of
 
+creator.general.data = General course data
+creator.catalog = Terms & Definitions
 
 # --- left navigation
 creator.course.open = Open course
@@ -19,7 +21,7 @@ creator.courses.expired = Expired courses
 
 
 # --- drafts
-creator.drafts.none = No drafts created yet.
+creator.drafts.none = No drafts yet.
 creator.drafts.editor.none = Not yet an editor of a draft.
 
 
@@ -27,6 +29,13 @@ creator.drafts.editor.none = Not yet an editor of a draft.
 creator.active.none = No active courses yet.
 creator.active.editor.none = Not yet an editor of an active course.
 creator.active.instructor.none = Not yet an instructor of an active course.
+
+
+# --- expired
+creator.expired.none = No expired courses yet.
+creator.expired.editor.none = Not yet an editor of an expired course.
+creator.expired.instructor.none = Not yet an instructor of an expired course.
+
 
 
 # --- course options
@@ -39,9 +48,9 @@ creator.course.edit = Edit
 
 # --- course option feedback
 
-creator.course.activated = Activated course '%s', course ID = %d.
-
 creator.course.deleted = Deleted course, course ID = %d.
+creator.course.delete.title = Delete course
+creator.course.delete.confirm = Please confirm the <strong>permanent</strong> deletion of the course '%s', <strong>including its lists of participants</strong>.
 creator.course.delete.draft.confirm = Please confirm the deletion of the course draft '%s'.
 creator.course.delete.draft.title = Delete course draft
 
@@ -53,15 +62,31 @@ creator.course.download.title = Download course
 creator.course.download.filename.info = Providing a filename is optional.
 creator.course.download.filename = Filename
 
+creator.course.activated = Activated course '%s', course ID = %d.
+creator.course.activate.title = Activate course
+creator.course.activate.confirm = Please confirm the activation of the course '%s'.
+
+creator.course.expired = Course expired, course ID = %d.
+creator.course.expire.title = Expire course
+creator.course.expire.confirm = Please confirm the expiration of the course '%s'.
+
 
 # --- new course modal
+
 creator.drafts.info = By using a draft of a different course, you can load course data of former courses.
 creator.draft = Draft
-creator.course.blank = Blank course
-creator.course.draft = Load course data
-creator.course.upload = Upload course data
 creator.title.working.info = Working course title. Can be edited later.
 creator.opened.new.course = Opened new course '%s', course ID = %d.
+
+creator.course.blank = Blank course
+
+creator.course.draft = Load course data
+creator.course.draft.info = Here, you can search your courses to use them as course drafts. <br> To search for a course, just enter the course title.
+
+creator.course.upload = Upload course data
+creator.upload.file = Choose file...
+creator.uploaded.file = Uploaded file
+creator.upload.info = Please upload a course file with JSON formatting.
 
 
 # --- edit course
@@ -98,7 +123,7 @@ creator.add.event = + &nbsp; Event
 creator.add.meeting = + &nbsp; Meeting
 
 
-# --- side info
+# --- side info course lists
 
 creator.info.drafts = Drafts are courses that are not activated yet. I.e., they are only visible to the creator and all added editors.
 creator.info.draft.edit = You can <strong>edit</strong> course drafts arbitrarily.
@@ -106,4 +131,21 @@ creator.info.draft.download = Drafts can be <strong>downloaded</strong>.
 creator.info.draft.duplicate = If you want to create multiple courses from one draft, you can <strong>duplicate</strong> that draft.
 creator.info.draft.delete = If you do no longer need a course draft, you can <strong>delete</strong> that draft <strong>irrevocably</strong>.
 
-creator.info.activate = Once you are happy with a course draft, you can <strong>activate</strong> that course.
+creator.info.active = Active courses are visible to all users. Once the enrollment period starts, users can enroll in an active course.
+creator.info.active.goto = Redirect to the course view of normal users.
+creator.info.active.edit = You can <strong>edit</strong> active courses. If users already enrolled in an edited course, they will be notified via e-mail.
+creator.info.active.download = Active courses can be <strong>downloaded</strong>.
+creator.info.active.user = You can user the <strong>participants management</strong> to manage enrolled users of this course.
+
+creator.info.expired.goto = Redirect to the course view. The course can no longer be edited.
+creator.info.expired.download = Expired courses can be <strong>downloaded</strong>.
+creator.info.expired.user = Opens the <strong>participants management</strong>. You can no longer manage users, but you can still download the lists of participants.
+creator.info.expired.delete = If you do no longer need an expired course, you can <strong>delete the course permanently</strong>. Please keep in mind that lists of participants are no longer accessible after the permanent course deletion.
+
+
+# --- side info course edit
+
+creator.info.preview = By using this option, you can switch between the course preview and editing the course.
+creator.info.validate = By using this option, you can check the entered course data for validity.
+creator.info.activate = If a course is active and did not yet expire, it is visible to all users. If you edit an already activated course, a notification e-mail will be send to all users enrolled in that course.
+creator.info.expire = Expired courses can no longer be found via the groups tree or the course search. You can still open the user lists or permanently delete the course. Enrolled users will still be able to see the course at 'expired courses'. <strong>Courses are permanently deleted after 5 years of their expiration date.</strong>

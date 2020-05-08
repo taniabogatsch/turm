@@ -197,6 +197,38 @@ func (users *UserList) Search(value, listType *string, searchInactive *bool, cou
 	return
 }
 
+/*Insert all entries in a user list into a course. */
+func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err error) {
+
+	stmt := `
+		INSERT INTO ` + table + `
+			(userid, courseid, viewmatrnr)
+		VALUES ($1, $2, $3)
+	`
+	if table != "editor" && table != "instructor" {
+		stmt = `
+			INSERT INTO ` + table + `
+				(userid, courseid)
+			VALUES ($1, $2)
+		`
+	}
+
+	for _, user := range *users {
+		if table != "editor" && table != "instructor" {
+			_, err = tx.Exec(stmt, user.UserID, *courseID)
+		} else {
+			_, err = tx.Exec(stmt, user.UserID, *courseID, user.ViewMatrNr)
+		}
+		if err != nil {
+			modelsLog.Error("failed to insert user", "table", table, "course ID",
+				*courseID, "user", user, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+	return
+}
+
 const (
 	stmtUsersWhere = `
 		FROM users u
