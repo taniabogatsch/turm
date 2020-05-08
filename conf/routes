@@ -74,28 +74,15 @@ POST    /edit/course/download                       EditCourse.Download
 
 POST    /edit/course/newEvent                       EditCourse.NewEvent
 
-POST    /editCourse/modals/changeUserList           EditCourse.ChangeUserList
-POST    /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
-POST    /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
-GET     /editCourse/modals/changeUserList           EditCourse.ChangeUserList
-GET     /editCourse/modals/deleteFromUserList       EditCourse.DeleteFromUserList
-GET     /editCourse/modals/changeViewMatrNr         EditCourse.ChangeViewMatrNr
+POST    /edit/course/changeUserList                 EditCourse.ChangeUserList
+POST    /edit/course/deleteFromUserList             EditCourse.DeleteFromUserList
+POST    /edit/course/changeViewMatrNr               EditCourse.ChangeViewMatrNr
 
-POST    /editCourse/modals/changeBool               EditCourse.ChangeBool
-GET     /editCourse/modals/changeBool               EditCourse.ChangeBool
-
-POST    /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
-GET     /editCourse/modals/changeTimestamp          EditCourse.ChangeTimestamp
-
-POST    /editCourse/modals/changeText               EditCourse.ChangeText
-GET     /editCourse/modals/changeText               EditCourse.ChangeText
-
-POST    /editCourse/modals/changeGroup              EditCourse.ChangeGroup
-GET     /editCourse/modals/changeGroup              EditCourse.ChangeGroup
-
-POST    /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
-GET     /editCourse/modals/changeEnrollLimit        EditCourse.ChangeEnrollLimit
-
+POST    /edit/course/changeBool                     EditCourse.ChangeBool
+POST    /edit/course/changeTimestamp                EditCourse.ChangeTimestamp
+POST    /edit/course/changeText                     EditCourse.ChangeText
+POST    /edit/course/changeGroup                    EditCourse.ChangeGroup
+POST    /edit/course/changeEnrollLimit              EditCourse.ChangeEnrollLimit
 
 POST    /edit/event/delete                          EditEvent.Delete
 POST    /edit/event/newMeeting                      EditEvent.NewMeeting
