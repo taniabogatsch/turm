@@ -12,6 +12,7 @@ instructor.of = Instructor of
 creator.general.data = General course data
 creator.catalog = Terms & Definitions
 
+
 # --- left navigation
 creator.course.open = Open course
 creator.course.new = New course

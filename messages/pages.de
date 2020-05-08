@@ -1,0 +1,107 @@
+# -------------------------------------------------------------------------------------------------- #
+# INDEX AND GROUP
+# -------------------------------------------------------------------------------------------------- #
+
+index.tab = Turm2
+index.page = Startseite
+
+groups = Gruppen
+
+group.id = Gruppen ID
+group.parent.id = Vorgänger ID
+group.name = Gruppenname
+group.course.limit = Kurslimit
+group.last.edited = Letzte Bearbeitung
+
+group.new = Neue Gruppe erstellen
+group.new.success = Gruppe '%s' wurde erstellt, ID = %d.
+
+group.edit = Gruppe bearbeiten
+group.edit.success = Gruppe '%s' wurde bearbeitet, ID = %d.
+
+group.delete.question = Sind Sie sicher, dass Sie die Gruppe '%s' löschen wollen?
+group.delete.title = Gruppe löschen
+group.delete.success = Gruppe ID = %d gelöscht.
+
+group.no.children = Diese Gruppe besitzt keine Untergruppen.
+group.course.limit.info = Innerhalb dieser Gruppe können Sie sich in maximal %d Kurse einschreiben.
+group.course.limit.x.info = Innerhalb dieser Gruppe (und Ihrer Untergruppen) können sich NutzerInnen nur in maximal X Kurse einschreiben. Wenn Sie das Feld leer lassen, dann können sich NutzerInnen in beliebig viele Kurse einschreiben.
+group.inherits.limit.info = Ein Vor-oder Nachgänger dieser Gruppe besitzt bereits ein Kurslimit.
+
+# -------------------------------------------------------------------------------------------------- #
+# LOGIN, LOGOUT, REGISTER, ACTIVATION, NEW PASSWORD, PREFERRED LANGUAGE
+# -------------------------------------------------------------------------------------------------- #
+
+login.tab = Anmelden
+login.page = Anmelden
+
+login.success = Anmeldung erfolgreich. E-Mail-Adresse: %s, Name: %s %s.
+login.ldap.auth.failed = Authentifizierung mit dem Universitätsserver nicht möglich. Bitte prüfen Sie, ob Ihr Nutzername und Ihr Passwort korrekt sind.
+login.stay = Angemeldet bleiben
+login.instead = Zurück zur Anmeldung?
+
+logout.success = Erfolgreich abgemeldet.
+
+register.tab = Registrierung
+register.page = Externen Account registrieren
+register.disclaimer = Durch das Registrieren akzeptieren Sie unsere Nutzungsbedingungen und unseren Datenschutz.
+
+register.success = Registrierung erfolgreich. Ihr Aktivierungscode wurde an %s gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.
+register.repeat.pw = Passwort wiederholen
+
+new.pw.tab = Neues Passwort
+new.pw.page = Neues Passwort
+
+new.pw.success = Ein neues Passwort wurde an %s gesendet, falls diese E-Mail-Adresse existiert. Bitte überprüfen Sie auch Ihren Spam-Ordner. Sie können sich nun mit dem neuen Passwort anmelden.
+new.pw.question = Passwort vergessen?
+new.pw.info = Bitte geben Sie Ihre E-Mail-Adresse an. Wir werden ein neues Passwort an diese E-Mail-Adresse senden. Neue Passwörter können <strong>nur</strong> für <strong>externe Accounts</strong> generiert werden (kein Universitätslogin).
+
+activation.tab = Account Aktivieren
+activation.page = Account Aktivieren
+
+activation.success = Account aktiviert.
+activation.resend.success = Ein neuer Aktivierungscode wurde an %s gesendet.
+activation.code = Aktivierungscode
+activation.resend = Aktivierungscode erneut zusenden
+
+pref.lang.tab = Sprache setzen
+pref.lang.page = Bevorzugte E-Mail-Sprache setzen
+
+pref.lang.success = Sprache der E-Mails wurde auf %s gesetzt.
+pref.lang.info = Sprache der E-Mails
+pref.lang.info.long = Sprache der E-Mails. Kann später im Profil geändert werden.
+
+# -------------------------------------------------------------------------------------------------- #
+# HELP PAGE
+# -------------------------------------------------------------------------------------------------- #
+
+data.privacy.tab = Nutzungsbedingungen und Datenschutz
+data.privacy.page = Nutzungsbedingungen und Datenschutz
+
+news.feed.tab = Turm2 News
+news.feed.page = Neuerungen & Ankündigungen
+
+faq.tab = FAQ
+faq.page = FAQs
+
+imprint.tab = Impressum
+imprint.page = Impressum
+
+# -------------------------------------------------------------------------------------------------- #
+# ADMINISTRATION
+# -------------------------------------------------------------------------------------------------- #
+
+admin.tab = Administration
+admin.page = Administration
+
+admin.users = Nutzerverwaltung
+admin.roles = Rollenverwaltung
+admin.dashboard = Dashboard
+
+admin.no.creators = Keine Kursverantwortlichen
+
+admin.change.role = Nutzerrolle ändern
+admin.new.role = Neue Rolle wählen
+admin.current.role = Bisher
+admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.
+admin.account.inactive = Dieser Account wurde noch nicht aktiviert.

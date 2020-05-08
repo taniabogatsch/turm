@@ -1,0 +1,134 @@
+# -------------------------------------------------------------------------------------------------- #
+# RANDOM
+# -------------------------------------------------------------------------------------------------- #
+
+header.no.javascript = JavaScript is not activated. Parts of the page may behave different than expected.
+
+footer.support.email = If you have any questions, please contact our <a href="mailto:%s?Subject=SupportTurm2" target="_top">support</a>.
+footer.data.policy = <a href="#">Here</a> you can find our data policy. #TODO
+
+nav.help = Help
+
+toast.error = Error
+toast.success = Success
+
+language.change.success = Set the page language to '%s'.
+
+intercept.invalid.action = You are not authorized for this action.
+
+# -------------------------------------------------------------------------------------------------- #
+# BUTTONS
+# -------------------------------------------------------------------------------------------------- #
+
+button.search = Search
+button.send = Send
+button.save = Save
+button.load = Load
+button.confirm = Confirm
+button.download = Download
+
+button.login = Login
+button.logout = Logout
+button.register = Register
+button.activate.account = Activate account
+
+button.add = + &nbsp; Add
+button.add.group = + &nbsp; Add group
+
+button.edit = Edit
+button.delete = Delete
+
+button.abort = Abbrechen
+button.close = Close
+
+button.collapse = Collapse
+button.show = Show
+
+button.enroll = Enroll
+
+# -------------------------------------------------------------------------------------------------- #
+# ERRORS
+# -------------------------------------------------------------------------------------------------- #
+
+error.support = Please contact the support.
+
+error.db = Error running a database query. %(error.support)s
+error.email = Error sending e-mail to %s. %(error.support)s
+error.typeConv = Invalid data conversion. %(error.support)s
+error.content = Error loading page content. %(error.support)s
+error.undefined = Application error. %(error.support)s
+
+# -------------------------------------------------------------------------------------------------- #
+# USER
+# -------------------------------------------------------------------------------------------------- #
+
+user.role = Role
+user.role.admin = Admin
+user.role.creator = Creator
+user.role.editor = Editor
+user.role.instructor = Instructor
+user.role.instructors = Instructors
+user.role.user = User
+
+user.admins = Admins
+user.creators = Creators
+
+user.ldap = University account
+user.external = External account
+user.matr.nr = Matriculation number
+user.matr.nrs = Matriculation numbers
+user.affiliation = Affiliation
+
+user.name = Name
+user.firstname = First name
+user.lastname = Last name
+user.email = E-mail
+user.username = Username
+user.password = Password
+
+user.salutation = Form of address
+user.salutation.ms = Ms.
+user.salutation.mr = Mr.
+user.salutation.none = No form of address
+
+user.id = User ID
+user.last.login = Last login
+user.first.login = First login
+user.language = Language
+
+user.data = User data
+user.details = User details
+
+# -------------------------------------------------------------------------------------------------- #
+# EMAIL
+# -------------------------------------------------------------------------------------------------- #
+
+email.dear.ms = Dear Ms.
+email.dear.mr = Dear Mr.
+email.none = Hello
+
+email.regards.plain = Sincerely
+email.dev.team = Your Turm2 Development Team
+
+email.no.reply = Please do not reply. <%s>
+email.regards = Sincerely <br> Your <a href="%s/">Turm2</a> Development Team <br>
+
+email.subject.activation = Welcome at TurmII - Your activation code
+email.subject.new.pw = Your new password for TurmII
+email.subject.new.role = Information about your new user role
+
+# -------------------------------------------------------------------------------------------------- #
+# SEARCH
+# -------------------------------------------------------------------------------------------------- #
+
+search.course = Search course...
+search.user = Search user...
+search.enter.value = Enter search value...
+
+search.course.title = Search for courses
+search.results = Search results
+search.no.results = No results
+search.limit = Search results are limited to a <strong>maximum of %d results</strong>. If your result is missing, please refine your search value.
+search.criteria = Search criteria are: last name, first name, e-mail address, matriculation number (only entire numbers).
+search.inactive.users = Show not activated accounts
+search.already.added = Already added

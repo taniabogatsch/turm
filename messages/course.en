@@ -2,6 +2,8 @@
 # COURSE FIELDS
 # -------------------------------------------------------------------------------------------------- #
 
+course = Course
+
 course.path = Course path
 course.title = Course title
 course.subtitle = Subtitle

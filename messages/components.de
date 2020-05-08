@@ -1,0 +1,134 @@
+# -------------------------------------------------------------------------------------------------- #
+# RANDOM
+# -------------------------------------------------------------------------------------------------- #
+
+header.no.javascript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
+
+footer.support.email = Bei Fragen wenden Sie sich bitte an unseren <a href="mailto:%s?Subject=SupportTurm2" target="_top">Support</a>.
+footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>. #TODO
+
+nav.help = Hilfen
+
+toast.error = Fehler
+toast.success = Erfolg
+
+language.change.success = Die Sprache der Seite ist nun '%s'.
+
+intercept.invalid.action = Für diese Aktion fehlt Ihnen die Berechtigung.
+
+# -------------------------------------------------------------------------------------------------- #
+# BUTTONS
+# -------------------------------------------------------------------------------------------------- #
+
+button.search = Suchen
+button.send = Senden
+button.save = Speichern
+button.load = Laden
+button.confirm = Bestätigen
+button.download = Herunterladen
+
+button.login = Anmelden
+button.logout = Abmelden
+button.register = Registrieren
+button.activate.account = Account aktivieren
+
+button.add = + &nbsp; Hinzufügen
+button.add.group = + &nbsp; Gruppe hinzufügen
+
+button.edit = Bearbeiten
+button.delete = Löschen
+
+button.abort = Abbrechen
+button.close = Schließen
+
+button.collapse = Einklappen
+button.show = Anzeigen
+
+button.enroll = Einschreiben
+
+# -------------------------------------------------------------------------------------------------- #
+# ERRORS
+# -------------------------------------------------------------------------------------------------- #
+
+error.support = Bitte kontaktieren Sie den Support.
+
+error.db = Fehler beim Ausführen einer Datenbankanfrage. %(error.support)s
+error.email = Fehler beim Senden der E-Mail an %s. %(error.support)s
+error.typeConv = Ungültige Daten konvertiert. %(error.support)s
+error.content = Fehler beim Laden von Inhalten. %(error.support)s
+error.undefined = Es ist ein Fehler aufgetreten. %(error.support)s
+
+# -------------------------------------------------------------------------------------------------- #
+# USER
+# -------------------------------------------------------------------------------------------------- #
+
+user.role = Rolle
+user.role.admin = Admin
+user.role.creator = KursverantwortlicheR
+user.role.editor = EditorIn
+user.role.instructor = OrganisatorIn
+user.role.instructors = OrganisatorInnen
+user.role.user = NutzerIn
+
+user.admins = Admins
+user.creators = Kursverantwortliche
+
+user.ldap = Uni Account
+user.external = Externer Account
+user.matr.nr = Matrikelnummer
+user.matr.nrs = Matrikelnummern
+user.affiliation = Zugehörigkeit
+
+user.name = Name
+user.firstname = Vorname
+user.lastname = Nachname
+user.email = E-Mail
+user.username = Benutzername
+user.password = Passwort
+
+user.salutation = Anrede
+user.salutation.ms = Frau
+user.salutation.mr = Herr
+user.salutation.none = Keine Anrede
+
+user.id = Nutzer ID
+user.last.login = Letzte Anmeldung
+user.first.login = Erste Anmeldung
+user.language = Sprache
+
+user.data = Nutzerdaten
+user.details = Nutzerdetails
+
+# -------------------------------------------------------------------------------------------------- #
+# EMAIL
+# -------------------------------------------------------------------------------------------------- #
+
+email.dear.ms = Sehr geehrte Frau
+email.dear.mr = Sehr geehrter Herr
+email.none = Hallo
+
+email.regards.plain = Mit freundlichen Grüßen
+email.dev.team = Ihr Turm2 Entwicklerteam
+
+email.no.reply = Antworten Sie nicht auf diese E-Mail. <%s>
+email.regards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwicklerteam <br>
+
+email.subject.activation = Willkommen bei TurmII - Ihr Aktivierungscode
+email.subject.new.pw = Ihr neues TurmII Passwort
+email.subject.new.role = Information zu Ihrer neuen Nutzerrolle
+
+# -------------------------------------------------------------------------------------------------- #
+# SEARCH
+# -------------------------------------------------------------------------------------------------- #
+
+search.course = Kurs suchen...
+search.user = NutzerIn suchen...
+search.enter.value = Suchwert eingeben...
+
+search.course.title = Kurssuche
+search.results = Suchergebnisse
+search.no.results = Keine Suchergebnisse
+search.limit = Suchergebnisse sind auf <strong>maximal %d Ergebnisse</strong> beschränkt. Sollte Ihr Suchergebnis fehlen, so verfeinern Sie bitte den Suchwert.
+search.criteria = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur ganze Nummer).
+search.inactive.users = Nicht aktivierte Accounts anzeigen
+search.already.added = Bereits hinzugefügt
