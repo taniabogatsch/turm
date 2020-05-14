@@ -27,13 +27,6 @@
 </div>
 
 <script>
-  function getDrafts() {
-    $.get('{{url "ManageCourses.GetDrafts"}}', {
-    }, function(data) {
-      $('#get-drafts').html(data);
-    })
-  }
-
   $(function() {
     //adjust the nav pills
     $('#v-pills-drafts-tab').addClass("active");

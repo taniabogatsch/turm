@@ -88,16 +88,4 @@ resultsID:    change-user-list-modal-results
       reactToListInput();
     });
   });
-
-  //renders all users matching value
-  function searchForList(value, searchInactive, listType, courseID) {
-    $.get("{{url "EditCourse.SearchUser"}}", {
-      "value": value,
-      "searchInactive": searchInactive,
-      "listType": listType,
-      "ID": courseID
-    }, function(data) {
-      $('#change-user-list-modal-results').html(data);
-    });
-  }
 </script>

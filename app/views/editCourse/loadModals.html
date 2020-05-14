@@ -1,3 +1,4 @@
+<!-- load all modals used for editing course information -->
 
 {{template "editCourse/modals/changeBool.html" dict_addLocale $.currentLocale}}
 {{template "editCourse/modals/changeGroup.html" dict_addLocale $.currentLocale "ID" .course.ID "Path" .course.Path}}
@@ -10,5 +11,3 @@
 {{template "editCourse/modals/newMeeting.html" dict_addLocale $.currentLocale}}
 {{template "editCourse/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
 {{template "editCourse/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
-
-<script src="/public/js/editCourse.js"></script>

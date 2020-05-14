@@ -55,10 +55,5 @@
 <script>
   $(function() {
     getGroups("index", '#groups');
-
-    //detect validation error
-    if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
-    }
   });
 </script>

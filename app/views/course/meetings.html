@@ -49,6 +49,7 @@
       <div class="float-left" id="meeting-{{.ID}}-time"></div>
       <script>
         $(function() {
+          //render the meeting start and end in a nice format
           const start = '{{.MeetingStart}}';
           const end = '{{.MeetingEnd}}';
           const startParts = start.split(" ");

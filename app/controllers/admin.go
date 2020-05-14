@@ -125,22 +125,12 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	if err := user.ChangeRole(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	err := c.sendEMail(&user,
@@ -148,12 +138,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		"newRole")
 	if err != nil {
 		return flashError(
-			errEMail,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			user.EMail,
-		)
+			errEMail, err, "", c.Controller, user.EMail)
 	}
 
 	//update the session if the user updated his own role
@@ -162,12 +147,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		c.Log.Error("failed to parse userID from session",
 			"session", c.Session, "error", err.Error())
 		return flashError(
-			errTypeConv,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "", c.Controller, "")
 	}
 	if sessionID == user.ID {
 		c.Session["role"] = user.Role.String()
@@ -189,23 +169,13 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	userID := c.Session["userID"].(string)
 	if err := group.Add(&userID); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("group.new.success",
@@ -224,23 +194,13 @@ func (c Admin) EditGroup(group models.Group) revel.Result {
 	//NOTE: the DB statement ensures that no courses are deleted
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	userID := c.Session["userID"].(string)
 	if err := group.Edit(&userID); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("group.edit.success",
@@ -266,22 +226,12 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	if err := group.Delete(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("group.delete.success",

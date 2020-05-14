@@ -17,24 +17,14 @@ func (c EditMeeting) Edit(ID int, meeting models.Meeting) revel.Result {
 	meeting.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	meeting.ID = ID
 	err := meeting.Update()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("meeting.update.success",
@@ -55,12 +45,7 @@ func (c EditMeeting) Delete(ID int) revel.Result {
 	err := meeting.Delete()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("meeting.delete.success",

@@ -27,13 +27,6 @@
 </div>
 
 <script>
-  function getExpiredCourses() {
-    $.get('{{url "ManageCourses.GetExpired"}}', {
-    }, function(data) {
-      $('#get-expired-courses').html(data);
-    })
-  }
-
   $(function() {
     //adjust the nav pills
     $('#v-pills-expired-tab').addClass("active");

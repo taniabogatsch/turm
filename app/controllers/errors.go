@@ -31,6 +31,9 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 	if err != nil {
 		c.Log.Error(err.Error())
 	}
+	if url == "" {
+		url = c.Session["currPath"].(string)
+	}
 	c.Log.Warn(errType.String(), "redirect", url)
 
 	switch errType {

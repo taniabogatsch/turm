@@ -54,16 +54,7 @@
 {{template "manageCourses/templates/newModal.html" dict_addLocale $.currentLocale}}
 {{template "manageCourses/templates/downloadModal.html" dict_addLocale $.currentLocale}}
 
+<script src="/public/js/manageCourses.js"></script>
 <script>
-  $(function() {
-    //detect validation error
-    if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
-    }
-  });
-
-  function openDownloadModal(ID) {
-    $('#download-course-modal-ID').val(ID);
-    $('#download-course-modal').modal('show');
-  }
+  {{template "js/manageCourses.js" .}}
 </script>

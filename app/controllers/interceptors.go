@@ -129,12 +129,7 @@ func (c Creator) authCreator() revel.Result {
 		return nil
 	} else if err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			"/",
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "/", c.Controller, "")
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))
@@ -150,12 +145,7 @@ func (c EditCourse) authEditCourse() revel.Result {
 		return nil
 	} else if err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			"/",
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "/", c.Controller, "")
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))
@@ -171,12 +161,7 @@ func (c EditEvent) authEditEvent() revel.Result {
 		return nil
 	} else if err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			"/",
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "/", c.Controller, "")
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))
@@ -192,12 +177,7 @@ func (c EditMeeting) authEditMeeting() revel.Result {
 		return nil
 	} else if err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			"/",
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "/", c.Controller, "")
 	}
 
 	c.Flash.Error(c.Message("intercept.invalid.action"))

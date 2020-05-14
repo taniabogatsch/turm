@@ -110,10 +110,6 @@
 
 <script>
   $(function() {
-    //detect validation error
-    if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
-    }
 
     //fill the form with flash values
     const username = $("#username-flash").html();

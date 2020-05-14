@@ -27,13 +27,6 @@
 </div>
 
 <script>
-  function getActiveCourses() {
-    $.get('{{url "ManageCourses.GetActive"}}', {
-    }, function(data) {
-      $('#get-active-courses').html(data);
-    })
-  }
-
   $(function() {
     //adjust the nav pills
     $('#v-pills-active-tab').addClass("active");

@@ -35,6 +35,11 @@ $(function() {
       $(this).removeClass("display-none");
     });
   }
+
+  //detect validation error
+  if ({{if .errors}}true{{else}}false{{end}}) {
+    showErrorToast($('#flash-errors').html());
+  }
 });
 
 {{if $.session.userID}}

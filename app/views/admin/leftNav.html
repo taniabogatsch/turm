@@ -24,7 +24,6 @@
   </div>
 </div>
 
-
 <!-- user details modal -->
 <div class="modal fade" id="user-details-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
@@ -34,20 +33,7 @@
   </div>
 </div>
 
+<script src="/public/js/admin.js"></script>
 <script>
-  function userDetails(ID) {
-    $.get("{{url "Admin.UserDetails"}}", {
-      "ID": ID
-    }, function(data) {
-      $('#user-details-modal-content').html(data);
-    });
-    $('#user-details-modal').modal('show');
-  }
-
-  $(function() {
-    //detect validation error
-    if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
-    }
-  });
+  {{template "js/admin.js" .}}
 </script>

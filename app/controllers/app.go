@@ -58,12 +58,7 @@ func (c App) ChangeLanguage(language string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	c.Session["currentLocale"] = language

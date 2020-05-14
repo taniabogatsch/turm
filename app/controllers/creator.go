@@ -19,33 +19,18 @@ func (c Creator) Activate(ID int) revel.Result {
 	course := models.Course{ID: ID}
 	if err := course.Get(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	course.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	if err := course.Update("active", true); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.course.activated",
@@ -68,20 +53,10 @@ func (c Creator) Delete(ID int) revel.Result {
 	if valid, err := course.Delete(); err == nil && !valid {
 		c.Validation.ErrorKey("validation.invalid.delete.course")
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	} else if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.course.deleted",
@@ -101,12 +76,7 @@ func (c Creator) Duplicate(ID int, title string) revel.Result {
 	course := models.Course{ID: ID, Title: title}
 	if err := course.Duplicate(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.course.duplicated",
@@ -129,12 +99,7 @@ func (c Creator) Expire(ID int) revel.Result {
 	course := models.Course{ID: ID}
 	if err := course.Update("expiration_date", now); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.course.expired",
@@ -154,12 +119,7 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 	param.Validate(c.Validation, &course)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//get the course creator
@@ -168,12 +128,7 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 		c.Log.Error("failed to parse userID from session",
 			"session", c.Session, "error", err.Error())
 		return flashError(
-			errTypeConv,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "", c.Controller, "")
 	}
 
 	if param.Option == models.BLANK {
@@ -194,12 +149,7 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 	}
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.opened.new.course",

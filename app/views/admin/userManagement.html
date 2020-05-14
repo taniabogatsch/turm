@@ -53,7 +53,6 @@
     $('#user-search-input').keyup(function() {
       reactToInput();
     });
-
     $('#search-inactive').change(function() {
       reactToInput();
     });
@@ -61,31 +60,6 @@
     //adjust the nav pills
     $('#v-pills-users-tab').addClass("active");
   });
-
-  //call if the search value changes of the 'inactive users'-checkbox is changed
-  function reactToInput() {
-    document.getElementById("search-form").classList.add('was-validated');
-    const value = $('#user-search-input').val();
-    if (value.length > 2) { //search matching users
-      const searchInactive = $('#search-inactive').is(':checked');
-      search(value, searchInactive);
-    } else if (value.length == 0) {
-      $('#user-search-results').html("");
-      document.getElementById("search-form").classList.remove('was-validated');
-    } else {
-      $('#user-search-results').html("");
-    }
-  }
-
-  //renders all users matching value
-  function search(value, searchInactive) {
-    $.get("{{url "Admin.SearchUser"}}", {
-      "value": value,
-      "searchInactive": searchInactive
-    }, function(data) {
-      $('#user-search-results').html(data);
-    });
-  }
 </script>
 
 {{template "footer.html" .}}

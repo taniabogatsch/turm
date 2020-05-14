@@ -24,12 +24,7 @@ func (c EditEvent) Delete(ID int) revel.Result {
 	err := event.Delete()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("event.delete.success",
@@ -52,24 +47,14 @@ func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval) revel.Resul
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	meeting := models.Meeting{EventID: ID, MeetingInterval: option}
 	err := meeting.NewBlank()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("meeting.new.success",
@@ -93,34 +78,21 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	if fieldID != "capacity" {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	event := models.Event{ID: ID}
 	err := event.Update(fieldID, value)
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("event.capacity.change.success",
@@ -148,12 +120,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 
 		if c.Validation.HasErrors() {
 			return flashError(
-				errValidation,
-				nil,
-				c.Session["currPath"].(string),
-				c.Controller,
-				"",
-			)
+				errValidation, nil, "", c.Controller, "")
 		}
 	}
 
@@ -161,10 +128,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	event := models.Event{ID: ID}
@@ -172,12 +136,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	if valid {
@@ -204,12 +163,7 @@ func (c EditEvent) ChangeWaitlist(ID int, option bool) revel.Result {
 	event := models.Event{ID: ID, HasWaitlist: option}
 	if err := event.Update("has_waitlist", event.HasWaitlist); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("event.waitlist.change.success"))

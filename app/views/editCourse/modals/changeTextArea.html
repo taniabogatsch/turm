@@ -72,8 +72,8 @@ formID:         change-text-area-modal-form         action
     //ensure that the form validation behaves correctly
     quill.on('text-change', function(delta, oldDelta, source) {
       if (source == 'user') {
-        var textArea = document.getElementById("change-text-area-modal-value");
-        var text = quill.root.innerHTML;
+        const textArea = document.getElementById("change-text-area-modal-value");
+        const text = quill.root.innerHTML;
         if (text != "<p><br></p>") {
           $('#change-text-area-modal-value').val(text);
           textArea.setCustomValidity('');

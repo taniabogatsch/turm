@@ -160,9 +160,9 @@ function openTextAreaModal(title, field, valid, action, info) {
 function submitTextArea() {
 
   document.getElementById("change-text-area-modal-form").classList.add('was-validated');
-  var textArea = document.getElementById("change-text-area-modal-value");
+  const textArea = document.getElementById("change-text-area-modal-value");
 
-  var text = quill.root.innerHTML;
+  const text = quill.root.innerHTML;
 
   if (text != "<p><br></p>") {
     $('#change-text-area-modal-value').val(text);
@@ -181,7 +181,7 @@ function openNewMeetingModal(eventID) {
 
 function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval) {
 
-  var meetingType = "single";
+  let meetingType = "single";
   if (interval != 0) {
     meetingType = "weekly";
     //$('#meeting-weekly-interval').val(interval); //TODO

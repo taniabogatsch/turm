@@ -93,7 +93,11 @@
   </div>
 </div>
 
+<script src="/public/js/editCourse.js"></script>
+
 <script>
+  {{template "js/editCourse.js" .}}
+
   $(function() {
     //adjust the nav pills
     {{if not .course.Active}}
@@ -112,12 +116,12 @@
       {{end}}
     {{end}}
 
-    //react to user input
+    //react to only ldap switch events
     $('#change-ldap-switch').change(function() {
       $('#change-ldap-form').submit();
     });
 
-    //react to user input
+    //react to visibility switch events
     $('#change-visibility-switch').change(function() {
       $('#change-visibility-form').submit();
     });

@@ -52,12 +52,7 @@ func (c EditCourse) Download(ID int, filename string) revel.Result {
 	course := models.Course{ID: ID}
 	if err := course.Get(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 	//reset some values
 	course.CreatorData = models.User{}
@@ -67,12 +62,7 @@ func (c EditCourse) Download(ID int, filename string) revel.Result {
 	json, err := json.Marshal(course)
 	if err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "", c.Controller, "")
 	}
 	jsonString := string(json[:])
 
@@ -89,12 +79,7 @@ func (c EditCourse) Download(ID int, filename string) revel.Result {
 	file, err := os.Create(filepath)
 	if err != nil {
 		return flashError(
-			errContent,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errContent, err, "", c.Controller, "")
 	}
 	defer file.Close()
 
@@ -103,12 +88,7 @@ func (c EditCourse) Download(ID int, filename string) revel.Result {
 	_, err = writer.WriteString(jsonString)
 	if err != nil {
 		return flashError(
-			errContent,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errContent, err, "", c.Controller, "")
 	}
 	defer writer.Flush()
 
@@ -127,23 +107,13 @@ func (c EditCourse) Validate(ID int) revel.Result {
 	course := models.Course{ID: ID}
 	if err := course.Get(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	course.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("creator.course.valid"))
@@ -166,24 +136,14 @@ func (c EditCourse) NewEvent(ID int, fieldID, value string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	event := models.Event{CourseID: ID, Title: value}
 	err := event.NewBlank()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("event.new.success",
@@ -217,12 +177,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	if fieldID != "enrollment_start" && fieldID != "enrollment_end" &&
@@ -230,10 +185,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	course := models.Course{ID: ID}
@@ -247,12 +199,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	if valid {
@@ -286,23 +233,13 @@ func (c EditCourse) ChangeUserList(ID, userID int, listType string) revel.Result
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
 	if err := entry.Insert(listType); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	//NOTE: if the course is active, the user should get a notification e-mail
@@ -331,23 +268,13 @@ func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Re
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
 	if err := entry.Delete(listType); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	//TODO: if the course is active, the user should get a notification e-mail
@@ -375,23 +302,13 @@ func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option boo
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID, ViewMatrNr: option}
 	if err := entry.Update(listType); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	//TODO: if the course is active, the user should get a notification e-mail
@@ -415,21 +332,13 @@ func (c EditCourse) ChangeBool(ID int, listType string, option bool) revel.Resul
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	course := models.Course{ID: ID}
 	if err := course.Update(listType, option); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("course."+listType+".change.success",
@@ -469,12 +378,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 
 		if c.Validation.HasErrors() {
 			return flashError(
-				errValidation,
-				nil,
-				c.Session["currPath"].(string),
-				c.Controller,
-				"",
-			)
+				errValidation, nil, "", c.Controller, "")
 		}
 	}
 
@@ -484,10 +388,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	course := models.Course{ID: ID}
@@ -498,12 +399,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 		fee, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return flashError(
-				errContent,
-				err,
-				c.Session["currPath"].(string),
-				c.Controller,
-				"",
-			)
+				errContent, err, "", c.Controller, "")
 		}
 		err = course.Update(fieldID, sql.NullFloat64{fee, valid})
 
@@ -513,12 +409,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	if valid {
@@ -552,12 +443,7 @@ func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	course := models.Course{
@@ -566,12 +452,7 @@ func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
 	}
 	if err := course.Update("parent_id", course.ParentID); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("course.group.change.success",
@@ -596,12 +477,7 @@ func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.R
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	valid := (value != 0)
@@ -610,22 +486,14 @@ func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.R
 		return flashError(
 			errContent,
 			errors.New("invalid column value"),
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			"", c.Controller, "")
 	}
 
 	course := models.Course{ID: ID}
 	err := course.Update(fieldID, sql.NullInt32{int32(value), valid})
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	if valid {

@@ -33,12 +33,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	credentials.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	var user models.User
@@ -49,12 +44,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 		if err != nil {
 			c.Validation.ErrorKey("login.ldap.auth.failed")
 			return flashError(
-				errAuth,
-				err,
-				c.Session["currPath"].(string),
-				c.Controller,
-				"",
-			)
+				errAuth, err, "", c.Controller, "")
 		}
 		c.Log.Debug("ldap authentication successful", "user", user)
 
@@ -69,24 +59,14 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	//login of user
 	if err := user.Login(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Validation.Required(user.ID).
 		MessageKey("validation.invalid.login")
 	if c.Validation.HasErrors() { //invalid external user credentials
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	c.setSession(&user)
@@ -153,23 +133,13 @@ func (c User) Registration(user models.User) revel.Result {
 	user.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//register the new user
 	if err := user.Register(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 	c.Log.Debug("registration successful", "user", user)
 
@@ -181,11 +151,9 @@ func (c User) Registration(user models.User) revel.Result {
 		"activation")
 	if err != nil {
 		return flashError(
-			errEMail,
-			err,
+			errEMail, err,
 			"/user/activationPage",
-			c.Controller,
-			user.EMail,
+			c.Controller, user.EMail,
 		)
 	}
 
@@ -227,12 +195,7 @@ func (c User) NewPassword(email string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//we do not want to provide any information on whether an e-mail exists
@@ -254,12 +217,7 @@ func (c User) NewPassword(email string) revel.Result {
 	user := models.User{EMail: strings.ToLower(email)}
 	if err := user.NewPassword(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 	c.Log.Debug("set new password", "user", user)
 
@@ -268,12 +226,7 @@ func (c User) NewPassword(email string) revel.Result {
 		"newPw")
 	if err != nil {
 		return flashError(
-			errEMail,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			user.EMail,
-		)
+			errEMail, err, "", c.Controller, user.EMail)
 	}
 
 	c.Flash.Success(c.Message("new.pw.success",
@@ -323,35 +276,20 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//set the activation code to null, if it matches
 	success, err := user.VerifyActivationCode()
 	if err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	if !success { //invalid activation code
 		c.Validation.ErrorKey("validation.invalid.activation")
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	c.Session.Del("notActivated")
@@ -372,22 +310,12 @@ func (c User) NewActivationCode() revel.Result {
 
 	if user.ID, err = strconv.Atoi(userID); err != nil {
 		return flashError(
-			errTypeConv,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err := user.NewActivationCode(); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	err = c.sendEMail(&user,
@@ -395,12 +323,7 @@ func (c User) NewActivationCode() revel.Result {
 		"activation")
 	if err != nil {
 		return flashError(
-			errEMail,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			user.EMail,
-		)
+			errEMail, err, "", c.Controller, user.EMail)
 	}
 
 	c.Flash.Success(c.Message("activation.resend.success",
@@ -434,12 +357,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation,
-			nil,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//update the language
@@ -447,12 +365,7 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	user := models.User{Language: sql.NullString{prefLanguage, true}}
 	if err := user.SetPrefLanguage(&userID); err != nil {
 		return flashError(
-			errDB,
-			err,
-			c.Session["currPath"].(string),
-			c.Controller,
-			"",
-		)
+			errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("pref.lang.success",
