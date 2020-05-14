@@ -1,80 +1,43 @@
 @import "../theme.css.less";
 
-.page {
-  padding-bottom: 6rem;
-
-  &-side {
-    float: left;
-    width: 25%;
-
-    &-left {
-      padding-left: 2%;
-    }
-
-    &-right {
-      padding-right: 2%;
-    }
-  }
-
-  &-middle {
-    float: left;
-    padding-left: 2%;
-    padding-right: 2%;
-    width: 50%;
-  }
-}
-
 @media @desktop {
   .page {
-    &-padding {
+    padding-bottom: 6rem;
+
+    &-side {
+      float: left;
+      width: 25%;
+
       &-left {
-        padding-left: 12rem;
-        &-small {
-          padding-left: 2rem;
-        }
+        padding-left: 2%;
       }
+
       &-right {
-        padding-right: 12rem;
-        &-small {
-          padding-right: 2rem;
-        }
+        padding-right: 2%;
       }
     }
-    &-add-scroll {
-      overflow-y: auto;
-      height: 75%;
+
+    &-middle {
+      float: left;
+      padding-left: 2%;
+      padding-right: 2%;
+      width: 50%;
     }
   }
 }
-
 
 @media @phone {
   .page {
     padding-bottom: 1rem;
     width: 100%;
-    font-size: 80%;
-    font-weight: 400;
 
     &-side {
       &-left {}
       &-right {}
     }
-    &-middle {}
+    &-middle {
+      padding-left: 4%;
+      padding-right: 4%;
+    }
   }
-}
-
-.footer {
-  &-custom {
-    position: fixed !important;
-    width: 100% !important;
-    border-top: 1px solid @grey;
-    bottom: 0 !important;
-    background: #fff;
-  }
-}
-
-.toast-custom {
-  z-index: 5000 !important;
-  position: fixed;
-  right:24px;
 }

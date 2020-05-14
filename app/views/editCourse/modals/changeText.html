@@ -20,7 +20,7 @@ validationID:   change-text-modal-validation    html
         method="POST" class="needs-validation" novalidate>
 
         <!-- modal header -->
-        <div class="modal-header background-color-darkblue border-radius-2">
+        <div class="modal-header bg-darkblue border-radius-2">
           <h5 class="modal-title text-white" id="change-text-modal-title"></h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -64,9 +64,9 @@ validationID:   change-text-modal-validation    html
   </div>
 </div>
 
-<div id="change-text-icon-pencil" class="display-none"> {{template "icons/pencil.html" .}} </div>
-<div id="change-text-icon-euro" class="display-none"> € </div>
-<div id="change-text-validation-fee" class="display-none"> {{msg $ "validation.invalid.fee"}} </div>
-<div id="change-text-validation-text" class="display-none"> {{msg $ "validation.invalid.text"}} </div>
-<div id="change-text-save" class="display-none"> {{msg $ "button.save"}} </div>
-<div id="change-text-add" class="display-none"> {{msg $ "button.add"}} </div>
+<div id="change-text-icon-pencil" class="d-none"> {{template "icons/pencil.html" .}} </div>
+<div id="change-text-icon-euro" class="d-none"> € </div>
+<div id="change-text-validation-fee" class="d-none"> {{msg $ "validation.invalid.fee"}} </div>
+<div id="change-text-validation-text" class="d-none"> {{msg $ "validation.invalid.text"}} </div>
+<div id="change-text-save" class="d-none"> {{msg $ "button.save"}} </div>
+<div id="change-text-add" class="d-none"> {{msg $ "button.create"}} </div>

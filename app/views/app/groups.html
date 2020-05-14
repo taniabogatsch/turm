@@ -12,33 +12,33 @@
             {{if eq $.session.role "admin"}}
               <!-- delete -->
               {{if not .Groups}}
-                <a href="#no-scroll" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="btn btn-outline-darkblue float-right margin-left-10">
+                <a href="#no-scroll" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="btn btn-outline-darkblue float-right ml-3">
                   {{template "icons/trash.html" . }}
                 </a>
               {{end}}
               <!-- edit -->
-              <a href="#no-scroll" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="btn btn-outline-darkblue float-right margin-left-10">
+              <a href="#no-scroll" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="btn btn-outline-darkblue float-right ml-3">
                 {{template "icons/pencil.html" . }}
               </a>
               <!-- add -->
-              <a href="#no-scroll" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="btn btn-outline-darkblue float-right margin-left-10">
+              <a href="#no-scroll" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="btn btn-outline-darkblue float-right ml-3">
                 {{template "icons/plus.html" . }}
               </a>
             {{end}}
           {{end}}
 
           {{if eq .IDPrefix "creator"}}
-            <a href="#no-scroll" class="btn btn-outline-darkblue float-right margin-left-10"
+            <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
               onclick='submitChangeGroupModal({{.ID}});'>
               {{msg $ "creator.add.course.here"}}
             </a>
           {{end}}
 
           <!-- dropdown and dropright icon and group name-->
-          <div id="icon-right-{{.IDPrefix}}-{{.ID}}" class="display-block">
+          <div id="icon-right-{{.IDPrefix}}-{{.ID}}" class="d-block">
             {{template "icons/caretRight.html" .}} {{.Name}}
           </div>
-          <div id="icon-down-{{.IDPrefix}}-{{.ID}}" class="display-none">
+          <div id="icon-down-{{.IDPrefix}}-{{.ID}}" class="d-none">
             {{template "icons/caretDown.html" .}} {{.Name}}
           </div>
 

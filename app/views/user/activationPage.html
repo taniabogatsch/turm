@@ -14,7 +14,7 @@
       {{msg $ "activation.page"}}
     </h3>
     <br>
-    <div class="login-width">
+    <div class="w-desktop-50">
 
       <!-- enter activation code form -->
       <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}' method="GET" class="needs-validation" novalidate>
@@ -27,7 +27,7 @@
               </span>
             </div>
             {{with $field := field "activationCode" .}}
-              <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "activation.code"}}' required maxlength="7" minlength="7">
+              <input type="text" class="form-control rounded-right" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "activation.code"}}' required maxlength="7" minlength="7">
             {{end}}
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.activation"}}

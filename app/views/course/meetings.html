@@ -78,14 +78,14 @@
 
   <!-- edit single meeting -->
   {{if eq .MeetingInterval 0}}
-    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left margin-left-20"
+    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}},
       {{.Place.String}}, {{.Annotation.String}}, 0, 0);'>
       {{template "icons/pencil.html" . }}
     </a>
 
   {{else}} <!-- edit weekly meeting -->
-    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left margin-left-20"
+    <a href="#no-scroll" class="badge btn-outline-darkblue preview-hide float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}}, {{.Place.String}},
       {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}});'>
       {{template "icons/pencil.html" . }}

@@ -14,25 +14,25 @@ $(function() {
 
   if ({{.session.role}} == "admin") {
     $(".admin").each(function() {
-      $(this).removeClass("display-none");
+      $(this).removeClass("d-none");
     });
   }
 
   if ({{.session.role}} == "creator") {
     $(".creator").each(function() {
-      $(this).removeClass("display-none");
+      $(this).removeClass("d-none");
     });
   }
 
   if ({{.session.isEditor}} == "true") {
     $(".editor").each(function() {
-      $(this).removeClass("display-none");
+      $(this).removeClass("d-none");
     });
   }
 
   if ({{.session.isInstructor}} == "true") {
     $(".instructor").each(function() {
-      $(this).removeClass("display-none");
+      $(this).removeClass("d-none");
     });
   }
 
@@ -51,7 +51,7 @@ $(function() {
       $('#group-modal-title').html('{{msg $ "group.new"}}');
       $('#input-parentID').val(parentID);
       $('#input-name').val("");
-      $('#group-confirm-btn').html('{{msg $ "button.add"}}');
+      $('#group-confirm-btn').html('{{msg $ "button.create"}}');
 
       if (inheritsLimits) {
         $('#input-courseLimits').attr("disabled", true);

@@ -12,7 +12,7 @@
     </button>
 
     <!-- duplicate -->
-    <button type="button" class="btn btn-outline-darkblue float-right margin-right-20"
+    <button type="button" class="btn btn-outline-darkblue float-right mr-3"
       onclick='confirmPOSTModal({{msg $ "creator.course.duplicate.title"}},
         {{msg $ "creator.course.duplicate.confirm" .Title}},
         {{url "Creator.Duplicate" .ID .Title}});'>
@@ -20,13 +20,13 @@
     </button>
 
     <!-- download -->
-    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll"
+    <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
       onclick='openDownloadModal({{.ID}});' role="button">
       {{template "icons/download.html" . }}
     </a>
 
     <!-- edit -->
-    <a class="btn btn-outline-darkblue float-right margin-right-20" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
       {{template "icons/pencil.html" . }}
     </a>
 

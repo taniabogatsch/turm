@@ -13,20 +13,20 @@
     </h3>
     <br>
 
-    <div class="login-width">
+    <div class="w-desktop-50 w-mobile-90">
       <ul class="nav nav-tabs" id="loginType" role="tablist" >
-        <li class="nav-item login-width-tab">
+        <li class="nav-item w-50">
           <a class="nav-link active" id="ldap" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="true">
             {{msg $ "user.ldap"}}
           </a>
         </li>
-        <li class="nav-item login-width-tab">
+        <li class="nav-item w-50">
           <a class="nav-link" id="external" data-toggle="tab" href="#loginFormTab" role="tab" aria-selected="false">
             {{msg $ "user.external"}}
           </a>
         </li>
       </ul>
-      <div class="tab-content login-width-content" id="loginTypeContent">
+      <div class="tab-content w-mobile-90 w-desktop-65" id="loginTypeContent">
         <div class="tab-pane fade show active" id="loginFormTab" role="tabpanel">
 
           <br>
@@ -41,7 +41,7 @@
                   {{template "icons/person.html" .}}
                 </span>
               </div>
-              <input id="input-user" type="text" class="form-control" name="credentials.Username" value="" placeholder='{{msg $ "user.username"}}' required maxlength="255">
+              <input id="input-user" type="text" class="form-control rounded-right" name="credentials.Username" value="" placeholder='{{msg $ "user.username"}}' required maxlength="255">
               <div class="invalid-feedback" id="input-user-validation">
                 {{msg $ "validation.invalid.username"}}
               </div>
@@ -53,7 +53,7 @@
                   {{template "icons/lock.html" .}}
                 </span>
               </div>
-              <input type="password" class="form-control" name="credentials.Password" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
+              <input type="password" class="form-control rounded-right" name="credentials.Password" value="" placeholder='{{msg $ "user.password"}}' required maxlength="511">
               <div class="invalid-feedback">
                 {{msg $ "validation.invalid.password"}}
               </div>
@@ -102,11 +102,11 @@
   {{template "toast.html" .}}
 </div>
 
-<div id="icon-person" class="display-none"> {{template "icons/person.html" .}} </div>
-<div id="icon-email" class="display-none"> {{template "icons/envelope.html" .}} </div>
-<div id="username-flash" class="display-none">{{with $username := field "credentials.Username" .}}{{$username.Flash}}{{end}}</div>
-<div id="email-flash" class="display-none">{{with $email := field "credentials.EMail" .}}{{$email.Flash}}{{end}}</div>
-<div id="stayLoggedIn-flash" class="display-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>
+<div id="icon-person" class="d-none"> {{template "icons/person.html" .}} </div>
+<div id="icon-email" class="d-none"> {{template "icons/envelope.html" .}} </div>
+<div id="username-flash" class="d-none">{{with $username := field "credentials.Username" .}}{{$username.Flash}}{{end}}</div>
+<div id="email-flash" class="d-none">{{with $email := field "credentials.EMail" .}}{{$email.Flash}}{{end}}</div>
+<div id="stayLoggedIn-flash" class="d-none">{{with $stayLoggedIn := field "credentials.StayLoggedIn" .}}{{$stayLoggedIn.Flash}}{{end}}</div>
 
 <script>
   $(function() {

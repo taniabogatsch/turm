@@ -11,14 +11,14 @@
     <li class="list-group-item mb-2 border rounded">
 
       <!-- delete event -->
-      <a class="btn btn-outline-darkblue float-right margin-left-20 preview-hide" href='#no-scroll' role="button"
+      <a class="btn btn-outline-darkblue float-right ml-3 preview-hide" href='#no-scroll' role="button"
         onclick='confirmPOSTModal({{msg $ "event.delete.title"}},
           {{msg $ "event.delete.confirm" .Title}}, "{{url "EditEvent.Delete" .ID}}#events");'>
         {{template "icons/trash.html" . }}
       </a>
 
       <!-- disabled enroll button -->
-      <button class="btn btn-outline-darkblue float-right margin-left-20 preview-show display-none" href='#no-scroll' role="button" disabled>
+      <button class="btn btn-outline-darkblue float-right ml-3 preview-show d-none" href='#no-scroll' role="button" disabled>
         {{msg $ "button.enroll"}}
       </button>
 
@@ -33,8 +33,8 @@
       </small>
 
       <!-- progress bar -->
-      <div class="progress float-right margin-right-20" style="width: 8rem;">
-        <div class="progress-bar background-color-darkblue" role="progressbar" style="width: {{.Percentage}}%;"
+      <div class="progress float-right mr-3" style="width: 8rem;">
+        <div class="progress-bar bg-darkblue" role="progressbar" style="width: {{.Percentage}}%;"
           aria-valuenow="{{.Fullness}}" aria-valuemin="0" aria-valuemax="{{.Capacity}}">
           {{.Percentage}}%
         </div>
@@ -93,16 +93,18 @@
       <!-- add a new meeting -->
       {{if .Meetings}}
         <br class="preview-hide">
+        <br class="desktop-hidden">
+        <br class="desktop-hidden">
       {{end}}
       <br class="preview-hide">
-      <button type="button" class="btn btn-outline-darkblue preview-hide"
+      <button type="button" class="btn btn-outline-darkblue preview-hide mt-2 mt-lg-0"
         onclick='openNewMeetingModal({{.ID}});'>
         {{msg $ "creator.add.meeting"}}
       </button>
 
       {{if not .Annotation.Valid}}
         <!-- add annotation button -->
-        <button type="button" class="btn btn-outline-darkblue preview-hide"
+        <button type="button" class="btn btn-outline-darkblue preview-hide mt-2 mt-lg-0"
           onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
             {{.Annotation.String}}, {{.Annotation.Valid}}, "{{url "EditEvent.ChangeText"}}#events",
             "text", "255", {{msg $ "event.annotation.change.info"}}, {{.ID}});'>
@@ -110,7 +112,7 @@
         </button>
       {{end}}
 
-      <button type="button" class="btn btn-outline-darkblue preview-hide">
+      <button type="button" class="btn btn-outline-darkblue preview-hide mt-2 mt-lg-0">
         + &nbsp; Einschreibeschlüssel
       </button>
     </li>

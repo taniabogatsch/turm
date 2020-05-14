@@ -1,22 +1,22 @@
 <!-- navigate to the different administration pages -->
 
-<div class="page page-side page-side-left page-padding-right">
-  <div class="position-fixed border-right page-padding-right-small">
+<div class="page page-side page-side-left pr-5 pr-lg-5 mb-5 mb-lg-0">
+  <div class="position-desktop-fixed border-right-desktop pr-4 pl-4 pl-lg-0">
     <h4>
       {{msg $ "admin.page"}}
     </h4>
     <hr>
 
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-users-tab" href='{{url "Admin.UserManagement"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-users-tab" href='{{url "Admin.UserManagement"}}' role="tab">
         {{template "icons/search.html" . }}
         &nbsp; {{msg $ "admin.users"}}
       </a>
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-roles-tab" href='{{url "Admin.RoleManagement"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-roles-tab" href='{{url "Admin.RoleManagement"}}' role="tab">
         {{template "icons/person.html" . }}
         &nbsp; {{msg $ "admin.roles"}}
       </a>
-      <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-dashboard-tab" href='{{url "Admin.Dashboard"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-dashboard-tab" href='{{url "Admin.Dashboard"}}' role="tab">
         {{template "icons/graphUp.html" . }}
         &nbsp; {{msg $ "admin.dashboard"}}
       </a>

@@ -1,7 +1,7 @@
 <!-- template rendering the content of the user details modal -->
 
 <!-- modal header -->
-<div class="modal-header background-color-darkblue border-radius-2">
+<div class="modal-header bg-darkblue border-radius-2">
   <h5 class="modal-title text-white">
     {{msg $ "user.details"}}
     {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .user.User}}
@@ -18,7 +18,7 @@
 
   <!-- change the user role -->
   {{if .user.User.ActivationCode.Valid}}
-    <div class="warning-feedback">
+    <div class="val-div w-100 text-danger">
       {{msg $ "admin.account.inactive"}}
     </div>
   {{end}}
@@ -68,10 +68,10 @@
   <div class="card border-0">
     <button onclick='changeIcon("user-data");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#user-data" aria-expanded="true" aria-controls="user-data">
       <!-- dropdown and dropright icon and section name-->
-      <div id="icon-right-user-data" class="display-block">
+      <div id="icon-right-user-data" class="d-block">
         {{template "icons/caretRight.html" .}} {{msg $ "user.data"}}
       </div>
-      <div id="icon-down-user-data" class="display-none">
+      <div id="icon-down-user-data" class="d-none">
         {{template "icons/caretDown.html" .}} {{msg $ "user.data"}}
       </div>
     </button>
@@ -88,10 +88,10 @@
     <div class="card border-0">
       <button onclick='changeIcon("group-data");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#group-data" aria-expanded="true" aria-controls="group-data">
         <!-- dropdown and dropright icon and section name-->
-        <div id="icon-right-group-data" class="display-block">
+        <div id="icon-right-group-data" class="d-block">
           {{template "icons/caretRight.html" .}} {{msg $ "groups"}}
         </div>
-        <div id="icon-down-group-data" class="display-none">
+        <div id="icon-down-group-data" class="d-none">
           {{template "icons/caretDown.html" .}} {{msg $ "groups"}}
         </div>
       </button>

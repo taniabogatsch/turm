@@ -4,7 +4,7 @@
 
 {{template "manageCourses/templates/leftNav.html" . }}
 
-<div class="page page-middle">
+<div class="page page-middle mb-5 mb-lg-0">
   <div class="tab-content">
 
     <h4>
@@ -19,9 +19,9 @@
   </div>
 </div>
 
-<div class="page page-side page-side-right page-padding-left">
-  <div class="position-fixed border-left page-padding-left-small page-side-right page-add-scroll">
-    {{template "toast.html" .}}
+<div class="page page-side page-side-right pl-desktop-12">
+  {{template "toast.html" .}}
+  <div class="position-desktop-fixed border-left pl-4 pr-4 h-65 overflow-y">
     {{template "manageCourses/legends/drafts.html"  dict_addLocale $.currentLocale}}
   </div>
 </div>

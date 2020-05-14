@@ -1,12 +1,12 @@
 <!-- this template contains two modals, one to add/edit groups, the other one to delete them -->
 
 <!-- add/edit groups -->
-<div class="modal fade to-front" id="group-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade z-idx-5000" id="group-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
 
       <!-- modal header -->
-      <div class="modal-header background-color-darkblue border-radius-2">
+      <div class="modal-header bg-darkblue border-radius-2">
         <h5 class="modal-title text-white" id="group-modal-title"></h5>
         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -30,7 +30,7 @@
                 {{template "icons/pencil.html" .}}
               </span>
             </div>
-            <input id="input-name" type="text" class="form-control" name="group.Name" value="" placeholder='{{msg $ "group.name"}}' required minlength="3" maxlength="255">
+            <input id="input-name" type="text" class="form-control rounded-right" name="group.Name" value="" placeholder='{{msg $ "group.name"}}' required minlength="3" maxlength="255">
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.groupName"}}
             </div>
@@ -46,7 +46,7 @@
                 {{template "icons/pencil.html" .}}
               </span>
             </div>
-            <input id="input-courseLimits" min="1" max="100" type="number" name="group.CourseLimit.Int32" value="" class="form-control" placeholder='{{msg $ "group.course.limit"}}'>
+            <input id="input-courseLimits" min="1" max="100" type="number" name="group.CourseLimit.Int32" value="" class="form-control rounded-right" placeholder='{{msg $ "group.course.limit"}}'>
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.courseLimit"}}
             </div>
@@ -73,7 +73,7 @@
     <div class="modal-content">
 
       <!-- modal header -->
-      <div class="modal-header background-color-darkblue border-radius-2">
+      <div class="modal-header bg-darkblue border-radius-2">
         <h5 class="modal-title text-white">
           {{msg $ "group.delete.title"}}
         </h5>

@@ -13,12 +13,12 @@
     </h3>
     <br>
 
-    <div class="login-width">
+    <div class="w-desktop-50">
 
       <!-- registration form -->
       <form id="registerForm" accept-charset="UTF-8" action='{{url "User.Registration"}}' method="POST" class="needs-validation" novalidate>
 
-        <div class="col login-width-tab">
+        <div class="col w-50">
           <small class="form-text text-muted">
             {{msg $ "pref.lang.info"}}
           </small>
@@ -33,7 +33,7 @@
         </div>
 
         {{with $salutation := field "user.Salutation" .}}
-          <div class="col login-width-tab">
+          <div class="col w-50">
             <small class="form-text text-muted">
               {{msg $ "user.salutation"}}
             </small>
@@ -56,7 +56,7 @@
             </span>
           </div>
           {{with $field := field "user.FirstName" .}}
-            <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.firstname"}}' required maxlength="255">
+            <input type="text" class="form-control rounded-right" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.firstname"}}' required maxlength="255">
           {{end}}
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.firstname"}}
@@ -70,7 +70,7 @@
             </span>
           </div>
           {{with $field := field "user.LastName" .}}
-            <input type="text" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.lastname"}}' required maxlength="255">
+            <input type="text" class="form-control rounded-right" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.lastname"}}' required maxlength="255">
           {{end}}
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.lastname"}}
@@ -84,7 +84,7 @@
             </span>
           </div>
           {{with $field := field "user.EMail" .}}
-            <input type="email" class="form-control" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.email"}}' required maxlength="255">
+            <input type="email" class="form-control rounded-right" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "user.email"}}' required maxlength="255">
           {{end}}
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.email"}}
@@ -97,7 +97,7 @@
               {{template "icons/lock.html" .}}
             </span>
           </div>
-          <input type="password" class="form-control" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="127" minlength="6">
+          <input type="password" class="form-control rounded-right" name="user.Password.String" value="" placeholder='{{msg $ "user.password"}}' required maxlength="127" minlength="6">
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.password"}}
           </div>
@@ -109,7 +109,7 @@
               {{template "icons/lock.html" .}}
             </span>
           </div>
-          <input type="password" class="form-control" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeat.pw"}}' required maxlength="127" minlength="6">
+          <input type="password" class="form-control rounded-right" name="user.PasswordRepeat" value="" placeholder='{{msg $ "register.repeat.pw"}}' required maxlength="127" minlength="6">
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.password"}}
           </div>

@@ -26,12 +26,12 @@ function changeIcon(id) {
   const iconRightClass = $("#icon-right-" + id).attr("class");
   const iconDownClass = $("#icon-down-" + id).attr("class");
 
-  if (iconRightClass == "display-block") {
-    $("#icon-right-" + id).attr("class", "display-none");
-    $("#icon-down-" + id).attr("class", "display-block");
+  if (iconRightClass == "d-block") {
+    $("#icon-right-" + id).attr("class", "d-none");
+    $("#icon-down-" + id).attr("class", "d-block");
   } else {
-    $("#icon-right-" + id).attr("class", "display-block");
-    $("#icon-down-" + id).attr("class", "display-none");
+    $("#icon-right-" + id).attr("class", "d-block");
+    $("#icon-down-" + id).attr("class", "d-none");
   }
 }
 
@@ -39,9 +39,9 @@ function changeIcon(id) {
 function showErrorToast(content) {
 
   $("#toast-title").html($("#icon-flash-alertCircle").html());
-  $("#toast-title").attr("class", "mr-auto color-danger");
+  $("#toast-title").attr("class", "mr-auto text-danger");
   $("#toast-content").html(content);
-  $("#toast-content").attr("class", "color-danger");
+  $("#toast-content").attr("class", "text-danger");
   $("#feedback-toast").toast('show');
 }
 
@@ -49,9 +49,9 @@ function showErrorToast(content) {
 function showSuccessToast(content) {
 
   $("#toast-title").html($("#icon-flash-check").html());
-  $("#toast-title").attr("class", "mr-auto color-success");
+  $("#toast-title").attr("class", "mr-auto text-success");
   $("#toast-content").html(content);
-  $("#toast-content").attr("class", "color-success");
+  $("#toast-content").attr("class", "text-success");
   $("#feedback-toast").toast('show');
 }
 

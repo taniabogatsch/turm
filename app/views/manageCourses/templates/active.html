@@ -9,18 +9,18 @@
     </a>
 
     <!-- download -->
-    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll"
+    <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
       onclick='openDownloadModal({{.ID}});' role="button">
       {{template "icons/download.html" . }}
     </a>
 
     <!-- edit -->
-    <a class="btn btn-outline-darkblue float-right margin-right-20" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
       {{template "icons/pencil.html" . }}
     </a>
 
     <!-- TODO: go to -->
-    <a class="btn btn-outline-darkblue float-right margin-right-20" href="#no-scroll" role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
       {{template "icons/eye.html" . }}
     </a>
 
