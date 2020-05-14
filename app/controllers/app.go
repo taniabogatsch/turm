@@ -70,3 +70,15 @@ func (c App) ChangeLanguage(language string) revel.Result {
 	))
 	return c.Redirect(c.Session["currPath"])
 }
+
+/*DataPrivacy renders the data privacy page.
+- Roles: all (except not activated users) */
+func (c App) DataPrivacy() revel.Result {
+
+	c.Log.Debug("render data privacy page", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("data.privacy.tab")
+
+	return c.Render()
+}

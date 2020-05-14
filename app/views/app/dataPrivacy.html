@@ -1,0 +1,21 @@
+<!-- landing page of the application -->
+
+{{template "header.html" .}}
+
+<div class="page page-side page-side-left">
+  <br class="mobile-hidden">
+</div>
+
+<div class="page page-middle">
+  {{if eq .currentLocale "en-US"}}
+    {{template "app/dataPrivacy/dataPrivacy.html.en" .}}
+  {{else if eq .currentLocale "de-DE"}}
+    {{template "app/dataPrivacy/dataPrivacy.html.de" .}}
+  {{end}}
+</div>
+
+<div class="page page-side page-side-right">
+  {{template "toast.html" .}}
+</div>
+
+{{template "footer.html" .}}

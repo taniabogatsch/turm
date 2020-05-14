@@ -13,6 +13,7 @@ module:jobs
 GET     /                                           App.Index
 GET     /app/changeLanguage                         App.ChangeLanguage
 GET     /app/groups                                 App.Groups
+GET     /app/dataPrivacy                            App.DataPrivacy
 
 
 # ---------------------------------------------------------------------------- #

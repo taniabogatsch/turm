@@ -5,7 +5,7 @@
 header.no.javascript = JavaScript is not activated. Parts of the page may behave different than expected.
 
 footer.support.email = If you have any questions, please contact our <a href="mailto:%s?Subject=SupportTurm2" target="_top">support</a>.
-footer.data.policy = <a href="#">Here</a> you can find our data policy. #TODO
+footer.data.policy = <a href='app/dataPrivacy'>Here</a> you can find our data policy.
 
 nav.help = Help
 
