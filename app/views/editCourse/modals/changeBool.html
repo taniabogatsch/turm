@@ -41,8 +41,11 @@ listType:       change-bool-modal-list          value
           <!-- boolean value -->
           <div class="form-group">
             <div class="form-check">
-              <input id="change-bool-modal-checkbox" class="form-check-input" type="checkbox"
-                value="true" name="option">
+              <label class="switch">
+                <input type="checkbox" name="option" id="change-bool-modal-checkbox">
+                <span class="slider round"></span>
+              </label>
+              &nbsp;
               <label class="form-check-label" id="change-bool-modal-option-1"></label>
               <label class="form-check-label" id="change-bool-modal-option-2"></label>
             </div>
@@ -69,11 +72,15 @@ listType:       change-bool-modal-list          value
     //react to user input
     $('#change-bool-modal-checkbox').change(function() {
       if($("#change-bool-modal-checkbox").is(':checked')) {
-        $('#change-bool-modal-option-1').removeClass("display-none");
-        $('#change-bool-modal-option-2').addClass("display-none");
+        $('#change-bool-modal-option-1').removeClass("d-none");
+        $('#change-bool-modal-option-2').addClass("d-none");
+        $('#change-bool-modal-option-1').addClass("d-inline");
+        $('#change-bool-modal-option-2').removeClass("d-inline");
       } else {
-        $('#change-bool-modal-option-1').addClass("display-none");
-        $('#change-bool-modal-option-2').removeClass("display-none");
+        $('#change-bool-modal-option-1').addClass("d-none");
+        $('#change-bool-modal-option-2').removeClass("d-none");
+        $('#change-bool-modal-option-1').removeClass("d-inline");
+        $('#change-bool-modal-option-2').addClass("d-inline");
       }
     });
   });

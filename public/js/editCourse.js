@@ -46,8 +46,9 @@ function openChangeModal(title, field, value, valid, action, modal, max, info, I
 
   if (field == "fee") {
     $('#change-text-modal-icon').html($('#change-text-icon-euro').html());
-    $('#change-text-modal-value').attr("pattern", "^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?");
+    $('#change-text-modal-value').attr("pattern", "^([0-9]{1,6}([,|.][0-9]{0,2})?)?");
     $('#change-text-modal-validation').html($('#change-text-validation-fee').html());
+    $('#change-text-modal-value').attr("maxlength", 10);
   } else {
     $('#change-text-modal-icon').html($('#change-text-icon-pencil').html());
     $('#change-text-modal-value').removeAttr("pattern");
@@ -119,11 +120,15 @@ function openBoolModal(title, action, option1, option2, value, userID, listType,
   $('#change-bool-modal-option-2').html(option2);
   $("#change-bool-modal-checkbox").prop("checked", value);
   if (value) {
-    $('#change-bool-modal-option-1').removeClass("display-none");
-    $('#change-bool-modal-option-2').addClass("display-none");
+    $('#change-bool-modal-option-1').removeClass("d-none");
+    $('#change-bool-modal-option-2').addClass("d-none");
+    $('#change-bool-modal-option-1').addClass("d-inline");
+    $('#change-bool-modal-option-2').removeClass("d-inline");
   } else {
-    $('#change-bool-modal-option-1').addClass("display-none");
-    $('#change-bool-modal-option-2').removeClass("display-none");
+    $('#change-bool-modal-option-1').addClass("d-none");
+    $('#change-bool-modal-option-2').removeClass("d-none");
+    $('#change-bool-modal-option-1').removeClass("d-inline");
+    $('#change-bool-modal-option-2').addClass("d-inline");
   }
 
   //set optional values: userID and listType
@@ -200,4 +205,26 @@ function openEditMeeting(meetingID, start, end, place, annotation, weekday, inte
   $('#meeting-' + meetingType + '-annotation').val(annotation);
 
   $('#edit-meeting-' + meetingType).modal('show');
+}
+
+function showPreview() {
+  $(".preview-hide").each(function() {
+    $(this).addClass("d-none");
+  });
+  $(".preview-show").each(function() {
+    $(this).removeClass("d-none");
+  });
+  $('#preview-btn').addClass('d-none');
+  $('#hide-preview-btn').removeClass('d-none');
+}
+
+function hidePreview() {
+  $(".preview-hide").each(function() {
+    $(this).removeClass("d-none");
+  });
+  $(".preview-show").each(function() {
+    $(this).addClass("d-none");
+  });
+  $('#preview-btn').removeClass('d-none');
+  $('#hide-preview-btn').addClass('d-none');
 }

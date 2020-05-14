@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"strings"
+	"time"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -95,7 +96,9 @@ func (meeting *Meeting) Validate(v *revel.Validation) {
 /*NewBlank creates a new blank meeting. */
 func (meeting *Meeting) NewBlank() (err error) {
 
-	err = app.Db.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval)
+	now := time.Now().Format(revel.TimeFormats[0])
+
+	err = app.Db.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval, now)
 	if err != nil {
 		modelsLog.Error("failed to insert blank meeting", "meeting", meeting,
 			"error", err.Error())
@@ -191,7 +194,7 @@ const (
 				event_id, meeting_start, meeting_end, meeting_interval
 			)
 		VALUES (
-				$1, '2006-01-01 10:00', '2006-01-01 11:00', $2
+				$1, $3, $3, $2
 		)
 		RETURNING id
 	`

@@ -10,7 +10,7 @@ editor.of = Editor of
 instructor.of = Instructor of
 
 creator.general.data = General course data
-creator.catalog = Terms & Definitions
+creator.wiki = Wiki
 
 
 # --- left navigation

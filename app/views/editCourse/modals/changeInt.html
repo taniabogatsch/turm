@@ -35,7 +35,7 @@ formID:       change-int-modal-form       action
           <!-- value -->
           <small class="form-text text-muted" id="change-int-modal-info">
           </small>
-          <input min="1" type="number" name="value" class="form-control"
+          <input min="1" max="1000000" type="number" name="value" class="form-control"
             id="change-int-modal-value" required>
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.int"}}

@@ -26,7 +26,7 @@ group.delete.success = Gruppe ID = %d gelöscht.
 group.no.children = Diese Gruppe besitzt keine Untergruppen.
 group.course.limit.info = Innerhalb dieser Gruppe können Sie sich in maximal %d Kurse einschreiben.
 group.course.limit.x.info = Innerhalb dieser Gruppe (und Ihrer Untergruppen) können sich NutzerInnen nur in maximal X Kurse einschreiben. Wenn Sie das Feld leer lassen, dann können sich NutzerInnen in beliebig viele Kurse einschreiben.
-group.inherits.limit.info = Ein Vor-oder Nachgänger dieser Gruppe besitzt bereits ein Kurslimit.
+group.inherits.limit.info = Eine vorherige oder nachfolgende Gruppe dieser Gruppe besitzt bereits ein Kurslimit.
 
 # -------------------------------------------------------------------------------------------------- #
 # LOGIN, LOGOUT, REGISTER, ACTIVATION, NEW PASSWORD, PREFERRED LANGUAGE

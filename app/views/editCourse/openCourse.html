@@ -23,7 +23,7 @@
             onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
               {{msg $ "creator.course.activate.confirm" .course.Title}},
               {{url "Creator.Activate" .course.ID}});'>
-            {{msg $ "creator.course.activate"}}
+            {{template "icons/unlock.html" . }}
           </button>
         {{else}}
           <!-- expire the course -->
@@ -31,7 +31,7 @@
             onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
               {{msg $ "creator.course.expire.confirm" .course.Title}},
               {{url "Creator.Expire" .course.ID}});'>
-            {{msg $ "creator.course.expire"}}
+            {{template "icons/archive.html" . }}
           </button>
         {{end}}
       {{else}}
@@ -42,7 +42,7 @@
               onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
                 {{msg $ "creator.course.activate.confirm" .course.Title}},
                 {{url "Creator.Activate" .course.ID}});'>
-              {{msg $ "creator.course.activate"}}
+              {{template "icons/unlock.html" . }}
             </button>
           {{else}}
             <!-- expire the course -->
@@ -50,7 +50,7 @@
               onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
                 {{msg $ "creator.course.expire.confirm" .course.Title}},
                 {{url "Creator.Expire" .course.ID}});'>
-              {{msg $ "creator.course.expire"}}
+              {{template "icons/archive.html" . }}
             </button>
           {{end}}
         {{end}}
@@ -60,13 +60,16 @@
         <!-- validate course -->
         <form class="float-right margin-right-20" action='{{url "EditCourse.Validate" .course.ID}}' method="POST">
           <button type="submit" class="btn btn-outline-darkblue">
-            {{msg $ "creator.course.validate"}}
+            {{template "icons/checkAll.html" . }}
           </button>
         </form>
       {{end}}
 
       <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-right margin-right-20" onclick="showPreview();">
-        {{msg $ "creator.course.preview"}}
+        {{template "icons/aspectRatio.html" . }}
+      </button>
+      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-right margin-right-20 d-none" onclick="hidePreview();">
+        {{template "icons/pencil.html" . }}
       </button>
     </h4>
     <hr>
@@ -84,9 +87,9 @@
 </div>
 
 <div class="page page-side page-side-right page-padding-left">
+  {{template "toast.html" .}}
   <div class="position-fixed border-left page-padding-left-small page-side-right page-add-scroll">
-    {{template "toast.html" .}}
-    {{template "editCourse/catalog.html"  dict_addLocale $.currentLocale "active" .course.Active "expired" .course.Expired}}
+    {{template "editCourse/wiki.html"  dict_addLocale $.currentLocale "active" .course.Active "expired" .course.Expired}}
   </div>
 </div>
 
@@ -108,6 +111,16 @@
         $('#pills-opened-expired').removeClass("display-none");
       {{end}}
     {{end}}
+
+    //react to user input
+    $('#change-ldap-switch').change(function() {
+      $('#change-ldap-form').submit();
+    });
+
+    //react to user input
+    $('#change-visibility-switch').change(function() {
+      $('#change-visibility-form').submit();
+    });
   });
 </script>
 

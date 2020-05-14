@@ -10,7 +10,7 @@ editor.of = EditorIn von
 instructor.of = OrganisatorIn von
 
 creator.general.data = Allgemeine Kursdaten
-creator.catalog = Verzeichnis
+creator.wiki = Wiki
 
 
 # --- left navigation

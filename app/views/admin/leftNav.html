@@ -1,11 +1,12 @@
 <!-- navigate to the different administration pages -->
 
-<div class="page page-side page-side-left">
-  <h4>
-    {{msg $ "admin.page"}}
-  </h4>
-  <hr>
-  <div class="login-width">
+<div class="page page-side page-side-left page-padding-right">
+  <div class="position-fixed border-right page-padding-right-small">
+    <h4>
+      {{msg $ "admin.page"}}
+    </h4>
+    <hr>
+
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
       <a class="nav-link btn-outline-darkblue margin-5" id="v-pills-users-tab" href='{{url "Admin.UserManagement"}}' role="tab">
         {{template "icons/search.html" . }}
@@ -22,6 +23,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- user details modal -->
 <div class="modal fade" id="user-details-modal" tabindex="-1" role="dialog" aria-hidden="true">

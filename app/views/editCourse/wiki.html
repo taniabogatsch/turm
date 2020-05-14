@@ -1,10 +1,10 @@
 <h4>
-  {{msg $ "creator.catalog"}}
+  {{msg $ "creator.wiki"}}
 </h4>
 <hr>
 
 <nav class="nav flex-column">
-  <a class="nav-link" href="#general-data">
+  <a class="nav-link" href="#">
     {{template "icons/infoSquare.html" .}}
     &nbsp; {{msg $ "creator.general.data"}}
   </a>
@@ -22,18 +22,28 @@
 
 <small class="form-text text-muted">
 
-  <strong> {{msg $ "creator.course.preview"}} / {{msg $ "creator.course.edit"}}: </strong>
+  {{template "icons/aspectRatio.html" . }} &nbsp;
+  <strong>
+    {{msg $ "creator.course.preview"}}
+  </strong>
+  &nbsp;
+  {{template "icons/pencil.html" . }} &nbsp;
+  <strong>
+    {{msg $ "creator.course.edit"}}:
+  </strong>
   {{msg $ "creator.info.preview"}}
 
   {{if not .active}}
 
     <!-- validate -->
     <hr>
+    {{template "icons/checkAll.html" . }} &nbsp;
     <strong> {{msg $ "creator.course.validate"}}: </strong>
     {{msg $ "creator.info.validate"}}
 
     <!-- activate -->
     <hr>
+    {{template "icons/unlock.html" . }} &nbsp;
     <strong> {{msg $ "creator.course.activate"}}: </strong>
     {{msg $ "creator.info.activate"}}
 
@@ -41,6 +51,7 @@
     <!-- expire -->
     {{if not .expired}}
       <hr>
+      {{template "icons/archive.html" . }} &nbsp;
       <strong> {{msg $ "creator.course.expire"}}: </strong>
       {{msg $ "creator.info.expire"}}
     {{end}}

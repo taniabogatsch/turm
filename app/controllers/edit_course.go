@@ -587,7 +587,22 @@ func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.R
 	c.Log.Debug("change enrollment limit", "ID", ID, "fieldID", fieldID, "value", value)
 
 	//NOTE: the interceptor assures that the course ID is valid
-	//NOTE: no validation is required; set to null, if value is 0
+	//NOTE: set to null, if value is 0
+
+	c.Validation.Check(value,
+		revel.Min{0},
+		revel.Max{1000000},
+	).MessageKey("validation.invalid.int")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation,
+			nil,
+			c.Session["currPath"].(string),
+			c.Controller,
+			"",
+		)
+	}
 
 	valid := (value != 0)
 

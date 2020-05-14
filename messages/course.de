@@ -11,8 +11,7 @@ course.fee = Teilnahmegebühr
 course.description = Kursbeschreibung
 course.speaker = ReferentIn
 course.audience = Zielgruppe
-course.only.ldap = NutzerInnen mit Universitätsaccount.
-course.not.only.ldap = NutzerInnen mit Externem- sowie Universitätsaccount.
+course.only.ldap = Nur NutzerInnen mit Universitätsaccount.
 
 course.clock = Uhr
 course.from = Von
@@ -133,7 +132,7 @@ course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
 course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
 course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr von %g€ löschen wollen?
 course.fee.delete.title = Teilnahmegebühr löschen
-course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15,00 oder 15.00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
+course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15 oder 15,0 oder 15,00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
 course.description.change.success = Kursbeschreibung geändert, Kurs ID = %d.
 course.description.delete.success = Kursbeschreibung gelöscht, Kurs ID = %d.
@@ -190,11 +189,8 @@ course.see.matr.nr.info = NutzerIn darf die Matrikelnummern eingeschriebener Nut
 course.not.see.matr.nr.info = NutzerIn darf die Matrikelnummern eingeschriebener NutzerInnen <strong>nicht</strong> sehen.
 
 course.visibility.public = Der Kurs ist öffentlich (ohne Anmeldung) sichtbar.
-course.visibility.not.public = Der Kurs ist <strong>nicht</strong> öffentlich (ohne Anmeldung) sichtbar.
-course.visibility.change.title = Sichtbarkeit ändern
 course.visible.change.success = Sichtbarkeit geändert, Kurs ID = %d.
 
-course.only.ldap.change.title = Zielgruppe ändern
 course.only_ldap.change.success = Zielgruppe geändert, Kurs ID = %d.
 
 course.whitelists.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.

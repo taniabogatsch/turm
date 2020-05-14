@@ -320,7 +320,7 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 }
 
 //FeePattern is the regular expression of accepted course fees
-var FeePattern = regexp.MustCompile("^([0-9]{1,}(((,||.)[0-9]{1,2})||( )))?")
+var FeePattern = regexp.MustCompile("^([0-9]{1,6}([,|.][0-9]{0,2})?)?")
 
 const (
 	stmtSelectCourse = `
@@ -343,8 +343,7 @@ const (
 			enrollment_start, enrollment_end, expiration_date
 		)
 		VALUES (
-			$3, $2, false, false, false, $1, '2006-01-01',
-			'2006-01-01', '2007-01-01'
+			$3, $2, false, false, false, $1, $1, $1, $1
 		)
 		RETURNING id, title
 	`

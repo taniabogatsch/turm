@@ -15,7 +15,8 @@
     <small class="form-text text-muted">
       {{msg $ "search.criteria"}}
     </small>
-    <form id="search-form" accept-charset="UTF-8" class="needs-validation" novalidate>
+    <form id="search-form" accept-charset="UTF-8" class="needs-validation"
+      novalidate onkeydown="return event.key != 'Enter';">
       <div class="form-group">
         <div class="input-group">
           <div class="input-group-prepend">
@@ -23,7 +24,9 @@
               {{template "icons/search.html" . }}
             </span>
           </div>
-          <input id="user-search-input" type="text" class="form-control rounded-right" placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3">
+          <input id="user-search-input" type="text" class="form-control rounded-right"
+            placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3"
+            onpaste="reactToInput();">
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.searchValue"}}
           </div>

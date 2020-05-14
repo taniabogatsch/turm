@@ -11,8 +11,7 @@ course.fee = Fee
 course.description = Course description
 course.speaker = Speaker
 course.audience = Audience
-course.only.ldap = Users with an university account.
-course.not.only.ldap = Users with both an external or an university account.
+course.only.ldap = Only users with an university account.
 
 course.clock =
 course.from = From
@@ -133,7 +132,7 @@ course.fee.change.success = Changes course fee to %s€, course ID = %d.
 course.fee.delete.success = Deleted course fee, course ID = %d.
 course.fee.delete.confirm = Please confirm the deletion of the course fee of %g€, course ID = %d.
 course.fee.delete.title = Delete course fee
-course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15,00 or 15.00 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
+course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15 or 15.0 or 15.00 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
 
 course.description.change.success = Changed course description, course ID = %d.
 course.description.delete.success = Deleted course description, course ID = %d.
@@ -190,11 +189,8 @@ course.see.matr.nr.info = This user is allowed to see the matriculation numbers 
 course.not.see.matr.nr.info = This user is <strong>not</strong> allowed to see the matriculation numbers of enrolled users.
 
 course.visibility.public = The course is publicly (without login) visible.
-course.visibility.not.public = The course is <strong>not</strong> publicly (without login) visible.
-course.visibility.change.title = Change visibility
 course.visible.change.success = Changed visibility, course ID = %d.
 
-course.only.ldap.change.title = Change audience
 course.only_ldap.change.success = Changed audience, course ID = %d.
 
 course.whitelists.change.success = Added user to whitelist: %s, course ID = %d.

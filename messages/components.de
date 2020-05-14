@@ -26,6 +26,7 @@ button.save = Speichern
 button.load = Laden
 button.confirm = Bestätigen
 button.download = Herunterladen
+button.create = Erstellen
 
 button.login = Anmelden
 button.logout = Abmelden

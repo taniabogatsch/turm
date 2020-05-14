@@ -53,15 +53,15 @@ validation.invalid.timestamp = Bitte geben Sie ein gültiges Datum und eine Uhrz
 validation.invalid.text = Die Eingabe muss aus 3 bis 511 Zeichen bestehen.
 validation.invalid.text.short = Die Eingabe muss aus 3 bis 255 Zeichen bestehen.
 validation.invalid.text.area = Bitte geben Sie Textinhalt an.
-validation.invalid.int = Bitte geben Sie eine natürliche positive Zahl an.
+validation.invalid.int = Bitte geben Sie eine Zahle zwischen 1 und 1.000.000 an.
 
-validation.invalid.fee = Bitte geben Sie eine gültige Teilnahmegebühr an.
+validation.invalid.fee = Bitte geben Sie eine gültige Teilnahmegebühr zwischen (0; 999999,99] an.
 
 validation.invalid.enrollment.start = Der Beginn des Einschreibezeitraums darf nicht vor der aktuellen Systemzeit liegen.
 validation.invalid.enrollment.end = Das Ende des Einschreibezeitraums muss nach dessen Anfang liegen.
 validation.invalid.unsubscribe.end = Das Ende des Ausschreibezeitraums muss nach dem Ende des Einschreibezeitraums liegen.
 validation.invalid.unsubscribe.expiration = Das Ende des Ausschreibezeitraums muss vor dem Ablaufdatum des Kurses liegen.
-validation.invalid.expiration.date = Das Ablaufdatum des Kurses muss nach dem Ende des Einschreibezeitraums lieben.
+validation.invalid.expiration.date = Das Ablaufdatum des Kurses muss nach dem Ende des Einschreibezeitraums liegen.
 validation.invalid.parent = Der Kurs muss Teil einer Gruppe sein.
 
 validation.invalid.meeting.start = Termine dürfen nicht vor dem Anfang des Einschreibezeitraums liegen.

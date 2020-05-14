@@ -86,8 +86,10 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	c.Validation.Required(value).
-		MessageKey("validation.invalid.int")
+	c.Validation.Check(value,
+		revel.Min{1},
+		revel.Max{1000000},
+	).MessageKey("validation.invalid.int")
 
 	if c.Validation.HasErrors() {
 		return flashError(
