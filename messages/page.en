@@ -75,7 +75,7 @@ pref.lang.info.long = E-mail language. Can be changed at the profile page later.
 # HELP PAGE
 # -------------------------------------------------------------------------------------------------- #
 
-data.privacy.tab = Terms of Use & Data privacy
+data.privacy.tab = Data privacy
 data.privacy.page = Terms of Use & Data privacy
 
 news.feed.tab = Turm2 News

@@ -82,3 +82,15 @@ func (c App) DataPrivacy() revel.Result {
 
 	return c.Render()
 }
+
+/*Imprint renders the imprint page.
+- Roles: all (except not activated users) */
+func (c App) Imprint() revel.Result {
+
+	c.Log.Debug("render imprint page", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("imprint.tab")
+
+	return c.Render()
+}
