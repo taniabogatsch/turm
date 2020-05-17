@@ -62,7 +62,7 @@ func (user *UserListEntry) Insert(table string) (err error) {
 		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID)
 	}
 	if err != nil {
-		modelsLog.Error("failed to insert user into user list", "user", user,
+		log.Error("failed to insert user into user list", "user", user,
 			"table", table, "error", err.Error())
 	}
 	return
@@ -79,7 +79,7 @@ func (user *UserListEntry) Delete(table string) (err error) {
 
 	_, err = app.Db.Exec(deleteUser, user.UserID, user.CourseID)
 	if err != nil {
-		modelsLog.Error("failed to delete user from user list", "user", user,
+		log.Error("failed to delete user from user list", "user", user,
 			"table", table, "error", err.Error())
 	}
 	return
@@ -102,7 +102,7 @@ func (user *UserListEntry) Update(table string) (err error) {
 
 	err = app.Db.Get(user, updateUser, user.UserID, user.CourseID, user.ViewMatrNr)
 	if err != nil {
-		modelsLog.Error("failed to update user from user list", "user", user,
+		log.Error("failed to update user from user list", "user", user,
 			"table", table, "error", err.Error())
 	}
 	return
@@ -130,7 +130,7 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 	`
 	err = tx.Select(users, selectUsers, *courseID)
 	if err != nil {
-		modelsLog.Error("failed to get user list", "table", table, "course ID",
+		log.Error("failed to get user list", "table", table, "course ID",
 			*courseID, "error", err.Error())
 		tx.Rollback()
 	}
@@ -157,7 +157,7 @@ func (users *UserList) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int, tab
 
 	_, err = tx.Exec(stmtDuplicateList, *courseIDOld, *courseIDNew)
 	if err != nil {
-		modelsLog.Error("failed to duplicate user list", "table", table, "course ID old",
+		log.Error("failed to duplicate user list", "table", table, "course ID old",
 			*courseIDOld, "course ID new", *courseIDNew, "error", err.Error())
 		tx.Rollback()
 	}
@@ -191,7 +191,7 @@ func (users *UserList) Search(value, listType *string, searchInactive *bool, cou
 
 	err = app.Db.Select(users, stmt, values, matrNr, *searchInactive, *courseID)
 	if err != nil {
-		modelsLog.Error("failed to search users", "values", values,
+		log.Error("failed to search users", "values", values,
 			"matrNr", matrNr, "error", err.Error())
 	}
 	return
@@ -220,7 +220,7 @@ func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err err
 			_, err = tx.Exec(stmt, user.UserID, *courseID, user.ViewMatrNr)
 		}
 		if err != nil {
-			modelsLog.Error("failed to insert user", "table", table, "course ID",
+			log.Error("failed to insert user", "table", table, "course ID",
 				*courseID, "user", user, "error", err.Error())
 			tx.Rollback()
 			return

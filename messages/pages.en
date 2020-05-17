@@ -13,11 +13,11 @@ group.name = Group name
 group.course.limit = Course limit
 group.last.edited = Last edited
 
-group.new = Create new group
-group.new.success = Created group '%s', ID = %d.
+group.insert = Create new group
+group.insert.success = Created group '%s', ID = %d.
 
-group.edit = Edit group
-group.edit.success = Edited group '%s', ID = %d.
+group.update = Edit group
+group.update.success = Edited group '%s', ID = %d.
 
 group.delete.question = Please confirm the deletion of the group '%s'.
 group.delete.title = Group deletion
@@ -72,16 +72,50 @@ pref.lang.info = E-mail language
 pref.lang.info.long = E-mail language. Can be changed at the profile page later.
 
 # -------------------------------------------------------------------------------------------------- #
-# HELP PAGE
+# HELP PAGES
 # -------------------------------------------------------------------------------------------------- #
 
 data.privacy.tab = Data privacy
 data.privacy.page = Terms of Use & Data privacy
 
+categories = Categories
+categories.none = No categories yet.
+
+category.name = Category name
+category.add = + &nbsp; Category
+category.select = Please select the category of this entry.
+
+category.insert = Create a new category
+category.insert.success = Added category '%s', ID = %d.
+
+category.update = Edit category
+category.update.success = Edited category '%s', ID = %d.
+
+category.delete.success = Deleted category, ID = %d.
+category.delete.title = Delete category
+category.delete.confirm = Please confirm the deletion of category '%s'.
+
+entries.none = No entries in this category yet.
+
+entry.content = Content
+entry.question = Question
+entry.answer = Answer
+
+entry.insert.success = Added entry to category %d, ID = %d.
+entry.insert.title = New entry
+entry.insert.add = + &nbsp; Entry
+
+entry.update = Edit entry
+entry.update.success = Edited entry of category %d, ID = %d.
+
+entry.delete.success = Deleted entry, ID = %d.
+entry.delete.title = Delete entry
+entry.delete.confirm = Please confirm the deletion of this entry.
+
 news.feed.tab = Turm2 News
 news.feed.page = Updates & Announcements
 
-faq.tab = FAQ
+faq.tab = FAQs
 faq.page = FAQs
 
 imprint.tab = Imprint

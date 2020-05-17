@@ -61,7 +61,7 @@
   $(function() {
     //detect validation error
     if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
+      showToast($('#flash-errors').html(), 'danger');
     }
   });
 </script>

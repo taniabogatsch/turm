@@ -16,15 +16,15 @@ func (users *Users) Get(role Role) (err error) {
 	case ADMIN:
 		err = app.Db.Select(users, stmtSelectUsers, ADMIN, app.TimeZone)
 		if err != nil {
-			modelsLog.Error("failed to get users", "role", ADMIN, "error", err.Error())
+			log.Error("failed to get users", "role", ADMIN, "error", err.Error())
 		}
 	case CREATOR:
 		err = app.Db.Select(users, stmtSelectUsers, CREATOR, app.TimeZone)
 		if err != nil {
-			modelsLog.Error("failed to get users", "role", CREATOR, "error", err.Error())
+			log.Error("failed to get users", "role", CREATOR, "error", err.Error())
 		}
 	default:
-		modelsLog.Error("invalid role provided", "role", role)
+		log.Error("invalid role provided", "role", role)
 	}
 	return
 }
@@ -42,7 +42,7 @@ func (users *Users) Search(value *string, searchInactive *bool) (err error) {
 
 	err = app.Db.Select(users, stmtSearchUsers, values, matrNr, app.TimeZone, *searchInactive)
 	if err != nil {
-		modelsLog.Error("failed to search users", "values", values,
+		log.Error("failed to search users", "values", values,
 			"matrNr", matrNr, "error", err.Error())
 	}
 	return

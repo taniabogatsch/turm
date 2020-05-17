@@ -43,11 +43,10 @@
           aria-haspopup="true" aria-expanded="false">
           {{msg $ "nav.help"}}
         </a>
-        <!-- TODO -->
         <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
           <a class="dropdown-item" href='{{url "App.DataPrivacy"}}'> {{msg $ "data.privacy.tab"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "news.feed.tab"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "faq.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.News"}}'> {{msg $ "news.feed.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.FAQs"}}'> {{msg $ "faq.tab"}} </a>
           <a class="dropdown-item" href='{{url "App.Imprint"}}'> {{msg $ "imprint.tab"}} </a>
         </div>
       </li>
@@ -156,7 +155,7 @@
 
 {{if $.session.userID}}
   {{if eq $.session.role "admin"}}
-    {{template "admin/groups.html" .}}
+    {{template "admin/modals/changeGroup.html" .}}
   {{end}}
 {{end}}
 

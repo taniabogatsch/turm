@@ -1,27 +1,34 @@
-<!-- this template loads all current groups and recursively loads their children -->
-<!-- TODO: only show add, edit and delete button if the user's role is admin -->
+<!-- show all groups and their children -->
 
-<!-- show all children -->
+<!-- show all groups of this level in the groups tree -->
 {{range .Groups}}
   {{if ne .ID 0}} <!-- group entry -->
     <div class="card border-0">
       <div id="heading-{{.IDPrefix}}-{{.ID}}">
-        <button onclick='changeIcon("{{.IDPrefix}}-{{.ID}}");' class="btn btn-block btn-light text-justify list-group-item" type="button" data-toggle="collapse" data-target="#{{.IDPrefix}}-{{.ID}}" aria-expanded="true" aria-controls="{{.IDPrefix}}-{{.ID}}">
+        <button onclick='changeIcon("{{.IDPrefix}}-{{.ID}}");' class="btn btn-block btn-light text-justify list-group-item"
+          type="button" data-toggle="collapse" data-target="#{{.IDPrefix}}-{{.ID}}" aria-expanded="true"
+          aria-controls="{{.IDPrefix}}-{{.ID}}">
 
           {{if $.session.userID}}
             {{if eq $.session.role "admin"}}
               <!-- delete -->
               {{if not .Groups}}
-                <a href="#no-scroll" onclick='openDeleteGroup({{.ID}}, {{msg $ "group.delete.question" .Name}});' class="btn btn-outline-darkblue float-right ml-3">
+                <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
+                  onclick='confirmPOSTModal({{msg $ "group.delete.title"}},
+                  {{msg $ "group.delete.question" .Name}}, "{{url "Admin.DeleteGroup" .ID}}#");'>
                   {{template "icons/trash.html" . }}
                 </a>
               {{end}}
-              <!-- edit -->
-              <a href="#no-scroll" onclick='openEditGroup({{.ID}}, {{.ParentID}}, {{.ChildHasLimits}}, {{.InheritsLimits}}, {{.Name}}, {{.CourseLimit.Int32}});' class="btn btn-outline-darkblue float-right ml-3">
+              <!-- update -->
+              <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
+                onclick='openAdminGroupModal({{.ID}}, {{.ParentID}}, {{.InheritsLimits}}, {{url "Admin.UpdateGroup"}},
+                {{msg $ "group.update"}}, {{.Name}}, {{.ChildHasLimits}}, {{.CourseLimit.Int32}});'>
                 {{template "icons/pencil.html" . }}
               </a>
-              <!-- add -->
-              <a href="#no-scroll" onclick="openCreateGroup({{.ID}}, {{.InheritsLimits}});" class="btn btn-outline-darkblue float-right ml-3">
+              <!-- insert -->
+              <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
+                onclick='openAdminGroupModal("", {{.ID}}, {{.InheritsLimits}},
+                {{url "Admin.InsertGroup"}}, {{msg $ "group.insert"}}, "", false, "");'>
                 {{template "icons/plus.html" . }}
               </a>
             {{end}}

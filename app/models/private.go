@@ -9,7 +9,7 @@ func updateByID(column string, value interface{}, selection interface{}, table s
 
 	err = app.Db.Get(model, update, selection, value)
 	if err != nil {
-		modelsLog.Error("failed to update value", "selection", selection,
+		log.Error("failed to update value", "selection", selection,
 			"value", value, "error", err.Error())
 	}
 	return

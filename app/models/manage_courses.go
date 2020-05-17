@@ -62,7 +62,7 @@ func (list *CourseList) GetByUserID(userID *int, userType string, active, expire
 	}
 
 	if err != nil {
-		modelsLog.Error("failed to get course list", "user ID", *userID,
+		log.Error("failed to get course list", "user ID", *userID,
 			"userType", userType, "active", active, "expired", expired,
 			"error", err.Error())
 	}

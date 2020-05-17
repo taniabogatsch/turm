@@ -7,6 +7,31 @@ module:jobs
 
 
 # ---------------------------------------------------------------------------- #
+# Admin
+# ---------------------------------------------------------------------------- #
+
+GET     /admin/userManagement                       Admin.UserManagement
+GET     /admin/roleManagement                       Admin.RoleManagement
+GET     /admin/dashboard                            Admin.Dashboard
+
+POST    /admin/insertGroup                          Admin.InsertGroup
+POST    /admin/updateGroup                          Admin.UpdateGroup
+POST    /admin/deleteGroup                          Admin.DeleteGroup
+
+GET     /admin/searchUser                           Admin.SearchUser
+GET     /admin/userDetails                          Admin.UserDetails
+POST    /admin/changeRole                           Admin.ChangeRole
+
+POST    /admin/insertCategory                       Admin.InsertCategory
+POST    /admin/updateCategory                       Admin.UpdateCategory
+POST    /admin/deleteCategory                       Admin.DeleteCategory
+
+POST    /admin/insertHelpPageEntry                  Admin.InsertHelpPageEntry
+POST    /admin/updateHelpPageEntry                  Admin.UpdateHelpPageEntry
+POST    /admin/deleteHelpPageEntry                  Admin.DeleteHelpPageEntry
+
+
+# ---------------------------------------------------------------------------- #
 # App
 # ---------------------------------------------------------------------------- #
 
@@ -16,41 +41,8 @@ GET     /app/groups                                 App.Groups
 GET     /app/dataPrivacy                            App.DataPrivacy
 GET     /app/imprint                                App.Imprint
 
-
-# ---------------------------------------------------------------------------- #
-# User
-# ---------------------------------------------------------------------------- #
-
-GET     /user/loginPage                             User.LoginPage
-POST    /user/login                                 User.Login
-GET     /user/logout                                User.Logout
-
-GET     /user/registrationPage                      User.RegistrationPage
-POST    /user/registration                          User.Registration
-
-GET     /user/newPasswordPage                       User.NewPasswordPage
-POST    /user/newPassword                           User.NewPassword
-
-GET     /user/activationPage                        User.ActivationPage
-GET     /user/verifyActivationCode                  User.VerifyActivationCode
-GET     /user/newActivationCode                     User.NewActivationCode
-
-GET     /user/prefLanguagePage                      User.PrefLanguagePage
-POST    /user/setPrefLanguage                       User.SetPrefLanguage
-
-
-# ---------------------------------------------------------------------------- #
-# Manage Courses
-# ---------------------------------------------------------------------------- #
-
-GET     /manageCourses/active                       ManageCourses.Active
-GET     /manageCourses/getActive                    ManageCourses.GetActive
-
-GET     /manageCourses/drafts                       ManageCourses.Drafts
-GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
-
-GET     /manageCourses/expired                      ManageCourses.Expired
-GET     /manageCourses/getExpired                   ManageCourses.GetExpired
+GET     /app/faqs                                   App.FAQs
+GET     /app/news                                   App.News
 
 
 # ---------------------------------------------------------------------------- #
@@ -65,7 +57,7 @@ POST    /creator/new                                Creator.New
 
 
 # ---------------------------------------------------------------------------- #
-# Edit course (course, event, meeting)
+# Edit (course, event, meeting)
 # ---------------------------------------------------------------------------- #
 
 GET     /editCourse/openCourse                      EditCourse.OpenCourse
@@ -97,20 +89,39 @@ POST    /edit/meeting/delete                        EditMeeting.Delete
 
 
 # ---------------------------------------------------------------------------- #
-# Admin
+# Manage Courses
 # ---------------------------------------------------------------------------- #
 
-GET     /admin/userManagement                       Admin.UserManagement
-GET     /admin/roleManagement                       Admin.RoleManagement
-GET     /admin/dashboard                            Admin.Dashboard
+GET     /manageCourses/active                       ManageCourses.Active
+GET     /manageCourses/getActive                    ManageCourses.GetActive
 
-POST    /admin/addGroup                             Admin.AddGroup
-POST    /admin/editGroup                            Admin.EditGroup
-POST    /admin/deleteGroup                          Admin.DeleteGroup
+GET     /manageCourses/drafts                       ManageCourses.Drafts
+GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
 
-GET     /admin/searchUser                           Admin.SearchUser
-GET     /admin/userDetails                          Admin.UserDetails
-POST    /admin/changeRole                           Admin.ChangeRole
+GET     /manageCourses/expired                      ManageCourses.Expired
+GET     /manageCourses/getExpired                   ManageCourses.GetExpired
+
+
+# ---------------------------------------------------------------------------- #
+# User
+# ---------------------------------------------------------------------------- #
+
+GET     /user/loginPage                             User.LoginPage
+POST    /user/login                                 User.Login
+GET     /user/logout                                User.Logout
+
+GET     /user/registrationPage                      User.RegistrationPage
+POST    /user/registration                          User.Registration
+
+GET     /user/newPasswordPage                       User.NewPasswordPage
+POST    /user/newPassword                           User.NewPassword
+
+GET     /user/activationPage                        User.ActivationPage
+GET     /user/verifyActivationCode                  User.VerifyActivationCode
+GET     /user/newActivationCode                     User.NewActivationCode
+
+GET     /user/prefLanguagePage                      User.PrefLanguagePage
+POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
 
 # ---------------------------------------------------------------------------- #

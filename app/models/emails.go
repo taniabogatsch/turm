@@ -31,7 +31,7 @@ func GetEMailSubjectBody(data *EMailData, language *string, subjectKey string,
 	filepath := filepath.Join("emails", filename+"_"+*language+".html")
 	buf, err := revel.TemplateOutputArgs(filepath, c.ViewArgs)
 	if err != nil {
-		modelsLog.Error("failed to parse e-mail template", "filepath", filepath,
+		log.Error("failed to parse e-mail template", "filepath", filepath,
 			"viewArgs", c.ViewArgs, "error", err.Error())
 		return
 	}

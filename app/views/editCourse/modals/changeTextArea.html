@@ -9,7 +9,7 @@ formID:         change-text-area-modal-form         action
 -->
 
 <div class="modal fade" id="change-text-area-modal" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
 
       <!-- form -->
@@ -62,25 +62,19 @@ formID:         change-text-area-modal-form         action
 </div>
 
 <script>
-  //initialize Quill editor
+  //initialize the Quill editor
   var quill;
+
   $(function() {
+    //set the Quill editor
     quill = new Quill('#change-text-area-modal-editor', {
       theme: 'snow'
     });
 
     //ensure that the form validation behaves correctly
     quill.on('text-change', function(delta, oldDelta, source) {
-      if (source == 'user') {
-        const textArea = document.getElementById("change-text-area-modal-value");
-        const text = quill.root.innerHTML;
-        if (text != "<p><br></p>") {
-          $('#change-text-area-modal-value').val(text);
-          textArea.setCustomValidity('');
-        } else {
-          textArea.setCustomValidity("Please provide a text.");
-        }
-      }
+      const text = quill.root.innerHTML;
+      detectTextFieldChange(source, "change-text-area-modal-value", text);
     });
   });
 </script>

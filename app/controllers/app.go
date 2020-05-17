@@ -34,7 +34,7 @@ func (c App) Groups(prefix string) revel.Result {
 	}
 
 	var Groups models.Groups
-	if err := Groups.Get(&prefix); err != nil {
+	if err := Groups.Select(&prefix); err != nil {
 		return renderError(
 			err,
 			c.Controller,
@@ -48,8 +48,7 @@ func (c App) Groups(prefix string) revel.Result {
 - Roles: all */
 func (c App) ChangeLanguage(language string) revel.Result {
 
-	c.Log.Debug("change language",
-		"old language", c.Session["currentLocale"],
+	c.Log.Debug("change language", "old language", c.Session["currentLocale"],
 		"language", language)
 
 	c.Validation.Check(language,
@@ -93,4 +92,40 @@ func (c App) Imprint() revel.Result {
 	c.ViewArgs["tabName"] = c.Message("imprint.tab")
 
 	return c.Render()
+}
+
+/*News renders the news page.
+- Roles: all (except not activated users) */
+func (c App) News() revel.Result {
+
+	c.Log.Debug("render news page", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("news.feed.tab")
+
+	var categories models.Categories
+	if err := categories.Select("news_feed_category"); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(categories)
+}
+
+/*FAQs renders the FAQs page.
+- Roles: all (except not activated users) */
+func (c App) FAQs() revel.Result {
+
+	c.Log.Debug("render FAQs page", "url", c.Request.URL)
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("faq.tab")
+
+	var categories models.Categories
+	if err := categories.Select("faq_category"); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(categories)
 }

@@ -33,7 +33,9 @@
   <br>
   {{if $.session.userID}}
     {{if eq $.session.role "admin"}}
-      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" onclick="openCreateGroup(0);">
+      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal"
+        onclick='openAdminGroupModal("", "", false, {{url "Admin.InsertGroup"}},
+        {{msg $ "group.insert"}}, "", false, "");'>
         {{msg $ "button.add.group"}}
       </button>
       <br>

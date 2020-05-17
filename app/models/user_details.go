@@ -24,8 +24,8 @@ type UserDetails struct {
 
 	//all categories, faqs and news created by this user
 	Categories []Category
-	FAQs       []FAQ
-	News       []NewsFeed
+	FAQs       []HelpPageEntries
+	News       []HelpPageEntries
 }
 
 /*Get all user details. */
@@ -33,7 +33,7 @@ func (user *UserDetails) Get() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
@@ -42,7 +42,7 @@ func (user *UserDetails) Get() (err error) {
 		return
 	}
 	//get groups
-	if err = user.Groups.GetByUser(&user.User.ID, tx); err != nil {
+	if err = user.Groups.SelectByUser(&user.User.ID, tx); err != nil {
 		return
 	}
 

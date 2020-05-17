@@ -203,7 +203,7 @@ func (user *User) Get(tx *sqlx.Tx) (err error) {
 
 	err = tx.Get(user, stmtGetUser, app.TimeZone, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to get user", "user", user, "error", err.Error())
+		log.Error("failed to get user", "user", user, "error", err.Error())
 		tx.Rollback()
 	}
 
@@ -217,7 +217,7 @@ func (user *User) GetBasicData(tx *sqlx.Tx) (err error) {
 
 	err = tx.Get(user, stmtSelectUser, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to get user", "user", user, "error", err.Error())
+		log.Error("failed to get user", "user", user, "error", err.Error())
 		tx.Rollback()
 	}
 	return
@@ -228,7 +228,7 @@ func (user *User) Login() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return err
 	}
 
@@ -237,14 +237,14 @@ func (user *User) Login() (err error) {
 
 	if !user.Password.Valid { //ldap login
 
-		modelsLog.Debug("ldap login")
+		log.Debug("ldap login")
 
 		//insert or update users table data
 		err = tx.Get(user, stmtLoginLdap,
 			user.FirstName, user.LastName, user.EMail, user.Salutation, now, now, user.MatrNr,
 			user.AcademicTitle, user.Title, user.NameAffix, user.Affiliations, app.TimeZone)
 		if err != nil {
-			modelsLog.Error("failed to update or insert ldap user", "user", user, "error", err.Error())
+			log.Error("failed to update or insert ldap user", "user", user, "error", err.Error())
 			tx.Rollback()
 			return
 		}
@@ -255,18 +255,18 @@ func (user *User) Login() (err error) {
 		}
 
 		if user.MatrNr.Valid && user.FirstLogin == now { //update the courses of study of that user
-			modelsLog.Debug("first login", "time", user.FirstLogin)
+			log.Debug("first login", "time", user.FirstLogin)
 			//TODO: update the courses of study
 		}
 
 	} else { //external login
 
-		modelsLog.Debug("external login")
+		log.Debug("external login")
 
 		err = tx.Get(user, stmtLoginExtern, now, user.EMail, user.Password)
 		if err != nil {
 			if err != sql.ErrNoRows {
-				modelsLog.Error("failed to update external user", "user", user, "error", err.Error())
+				log.Error("failed to update external user", "user", user, "error", err.Error())
 				tx.Rollback()
 				return
 			}
@@ -294,7 +294,7 @@ func (user *User) Register() (err error) {
 	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
 		user.Salutation, now, now, user.Password, activationCode, user.Language)
 	if err != nil {
-		modelsLog.Error("failed to register external user", "user", user, "error", err.Error())
+		log.Error("failed to register external user", "user", user, "error", err.Error())
 	}
 	user.ActivationCode.String = activationCode
 	return
@@ -307,7 +307,7 @@ func (user *User) NewPassword() (err error) {
 
 	err = app.Db.Get(user, stmtUpdatePassword, password, user.EMail)
 	if err != nil {
-		modelsLog.Error("failed to update password", "user", user,
+		log.Error("failed to update password", "user", user,
 			"password", password, "error", err.Error())
 	}
 	user.Password.String = password
@@ -319,19 +319,19 @@ func (user *User) VerifyActivationCode() (success bool, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	err = tx.Get(&success, stmtSelectCode, user.ActivationCode.String, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to select activation code", "user", user, "error", err.Error())
+		log.Error("failed to select activation code", "user", user, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
 	if !success {
-		modelsLog.Debug("invalid activation code, verification failed",
+		log.Debug("invalid activation code, verification failed",
 			"user", user)
 		tx.Commit()
 		return
@@ -339,7 +339,7 @@ func (user *User) VerifyActivationCode() (success bool, err error) {
 
 	_, err = tx.Exec(stmtUpdateCode, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to update activation code", "user", user, "error", err.Error())
+		log.Error("failed to update activation code", "user", user, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -355,7 +355,7 @@ func (user *User) NewActivationCode() (err error) {
 
 	err = app.Db.Get(user, stmtUpdateCodeReturningData, activationCode, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to update activation code", "user", user,
+		log.Error("failed to update activation code", "user", user,
 			"activationCode", activationCode, "error", err.Error())
 	}
 	user.ActivationCode.String = activationCode
@@ -367,14 +367,14 @@ func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
 
 	user.ID, err = strconv.Atoi(*userIDSession)
 	if err != nil {
-		modelsLog.Error("failed to parse userID from session",
+		log.Error("failed to parse userID from session",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
 
 	err = app.Db.Get(user, stmtUpdateLanguage, user.Language.String, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to update language", "userID", user.ID,
+		log.Error("failed to update language", "userID", user.ID,
 			"language", user.Language, "error", err.Error())
 	}
 	return
@@ -385,7 +385,7 @@ func (user *User) ChangeRole() (err error) {
 
 	err = app.Db.Get(user, stmtUpdateRole, user.Role, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to update user role", "userID", user.ID,
+		log.Error("failed to update user role", "userID", user.ID,
 			"role", user.Role, "error", err.Error())
 	}
 	return
@@ -402,7 +402,7 @@ func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 
 	err := tx.Get(&data, stmtIsEditorInstructor, user.ID)
 	if err != nil {
-		modelsLog.Error("failed to get isEditor and isInstructor", "userID",
+		log.Error("failed to get isEditor and isInstructor", "userID",
 			user.ID, "error", err.Error())
 		tx.Rollback()
 	}
@@ -414,7 +414,7 @@ func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (autho
 
 	user.ID, err = strconv.Atoi(*userIDSession)
 	if err != nil {
-		modelsLog.Error("failed to parse userID from session",
+		log.Error("failed to parse userID from session",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
@@ -433,7 +433,7 @@ func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (autho
 	}
 
 	if err != nil {
-		modelsLog.Error("failed to retrieve whether the user is authorized or not", "userID", user.ID,
+		log.Error("failed to retrieve whether the user is authorized or not", "userID", user.ID,
 			"ID", *ID, "error", err.Error())
 	}
 	return
@@ -454,7 +454,7 @@ func generateCode() string {
 		b[i] = characters[rand.Intn(len(characters))]
 	}
 
-	modelsLog.Debug("generated code", "code", string(b))
+	log.Debug("generated code", "code", string(b))
 	return string(b)
 }
 

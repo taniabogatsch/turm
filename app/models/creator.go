@@ -65,7 +65,7 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 			var jsonIntf map[string]interface{}
 			err := json.Unmarshal([]byte(param.JSON), &jsonIntf)
 			if err != nil {
-				modelsLog.Error("cannot unmarshal file", "file", string(param.JSON), "error", err.Error())
+				log.Error("cannot unmarshal file", "file", string(param.JSON), "error", err.Error())
 				v.ErrorKey("validation.invalid.file")
 			}
 
@@ -83,7 +83,7 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 						//create an updated json to be unmarshalled into the course struct
 						json, err := json.Marshal(jsonIntf)
 						if err != nil {
-							modelsLog.Error("cannot marshal file", "file", jsonIntf, "error", err.Error())
+							log.Error("cannot marshal file", "file", jsonIntf, "error", err.Error())
 							v.ErrorKey("validation.invalid.file")
 						}
 						param.JSON = json

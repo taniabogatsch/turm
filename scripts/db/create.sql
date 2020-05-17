@@ -190,22 +190,22 @@ CREATE TABLE unsubscribed (
 CREATE TABLE faq_category (
   id              serial                    PRIMARY KEY,
   name            varchar(255)              NOT NULL,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creation_date   timestamp with time zone  NOT NULL,
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id)
 );
 
 
 CREATE TABLE faqs (
   id              serial                    PRIMARY KEY,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   category_id     integer                   NOT NULL,
   question        varchar(511)              NOT NULL,
   answer          text                      NOT NULL,
-  creation_date   timestamp with time zone  NOT NULL,
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
+  FOREIGN KEY (last_editor) REFERENCES users (id),
   FOREIGN KEY (category_id) REFERENCES faq_category (id)
 );
 
@@ -213,20 +213,20 @@ CREATE TABLE faqs (
 CREATE TABLE news_feed_category (
   id              serial                    PRIMARY KEY,
   name            varchar(255)              NOT NULL,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creation_date   timestamp with time zone  NOT NULL,
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id)
 );
 
 
 CREATE TABLE news_feed (
   id              serial                    PRIMARY KEY,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   category_id     integer                   NOT NULL,
   content         text                      NOT NULL,
-  creation_date   timestamp with time zone  NOT NULL,
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
+  FOREIGN KEY (last_editor) REFERENCES users (id),
   FOREIGN KEY (category_id) REFERENCES news_feed_category (id)
 );

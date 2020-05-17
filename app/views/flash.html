@@ -1,9 +1,9 @@
 <script>
 	$(function(){
 		{{if .flash.success}}
-			showSuccessToast('{{.flash.success}}');
+			showToast('{{.flash.success}}', 'success');
 		{{else if .flash.error}}
-			showErrorToast('{{.flash.error}}');
+			showToast('{{.flash.error}}', 'danger');
 		{{end}}
 	});
 </script>
