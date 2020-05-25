@@ -17,11 +17,11 @@ import (
 
 //TODO: notify enrolled users if course is updated
 
-/*OpenCourse opens an already existing course for modification, etc.
+/*Open opens an already existing course for modification, etc.
 - Roles: creator and editors of this course. */
-func (c EditCourse) OpenCourse(ID int) revel.Result {
+func (c Edit) Open(ID int) revel.Result {
 
-	c.Log.Debug("course management: open course", "ID", ID)
+	c.Log.Debug("open course", "ID", ID)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -43,7 +43,7 @@ func (c EditCourse) OpenCourse(ID int) revel.Result {
 
 /*Download a course as JSON.
 - Roles: creator of the course */
-func (c EditCourse) Download(ID int, filename string) revel.Result {
+func (c Edit) Download(ID int, filename string) revel.Result {
 
 	c.Log.Debug("download course", "ID", ID, "filename", filename)
 
@@ -98,7 +98,7 @@ func (c EditCourse) Download(ID int, filename string) revel.Result {
 
 /*Validate all course data.
 - Roles: creator and editors of this course. */
-func (c EditCourse) Validate(ID int) revel.Result {
+func (c Edit) Validate(ID int) revel.Result {
 
 	c.Log.Debug("validate course", "ID", ID)
 
@@ -122,7 +122,7 @@ func (c EditCourse) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c EditCourse) NewEvent(ID int, fieldID, value string) revel.Result {
+func (c Edit) NewEvent(ID int, fieldID, value string) revel.Result {
 
 	c.Log.Debug("create a new event", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -155,7 +155,7 @@ func (c EditCourse) NewEvent(ID int, fieldID, value string) revel.Result {
 
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
+func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 
 	c.Log.Debug("change timestamp", "ID", ID, "date", date,
 		"time", time, "fieldID", fieldID)
@@ -217,7 +217,7 @@ func (c EditCourse) ChangeTimestamp(ID int, fieldID, date, time string) revel.Re
 
 /*ChangeUserList adds a user to the user list of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeUserList(ID, userID int, listType string) revel.Result {
+func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 
 	c.Log.Debug("add user to user list", "ID", ID, "userID", userID, "listType", listType)
 
@@ -253,7 +253,7 @@ func (c EditCourse) ChangeUserList(ID, userID int, listType string) revel.Result
 
 /*DeleteFromUserList removes a from the user list of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Result {
+func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
 	c.Log.Debug("delete user from user list", "ID", ID, "userID", userID, "listType", listType)
 
@@ -287,7 +287,7 @@ func (c EditCourse) DeleteFromUserList(ID, userID int, listType string) revel.Re
 
 /*ChangeViewMatrNr toggles the matriculation number restrictions for an editor/instructor.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option bool) revel.Result {
+func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) revel.Result {
 
 	c.Log.Debug("update user in user list", "ID", ID, "userID", userID,
 		"listType", listType, "option", option)
@@ -322,7 +322,7 @@ func (c EditCourse) ChangeViewMatrNr(ID, userID int, listType string, option boo
 
 /*ChangeBool toggles the provided boolean value of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeBool(ID int, listType string, option bool) revel.Result {
+func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 
 	c.Log.Debug("update bool", "ID", ID, "listType", listType, "option", option)
 
@@ -349,7 +349,7 @@ func (c EditCourse) ChangeBool(ID int, listType string, option bool) revel.Resul
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
+func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -433,7 +433,7 @@ func (c EditCourse) ChangeText(ID int, fieldID, value string) revel.Result {
 
 /*ChangeGroup changes the group of a course.
 - Roles: creator and editors of the course. */
-func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
+func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 
 	c.Log.Debug("change group", "ID", ID, "parentID", parentID)
 
@@ -463,7 +463,7 @@ func (c EditCourse) ChangeGroup(ID, parentID int) revel.Result {
 
 /*ChangeEnrollLimit changes the enrollment limit of a course.
 - Roles: creator and editors of the course */
-func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result {
+func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result {
 
 	c.Log.Debug("change enrollment limit", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -511,7 +511,7 @@ func (c EditCourse) ChangeEnrollLimit(ID int, fieldID string, value int) revel.R
 
 /*SearchUser searches for users for the different user lists.
 - Roles: creator and editors of the course. */
-func (c EditCourse) SearchUser(ID int, value, listType string, searchInactive bool) revel.Result {
+func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) revel.Result {
 
 	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
 

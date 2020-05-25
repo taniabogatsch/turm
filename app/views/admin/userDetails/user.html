@@ -1,64 +1,107 @@
 <!-- template containing all user data of the user details -->
 
-<table class="table">
-  <tbody>
-    <tr>
-      <th scope="row"> {{msg $ "user.id"}} </th>
-      <td> {{.User.ID}} </td>
-    </tr>
-    <tr>
-      <th scope="row"> {{msg $ "user.name"}} </th>
-      <td>
-        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .User}}
-      </td>
-    </tr>
-    <tr>
-      <th scope="row"> {{msg $ "user.email"}} </th>
-      <td> {{.User.EMail}} </td>
-    </tr>
-    <tr>
-      <th scope="row"> {{msg $ "user.role"}} </th>
-      <td>
-        {{if eq .User.Role 0}}
-          {{msg $ "user.role.user"}}
-        {{else if eq .User.Role 1}}
-          {{msg $ "user.role.creator"}}
-        {{else if eq .User.Role 2}}
-          {{msg $ "user.role.admin"}}
-        {{end}}
-      </td>
-    </tr>
-    <tr>
-      <th scope="row"> {{msg $ "user.last.login"}} </th>
-      <td> {{.User.LastLogin}} </td>
-    </tr>
-    <tr>
-      <th scope="row"> {{msg $ "user.first.login"}} </th>
-      <td> {{.User.FirstLogin}} </td>
-    </tr>
-    {{if .User.Language.Valid}}
-      <tr>
-        <th scope="row"> {{msg $ "user.language"}} </th>
-        <td> {{.User.Language.String}} </td>
-      </tr>
-    {{end}}
-    {{if .User.MatrNr.Valid}}
-      <tr>
-        <th scope="row"> {{msg $ "user.matr.nr"}} </th>
-        <td> {{.User.MatrNr.Int32}} </td>
-      </tr>
-    {{end}}
-    {{if .User.Affiliations.Valid}}
-      <tr>
-        <th scope="row"> {{msg $ "user.affiliation"}} </th>
-        <td>
-          {{range $key, $value := .User.Affiliations.Affiliations}}
-            {{if eq $key 0}}{{$value}}{{else}}, {{$value}}{{end}}
-          {{end}}
-        </td>
-      </tr>
-    {{end}}
+<!-- user ID -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.id"}}:
+  </div>
+  <div class="col-sm-8">
+    {{.User.ID}}
+  </div>
+</div>
 
-    <!-- TODO: add studies -->
-  </tbody>
-</table>
+<!-- name -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.name"}}:
+  </div>
+  <div class="col-sm-8">
+    {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .User}}
+  </div>
+</div>
+
+<!-- e-mail -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.email"}}:
+  </div>
+  <div class="col-sm-8">
+    {{.User.EMail}}
+  </div>
+</div>
+
+<!-- role -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.role"}}:
+  </div>
+  <div class="col-sm-8">
+    {{if eq .User.Role 0}}
+      {{msg $ "user.role.user"}}
+    {{else if eq .User.Role 1}}
+      {{msg $ "user.role.creator"}}
+    {{else if eq .User.Role 2}}
+      {{msg $ "user.role.admin"}}
+    {{end}}
+  </div>
+</div>
+
+<!-- last login -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.last.login"}}:
+  </div>
+  <div class="col-sm-8">
+    {{.User.LastLogin}}
+  </div>
+</div>
+
+<!-- first login -->
+<div class="row mb-2">
+  <div class="col-sm-4 text-muted">
+    {{msg $ "user.first.login"}}:
+  </div>
+  <div class="col-sm-8">
+    {{.User.FirstLogin}}
+  </div>
+</div>
+
+{{if .User.Language.Valid}}
+  <!-- language -->
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "user.language"}}:
+    </div>
+    <div class="col-sm-8">
+      {{.User.Language.String}}
+    </div>
+  </div>
+{{end}}
+
+{{if .User.MatrNr.Valid}}
+  <!-- matriculation number -->
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "user.matr.nr"}}:
+    </div>
+    <div class="col-sm-8">
+      {{.User.MatrNr.Int32}}
+    </div>
+  </div>
+{{end}}
+
+{{if .User.Affiliations.Valid}}
+  <!-- affiliation(s) -->
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "user.affiliation"}}:
+    </div>
+    <div class="col-sm-8">
+      {{range $key, $value := .User.Affiliations.Affiliations}}
+        {{if eq $key 0}}{{$value}}{{else}}, {{$value}}{{end}}
+      {{end}}
+    </div>
+  </div>
+{{end}}
+
+<!-- TODO: add studies -->

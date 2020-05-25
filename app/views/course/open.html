@@ -1,0 +1,23 @@
+<!-- show the details of a course -->
+
+{{template "header.html" .}}
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+<div class="page page-middle">
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+  {{end}}
+</div>
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+{{template "footer.html" .}}

@@ -81,8 +81,8 @@ func (c App) authApp() revel.Result {
 	return nil
 }
 
-//authManageCourses prevents unauthorized access to controllers of type ManageCourses.
-func (c ManageCourses) authManageCourses() revel.Result {
+//authManage prevents unauthorized access to controllers of type Manage.
+func (c Manage) authManage() revel.Result {
 
 	c.Log.Debug("executing auth manage courses interceptor")
 
@@ -136,8 +136,8 @@ func (c Creator) authCreator() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authEditCourse prevents unauthorized access to controllers of type EditCourse.
-func (c EditCourse) authEditCourse() revel.Result {
+//authEditEdit prevents unauthorized access to controllers of type Edit.
+func (c Edit) authEdit() revel.Result {
 
 	c.Log.Debug("executing auth edit courses interceptor")
 

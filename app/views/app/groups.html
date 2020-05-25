@@ -1,4 +1,4 @@
-<!-- show all groups and their children -->
+<!-- show groups and their children -->
 
 <!-- show all groups of this level in the groups tree -->
 {{range .Groups}}
@@ -66,11 +66,14 @@
       </div>
     </div>
   {{else}}
-    <!-- TODO: open course, either via redirect or via reload -->
-    <button class="btn btn-block btn-light text-justify list-group-item" type="button" {{if eq .IDPrefix "creator"}}disabled{{end}}>
-      <span class="badge badge-secondary btn-darkblue"> {{msg $ "course"}} </span>
-      &nbsp; {{.Name}}
-    </button>
+    <!-- open course -->
+    <form action='{{url "Course.Open" .CourseID}}' method="POST">
+      <button class="btn btn-block btn-light text-justify list-group-item"
+        type="submit" {{if eq .IDPrefix "creator"}}disabled{{end}}>
+        <span class="badge badge-secondary btn-darkblue"> {{msg $ "course"}} </span>
+        &nbsp; {{.Name}}
+      </button>
+    </form>
   {{end}}
 
 {{else}}

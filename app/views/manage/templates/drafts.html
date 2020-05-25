@@ -26,11 +26,11 @@
     </a>
 
     <!-- edit -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
       {{template "icons/pencil.html" . }}
     </a>
 
-    <a class="text-body" href='{{url "EditCourse.OpenCourse" .ID}}'>
+    <a class="text-body" href='{{url "Edit.Open" .ID}}'>
       {{.Title}}
     </a>
 
@@ -40,7 +40,8 @@
     </small>
   </li>
 
-{{else}} <!-- user created no drafts -->
+{{else}}
+  <!-- no drafts -->
   <small class="form-text text-muted">
     {{msg $ "creator.drafts.none"}}
   </small>

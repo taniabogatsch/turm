@@ -12,8 +12,13 @@ type User struct {
 	*revel.Controller
 }
 
-/*EditCourse implements logic to edit course data. */
-type EditCourse struct {
+/*Course implements logic to load courses. */
+type Course struct {
+	*revel.Controller
+}
+
+/*Edit implements logic to edit course data. */
+type Edit struct {
 	*revel.Controller
 }
 
@@ -32,8 +37,8 @@ type Creator struct {
 	*revel.Controller
 }
 
-/*ManageCourses implements the course management page. */
-type ManageCourses struct {
+/*Manage implements the course management page. */
+type Manage struct {
 	*revel.Controller
 }
 

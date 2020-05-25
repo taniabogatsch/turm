@@ -10,8 +10,8 @@ module:jobs
 # Admin
 # ---------------------------------------------------------------------------- #
 
-GET     /admin/userManagement                       Admin.UserManagement
-GET     /admin/roleManagement                       Admin.RoleManagement
+GET     /admin/users                                Admin.Users
+GET     /admin/roles                                Admin.Roles
 GET     /admin/dashboard                            Admin.Dashboard
 
 POST    /admin/insertGroup                          Admin.InsertGroup
@@ -46,6 +46,14 @@ GET     /app/news                                   App.News
 
 
 # ---------------------------------------------------------------------------- #
+# Course
+# ---------------------------------------------------------------------------- #
+
+POST     /course/open                                Course.Open
+GET      /course/open                                Course.Open
+
+
+# ---------------------------------------------------------------------------- #
 # Creator
 # ---------------------------------------------------------------------------- #
 
@@ -60,23 +68,23 @@ POST    /creator/new                                Creator.New
 # Edit (course, event, meeting)
 # ---------------------------------------------------------------------------- #
 
-GET     /editCourse/openCourse                      EditCourse.OpenCourse
-GET     /editCourse/searchUser                      EditCourse.SearchUser
+GET     /edit/open                                  Edit.Open
+GET     /edit/searchUser                            Edit.SearchUser
 
-POST    /edit/course/validate                       EditCourse.Validate
-POST    /edit/course/download                       EditCourse.Download
+POST    /edit/course/validate                       Edit.Validate
+POST    /edit/course/download                       Edit.Download
 
-POST    /edit/course/newEvent                       EditCourse.NewEvent
+POST    /edit/course/newEvent                       Edit.NewEvent
 
-POST    /edit/course/changeUserList                 EditCourse.ChangeUserList
-POST    /edit/course/deleteFromUserList             EditCourse.DeleteFromUserList
-POST    /edit/course/changeViewMatrNr               EditCourse.ChangeViewMatrNr
+POST    /edit/course/changeUserList                 Edit.ChangeUserList
+POST    /edit/course/deleteFromUserList             Edit.DeleteFromUserList
+POST    /edit/course/changeViewMatrNr               Edit.ChangeViewMatrNr
 
-POST    /edit/course/changeBool                     EditCourse.ChangeBool
-POST    /edit/course/changeTimestamp                EditCourse.ChangeTimestamp
-POST    /edit/course/changeText                     EditCourse.ChangeText
-POST    /edit/course/changeGroup                    EditCourse.ChangeGroup
-POST    /edit/course/changeEnrollLimit              EditCourse.ChangeEnrollLimit
+POST    /edit/course/changeBool                     Edit.ChangeBool
+POST    /edit/course/changeTimestamp                Edit.ChangeTimestamp
+POST    /edit/course/changeText                     Edit.ChangeText
+POST    /edit/course/changeGroup                    Edit.ChangeGroup
+POST    /edit/course/changeEnrollLimit              Edit.ChangeEnrollLimit
 
 POST    /edit/event/delete                          EditEvent.Delete
 POST    /edit/event/newMeeting                      EditEvent.NewMeeting
@@ -92,14 +100,9 @@ POST    /edit/meeting/delete                        EditMeeting.Delete
 # Manage Courses
 # ---------------------------------------------------------------------------- #
 
-GET     /manageCourses/active                       ManageCourses.Active
-GET     /manageCourses/getActive                    ManageCourses.GetActive
-
-GET     /manageCourses/drafts                       ManageCourses.Drafts
-GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
-
-GET     /manageCourses/expired                      ManageCourses.Expired
-GET     /manageCourses/getExpired                   ManageCourses.GetExpired
+GET     /manageCourses/active                       Manage.Active
+GET     /manageCourses/drafts                       Manage.Drafts
+GET     /manageCourses/expired                      Manage.Expired
 
 
 # ---------------------------------------------------------------------------- #

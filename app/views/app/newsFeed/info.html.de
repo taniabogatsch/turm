@@ -1,3 +1,5 @@
+<!-- small news feed information text -->
+
 <h4>
   <br>
 </h4>
@@ -12,5 +14,5 @@ Willkommen bei unserem Update Feed!
   Wir freuen uns sehr darüber, Ihnen mit Turm2 ein hilfreiches Werkzeug zur Kursverwaltung zur Verfügung stellen zu können. Bitte haben Sie aber Verständnis dafür, dass diese Seite von einem kleinen Team an Studierenden entwickelt wird und daher Neuerungen nicht immer direkt umgesetzt werden können und Fehler hin und wieder auftreten.
   <br>
   <br>
-  Nichtsdestotrotz können Sie neue Features, die Ihnen beim momentanen Stand fehlen, immer gerne an unsere <a href="mailto:{{.serviceMail}}">Service-E-Mail-Adresse</a> senden .
+  Nichtsdestotrotz können Sie neue Features, die Ihnen beim momentanen Stand fehlen, immer gerne an unsere <a href="mailto:{{.serviceMail}}">Service-E-Mail-Adresse</a> senden.
 </small>

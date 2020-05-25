@@ -1,18 +1,18 @@
 <!-- navigate to the different administration pages -->
 
-<div class="page page-side page-side-left pr-5 pr-lg-5 mb-5 mb-lg-0">
-  <div class="position-desktop-fixed border-right-desktop pr-4 pl-4 pl-lg-0">
+<div class="page page-side">
+  <div class="page-left-layout">
     <h4>
       {{msg $ "admin.page"}}
     </h4>
     <hr>
 
     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-users-tab" href='{{url "Admin.UserManagement"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-users-tab" href='{{url "Admin.Users"}}' role="tab">
         {{template "icons/search.html" . }}
         &nbsp; {{msg $ "admin.users"}}
       </a>
-      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-roles-tab" href='{{url "Admin.RoleManagement"}}' role="tab">
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-roles-tab" href='{{url "Admin.Roles"}}' role="tab">
         {{template "icons/person.html" . }}
         &nbsp; {{msg $ "admin.roles"}}
       </a>

@@ -15,7 +15,7 @@
     </a>
 
     <!-- edit -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "EditCourse.OpenCourse" .ID}}' role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
       {{template "icons/pencil.html" . }}
     </a>
 
@@ -33,7 +33,8 @@
     </small>
   </li>
 
-{{else}} <!-- no active courses -->
+{{else}}
+  <!-- no active courses -->
   <small class="form-text text-muted">
     {{msg $ "creator.active.none"}}
   </small>

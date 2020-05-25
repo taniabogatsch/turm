@@ -1,16 +1,6 @@
-<!-- template containing user search results -->
+<!-- range over the specified user entries -->
 
-<!-- title -->
-<h5>
-  {{msg $ "search.results"}}
-</h5>
-<small class="form-text text-muted">
-  {{msg $ "search.limit" 5}}
-</small>
-<br>
-
-<!-- search results -->
-{{range $key, $value := .users}}
+{{range $key, $value := .entries}}
   {{if ne $key 0}}
     <hr>
   {{end}}

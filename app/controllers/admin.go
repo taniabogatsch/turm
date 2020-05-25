@@ -10,9 +10,9 @@ import (
 	"github.com/revel/revel"
 )
 
-/*UserManagement renders the user management page.
+/*Users renders the user management page.
 - Roles: admin (activated) */
-func (c Admin) UserManagement() revel.Result {
+func (c Admin) Users() revel.Result {
 
 	c.Log.Debug("render user management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
@@ -22,9 +22,9 @@ func (c Admin) UserManagement() revel.Result {
 	return c.Render()
 }
 
-/*RoleManagement renders the role management page.
+/*Roles renders the role management page.
 - Roles: admin (activated) */
-func (c Admin) RoleManagement() revel.Result {
+func (c Admin) Roles() revel.Result {
 
 	c.Log.Debug("render role management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()

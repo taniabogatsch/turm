@@ -2,12 +2,12 @@
 
 {{template "header.html" .}}
 
-<div class="page page-side page-side-left">
-  <br class="mobile-hidden">
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 <div class="page page-middle">
-  <!-- load the file in the respective language -->
+  <!-- load the imprint in the respective language -->
   {{if eq .currentLocale "en-US"}}
     {{template "app/imprint/imprint.html.en" .}}
   {{else if eq .currentLocale "de-DE"}}
@@ -15,8 +15,8 @@
   {{end}}
 </div>
 
-<div class="page page-side page-side-right">
-  {{template "toast.html" .}}
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 {{template "footer.html" .}}

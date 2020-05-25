@@ -126,7 +126,7 @@ imprint.page = Imprint
 # -------------------------------------------------------------------------------------------------- #
 
 admin.tab = Administration
-admin.page = Administration
+admin.page = Admin
 
 admin.users = User management
 admin.roles = Role Management

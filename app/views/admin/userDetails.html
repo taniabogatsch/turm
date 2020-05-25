@@ -27,27 +27,30 @@
     <!-- user ID -->
     <input type="hidden" id="input-user-ID" name="user.ID" value="{{.user.User.ID}}">
 
+    <!-- select a new user role -->
     <small class="form-text text-muted">
-      {{msg $ "admin.new.role"}}
+      {{msg $ "admin.new.role"}}:
+      {{msg $ "admin.current.role"}}
+      {{if eq .user.User.Role 0}}
+        {{msg $ "user.role.user"}}
+      {{else if eq .user.User.Role 1}}
+        {{msg $ "user.role.creator"}}
+      {{else if eq .user.User.Role 2}}
+        {{msg $ "user.role.admin"}}
+      {{end}}
     </small>
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          {{msg $ "admin.current.role"}}
-          {{if eq .user.User.Role 0}}
-            {{msg $ "user.role.user"}}
-          {{else if eq .user.User.Role 1}}
-            {{msg $ "user.role.creator"}}
-          {{else if eq .user.User.Role 2}}
-            {{msg $ "user.role.admin"}}
-          {{end}}
-        </span>
-      </div>
       {{with $role := field "user.Role" .}}
         <select name="user.Role" class="custom-select">
-          <option value="0" {{if eq "0" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.user"}} </option>
-          <option value="1" {{if eq "1" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.creator"}} </option>
-          <option value="2" {{if eq "2" $role.Flash}}selected="selected"{{end}}> {{msg $ "user.role.admin"}} </option>
+          <option value="0" {{if eq "0" $role.Flash}}selected="selected"{{end}}>
+            {{msg $ "user.role.user"}}
+          </option>
+          <option value="1" {{if eq "1" $role.Flash}}selected="selected"{{end}}>
+            {{msg $ "user.role.creator"}}
+          </option>
+          <option value="2" {{if eq "2" $role.Flash}}selected="selected"{{end}}>
+            {{msg $ "user.role.admin"}}
+          </option>
         </select>
         <div class="invalid-feedback">
           {{msg $ "validation.invalid.role"}}

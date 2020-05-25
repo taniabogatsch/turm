@@ -207,22 +207,22 @@ function openEditMeeting(meetingID, start, end, place, annotation, weekday, inte
   $('#edit-meeting-' + meetingType).modal('show');
 }
 
-function showPreview() {
-  $(".preview-hide").each(function() {
+function plainCourse() {
+  $(".edit-show").each(function() {
     $(this).addClass("d-none");
   });
-  $(".preview-show").each(function() {
+  $(".edit-hide").each(function() {
     $(this).removeClass("d-none");
   });
   $('#preview-btn').addClass('d-none');
   $('#hide-preview-btn').removeClass('d-none');
 }
 
-function hidePreview() {
-  $(".preview-hide").each(function() {
+function editCourse() {
+  $(".edit-show").each(function() {
     $(this).removeClass("d-none");
   });
-  $(".preview-show").each(function() {
+  $(".edit-hide").each(function() {
     $(this).addClass("d-none");
   });
   $('#preview-btn').removeClass('d-none');

@@ -28,6 +28,8 @@ type Group struct {
 	//identifies whether any parent/child has a course limit
 	InheritsLimits bool ``
 	ChildHasLimits bool ``
+	//used to open courses
+	CourseID int `db:"course_id"`
 }
 
 /*Validate Group fields. */
@@ -391,7 +393,7 @@ const (
 	stmtGetChildren = `
 		/* get all groups */
 		(
-			SELECT id, parent_id, name::text AS name, course_limit
+			SELECT id, parent_id, name::text AS name, course_limit, id AS course_id
 			FROM groups
 			WHERE parent_id = $1
 			ORDER BY name ASC
@@ -408,7 +410,7 @@ const (
 					WHERE g.id = c.parent_id
 						AND g.id = $1
 						AND c.id = co.id
-				) AS course_limit
+				) AS course_limit, co.id AS course_id
 
 			FROM courses co
 			WHERE co.parent_id = $1

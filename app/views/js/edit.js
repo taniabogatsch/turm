@@ -1,7 +1,7 @@
 /* This file comprises edit course javascript functions that must be assembled by the template engine. */
 
 function searchForList(value, searchInactive, listType, courseID) {
-  $.get("{{url "EditCourse.SearchUser"}}", {
+  $.get("{{url "Edit.SearchUser"}}", {
     "value": value,
     "searchInactive": searchInactive,
     "listType": listType,

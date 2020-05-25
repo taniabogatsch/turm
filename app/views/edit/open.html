@@ -2,7 +2,7 @@
 
 {{template "header.html" .}}
 
-{{template "manageCourses/templates/leftNav.html" . }}
+{{template "manage/templates/leftNav.html" . }}
 
 <div class="page page-middle">
   <div class="tab-content">
@@ -15,9 +15,6 @@
       {{else}}
         &nbsp; {{msg $ "creator.course.draft.is.open"}}
       {{end}}
-
-      <br class="desktop-hidden">
-      <br class="desktop-hidden">
 
       {{if eq .session.role "admin"}}
         {{if not .course.Active}}
@@ -61,17 +58,17 @@
 
       {{if not .course.Active}}
         <!-- validate course -->
-        <form class="float-left float-lg-right mr-3" action='{{url "EditCourse.Validate" .course.ID}}' method="POST">
+        <form class="float-left float-lg-right mr-3" action='{{url "Edit.Validate" .course.ID}}' method="POST">
           <button type="submit" class="btn btn-outline-darkblue">
             {{template "icons/checkAll.html" . }}
           </button>
         </form>
       {{end}}
 
-      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3" onclick="showPreview();">
+      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3" onclick="plainCourse();">
         {{template "icons/aspectRatio.html" . }}
       </button>
-      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3 d-none" onclick="hidePreview();">
+      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3 d-none" onclick="editCourse();">
         {{template "icons/pencil.html" . }}
       </button>
     </h4>
@@ -84,22 +81,21 @@
     {{else}}
       {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
       <!-- load all modals responsible for changing content -->
-      {{template "editCourse/loadModals.html" dict_addLocale $.currentLocale "course" .course}}
+      {{template "edit/loadModals.html" dict_addLocale $.currentLocale "course" .course}}
     {{end}}
   </div>
 </div>
 
-<div class="page page-side page-side-right pl-desktop-12">
-  {{template "toast.html" .}}
-  <div class="position-fixed border-left pl-4 pr-4 h-65 overflow-y">
-    {{template "editCourse/wiki.html"  dict_addLocale $.currentLocale "active" .course.Active "expired" .course.Expired}}
+<div class="page page-side">
+  <div class="page-right-layout">
+    {{template "edit/wiki.html"  dict_addLocale $.currentLocale "active" .course.Active "expired" .course.Expired}}
   </div>
 </div>
 
-<script src="/public/js/editCourse.js"></script>
+<script src="/public/js/edit.js"></script>
 
 <script>
-  {{template "js/editCourse.js" .}}
+  {{template "js/edit.js" .}}
 
   $(function() {
     //adjust the nav pills
@@ -128,6 +124,8 @@
     $('#change-visibility-switch').change(function() {
       $('#change-visibility-form').submit();
     });
+
+    editCourse();
   });
 </script>
 

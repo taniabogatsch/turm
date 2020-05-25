@@ -1,24 +1,25 @@
-<!-- the activation page provides the account activation form -->
+<!-- the activation page contains the account activation form -->
 
 {{template "header.html" .}}
 
-<div class="page page-side page-side-left">
-  <br class="mobile-hidden">
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 <div class="page page-middle">
   <center>
 
-    <!-- account activation page -->
     <h3>
       {{msg $ "activation.page"}}
     </h3>
     <br>
-    <div class="w-desktop-50">
+    <div class="w-form">
 
-      <!-- enter activation code form -->
-      <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}' method="GET" class="needs-validation" novalidate>
+      <!-- GET form -->
+      <form id="activation-code-form" accept-charset="UTF-8" action='{{url "User.VerifyActivationCode"}}'
+        method="GET" class="needs-validation" novalidate>
 
+        <!-- activation code -->
         <div class="col">
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -27,7 +28,9 @@
               </span>
             </div>
             {{with $field := field "activationCode" .}}
-              <input type="text" class="form-control rounded-right" name="{{$field.Name}}" value="{{$field.Flash}}" placeholder='{{msg $ "activation.code"}}' required maxlength="7" minlength="7">
+              <input type="text" class="form-control rounded-right" name="{{$field.Name}}"
+                value="{{$field.Flash}}" placeholder='{{msg $ "activation.code"}}'
+                required maxlength="7" minlength="7">
             {{end}}
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.activation"}}
@@ -36,7 +39,7 @@
         </div>
 
         <br>
-        <!-- button to confirm activation -->
+        <!-- submit form -->
         <button class="btn btn-darkblue" type="submit">
           {{msg $ "button.activate.account"}}
         </button>
@@ -54,8 +57,8 @@
   </center>
 </div>
 
-<div class="page page-side page-side-right">
-  {{template "toast.html" .}}
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 {{template "footer.html" .}}
