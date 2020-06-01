@@ -17,7 +17,7 @@ type EMailData struct {
 func GetEMailSubjectBody(data *EMailData, language *string, subjectKey string,
 	filename string, email *app.EMail, c *revel.Controller) (err error) {
 
-	data.URL = app.URL
+	data.URL = app.Mailer.URL
 	c.ViewArgs["data"] = data //set the data for parsing the e-mail body
 
 	cLanguage := c.Session["currentLocale"].(string)
@@ -25,7 +25,7 @@ func GetEMailSubjectBody(data *EMailData, language *string, subjectKey string,
 	c.Request.Locale = *language
 
 	email.Subject = c.Message(subjectKey) //set the e-mail subject
-	email.ReplyTo = c.Message("email.no.reply", app.ServiceEMail)
+	email.ReplyTo = c.Message("email.no.reply", app.Mailer.EMail)
 
 	//parse template / e-mail body
 	filepath := filepath.Join("emails", filename+"_"+*language+".html")

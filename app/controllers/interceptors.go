@@ -15,7 +15,7 @@ func general(c *revel.Controller) revel.Result {
 
 	c.Log.Debug("executing general interceptor")
 
-	c.ViewArgs["serviceEMail"] = app.ServiceEMail
+	c.ViewArgs["serviceEMail"] = app.Mailer.EMail
 	c.ViewArgs["languages"] = app.Languages
 
 	//set language

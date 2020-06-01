@@ -111,7 +111,7 @@ func (user *User) Validate(v *revel.Validation) {
 		Unique{},
 	).MessageKey("validation.email.notUnique")
 
-	isLdapEMail := !strings.Contains(user.EMail, app.EMailSuffix)
+	isLdapEMail := !strings.Contains(user.EMail, app.Mailer.Suffix)
 	v.Required(isLdapEMail).
 		MessageKey("validation.email.ldap")
 

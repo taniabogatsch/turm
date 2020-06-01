@@ -189,7 +189,7 @@ func (c User) NewPassword(email string) revel.Result {
 	c.Validation.Email(email).
 		MessageKey("validation.invalid.email")
 
-	isLdapEMail := !strings.Contains(strings.ToLower(email), app.EMailSuffix)
+	isLdapEMail := !strings.Contains(strings.ToLower(email), app.Mailer.Suffix)
 	c.Validation.Required(isLdapEMail).
 		MessageKey("validation.email.ldap")
 
