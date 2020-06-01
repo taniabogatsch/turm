@@ -11,12 +11,12 @@ func init() {
 	revel.InterceptFunc(general, revel.BEFORE, &revel.Controller{})
 
 	//prevent unauthorized actions
-	revel.InterceptMethod(Admin.authAdmin, revel.BEFORE)
-	revel.InterceptMethod(App.authApp, revel.BEFORE)
-	revel.InterceptMethod(Manage.authManage, revel.BEFORE)
-	revel.InterceptMethod(Creator.authCreator, revel.BEFORE)
-	revel.InterceptMethod(Edit.authEdit, revel.BEFORE)
-	revel.InterceptMethod(EditEvent.authEditEvent, revel.BEFORE)
-	revel.InterceptMethod(EditMeeting.authEditMeeting, revel.BEFORE)
-	revel.InterceptMethod(User.authUser, revel.BEFORE)
+	revel.InterceptMethod(Admin.auth, revel.BEFORE)
+	revel.InterceptMethod(App.auth, revel.BEFORE)
+	revel.InterceptMethod(Manage.auth, revel.BEFORE)
+	revel.InterceptMethod(Creator.auth, revel.BEFORE)
+	revel.InterceptMethod(Edit.auth, revel.BEFORE)
+	revel.InterceptMethod(EditEvent.auth, revel.BEFORE)
+	revel.InterceptMethod(EditMeeting.auth, revel.BEFORE)
+	revel.InterceptMethod(User.auth, revel.BEFORE)
 }

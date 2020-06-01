@@ -52,8 +52,8 @@ CREATE TABLE groups (
   last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id),
-  FOREIGN KEY (parent_id) REFERENCES groups (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (parent_id) REFERENCES groups (id) /* Prevent the deletion of groups if they still have subgroups. */
 );
 
 
@@ -77,8 +77,8 @@ CREATE TABLE courses (
   expiration_date       timestamp with time zone  NOT NULL,
   parent_id             integer,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (parent_id) REFERENCES groups (id)
+  FOREIGN KEY (creator) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (parent_id) REFERENCES groups (id) /* Prevent the deletion of groups if they still have courses. */
 );
 
 
@@ -193,7 +193,7 @@ CREATE TABLE faq_category (
   last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL
 );
 
 
@@ -205,8 +205,8 @@ CREATE TABLE faqs (
   answer          text                      NOT NULL,
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id),
-  FOREIGN KEY (category_id) REFERENCES faq_category (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (category_id) REFERENCES faq_category (id) /* Prevent the deletion of categories if they still contain FAQs. */
 );
 
 
@@ -216,7 +216,7 @@ CREATE TABLE news_feed_category (
   last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL
 );
 
 
@@ -227,6 +227,6 @@ CREATE TABLE news_feed (
   content         text                      NOT NULL,
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id),
-  FOREIGN KEY (category_id) REFERENCES news_feed_category (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (category_id) REFERENCES news_feed_category (id) /* Prevent the deletion of categories if they still contain news. */
 );

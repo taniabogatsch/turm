@@ -8,7 +8,6 @@ import (
 	"turm/app"
 	"turm/app/models"
 
-	"github.com/revel/revel"
 	ldap "gopkg.in/ldap.v2"
 )
 
@@ -21,7 +20,7 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	hostAndPort := fmt.Sprintf("%s:%d", app.LdapHost, app.LdapPort)
 	l, err := ldap.DialTLS("tcp", hostAndPort, tlsConfig)
 	if err != nil {
-		revel.AppLog.Error("error getting the TLS encrypted connection",
+		log.Error("error getting the TLS encrypted connection",
 			"hostAndPort", hostAndPort, "tlsConfig", tlsConfig, "error", err.Error())
 		return
 	}
@@ -32,7 +31,7 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	err = l.Bind(base, credentials.Password) //actual 'login'
 	if err != nil {
 		if !strings.Contains(err.Error(), "Invalid Credentials") {
-			revel.AppLog.Error("cannot login the user", "base", base, "error", err.Error())
+			log.Error("cannot login the user", "base", base, "error", err.Error())
 		}
 		return
 	}
@@ -59,12 +58,12 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 
 	sr, err := l.Search(searchRequest)
 	if err != nil {
-		revel.AppLog.Error("error getting attributes", "search request", searchRequest, "error", err.Error())
+		log.Error("error getting attributes", "search request", searchRequest, "error", err.Error())
 		return
 	}
 	//must be at least one, because we already logged in with this username
 	if len(sr.Entries) != 1 {
-		revel.AppLog.Error("user does not exist or too many entries returned")
+		log.Error("user does not exist or too many entries returned")
 		return err
 	}
 
@@ -107,7 +106,7 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	if e.GetAttributeValue("thuEduStudentNumber") != "" {
 		matrNr, err := strconv.Atoi(e.GetAttributeValue("thuEduStudentNumber"))
 		if err != nil {
-			revel.AppLog.Error("error parsing matriculation number",
+			log.Error("error parsing matriculation number",
 				"matrNr", e.GetAttributeValue("thuEduStudentNumber"), "error", err.Error())
 			return err
 		}

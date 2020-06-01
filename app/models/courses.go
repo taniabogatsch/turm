@@ -108,7 +108,7 @@ func (course *Course) Validate(v *revel.Validation) {
 
 /*Update the specified column in the course table. */
 func (course *Course) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, course.ID, "courses", course)
+	return updateByID(column, "courses", value, course.ID, course)
 }
 
 /*Get all course data. */
@@ -197,10 +197,7 @@ func (course *Course) Delete() (valid bool, err error) {
 	}
 
 	if valid {
-		_, err = tx.Exec(stmtDeleteCourse, course.ID)
-		if err != nil {
-			log.Error("failed to delete course", "course ID", course.ID, "error", err.Error())
-			tx.Rollback()
+		if err = deleteByID("id", "courses", course.ID, tx); err != nil {
 			return
 		}
 	}
@@ -357,11 +354,6 @@ const (
 				OR
 				(current_timestamp > expiration_date)
 			)
-	`
-
-	stmtDeleteCourse = `
-		DELETE FROM courses
-		WHERE id = $1
 	`
 
 	stmtDuplicateCourse = `

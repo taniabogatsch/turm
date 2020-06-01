@@ -37,18 +37,12 @@ func (event *Event) NewBlank() (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, event.ID, "events", event)
+	return updateByID(column, "events", value, event.ID, event)
 }
 
 /*Delete an event. */
 func (event *Event) Delete() (err error) {
-
-	_, err = app.Db.Exec(stmtDeleteEvent, event.ID)
-	if err != nil {
-		log.Error("failed to delete event", "eventID", event.ID,
-			"error", err.Error())
-	}
-	return
+	return deleteByID("id", "events", event.ID, nil)
 }
 
 /*Events holds all events of a course. */
@@ -151,11 +145,6 @@ const (
 				$1, $2, 1, false
 		)
 		RETURNING id, title
-	`
-
-	stmtDeleteEvent = `
-		DELETE FROM events
-		WHERE id = $1
 	`
 
 	stmtDuplicateEvent = `

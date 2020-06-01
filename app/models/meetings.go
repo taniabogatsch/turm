@@ -126,13 +126,7 @@ func (meeting *Meeting) Update() (err error) {
 
 /*Delete a meeting. */
 func (meeting *Meeting) Delete() (err error) {
-
-	_, err = app.Db.Exec(stmtDeleteMeeting, meeting.ID)
-	if err != nil {
-		log.Error("failed to delete meeting", "meetingID", meeting.ID,
-			"error", err.Error())
-	}
-	return
+	return deleteByID("id", "meetings", meeting.ID, nil)
 }
 
 /*Meetings holds all meetings of an event. */
@@ -211,11 +205,6 @@ const (
 		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4, weekday = $6
 		WHERE id = $5
 		RETURNING id
-	`
-
-	stmtDeleteMeeting = `
-		DELETE FROM meetings
-		WHERE id = $1
 	`
 
 	stmtDuplicateMeeting = `

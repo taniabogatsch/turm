@@ -119,10 +119,7 @@ func (group *Group) Delete() (err error) {
 		return
 	}
 
-	_, err = tx.Exec(stmtDeleteGroup, group.ID)
-	if err != nil {
-		log.Error("failed to delete group", "group", group, "error", err.Error())
-		tx.Rollback()
+	if err = deleteByID("id", "groups", group.ID, tx); err != nil {
 		return
 	}
 
@@ -439,11 +436,6 @@ const (
 		SET parent_id = (
 			SELECT parent_id FROM groups WHERE id = $1
 		) WHERE parent_id = $1
-	`
-
-	stmtDeleteGroup = `
-		DELETE FROM groups
-		WHERE id = $1
 	`
 
 	stmtGetRootGroups = `

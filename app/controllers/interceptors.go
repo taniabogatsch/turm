@@ -50,8 +50,8 @@ func general(c *revel.Controller) revel.Result {
 	return nil
 }
 
-//authAdmin prevents unauthorized access to controllers of type Admin.
-func (c Admin) authAdmin() revel.Result {
+//auth prevents unauthorized access to controllers of type Admin.
+func (c Admin) auth() revel.Result {
 
 	c.Log.Debug("executing auth admin interceptor")
 
@@ -66,8 +66,8 @@ func (c Admin) authAdmin() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authApp prevents unauthorized access to controllers of type App.
-func (c App) authApp() revel.Result {
+//auth prevents unauthorized access to controllers of type App.
+func (c App) auth() revel.Result {
 
 	c.Log.Debug("executing auth app interceptor")
 
@@ -81,8 +81,8 @@ func (c App) authApp() revel.Result {
 	return nil
 }
 
-//authManage prevents unauthorized access to controllers of type Manage.
-func (c Manage) authManage() revel.Result {
+//auth prevents unauthorized access to controllers of type Manage.
+func (c Manage) auth() revel.Result {
 
 	c.Log.Debug("executing auth manage courses interceptor")
 
@@ -112,8 +112,8 @@ func (c Manage) authManage() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authCreator prevents unauthorized access to controllers of type Creator.
-func (c Creator) authCreator() revel.Result {
+//auth prevents unauthorized access to controllers of type Creator.
+func (c Creator) auth() revel.Result {
 
 	c.Log.Debug("executing auth creator interceptor")
 
@@ -136,8 +136,8 @@ func (c Creator) authCreator() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authEditEdit prevents unauthorized access to controllers of type Edit.
-func (c Edit) authEdit() revel.Result {
+//auth prevents unauthorized access to controllers of type Edit.
+func (c Edit) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit courses interceptor")
 
@@ -152,8 +152,8 @@ func (c Edit) authEdit() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authEditEvent prevents unauthorized access to controllers of type EditEvent.
-func (c EditEvent) authEditEvent() revel.Result {
+//auth prevents unauthorized access to controllers of type EditEvent.
+func (c EditEvent) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit events interceptor")
 
@@ -168,8 +168,8 @@ func (c EditEvent) authEditEvent() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authEditMeeting prevents unauthorized access to controllers of type EditMeeting.
-func (c EditMeeting) authEditMeeting() revel.Result {
+//auth prevents unauthorized access to controllers of type EditMeeting.
+func (c EditMeeting) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit meetings interceptor")
 
@@ -184,8 +184,8 @@ func (c EditMeeting) authEditMeeting() revel.Result {
 	return c.Redirect(App.Index)
 }
 
-//authUser prevents unauthorized access to controllers of type User.
-func (c User) authUser() revel.Result {
+//auth prevents unauthorized access to controllers of type User.
+func (c User) auth() revel.Result {
 
 	c.Log.Debug("executing auth user interceptor")
 

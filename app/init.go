@@ -103,6 +103,7 @@ func init() {
 		jobs.Schedule("@every 30s", sendEMails{})
 	})
 
+	//register custom template functions
 	revel.TemplateFuncs["dict_addLocale"] = func(locale string, values ...interface{}) (map[string]interface{}, error) {
 		if len(values)%2 != 0 {
 			return nil, errors.New("invalid dict call")

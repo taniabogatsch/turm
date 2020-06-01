@@ -86,17 +86,7 @@ func (category *Category) Update(table, userIDSession *string) (err error) {
 
 /*Delete a category from either faq_category or news_feed_category. */
 func (category *Category) Delete(table *string) (err error) {
-
-	stmt := `DELETE FROM ` + *table + `
-		WHERE id = $1
-	`
-
-	_, err = app.Db.Exec(stmt, category.ID)
-	if err != nil {
-		log.Error("failed to delete category", "category", category,
-			"table", *table, "error", err.Error())
-	}
-	return
+	return deleteByID("id", *table, category.ID, nil)
 }
 
 /*Categories holds all categories of either the FAQs or the news feed. */
@@ -244,17 +234,7 @@ func (entry *HelpPageEntry) Update(userIDSession *string) (err error) {
 
 /*Delete an entry from either faq or news_feed. */
 func (entry *HelpPageEntry) Delete(table *string) (err error) {
-
-	stmt := `DELETE FROM ` + *table + `
-		WHERE id = $1
-	`
-
-	_, err = app.Db.Exec(stmt, entry.ID)
-	if err != nil {
-		log.Error("failed to delete entry", "entry", entry,
-			"table", *table, "error", err.Error())
-	}
-	return
+	return deleteByID("id", *table, entry.ID, nil)
 }
 
 /*HelpPageEntries holds all entries of a specified help page. */
