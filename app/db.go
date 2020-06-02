@@ -1,24 +1,31 @@
 package app
 
 import (
-	"os"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
 
+/*DB is an abstraction to the actual database connection. */
+type DB struct {
+	*sqlx.DB
+}
+
 var (
-	//DBData holds all DB connection data
-	DBData DBConn
+	//dbData holds all DB connection data
+	dbData dbConn
+
+	//Db is the database object representing the DB connections
+	Db *DB
 )
 
-/*DBConn contains all DB connection fields. */
-type DBConn struct {
+//dbConn contains all DB connection fields
+type dbConn struct {
 	User     string
 	Name     string
 	Host     string
 	Port     string
 	Password string
+	Driver   string
 }
 
 //initDB sets up a database connection.
@@ -26,23 +33,21 @@ func initDB() {
 
 	revel.AppLog.Info("init DB")
 
-	driver := revel.Config.StringDefault("db.driver", "postgres")
-	conn := "user=" + DBData.User + " password=" + DBData.Password + " dbname=" +
-		DBData.Name + " host=" + DBData.Host + " port=" + DBData.Port + " sslmode=disable"
+	conn := "user=" + dbData.User + " password=" + dbData.Password + " dbname=" +
+		dbData.Name + " host=" + dbData.Host + " port=" + dbData.Port + " sslmode=disable"
 
-	db, err := sqlx.Connect(driver, conn)
+	db, err := sqlx.Connect(dbData.Driver, conn)
 	if err != nil {
-		revel.AppLog.Fatal("DB connection error", "driver", driver, "conn",
+		revel.AppLog.Fatal("DB connection error", "driver", dbData.Driver, "conn",
 			conn, "error", err.Error())
 	}
 
 	Db = &DB{DB: db}
 
-	//validate the connection
-	var dummy int
-	err = Db.Get(&dummy, `select 1 as dummy`)
+	// force a connection and test that it worked
+	err = Db.Ping()
 	if err != nil {
-		revel.AppLog.Fatal("DB connection not working", "error", err.Error())
+		revel.AppLog.Fatal("DB connection test failed", "err", err.Error())
 	}
 
 	revel.AppLog.Info("connected to DB")
@@ -52,20 +57,19 @@ func initDB() {
 func initDBData() {
 
 	var found bool
-	if DBData.Host, found = revel.Config.String("db.host"); !found {
-		revel.AppLog.Error("no db.host set in config")
-		os.Exit(1)
+	if dbData.Host, found = revel.Config.String("db.host"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.host")
 	}
-	if DBData.Port, found = revel.Config.String("db.port"); !found {
-		revel.AppLog.Error("no db.port set in config")
-		os.Exit(1)
+	if dbData.Port, found = revel.Config.String("db.port"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.port")
 	}
-	if DBData.User, found = revel.Config.String("db.user"); !found {
-		revel.AppLog.Error("no db.user set in config")
-		os.Exit(1)
+	if dbData.User, found = revel.Config.String("db.user"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.user")
 	}
-	if DBData.Name, found = revel.Config.String("db.db"); !found {
-		revel.AppLog.Error("no db.db set in config")
-		os.Exit(1)
+	if dbData.Name, found = revel.Config.String("db.db"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.db")
+	}
+	if dbData.Driver, found = revel.Config.String("db.driver"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "db.driver")
 	}
 }

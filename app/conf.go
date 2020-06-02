@@ -51,7 +51,7 @@ func initConfigVariables() {
 	initMailerData()
 	initDBData()
 	initServerData()
-	initCloudData() //NOTE: must be after initMailerData
+	initJobData() //NOTE: must be after initMailerData
 
 	//time zone
 	if TimeZone, found = revel.Config.String("timezone.long"); !found {
@@ -104,7 +104,7 @@ func initPasswords() {
 	json.Unmarshal(fileContent, &passwords)
 
 	Mailer.Password = passwords["email.pw"]
-	DBData.Password = passwords["db.pw"]
+	dbData.Password = passwords["db.pw"]
 }
 
 //initServerData initializes all server config variables

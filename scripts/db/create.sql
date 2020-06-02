@@ -36,6 +36,7 @@ CREATE TABLE studies (
   semester                integer   NOT NULL,
   degree_id               integer   NOT NULL,
   course_of_studies_id    integer   NOT NULL,
+  touched                 bool      NOT NULL,
 
   PRIMARY KEY (user_id, degree_id, course_of_studies_id),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

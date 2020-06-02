@@ -4,17 +4,11 @@ import (
 	"errors"
 	"turm/modules/jobs/app/jobs"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 
 	//Blank import needed for loading Postgres driver for SQLx
 	_ "github.com/jackc/pgx/stdlib"
 )
-
-/*DB is an abstraction to the actual database connection. */
-type DB struct {
-	*sqlx.DB
-}
 
 var (
 	//AppVersion revel app version (ldflags)
@@ -22,13 +16,11 @@ var (
 
 	//BuildTime revel app build-time (ldflags)
 	BuildTime string
-
-	//Db is the database object representing the DB connections
-	Db *DB
 )
 
 //init application
 func init() {
+
 	//Filters is the default set of global filters.
 	revel.Filters = []revel.Filter{
 		revel.PanicFilter,             //Recover from panics and display an error page instead.
@@ -49,22 +41,38 @@ func init() {
 	revel.TimeFormats = append(revel.TimeFormats, "2006-01-02 15:04:05 -0700")
 
 	//register startup functions with OnAppStart
-	revel.OnAppStart(initPasswords) //NOTE: must be executed first
-	revel.OnAppStart(initConfigVariables)
-	revel.OnAppStart(initDB)
+	revel.OnAppStart(initPasswords, 1) //NOTE: must be executed first
+	revel.OnAppStart(initConfigVariables, 2)
+	revel.OnAppStart(initDB, 3)
 
 	//register scheduled jobs
-	revel.OnAppStart(initJobSchedules)
+	revel.OnAppStart(initJobSchedules, 4)
 	revel.OnAppStart(func() {
 		jobs.Schedule("@every 30s", sendEMails{})
 		jobs.Schedule(jobSchedules["jobs.dbbackup"], backupDB{})
+		jobs.Schedule(jobSchedules["jobs.parseStudies"], parseStudies{})
+	}, 5)
+
+	//close DB connection
+	revel.OnAppStop(func() {
+		if Db != nil {
+			err := Db.Close()
+			if err != nil {
+				revel.AppLog.Error("failed to close DB connection OnAppStop", "err", err.Error())
+			}
+		}
 	})
 
-	//register custom template functions
-	revel.TemplateFuncs["dict_addLocale"] = func(locale string, values ...interface{}) (map[string]interface{}, error) {
+	//custom template function to pass the current locale and a set of values to a template
+	revel.TemplateFuncs["dict_addLocale"] = func(locale string,
+		values ...interface{}) (map[string]interface{}, error) {
+
+		//values must be key-value pairs
 		if len(values)%2 != 0 {
 			return nil, errors.New("invalid dict call")
 		}
+
+		//create a dictionary from the key-value pairs
 		dict := make(map[string]interface{}, len(values)/2)
 		for i := 0; i < len(values); i += 2 {
 			key, ok := values[i].(string)
@@ -73,6 +81,8 @@ func init() {
 			}
 			dict[key] = values[i+1]
 		}
+
+		//set the current locale and return
 		dict["currentLocale"] = locale
 		return dict, nil
 	}

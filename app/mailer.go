@@ -39,11 +39,12 @@ func init() {
 	EMailQueue = make(chan EMail, 1000)
 }
 
-//sendEMails sends e-mails from the queue.
+//sendEMails sends e-mails from the queue
 type sendEMails struct{}
 
 /*Run is a job that sends one e-mail from the queue. */
 func (e sendEMails) Run() {
+
 	email := <-EMailQueue
 	mailer(&email)
 	revel.AppLog.Debug("sending email", "recipient", email.Recipient,
@@ -53,7 +54,7 @@ func (e sendEMails) Run() {
 	time.Sleep(time.Second * 15) //necessary to not spam the e-mail server too much
 }
 
-//mailer sends an e-mail.
+//mailer sends an e-mail
 func mailer(email *EMail) {
 
 	//NOTE: receipts must look like this: []string{"some.mail@tu-ilmenau.de", "second.mail@web.de"}
@@ -74,7 +75,7 @@ func mailer(email *EMail) {
 	err := smtp.SendMail(Mailer.URL, auth, Mailer.EMail, []string{email.Recipient}, []byte(msg))
 	if err != nil {
 		revel.AppLog.Error("error sending e-mail", "recipient", email.Recipient,
-			"subject", email.Subject, "replyTo", email.ReplyTo, "error", err.Error())
+			"subject", email.Subject, "replyTo", email.ReplyTo, "err", err.Error())
 	}
 	return
 }
@@ -82,6 +83,7 @@ func mailer(email *EMail) {
 /*HTMLToMimeFormat takes a HTML string and doubles it into a e-mail body that contains the HTML and a plaintext (divided by a string sequence).
 This format of sending a HTML or plaintext e-mail is called MIME format. */
 func HTMLToMimeFormat(html *string) (mimeBody string) {
+
 	//HTML2Text takes reader and readability-setting as bool and returns plain text
 	//NOTE: text looks pretty dull, but is correct
 	plaintext := html2text.HTML2Text(*html)
