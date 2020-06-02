@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------------------------------- #
 
 creator.tab = Course management
-creator.page = Course management
+creator.page = Courses
 
 creator.of = Creator of
 editor.of = Editor of

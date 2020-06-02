@@ -12,7 +12,8 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Group is a model of the groups table. */
+/*Group is a model of the groups table. Groups are used to specify sections
+and subsections of an institution in which courses are placed. */
 type Group struct {
 	ID          int           `db:"id, primarykey, autoincrement"`
 	ParentID    sql.NullInt32 `db:"parent_id"`
@@ -27,6 +28,8 @@ type Group struct {
 	//identifies whether any parent/child has a course limit
 	InheritsLimits bool ``
 	ChildHasLimits bool ``
+	//used to open courses
+	CourseID int `db:"course_id"`
 }
 
 /*Validate Group fields. */
@@ -62,12 +65,12 @@ func (group *Group) Validate(v *revel.Validation) {
 	}
 }
 
-/*Add a new group to the groups table. */
-func (group *Group) Add(userIDSession *string) (err error) {
+/*Insert a new group into the groups table. */
+func (group *Group) Insert(userIDSession *string) (err error) {
 
 	userID, err := strconv.Atoi(*userIDSession)
 	if err != nil {
-		modelsLog.Error("failed to parse userID from userIDSession",
+		log.Error("failed to parse userID from userIDSession",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
@@ -75,18 +78,18 @@ func (group *Group) Add(userIDSession *string) (err error) {
 	err = app.Db.Get(group, stmtInsertGroup, group.ParentID, group.Name,
 		group.CourseLimit, userID, time.Now().Format(revel.TimeFormats[0]))
 	if err != nil {
-		modelsLog.Error("failed to add group", "group", group, "userID",
+		log.Error("failed to insert group", "group", group, "userID",
 			userID, "error", err.Error())
 	}
 	return
 }
 
-/*Edit a group of the groups table. */
-func (group *Group) Edit(userIDSession *string) (err error) {
+/*Update a group in the groups table. */
+func (group *Group) Update(userIDSession *string) (err error) {
 
 	userID, err := strconv.Atoi(*userIDSession)
 	if err != nil {
-		modelsLog.Error("failed to parse userID from userIDSession",
+		log.Error("failed to parse userID from userIDSession",
 			"userIDSession", *userIDSession, "error", err.Error())
 		return
 	}
@@ -94,32 +97,29 @@ func (group *Group) Edit(userIDSession *string) (err error) {
 	err = app.Db.Get(group, stmtUpdateGroup, group.Name, group.CourseLimit, userID,
 		time.Now().Format(revel.TimeFormats[0]), group.ID)
 	if err != nil {
-		modelsLog.Error("failed to update group", "group", group, "userID",
+		log.Error("failed to update group", "group", group, "userID",
 			userID, "error", err.Error())
 	}
 	return
 }
 
-/*Delete a group of the groups table. */
+/*Delete a group from the groups table. */
 func (group *Group) Delete() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	_, err = tx.Exec(stmtMoveInactiveCourses, group.ID)
 	if err != nil {
-		modelsLog.Error("failed to move inactive courses", "group", group, "error", err.Error())
+		log.Error("failed to move inactive courses", "group", group, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	_, err = tx.Exec(stmtDeleteGroup, group.ID)
-	if err != nil {
-		modelsLog.Error("failed to delete group", "group", group, "error", err.Error())
-		tx.Rollback()
+	if err = deleteByID("id", "groups", group.ID, tx); err != nil {
 		return
 	}
 
@@ -127,22 +127,23 @@ func (group *Group) Delete() (err error) {
 	return
 }
 
-/*Groups holds all groups of the groups table. */
+/*Groups holds all groups in which courses can be placed. The struct is
+filled recursively by traversing the children of each group. */
 type Groups []Group
 
-/*Get all groups. */
-func (groups *Groups) Get(prefix *string) (err error) {
+/*Select all groups. */
+func (groups *Groups) Select(prefix *string) (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	//get root groups for recursive calls
 	err = tx.Select(groups, stmtGetRootGroups)
 	if err != nil {
-		modelsLog.Error("failed to get root groups", "error", err.Error())
+		log.Error("failed to select root groups", "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -153,7 +154,7 @@ func (groups *Groups) Get(prefix *string) (err error) {
 		(*groups)[key].IDPrefix = *prefix
 		(*groups)[key].InheritsLimits = (*groups)[key].CourseLimit.Valid
 
-		(*groups)[key].ChildHasLimits, err = (&(*groups)[key]).getChildren(tx)
+		(*groups)[key].ChildHasLimits, err = (&(*groups)[key]).selectChildren(tx)
 		if err != nil {
 			tx.Rollback()
 			return
@@ -168,36 +169,36 @@ func (groups *Groups) Get(prefix *string) (err error) {
 	return
 }
 
-/*GetPath returns the path of a course in the groups tree. */
-func (groups *Groups) GetPath(courseID *int, tx *sqlx.Tx) (err error) {
+/*SelectPath selects the path of a course in the groups tree. */
+func (groups *Groups) SelectPath(courseID *int, tx *sqlx.Tx) (err error) {
 
 	err = tx.Select(groups, stmtGetPath, *courseID)
 	if err != nil {
-		modelsLog.Error("failed to get path", "courseID", *courseID,
+		log.Error("failed to select path", "courseID", *courseID,
 			"error", err.Error())
 		tx.Rollback()
 	}
 	return
 }
 
-/*GetByUser gets all groups created by a user. */
-func (groups *Groups) GetByUser(userID *int, tx *sqlx.Tx) (err error) {
+/*SelectByUser selects all groups created by a user. */
+func (groups *Groups) SelectByUser(userID *int, tx *sqlx.Tx) (err error) {
 
 	err = tx.Select(groups, stmtSelectGroups, app.TimeZone, *userID)
 	if err != nil {
-		modelsLog.Error("failed to get groups", "error", err.Error())
+		log.Error("failed to select groups by user", "error", err.Error())
 		tx.Rollback()
 	}
 	return
 }
 
-//getChildren recursively returns all children of the current group.
-func (group *Group) getChildren(tx *sqlx.Tx) (hasLimits bool, err error) {
+//selectChildren recursively returns all children of the current group.
+func (group *Group) selectChildren(tx *sqlx.Tx) (hasLimits bool, err error) {
 
 	err = tx.Select(&group.Groups, stmtGetChildren, group.ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			modelsLog.Error("failed to get children", "group", group, "error", err.Error())
+			log.Error("failed to select children", "group", group, "error", err.Error())
 			return
 		}
 		err = nil
@@ -218,7 +219,7 @@ func (group *Group) getChildren(tx *sqlx.Tx) (hasLimits bool, err error) {
 		//only get the children if the entry is a group
 		if group.Groups[key].ID != 0 {
 
-			hasLimitsTemp, err := (&group.Groups[key]).getChildren(tx)
+			hasLimitsTemp, err := (&group.Groups[key]).selectChildren(tx)
 			if err != nil {
 				return false, err
 			}
@@ -254,7 +255,7 @@ func (courseLimit ParentHasCourseLimit) IsSatisfied(i interface{}) bool {
 	err := app.Db.Get(&group, stmtParentHasCourseLimit, parentID)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			modelsLog.Error("failed to retrieve information for this group",
+			log.Error("failed to retrieve information for this group",
 				"parentID", parentID, "error", err.Error())
 		}
 		return false
@@ -281,7 +282,7 @@ func (courseLimit ChildHasCourseLimit) IsSatisfied(i interface{}) bool {
 	var childHasCourseLimit bool
 	err := app.Db.Get(&childHasCourseLimit, stmtChildHasCourseLimit, parentID)
 	if err != nil {
-		modelsLog.Error("failed to retrieve information for this group",
+		log.Error("failed to retrieve information for this group",
 			"parentID", parentID, "error", err.Error())
 		return false
 	}
@@ -307,7 +308,7 @@ func (noneActive NoActiveChildren) IsSatisfied(i interface{}) bool {
 	var noActiveChildren bool
 	err := app.Db.Get(&noActiveChildren, stmtNoActiveChildren, parentID)
 	if err != nil {
-		modelsLog.Error("failed to retrieve information for this group",
+		log.Error("failed to retrieve information for this group",
 			"parentID", parentID, "error", err.Error())
 		return false
 	}
@@ -389,7 +390,7 @@ const (
 	stmtGetChildren = `
 		/* get all groups */
 		(
-			SELECT id, parent_id, name::text AS name, course_limit
+			SELECT id, parent_id, name::text AS name, course_limit, id AS course_id
 			FROM groups
 			WHERE parent_id = $1
 			ORDER BY name ASC
@@ -406,7 +407,7 @@ const (
 					WHERE g.id = c.parent_id
 						AND g.id = $1
 						AND c.id = co.id
-				) AS course_limit
+				) AS course_limit, co.id AS course_id
 
 			FROM courses co
 			WHERE co.parent_id = $1
@@ -435,11 +436,6 @@ const (
 		SET parent_id = (
 			SELECT parent_id FROM groups WHERE id = $1
 		) WHERE parent_id = $1
-	`
-
-	stmtDeleteGroup = `
-		DELETE FROM groups
-		WHERE id = $1
 	`
 
 	stmtGetRootGroups = `

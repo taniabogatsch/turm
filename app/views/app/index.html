@@ -2,13 +2,13 @@
 
 {{template "header.html" .}}
 
-<div class="page page-side page-side-left">
-  <br class="mobile-hidden">
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 <div class="page page-middle">
-  {{template "flash.html" .}}
 
+  <!-- course search -->
   <h4>
     {{msg $ "search.course.title"}}
   </h4>
@@ -19,7 +19,8 @@
           {{template "icons/search.html" . }}
         </span>
       </div>
-      <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}' required maxlength="127" minlength="3">
+      <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}'
+        required maxlength="127" minlength="3">
       <div class="invalid-feedback">
         {{msg $ "validation.invalid.searchValue"}}
       </div>
@@ -28,26 +29,30 @@
   <br>
   <br>
 
+  <!-- groups -->
   <h4>
     {{msg $ "groups"}}
   </h4>
-  <!-- 'Add Group'-button -->
   <br>
   {{if $.session.userID}}
     {{if eq $.session.role "admin"}}
-      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal" onclick="openCreateGroup(0);">
+      <!-- insert a new root group -->
+      <button type="button" class="btn btn-outline-darkblue" data-toggle="modal"
+        onclick='openAdminGroupModal("", "", false, {{url "Admin.InsertGroup"}},
+        {{msg $ "group.insert"}}, "", false, "");'>
         {{msg $ "button.add.group"}}
       </button>
       <br>
       <br>
     {{end}}
   {{end}}
+  <!-- load groups -->
   <div id="groups">
   </div>
 </div>
 
-<div class="page page-side page-side-right">
-  {{template "toast.html" .}}
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 {{template "footer.html" .}}

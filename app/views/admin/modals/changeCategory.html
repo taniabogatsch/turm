@@ -1,0 +1,54 @@
+<!-- modal to insert/update categories -->
+
+<div class="modal fade z-idx-5000" id="admin-category-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white" id="admin-category-modal-title"></h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- form -->
+      <form id="admin-category-modal-form" accept-charset="UTF-8" method="POST"
+        class="needs-validation" novalidate>
+
+        <div class="modal-body">
+
+          <!-- ID -->
+          <input type="hidden" id="admin-category-modal-ID" name="category.ID">
+          <!-- table -->
+          <input type="hidden" id="admin-category-modal-table" name="table">
+
+          <!-- group name -->
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input id="admin-category-modal-name" type="text" class="form-control rounded-right" name="category.Name"
+              placeholder='{{msg $ "category.name"}}' required minlength="3" maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<!-- template containing all course drafts -->
+
+{{template "header.html" .}}
+
+{{template "manage/templates/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      {{template "icons/paperclip.html" . }}
+      &nbsp; {{msg $ "creator.drafts"}}
+    </h4>
+    <hr>
+
+    {{if .errMsg}}
+      <div class="val-div w-100 text-danger">
+        {{.errMsg}}
+      </div>
+    {{end}}
+
+    <!-- drafts -->
+    {{if eq .session.role "admin"}}
+      <ul class="list-group">
+        {{template "manage/templates/drafts.html" dict_addLocale $.currentLocale "entries" .creator}}
+      </ul>
+      <br>
+
+    {{else}}
+
+      {{if eq .session.role "creator"}}
+        <h5>
+          {{msg $ "creator.of"}}
+        </h5>
+
+        <ul class="list-group">
+          {{template "manage/templates/drafts.html" dict_addLocale $.currentLocale "entries" .creator}}
+        </ul>
+        <br>
+      {{end}}
+
+      {{if eq .session.isEditor "true"}}
+        <h5>
+          {{msg $ "editor.of"}}
+        </h5>
+
+        <ul class="list-group">
+          {{range .editor}}
+            <li class="list-group-item">
+
+              <!-- download -->
+              <a class="btn btn-outline-darkblue float-right" href="#no-scroll"
+                onclick='openDownloadModal({{.ID}});' role="button">
+                {{template "icons/download.html" . }}
+              </a>
+
+              <!-- edit -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
+                {{template "icons/pencil.html" . }}
+              </a>
+
+              <!-- edit the course via clicking on its title -->
+              <a class="text-body" href='{{url "Edit.Open" .ID}}'>
+                {{.Title}}
+              </a>
+
+              <small class="form-text text-muted">
+                {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+              </small>
+            </li>
+
+          {{else}} <!-- user is not an editor of any draft -->
+            <small class="form-text text-muted">
+              {{msg $ "creator.drafts.editor.none"}}
+            </small>
+          {{end}}
+        </ul>
+      {{end}}
+    {{end}}
+
+  </div>
+</div>
+
+<div class="page page-side">
+  <div class="page-right-layout">
+    {{template "manage/legends/drafts.html"  dict_addLocale $.currentLocale}}
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //adjust the nav pills
+    $('#v-pills-drafts-tab').addClass("active");
+  });
+</script>
+
+{{template "footer.html" .}}

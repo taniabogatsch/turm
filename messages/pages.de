@@ -13,11 +13,11 @@ group.name = Gruppenname
 group.course.limit = Kurslimit
 group.last.edited = Letzte Bearbeitung
 
-group.new = Neue Gruppe erstellen
-group.new.success = Gruppe '%s' wurde erstellt, ID = %d.
+group.insert = Neue Gruppe erstellen
+group.insert.success = Gruppe '%s' wurde erstellt, ID = %d.
 
-group.edit = Gruppe bearbeiten
-group.edit.success = Gruppe '%s' wurde bearbeitet, ID = %d.
+group.update = Gruppe bearbeiten
+group.update.success = Gruppe '%s' wurde bearbeitet, ID = %d.
 
 group.delete.question = Sind Sie sicher, dass Sie die Gruppe '%s' löschen wollen?
 group.delete.title = Gruppe löschen
@@ -72,16 +72,50 @@ pref.lang.info = Sprache der E-Mails
 pref.lang.info.long = Sprache der E-Mails. Kann später im Profil geändert werden.
 
 # -------------------------------------------------------------------------------------------------- #
-# HELP PAGE
+# HELP PAGES
 # -------------------------------------------------------------------------------------------------- #
 
-data.privacy.tab = Nutzungsbedingungen und Datenschutz
+data.privacy.tab = Datenschutz
 data.privacy.page = Nutzungsbedingungen und Datenschutz
+
+categories = Kategorien
+categories.none = Noch keine Kategorien vorhanden.
+
+category.name = Kategoriename
+category.add = + &nbsp; Kategorie
+category.select = Bitte wählen Sie die Kategorie dieses Eintrags.
+
+category.insert = Neue Kategorie erstellen
+category.insert.success = Kategorie '%s' hinzugefügt, ID = %d.
+
+category.update = Kategorie bearbeiten
+category.update.success = Kategorie '%s' bearbeitet, ID = %d.
+
+category.delete.success = Kategorie gelöscht, ID = %d.
+category.delete.title = Kategorie löschen
+category.delete.confirm = Kategorie '%s' löschen?
+
+entries.none = Diese Kategorie besitzt noch keine Einträge.
+
+entry.content = Inhalt
+entry.question = Frage
+entry.answer = Antwort
+
+entry.insert.success = Eintrag zu Kategorie %d hinzugefügt, ID = %d.
+entry.insert.title = Neuer Eintrag
+entry.insert.add = + &nbsp; Eintrag
+
+entry.update = Eintrag bearbeiten
+entry.update.success = Eintrag aus Kategorie %d bearbeitet, ID = %d.
+
+entry.delete.success = Eintrag gelöscht, ID = %d.
+entry.delete.title = Eintrag löschen
+entry.delete.confirm = Wollen Sie diesen Eintrag wirklich löschen?
 
 news.feed.tab = Turm2 News
 news.feed.page = Neuerungen & Ankündigungen
 
-faq.tab = FAQ
+faq.tab = FAQs
 faq.page = FAQs
 
 imprint.tab = Impressum
@@ -92,7 +126,7 @@ imprint.page = Impressum
 # -------------------------------------------------------------------------------------------------- #
 
 admin.tab = Administration
-admin.page = Administration
+admin.page = Admin
 
 admin.users = Nutzerverwaltung
 admin.roles = Rollenverwaltung

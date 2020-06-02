@@ -108,7 +108,7 @@ func (course *Course) Validate(v *revel.Validation) {
 
 /*Update the specified column in the course table. */
 func (course *Course) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, course.ID, "courses", course)
+	return updateByID(column, "courses", value, course.ID, course)
 }
 
 /*Get all course data. */
@@ -116,13 +116,13 @@ func (course *Course) Get() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
 	if err != nil {
-		modelsLog.Error("failed to get course", "course ID", course.ID, "error", err.Error())
+		log.Error("failed to get course", "course ID", course.ID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -156,7 +156,7 @@ func (course *Course) Get() (err error) {
 	}
 
 	//get the path of the course in the groups tree
-	if err = course.Path.GetPath(&course.ID, tx); err != nil {
+	if err = course.Path.SelectPath(&course.ID, tx); err != nil {
 		return
 	}
 
@@ -173,7 +173,7 @@ func (course *Course) NewBlank(creatorID *int, title *string) (err error) {
 
 	err = app.Db.Get(course, stmtInsertBlankCourse, now, *creatorID, *title)
 	if err != nil {
-		modelsLog.Error("failed to insert blank course", "now", now,
+		log.Error("failed to insert blank course", "now", now,
 			"creator ID", *creatorID, "error", err.Error())
 	}
 	return
@@ -184,23 +184,20 @@ func (course *Course) Delete() (valid bool, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	err = tx.Get(&valid, stmtCourseIsInactiveOrExpired, course.ID)
 	if err != nil {
-		modelsLog.Error("failed to get validity of course deletion", "course ID", course.ID,
+		log.Error("failed to get validity of course deletion", "course ID", course.ID,
 			"error", err.Error())
 		tx.Rollback()
 		return
 	}
 
 	if valid {
-		_, err = tx.Exec(stmtDeleteCourse, course.ID)
-		if err != nil {
-			modelsLog.Error("failed to delete course", "course ID", course.ID, "error", err.Error())
-			tx.Rollback()
+		if err = deleteByID("id", "courses", course.ID, tx); err != nil {
 			return
 		}
 	}
@@ -217,14 +214,14 @@ func (course *Course) Duplicate() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	//duplicate general course data
 	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title, now)
 	if err != nil {
-		modelsLog.Error("failed to duplicate course", "course ID", course.ID, "title",
+		log.Error("failed to duplicate course", "course ID", course.ID, "title",
 			course.Title, "now", now, "error", err.Error())
 		tx.Rollback()
 		return
@@ -262,7 +259,7 @@ func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err erro
 		//unmarshal into the course struct
 		err = json.Unmarshal(*data, &course)
 		if err != nil {
-			modelsLog.Error("failed to unmarshal into new struct", "data",
+			log.Error("failed to unmarshal into new struct", "data",
 				*data, "error", err.Error())
 			return
 		}
@@ -283,7 +280,7 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
-		modelsLog.Error("failed to begin tx", "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
@@ -291,7 +288,7 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 		course.EnrollLimitEvents, course.EnrollmentEnd, course.EnrollmentStart, course.ExpirationDate,
 		course.Fee, course.OnlyLDAP, course.Speaker, course.Subtitle, title, course.UnsubscribeEnd, course.Visible)
 	if err != nil {
-		modelsLog.Error("failed to insert general course data", "creator ID", *creatorID,
+		log.Error("failed to insert general course data", "creator ID", *creatorID,
 			"title", *title, "now", now, "course", *course, "error", err.Error())
 		tx.Rollback()
 		return
@@ -357,11 +354,6 @@ const (
 				OR
 				(current_timestamp > expiration_date)
 			)
-	`
-
-	stmtDeleteCourse = `
-		DELETE FROM courses
-		WHERE id = $1
 	`
 
 	stmtDuplicateCourse = `

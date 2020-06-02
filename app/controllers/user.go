@@ -40,11 +40,15 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	if credentials.Username != "" { //ldap login, authenticate the user
 
-		err := auth.LDAPServerAuth(&credentials, &user)
+		success, err := auth.LDAPServerAuth(&credentials, &user)
 		if err != nil {
-			c.Validation.ErrorKey("login.ldap.auth.failed")
 			return flashError(
 				errAuth, err, "", c.Controller, "")
+		}
+		if !success {
+			c.Validation.ErrorKey("login.ldap.auth.failed")
+			return flashError(
+				errValidation, nil, "", c.Controller, "")
 		}
 		c.Log.Debug("ldap authentication successful", "user", user)
 
@@ -189,7 +193,7 @@ func (c User) NewPassword(email string) revel.Result {
 	c.Validation.Email(email).
 		MessageKey("validation.invalid.email")
 
-	isLdapEMail := !strings.Contains(strings.ToLower(email), app.EMailSuffix)
+	isLdapEMail := !strings.Contains(strings.ToLower(email), app.Mailer.Suffix)
 	c.Validation.Required(isLdapEMail).
 		MessageKey("validation.email.ldap")
 

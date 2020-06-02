@@ -1,0 +1,22 @@
+<!-- terms of use and data privacy -->
+
+{{template "header.html" .}}
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+<div class="page page-middle">
+  <!-- load the terms of use and data privacy content in the respective language -->
+  {{if eq .currentLocale "en-US"}}
+    {{template "app/dataPrivacy/dataPrivacy.html.en" .}}
+  {{else if eq .currentLocale "de-DE"}}
+    {{template "app/dataPrivacy/dataPrivacy.html.de" .}}
+  {{end}}
+</div>
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+{{template "footer.html" .}}

@@ -1,0 +1,138 @@
+<!-- template containing all expired courses -->
+
+{{template "header.html" .}}
+
+{{template "manage/templates/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      {{template "icons/archive.html" . }}
+      &nbsp; {{msg $ "creator.courses.expired"}}
+    </h4>
+    <hr>
+
+    {{if .errMsg}}
+      <div class="val-div w-100 text-danger">
+        {{.errMsg}}
+      </div>
+    {{end}}
+
+    <!-- admins see all expired courses -->
+    {{if eq .session.role "admin"}}
+      <ul class="list-group">
+        {{template "manage/templates/expired.html" dict_addLocale $.currentLocale "entries" .creator}}
+      </ul>
+      <br>
+
+    {{else}}
+      {{if eq .session.role "creator"}}
+        <h5>
+          {{msg $ "creator.of"}}
+        </h5>
+
+        <ul class="list-group">
+          {{template "manage/templates/expired.html" dict_addLocale $.currentLocale "entries" .creator}}
+        </ul>
+        <br>
+      {{end}}
+
+      {{if eq .session.isEditor "true"}}
+        <h5>
+          {{msg $ "editor.of"}}
+        </h5>
+
+        <ul class="list-group">
+          {{range .editor}}
+            <li class="list-group-item">
+
+              <!-- TODO: participants -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+                {{template "icons/people.html" . }}
+              </a>
+
+              <!-- download -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
+                onclick='openDownloadModal({{.ID}});' role="button">
+                {{template "icons/download.html" . }}
+              </a>
+
+              <!-- TODO: go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+                {{template "icons/eye.html" . }}
+              </a>
+
+              <a class="text-body" href='#'> <!-- TODO: go to -->
+                {{.Title}}
+              </a>
+
+              <small class="form-text text-muted">
+                {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+              </small>
+            </li>
+
+          {{else}} <!-- not yet editor of any expired courses -->
+            <small class="form-text text-muted">
+              {{msg $ "creator.expired.editor.none"}}
+            </small>
+          {{end}}
+        </ul>
+        <br>
+      {{end}}
+
+      {{if eq .session.isInstructor "true"}}
+        <h5>
+          {{msg $ "instructor.of"}}
+        </h5>
+
+        <ul class="list-group">
+          {{range .instructor}}
+            <li class="list-group-item">
+
+              <!-- TODO: participants -->
+              <a class="btn btn-outline-darkblue float-right" href="#no-scroll" role="button">
+                {{template "icons/people.html" . }}
+              </a>
+
+              <!-- TODO: go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+                {{template "icons/eye.html" . }}
+              </a>
+
+              <a class="text-body" href='#'> <!-- TODO: go to -->
+                {{.Title}}
+              </a>
+
+              <small class="form-text text-muted">
+                {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
+              </small>
+            </li>
+
+          {{else}} <!-- not yet instructor of any expired courses -->
+            <small class="form-text text-muted">
+              {{msg $ "creator.expired.instructor.none"}}
+            </small>
+          {{end}}
+        </ul>
+      {{end}}
+    {{end}}
+
+  </div>
+</div>
+
+<div class="page page-side">
+  <div class="page-right-layout">
+    {{template "manage/legends/expired.html"  dict_addLocale $.currentLocale}}
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //adjust the nav pills
+    $('#v-pills-expired-tab').addClass("active");
+    getExpiredCourses();
+  });
+</script>
+
+{{template "footer.html" .}}

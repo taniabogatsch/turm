@@ -38,7 +38,7 @@ func (c Creator) Activate(ID int) revel.Result {
 		course.ID,
 	))
 	//TODO: redirect to course?
-	return c.Redirect(ManageCourses.Active)
+	return c.Redirect(Manage.Active)
 }
 
 /*Delete a course (draft).
@@ -105,7 +105,7 @@ func (c Creator) Expire(ID int) revel.Result {
 	c.Flash.Success(c.Message("creator.course.expired",
 		course.ID,
 	))
-	return c.Redirect(ManageCourses.Expired)
+	return c.Redirect(Manage.Expired)
 }
 
 /*New creates a new inactive course according to the specified parameters.
@@ -139,7 +139,7 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 	} else if param.Option == models.DRAFT {
 
 		//TODO
-		return c.Redirect(ManageCourses.Drafts)
+		return c.Redirect(Manage.Drafts)
 
 	} else {
 
@@ -156,5 +156,5 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 		course.Title,
 		course.ID,
 	))
-	return c.Redirect(EditCourse.OpenCourse, course.ID)
+	return c.Redirect(Edit.Open, course.ID)
 }

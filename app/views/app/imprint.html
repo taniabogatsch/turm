@@ -1,0 +1,22 @@
+<!-- imprint -->
+
+{{template "header.html" .}}
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+<div class="page page-middle">
+  <!-- load the imprint in the respective language -->
+  {{if eq .currentLocale "en-US"}}
+    {{template "app/imprint/imprint.html.en" .}}
+  {{else if eq .currentLocale "de-DE"}}
+    {{template "app/imprint/imprint.html.de" .}}
+  {{end}}
+</div>
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+{{template "footer.html" .}}

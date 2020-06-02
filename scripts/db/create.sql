@@ -36,6 +36,7 @@ CREATE TABLE studies (
   semester                integer   NOT NULL,
   degree_id               integer   NOT NULL,
   course_of_studies_id    integer   NOT NULL,
+  touched                 bool      NOT NULL,
 
   PRIMARY KEY (user_id, degree_id, course_of_studies_id),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
@@ -52,8 +53,8 @@ CREATE TABLE groups (
   last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (last_editor) REFERENCES users (id),
-  FOREIGN KEY (parent_id) REFERENCES groups (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (parent_id) REFERENCES groups (id) /* Prevent the deletion of groups if they still have subgroups. */
 );
 
 
@@ -77,8 +78,8 @@ CREATE TABLE courses (
   expiration_date       timestamp with time zone  NOT NULL,
   parent_id             integer,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (parent_id) REFERENCES groups (id)
+  FOREIGN KEY (creator) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (parent_id) REFERENCES groups (id) /* Prevent the deletion of groups if they still have courses. */
 );
 
 
@@ -190,43 +191,43 @@ CREATE TABLE unsubscribed (
 CREATE TABLE faq_category (
   id              serial                    PRIMARY KEY,
   name            varchar(255)              NOT NULL,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creation_date   timestamp with time zone  NOT NULL,
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL
 );
 
 
 CREATE TABLE faqs (
   id              serial                    PRIMARY KEY,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   category_id     integer                   NOT NULL,
   question        varchar(511)              NOT NULL,
   answer          text                      NOT NULL,
-  creation_date   timestamp with time zone  NOT NULL,
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (category_id) REFERENCES faq_category (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (category_id) REFERENCES faq_category (id) /* Prevent the deletion of categories if they still contain FAQs. */
 );
 
 
 CREATE TABLE news_feed_category (
   id              serial                    PRIMARY KEY,
   name            varchar(255)              NOT NULL,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
-  creation_date   timestamp with time zone  NOT NULL,
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL
 );
 
 
 CREATE TABLE news_feed (
   id              serial                    PRIMARY KEY,
-  creator         integer, /* Set to null if user data is deleted due to data policy requirements. */
+  last_editor     integer, /* Set to null if user data is deleted due to data policy requirements. */
   category_id     integer                   NOT NULL,
   content         text                      NOT NULL,
-  creation_date   timestamp with time zone  NOT NULL,
+  last_edited     timestamp with time zone  NOT NULL,
 
-  FOREIGN KEY (creator) REFERENCES users (id),
-  FOREIGN KEY (category_id) REFERENCES news_feed_category (id)
+  FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
+  FOREIGN KEY (category_id) REFERENCES news_feed_category (id) /* Prevent the deletion of categories if they still contain news. */
 );

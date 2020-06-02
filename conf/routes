@@ -7,12 +7,102 @@ module:jobs
 
 
 # ---------------------------------------------------------------------------- #
+# Admin
+# ---------------------------------------------------------------------------- #
+
+GET     /admin/users                                Admin.Users
+GET     /admin/roles                                Admin.Roles
+GET     /admin/dashboard                            Admin.Dashboard
+
+POST    /admin/insertGroup                          Admin.InsertGroup
+POST    /admin/updateGroup                          Admin.UpdateGroup
+POST    /admin/deleteGroup                          Admin.DeleteGroup
+
+GET     /admin/searchUser                           Admin.SearchUser
+GET     /admin/userDetails                          Admin.UserDetails
+POST    /admin/changeRole                           Admin.ChangeRole
+
+POST    /admin/insertCategory                       Admin.InsertCategory
+POST    /admin/updateCategory                       Admin.UpdateCategory
+POST    /admin/deleteCategory                       Admin.DeleteCategory
+
+POST    /admin/insertHelpPageEntry                  Admin.InsertHelpPageEntry
+POST    /admin/updateHelpPageEntry                  Admin.UpdateHelpPageEntry
+POST    /admin/deleteHelpPageEntry                  Admin.DeleteHelpPageEntry
+
+
+# ---------------------------------------------------------------------------- #
 # App
 # ---------------------------------------------------------------------------- #
 
 GET     /                                           App.Index
 GET     /app/changeLanguage                         App.ChangeLanguage
 GET     /app/groups                                 App.Groups
+GET     /app/dataPrivacy                            App.DataPrivacy
+GET     /app/imprint                                App.Imprint
+
+GET     /app/faqs                                   App.FAQs
+GET     /app/news                                   App.News
+
+
+# ---------------------------------------------------------------------------- #
+# Course
+# ---------------------------------------------------------------------------- #
+
+POST     /course/open                                Course.Open
+GET      /course/open                                Course.Open
+
+
+# ---------------------------------------------------------------------------- #
+# Creator
+# ---------------------------------------------------------------------------- #
+
+POST    /creator/activate                           Creator.Activate
+POST    /creator/delete                             Creator.Delete
+POST    /creator/duplicate                          Creator.Duplicate
+POST    /creator/expire                             Creator.Expire
+POST    /creator/new                                Creator.New
+
+
+# ---------------------------------------------------------------------------- #
+# Edit (course, event, meeting)
+# ---------------------------------------------------------------------------- #
+
+GET     /edit/open                                  Edit.Open
+GET     /edit/searchUser                            Edit.SearchUser
+
+POST    /edit/course/validate                       Edit.Validate
+POST    /edit/course/download                       Edit.Download
+
+POST    /edit/course/newEvent                       Edit.NewEvent
+
+POST    /edit/course/changeUserList                 Edit.ChangeUserList
+POST    /edit/course/deleteFromUserList             Edit.DeleteFromUserList
+POST    /edit/course/changeViewMatrNr               Edit.ChangeViewMatrNr
+
+POST    /edit/course/changeBool                     Edit.ChangeBool
+POST    /edit/course/changeTimestamp                Edit.ChangeTimestamp
+POST    /edit/course/changeText                     Edit.ChangeText
+POST    /edit/course/changeGroup                    Edit.ChangeGroup
+POST    /edit/course/changeEnrollLimit              Edit.ChangeEnrollLimit
+
+POST    /edit/event/delete                          EditEvent.Delete
+POST    /edit/event/newMeeting                      EditEvent.NewMeeting
+POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
+POST    /edit/event/changeText                      EditEvent.ChangeText
+POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
+
+POST    /edit/meeting/change                        EditMeeting.Edit
+POST    /edit/meeting/delete                        EditMeeting.Delete
+
+
+# ---------------------------------------------------------------------------- #
+# Manage Courses
+# ---------------------------------------------------------------------------- #
+
+GET     /manageCourses/active                       Manage.Active
+GET     /manageCourses/drafts                       Manage.Drafts
+GET     /manageCourses/expired                      Manage.Expired
 
 
 # ---------------------------------------------------------------------------- #
@@ -35,80 +125,6 @@ GET     /user/newActivationCode                     User.NewActivationCode
 
 GET     /user/prefLanguagePage                      User.PrefLanguagePage
 POST    /user/setPrefLanguage                       User.SetPrefLanguage
-
-
-# ---------------------------------------------------------------------------- #
-# Manage Courses
-# ---------------------------------------------------------------------------- #
-
-GET     /manageCourses/active                       ManageCourses.Active
-GET     /manageCourses/getActive                    ManageCourses.GetActive
-
-GET     /manageCourses/drafts                       ManageCourses.Drafts
-GET     /manageCourses/getDrafts                    ManageCourses.GetDrafts
-
-GET     /manageCourses/expired                      ManageCourses.Expired
-GET     /manageCourses/getExpired                   ManageCourses.GetExpired
-
-
-# ---------------------------------------------------------------------------- #
-# Creator
-# ---------------------------------------------------------------------------- #
-
-POST    /creator/activate                           Creator.Activate
-POST    /creator/delete                             Creator.Delete
-POST    /creator/duplicate                          Creator.Duplicate
-POST    /creator/expire                             Creator.Expire
-POST    /creator/new                                Creator.New
-
-
-# ---------------------------------------------------------------------------- #
-# Edit course (course, event, meeting)
-# ---------------------------------------------------------------------------- #
-
-GET     /editCourse/openCourse                      EditCourse.OpenCourse
-GET     /editCourse/searchUser                      EditCourse.SearchUser
-
-POST    /edit/course/validate                       EditCourse.Validate
-POST    /edit/course/download                       EditCourse.Download
-
-POST    /edit/course/newEvent                       EditCourse.NewEvent
-
-POST    /edit/course/changeUserList                 EditCourse.ChangeUserList
-POST    /edit/course/deleteFromUserList             EditCourse.DeleteFromUserList
-POST    /edit/course/changeViewMatrNr               EditCourse.ChangeViewMatrNr
-
-POST    /edit/course/changeBool                     EditCourse.ChangeBool
-POST    /edit/course/changeTimestamp                EditCourse.ChangeTimestamp
-POST    /edit/course/changeText                     EditCourse.ChangeText
-POST    /edit/course/changeGroup                    EditCourse.ChangeGroup
-POST    /edit/course/changeEnrollLimit              EditCourse.ChangeEnrollLimit
-
-POST    /edit/event/delete                          EditEvent.Delete
-POST    /edit/event/newMeeting                      EditEvent.NewMeeting
-POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
-POST    /edit/event/changeText                      EditEvent.ChangeText
-POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
-
-POST    /edit/meeting/change                        EditMeeting.Edit
-POST    /edit/meeting/delete                        EditMeeting.Delete
-
-
-# ---------------------------------------------------------------------------- #
-# Admin
-# ---------------------------------------------------------------------------- #
-
-GET     /admin/userManagement                       Admin.UserManagement
-GET     /admin/roleManagement                       Admin.RoleManagement
-GET     /admin/dashboard                            Admin.Dashboard
-
-POST    /admin/addGroup                             Admin.AddGroup
-POST    /admin/editGroup                            Admin.EditGroup
-POST    /admin/deleteGroup                          Admin.DeleteGroup
-
-GET     /admin/searchUser                           Admin.SearchUser
-GET     /admin/userDetails                          Admin.UserDetails
-POST    /admin/changeRole                           Admin.ChangeRole
 
 
 # ---------------------------------------------------------------------------- #

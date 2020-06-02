@@ -100,7 +100,7 @@ func (meeting *Meeting) NewBlank() (err error) {
 
 	err = app.Db.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval, now)
 	if err != nil {
-		modelsLog.Error("failed to insert blank meeting", "meeting", meeting,
+		log.Error("failed to insert blank meeting", "meeting", meeting,
 			"error", err.Error())
 	}
 	return
@@ -118,7 +118,7 @@ func (meeting *Meeting) Update() (err error) {
 			meeting.ID, meeting.WeekDay)
 	}
 	if err != nil {
-		modelsLog.Error("failed to update meeting", "meeting", meeting,
+		log.Error("failed to update meeting", "meeting", meeting,
 			"error", err.Error())
 	}
 	return
@@ -126,13 +126,7 @@ func (meeting *Meeting) Update() (err error) {
 
 /*Delete a meeting. */
 func (meeting *Meeting) Delete() (err error) {
-
-	_, err = app.Db.Exec(stmtDeleteMeeting, meeting.ID)
-	if err != nil {
-		modelsLog.Error("failed to delete meeting", "meetingID", meeting.ID,
-			"error", err.Error())
-	}
-	return
+	return deleteByID("id", "meetings", meeting.ID, nil)
 }
 
 /*Meetings holds all meetings of an event. */
@@ -143,7 +137,7 @@ func (meetings *Meetings) Get(tx *sqlx.Tx, eventID *int) (err error) {
 
 	err = tx.Select(meetings, stmtSelectMeetings, &eventID, app.TimeZone)
 	if err != nil {
-		modelsLog.Error("failed to get meetings of event", "event ID", *eventID, "error", err.Error())
+		log.Error("failed to get meetings of event", "event ID", *eventID, "error", err.Error())
 		tx.Rollback()
 	}
 	return
@@ -154,7 +148,7 @@ func (meetings *Meetings) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (e
 
 	_, err = tx.Exec(stmtDuplicateMeeting, *eventIDNew, *eventIDOld)
 	if err != nil {
-		modelsLog.Error("failed to duplicate event", "event ID new",
+		log.Error("failed to duplicate event", "event ID new",
 			*eventIDNew, "event ID old", *eventIDOld, "error", err.Error())
 		tx.Rollback()
 		return
@@ -169,7 +163,7 @@ func (meetings *Meetings) Insert(tx *sqlx.Tx, eventID *int) (err error) {
 		_, err = tx.Exec(stmtInsertMeeting, meeting.Annotation, *eventID, meeting.MeetingEnd,
 			meeting.MeetingInterval, meeting.MeetingStart, meeting.Place, meeting.WeekDay)
 		if err != nil {
-			modelsLog.Error("failed to insert meeting of event", "event ID", *eventID,
+			log.Error("failed to insert meeting of event", "event ID", *eventID,
 				"error", err.Error())
 			tx.Rollback()
 			return
@@ -211,11 +205,6 @@ const (
 		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4, weekday = $6
 		WHERE id = $5
 		RETURNING id
-	`
-
-	stmtDeleteMeeting = `
-		DELETE FROM meetings
-		WHERE id = $1
 	`
 
 	stmtDuplicateMeeting = `

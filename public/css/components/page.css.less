@@ -1,43 +1,124 @@
+//page.css.less defines the composition of the page for different screen resolutions
+
 @import "../theme.css.less";
 
-@media @desktop {
+@media @extra {
   .page {
     padding-bottom: 6rem;
+    padding-left: 2%;
+    padding-right: 2%;
+    float: left;
 
     &-side {
-      float: left;
-      width: 25%;
-
-      &-left {
-        padding-left: 2%;
-      }
-
-      &-right {
-        padding-right: 2%;
-      }
+      width: 20%;
     }
 
     &-middle {
-      float: left;
-      padding-left: 2%;
-      padding-right: 2%;
-      width: 50%;
+      width: 60%;
+    }
+
+    &-right-layout {
+      position: fixed;
+      overflow-y: auto;
+      border-left: 1px solid #dee2e6 !important;
+      padding-left: 2rem;
+      padding-right: 2rem;
+      height: 65%;
+    }
+
+    &-left-layout {
+      position: fixed;
+      overflow-y: auto;
+      border-right: 1px solid #dee2e6 !important;
+      padding-right: 2rem;
+      height: 65%;
     }
   }
 }
 
-@media @phone {
+@media @large {
+  .page {
+    padding-bottom: 6rem;
+    padding-left: 2%;
+    padding-right: 2%;
+    float: left;
+
+    &-side {
+      width: 20%;
+    }
+
+    &-middle {
+      width: 60%;
+    }
+
+    &-right-layout {
+      position: fixed;
+      overflow-y: auto;
+      border-left: 1px solid #dee2e6 !important;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      height: 65%;
+    }
+
+    &-left-layout {
+      border-right: 1px solid #dee2e6 !important;
+      padding-right: 1rem;
+    }
+  }
+}
+
+@media @medium {
   .page {
     padding-bottom: 1rem;
+    padding-left: 4%;
+    padding-right: 4%;
     width: 100%;
 
     &-side {
-      &-left {}
-      &-right {}
+      margin-bottom: 2rem;
     }
-    &-middle {
-      padding-left: 4%;
-      padding-right: 4%;
+
+    &-middle {}
+
+    &-right-layout {
+      position: inherit;
+      overflow-y: auto;
+      border: 0 !important;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+
+    &-left-layout {
+      margin-top: 3rem;
+      border: 0 !important;
+    }
+  }
+}
+
+@media @small {
+  .page {
+    padding-bottom: 1rem;
+    padding-left: 4%;
+    padding-right: 4%;
+    width: 100%;
+
+    &-side {
+      margin-bottom: 2rem;
+    }
+
+    &-middle {}
+
+    &-right-layout {
+      position: inherit;
+      overflow-y: auto;
+      border: 0 !important;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+
+    &-left-layout {
+      margin-top: 3rem;
+      border: 0 !important;
     }
   }
 }

@@ -2,8 +2,8 @@
 
 {{template "header.html" .}}
 
-<div class="page page-side page-side-left">
-  <br class="mobile-hidden">
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 <div class="page page-middle">
@@ -12,25 +12,29 @@
       {{msg $ "pref.lang.page"}}
     </h3>
     <br>
-    <div class="w-desktop-50">
+    <div class="w-form">
 
-      <!-- set preferred language form -->
-      <form id="pref-lang-form" accept-charset="UTF-8" action='{{url "User.SetPrefLanguage"}}' method="POST" class="needs-validation" novalidate>
+      <!-- POST form -->
+      <form id="pref-lang-form" accept-charset="UTF-8" action='{{url "User.SetPrefLanguage"}}'
+        method="POST" class="needs-validation" novalidate>
 
-        <div class="col w-50">
+        <div class="col w-content">
           <small class="form-text text-muted">
             {{msg $ "pref.lang.info.long"}}
           </small>
           <br>
+          <!-- language selection -->
           <select name="prefLanguage" class="custom-select">
             {{range .languages}}
-              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}> {{.}} </option>
+              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}>
+                {{.}}
+              </option>
             {{end}}
           </select>
         </div>
 
         <br>
-        <!-- button to confirm preferred language -->
+        <!-- submit POST form -->
         <button class="btn btn-darkblue" type="submit">
           {{msg $ "button.save"}}
         </button>
@@ -40,8 +44,8 @@
   </center>
 </div>
 
-<div class="page page-side page-side-right">
-  {{template "toast.html" .}}
+<div class="page page-side">
+  <br class="medium-hidden">
 </div>
 
 {{template "footer.html" .}}

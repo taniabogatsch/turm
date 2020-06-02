@@ -1,0 +1,55 @@
+<!-- template containing user search results -->
+
+<!-- title -->
+<h5>
+  {{msg $ "search.results"}}
+</h5>
+<small class="form-text text-muted">
+  {{msg $ "search.limit" 5}}
+</small>
+
+<table class="table">
+  <tbody>
+    {{range .users}}
+      <tr {{if .OnList}}class="text-muted"{{end}}>
+        <td> {{.EMail}}
+          {{if .ActivationCode.Valid}}
+            <div class="val-div w-100 text-danger">
+              {{msg $ "admin.account.inactive"}}
+            </div>
+          {{end}}
+        </td>
+        <td class="text-center">
+          {{if not .OnList}}
+            <button type="button" class="btn btn-outline-darkblue" onclick="submitList({{.UserID}});">
+              +
+            </button>
+          {{else}}
+            {{msg $ "search.already.added"}}
+          {{end}}
+        </td>
+      </tr>
+    {{else}}
+      <tr>
+        <td colspan="2">
+          {{if .errMsg}}
+            <div class="val-div w-100 text-danger">
+              {{.errMsg}}
+            </div>
+          {{else}}
+            {{msg $ "search.no.results"}}
+          {{end}}
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+
+<script>
+  $(function() {
+    //detect validation error
+    if ({{if .errors}}true{{else}}false{{end}}) {
+      showToast($('#flash-errors').html(), 'danger');
+    }
+  });
+</script>

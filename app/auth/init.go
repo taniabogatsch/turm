@@ -5,6 +5,6 @@ package auth
 import "github.com/revel/revel"
 
 var (
-	//authLog logs all authentication errors
-	authLog = revel.AppLog.New("section", "authentication")
+	//log all authentication errors
+	log = revel.AppLog.New("section", "authentication")
 )

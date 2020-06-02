@@ -5,7 +5,7 @@
 header.no.javascript = JavaScript is not activated. Parts of the page may behave different than expected.
 
 footer.support.email = If you have any questions, please contact our <a href="mailto:%s?Subject=SupportTurm2" target="_top">support</a>.
-footer.data.policy = <a href="#">Here</a> you can find our data policy. #TODO
+footer.data.policy = <a href='app/dataPrivacy'>Here</a> you can find our data policy.
 
 nav.help = Help
 
@@ -53,6 +53,7 @@ button.enroll = Enroll
 
 error.support = Please contact the support.
 
+error.auth = Error connecting to the university server. %(error.support)s
 error.db = Error running a database query. %(error.support)s
 error.email = Error sending e-mail to %s. %(error.support)s
 error.typeConv = Invalid data conversion. %(error.support)s

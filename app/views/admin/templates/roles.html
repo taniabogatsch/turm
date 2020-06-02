@@ -1,0 +1,38 @@
+<!-- range over the specified user entries -->
+
+{{range $key, $value := .entries}}
+  {{if ne $key 0}}
+    <hr>
+  {{end}}
+  <div class="row mb-2">
+    <div class="col-sm-6">
+      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
+      <br>
+      {{.EMail}}
+    </div>
+    <div class="col-sm-4">
+      {{.LastLogin}}
+      <br>
+      {{if eq .Role 0}}
+        {{msg $ "user.role.user"}}
+      {{else if eq .Role 1}}
+        {{msg $ "user.role.creator"}}
+      {{else if eq .Role 2}}
+        {{msg $ "user.role.admin"}}
+      {{end}}
+    </div>
+    <div class="col-sm-2">
+      <a href="#no-scroll" onclick="userDetails({{.ID}})" class="btn btn-outline-darkblue">
+        {{template "icons/tools.html" . }}
+      </a>
+    </div>
+  </div>
+{{else}}
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    {{msg $ "search.no.results"}}
+  {{end}}
+{{end}}

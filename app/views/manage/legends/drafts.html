@@ -1,0 +1,32 @@
+<!-- showing additional information about the buttons/actions for drafts -->
+
+<h4>
+  {{msg $ "creator.wiki"}}
+</h4>
+<hr>
+
+<p> {{msg $ "creator.drafts"}} </p>
+<small class="form-text text-muted">
+  {{msg $ "creator.info.drafts"}}
+  <hr>
+
+  {{template "icons/pencil.html" . }} &nbsp;
+  {{msg $ "creator.info.draft.edit"}}
+  {{msg $ "creator.info.activate"}}
+  <hr>
+
+  {{template "icons/download.html" . }} &nbsp;
+  {{msg $ "creator.info.draft.download"}}
+  <hr>
+
+  <div class="d-none admin creator">
+    {{template "icons/files.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.duplicate"}}
+    <hr>
+  </div>
+
+  <div class="d-none admin creator">
+    {{template "icons/trash.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.delete"}}
+  </div>
+</small>

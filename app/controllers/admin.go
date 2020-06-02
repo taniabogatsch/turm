@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 	"turm/app"
@@ -10,9 +9,9 @@ import (
 	"github.com/revel/revel"
 )
 
-/*UserManagement renders the user management page.
+/*Users renders the user management page.
 - Roles: admin (activated) */
-func (c Admin) UserManagement() revel.Result {
+func (c Admin) Users() revel.Result {
 
 	c.Log.Debug("render user management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
@@ -22,9 +21,9 @@ func (c Admin) UserManagement() revel.Result {
 	return c.Render()
 }
 
-/*RoleManagement renders the role management page.
+/*Roles renders the role management page.
 - Roles: admin (activated) */
-func (c Admin) RoleManagement() revel.Result {
+func (c Admin) Roles() revel.Result {
 
 	c.Log.Debug("render role management page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
@@ -92,20 +91,12 @@ func (c Admin) UserDetails(ID int) revel.Result {
 
 	c.Log.Debug("get user details", "userID", ID)
 
-	c.Validation.Required(ID)
-	if c.Validation.HasErrors() {
-		return renderError(
-			errors.New("missing user ID"),
-			c.Controller,
-		)
-	}
+	//NOTE: no ID validation, if this controller is called with an
+	//invalid ID, then something is going wrong
 
 	user := models.UserDetails{User: models.User{ID: ID}}
 	if err := user.Get(); err != nil {
-		return renderError(
-			err,
-			c.Controller,
-		)
+		return renderError(err, c.Controller)
 	}
 
 	return c.Render(user)
@@ -161,11 +152,11 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*AddGroup adds a new group.
+/*InsertGroup inserts a new group.
 - Roles: admin (activated) */
-func (c Admin) AddGroup(group models.Group) revel.Result {
+func (c Admin) InsertGroup(group models.Group) revel.Result {
 
-	c.Log.Debug("add group", "group", group)
+	c.Log.Debug("insert group", "group", group)
 
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
 		return flashError(
@@ -173,37 +164,39 @@ func (c Admin) AddGroup(group models.Group) revel.Result {
 	}
 
 	userID := c.Session["userID"].(string)
-	if err := group.Add(&userID); err != nil {
+	if err := group.Insert(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("group.new.success",
+	c.Flash.Success(c.Message("group.insert.success",
 		group.Name,
 		group.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*EditGroup edits the name and the course limit of a group.
+/*UpdateGroup updates the name and the course limit of a group.
 - Roles: admin (activated) */
-func (c Admin) EditGroup(group models.Group) revel.Result {
+func (c Admin) UpdateGroup(group models.Group) revel.Result {
 
-	c.Log.Debug("edit group", "group", group)
+	c.Log.Debug("update group", "group", group)
 
-	//NOTE: the DB statement ensures that no courses are deleted
+	c.Validation.Required(group.ID).
+		MessageKey("validation.invalid.params")
+
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
 		return flashError(
 			errValidation, nil, "", c.Controller, "")
 	}
 
 	userID := c.Session["userID"].(string)
-	if err := group.Edit(&userID); err != nil {
+	if err := group.Update(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("group.edit.success",
+	c.Flash.Success(c.Message("group.update.success",
 		group.Name,
 		group.ID,
 	))
@@ -214,12 +207,11 @@ func (c Admin) EditGroup(group models.Group) revel.Result {
 sub groups and no active courses. Upon deletion, all inactive courses of
 that group become the children of the parent group.
 - Roles: admin (activated) */
-func (c Admin) DeleteGroup(group models.Group) revel.Result {
+func (c Admin) DeleteGroup(ID int) revel.Result {
 
-	c.Log.Debug("delete group", "group", group)
+	c.Log.Debug("delete group", "ID", ID)
 
-	//NOTE: the DB statement ensures that no courses are deleted
-	c.Validation.Check(group.ID,
+	c.Validation.Check(ID,
 		models.NoActiveChildren{},
 		revel.Required{},
 	).MessageKey("validation.invalid.groupID")
@@ -229,6 +221,7 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
+	group := models.Group{ID: ID}
 	if err := group.Delete(); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -236,6 +229,178 @@ func (c Admin) DeleteGroup(group models.Group) revel.Result {
 
 	c.Flash.Success(c.Message("group.delete.success",
 		group.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*InsertCategory inserts a new category, either in the faq_category or the
+news_feed_category table.
+- Roles: admin (activated) */
+func (c Admin) InsertCategory(category models.Category, table string) revel.Result {
+
+	c.Log.Debug("insert category", "category", category, "table", table)
+
+	if table != "faq_category" && table != "news_feed_category" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	if category.Validate(c.Validation); c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	userID := c.Session["userID"].(string)
+	if err := category.Insert(&table, &userID); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("category.insert.success",
+		category.Name,
+		category.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*UpdateCategory updates the name of a category.
+- Roles: admin (activated) */
+func (c Admin) UpdateCategory(category models.Category, table string) revel.Result {
+
+	c.Log.Debug("update category", "category", category, "table", table)
+
+	if table != "faq_category" && table != "news_feed_category" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	c.Validation.Required(category.ID).
+		MessageKey("validation.invalid.params")
+
+	if category.Validate(c.Validation); c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	userID := c.Session["userID"].(string)
+	if err := category.Update(&table, &userID); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("category.update.success",
+		category.Name,
+		category.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*DeleteCategory deletes a category.
+- Roles: admin (activated) */
+func (c Admin) DeleteCategory(ID int, table string) revel.Result {
+
+	c.Log.Debug("delete category", "ID", ID, "table", table)
+
+	if table != "faq_category" && table != "news_feed_category" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	c.Validation.Required(ID).
+		MessageKey("validation.invalid.params")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	category := models.Category{ID: ID}
+	if err := category.Delete(&table); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("category.delete.success",
+		category.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*InsertHelpPageEntry inserts a new entry, either in the faq or the news_feed table.
+- Roles: admin (activated) */
+func (c Admin) InsertHelpPageEntry(entry models.HelpPageEntry) revel.Result {
+
+	c.Log.Debug("insert entry", "entry", entry)
+
+	if entry.Validate(c.Validation); c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	userID := c.Session["userID"].(string)
+	if err := entry.Insert(&userID); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("entry.insert.success",
+		entry.CategoryID,
+		entry.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*UpdateHelpPageEntry updates an entry in either the faq (question/answer)
+or the news_feed (content) table.
+- Roles: admin (activated) */
+func (c Admin) UpdateHelpPageEntry(entry models.HelpPageEntry) revel.Result {
+
+	c.Log.Debug("update entry", "entry", entry)
+
+	c.Validation.Required(entry.ID).
+		MessageKey("validation.invalid.params")
+
+	if entry.Validate(c.Validation); c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	userID := c.Session["userID"].(string)
+	if err := entry.Update(&userID); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("entry.update.success",
+		entry.CategoryID,
+		entry.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*DeleteHelpPageEntry deletes an entry in either the faq or the news_feed table.
+- Roles: admin (activated) */
+func (c Admin) DeleteHelpPageEntry(ID int, table string) revel.Result {
+
+	c.Log.Debug("delete entry", "ID", ID, "table", table)
+
+	if table != "faqs" && table != "news_feed" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
+	c.Validation.Required(ID).
+		MessageKey("validation.invalid.params")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	entry := models.HelpPageEntry{ID: ID}
+	if err := entry.Delete(&table); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("entry.delete.success",
+		entry.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
 }

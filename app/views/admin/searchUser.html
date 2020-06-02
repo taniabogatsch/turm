@@ -7,61 +7,42 @@
 <small class="form-text text-muted">
   {{msg $ "search.limit" 5}}
 </small>
+<br>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col"> {{msg $ "user.name"}} </th>
-      <th scope="col"> {{msg $ "user.email"}} </th>
-      <th scope="col"> {{msg $ "user.last.login"}} </th>
-      <th scope="col"> {{msg $ "user.role"}} </th>
-      <th scope="col"> </th>
-    </tr>
-  </thead>
-  <tbody>
-    {{range .users}}
-      <tr>
-        <td>
-          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
-        </td>
-        <td> {{.EMail}} </td>
-        <td> {{.LastLogin}} </td>
-        <td>
-          {{if eq .Role 0}}
-            {{msg $ "user.role.user"}}
-          {{else if eq .Role 1}}
-            {{msg $ "user.role.creator"}}
-          {{else if eq .Role 2}}
-            {{msg $ "user.role.admin"}}
-          {{end}}
-        </td>
-        <td class="text-right">
-          <a href="#no-scroll" onclick="userDetails({{.ID}})" class="btn btn-outline-darkblue">
-            {{template "icons/tools.html" . }}
-          </a>
-        </td>
-      </tr>
-    {{else}}
-      <tr>
-        <td colspan="5">
-          {{if .errMsg}}
-            <div class="val-div w-100 text-danger">
-              {{.errMsg}}
-            </div>
-          {{else}}
-            {{msg $ "search.no.results"}}
-          {{end}}
-        </td>
-      </tr>
-    {{end}}
-  </tbody>
-</table>
-
-<script>
-  $(function() {
-    //detect validation error
-    if ({{if .errors}}true{{else}}false{{end}}) {
-      showErrorToast($('#flash-errors').html());
-    }
-  });
-</script>
+<!-- search results -->
+{{range $key, $value := .users}}
+  {{if ne $key 0}}
+    <hr>
+  {{end}}
+  <div class="row mb-2">
+    <div class="col-sm-6">
+      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
+      <br>
+      {{.EMail}}
+    </div>
+    <div class="col-sm-4">
+      {{.LastLogin}}
+      <br>
+      {{if eq .Role 0}}
+        {{msg $ "user.role.user"}}
+      {{else if eq .Role 1}}
+        {{msg $ "user.role.creator"}}
+      {{else if eq .Role 2}}
+        {{msg $ "user.role.admin"}}
+      {{end}}
+    </div>
+    <div class="col-sm-2">
+      <a href="#no-scroll" onclick="userDetails({{.ID}})" class="btn btn-outline-darkblue">
+        {{template "icons/tools.html" . }}
+      </a>
+    </div>
+  </div>
+{{else}}
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    {{msg $ "search.no.results"}}
+  {{end}}
+{{end}}

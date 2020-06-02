@@ -1,0 +1,70 @@
+<!-- English (en-US) imprint -->
+
+<center>
+  <h4> Imprint </h4>
+</center>
+<br>
+<br>
+
+<strong> General: </strong>
+<br>
+Turm2 is an enrollment system that is mostly designed for the <a href="https://www.tu-ilmenau.de/zib/"> Zentralinstitut für Bildung </a>
+as well as other stakeholders and groups of the <a href="https://www.tu-ilmenau.de/impressum/"> Ilmenau University of Technology</a>.
+It originated from an university software project and was continued by research assistants.
+Special thanks go to the <a href="https://www.tu-ilmenau.de/de/dbis/"> Databases and Information Systems Group</a>.
+<br>
+<br>
+Owner of the system is the <a href="https://www.tu-ilmenau.de/impressum/"> Ilmenau University of Technology</a>.
+
+<hr>
+
+<strong> Contact: </strong>
+<br>
+<a href="mailto:{{.serviceMail}}">{{.serviceMail}}</a>
+
+<hr>
+<strong> Team: </strong>
+<br>
+<table class="table">
+  <tr>
+    <td> Tania Bogatsch </td>
+    <td> Project Management and Lead Developer </td>
+  </tr>
+  <tr>
+    <td> Sophie Altenburg </td>
+    <td> Lead Developer and Stakeholder Communication </td>
+  </tr>
+  <tr>
+    <td> Henrik Seufert </td>
+    <td> Lead developer </td>
+  </tr>
+  <tr>
+    <td> M-Wesam Aljajeh </td>
+    <td> Developer </td>
+  </tr>
+</table>
+
+<hr>
+<strong> Concept and early development (software project 2018): </strong>
+<br>
+<table class="table">
+  <tr>
+    <td colspan="2"> Supervisor: Dipl.-Inf. Stefan Hagedorn </td>
+  </tr>
+  <tr>
+    <td> Tania Bogatsch </td>
+    <td> Sophie Altenburg </td>
+  </tr>
+  <tr>
+    <td> Henrik Seufert </td>
+    <td> M-Wesam Aljajeh </td>
+  </tr>
+  <tr>
+    <td> Mohamed Alsabbagh </td>
+    <td> Marco Brodkorb </td>
+  </tr>
+  <tr>
+    <td> Erik Rothamel </td>
+    <td> Christian Machulla </td>
+  </tr>
+</table>

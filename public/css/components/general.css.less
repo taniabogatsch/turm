@@ -63,64 +63,50 @@
   border-top-right-radius: 2px;
 }
 
-/* phone resolution properties */
-@media @phone {
-  .mobile-hidden {
+@media @extra {
+  .extra-hidden {
     display: none;
   }
-  .w-mobile {
-    &-50 {
-      width: 50%;
-    }
-    &-65 {
-      width: 65%;
-    }
-    &-90 {
-      width: 90%;
-    }
+  .w-form {
+    width: 40%;
   }
-  .pl-mobile {
-    &-12 {
-      padding-left: 12rem;
-    }
-  }
-  .position-phone {
-    &-fixed {
-      position: fixed;
-    }
-  }
-  .border-right-mobile {
-    border-right: 1px solid #dee2e6 !important;
+  .w-content {
+    width: 50%;
   }
 }
 
-/* desktop resolution properties */
-@media @desktop {
-  .desktop-hidden {
+@media @large {
+  .large-hidden {
     display: none;
   }
-  .w-desktop {
-    &-50 {
-      width: 50%;
-    }
-    &-65 {
-      width: 65%;
-    }
-    &-90 {
-      width: 90%;
-    }
+  .w-form {
+    width: 60%;
   }
-  .pl-desktop {
-    &-12 {
-      padding-left: 12rem;
-    }
+  .w-content {
+    width: 50%;
   }
-  .position-desktop {
-    &-fixed {
-      position: fixed;
-    }
+}
+
+@media @medium {
+  .medium-hidden {
+    display: none;
   }
-  .border-right-desktop {
-    border-right: 1px solid #dee2e6 !important;
+  .w-form {
+    width: 90%;
+  }
+  .w-content {
+    width: 50%;
+  }
+}
+
+@media @small {
+  .small-hidden {
+    display: none;
+  }
+  .w-form {
+    width: 90%;
+  }
+  .w-content {
+    width: 100%;
   }
 }

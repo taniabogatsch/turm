@@ -10,7 +10,7 @@
     </a>
   </div>
 
-  <div class="navbar-brand">
+  <div class="navbar-brand large-hidden">
     <!-- Turm2 text -->
     <a class="text-white card-link float-left" href='{{url "App.Index"}}'>
       <h2>
@@ -43,12 +43,11 @@
           aria-haspopup="true" aria-expanded="false">
           {{msg $ "nav.help"}}
         </a>
-        <!-- TODO -->
         <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
-          <a class="dropdown-item" href="#"> {{msg $ "data.privacy.tab"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "news.feed.tab"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "faq.tab"}} </a>
-          <a class="dropdown-item" href="#"> {{msg $ "imprint.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.DataPrivacy"}}'> {{msg $ "data.privacy.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.News"}}'> {{msg $ "news.feed.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.FAQs"}}'> {{msg $ "faq.tab"}} </a>
+          <a class="dropdown-item" href='{{url "App.Imprint"}}'> {{msg $ "imprint.tab"}} </a>
         </div>
       </li>
 
@@ -72,20 +71,20 @@
       </li>
 
       <li class="nav-item active d-none admin creator editor instructor">
-        <a class="nav-link" href='{{url "ManageCourses.Active"}}'>
-          {{msg $ "creator.tab"}}
+        <a class="nav-link" href='{{url "Manage.Active"}}'>
+          {{msg $ "creator.page"}}
         </a>
       </li>
 
       <li class="nav-item active d-none admin">
-        <a class="nav-link" href='{{url "Admin.UserManagement"}}'>
-          {{msg $ "admin.tab"}}
+        <a class="nav-link" href='{{url "Admin.Users"}}'>
+          {{msg $ "admin.page"}}
         </a>
       </li>
     </ul> <!-- end of left aligned entries -->
 
     {{if .session.userID}}
-      <span class="navbar-text mt-2 mt-lg-0 mr-0 mr-lg-3">
+      <span class="navbar-text mt-2 mt-lg-0 mr-0 mr-lg-3 large-hidden">
         <a class="text-white" href="#">
           {{$.session.firstName}} {{$.session.lastName}}
         </a>
@@ -156,12 +155,12 @@
 
 {{if $.session.userID}}
   {{if eq $.session.role "admin"}}
-    {{template "admin/groups.html" .}}
+    {{template "admin/modals/changeGroup.html" .}}
   {{end}}
 {{end}}
 
 <br>
 <br>
-<br>
-<br>
-<br>
+<br class="medium-hidden">
+<br class="medium-hidden">
+<br class="medium-hidden">

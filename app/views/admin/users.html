@@ -1,0 +1,67 @@
+<!-- template containing the user search -->
+
+{{template "header.html" .}}
+
+{{template "admin/templates/leftNav.html" .}}
+
+<div class="page page-middle">
+  <div class="tab-content">
+    <h4>
+      {{template "icons/search.html" .}} &nbsp; {{msg $ "admin.users"}}
+    </h4>
+    <hr>
+
+    <!--search for users -->
+    <small class="form-text text-muted">
+      {{msg $ "search.criteria"}}
+    </small>
+    <form id="search-form" accept-charset="UTF-8" class="needs-validation"
+      novalidate onkeydown="return event.key != 'Enter';">
+      <div class="form-group">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text border-right-0">
+              {{template "icons/search.html" .}}
+            </span>
+          </div>
+          <input id="user-search-input" type="text" class="form-control rounded-right"
+            placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3"
+            onpaste="reactToInput();">
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.searchValue"}}
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="form-group form-check">
+      <input id="search-inactive" type="checkbox" class="form-check-input">
+      <label class="form-check-label">
+        {{msg $ "search.inactive.users"}}
+      </label>
+    </div>
+
+    <br>
+    <div id="user-search-results"></div>
+  </div>
+</div>
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+<script>
+  $(function() {
+    //react to user input
+    $('#user-search-input').keyup(function() {
+      reactToInput();
+    });
+    $('#search-inactive').change(function() {
+      reactToInput();
+    });
+
+    //adjust the nav pills
+    $('#v-pills-users-tab').addClass("active");
+  });
+</script>
+
+{{template "footer.html" .}}

@@ -5,7 +5,7 @@
 header.no.javascript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
 
 footer.support.email = Bei Fragen wenden Sie sich bitte an unseren <a href="mailto:%s?Subject=SupportTurm2" target="_top">Support</a>.
-footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href="#">hier</a>. #TODO
+footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href='app/dataPrivacy'>hier</a>.
 
 nav.help = Hilfen
 
@@ -53,6 +53,7 @@ button.enroll = Einschreiben
 
 error.support = Bitte kontaktieren Sie den Support.
 
+error.auth = Fehler beim Verbinden mit dem Universitätsserver. %(error.support)s
 error.db = Fehler beim Ausführen einer Datenbankanfrage. %(error.support)s
 error.email = Fehler beim Senden der E-Mail an %s. %(error.support)s
 error.typeConv = Ungültige Daten konvertiert. %(error.support)s

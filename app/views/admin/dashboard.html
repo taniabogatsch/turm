@@ -2,18 +2,20 @@
 
 {{template "header.html" .}}
 
-{{template "admin/leftNav.html" . }}
+{{template "admin/templates/leftNav.html" .}}
 
-<div class="page page-middle mb-5 mb-lg-0">
+<div class="page page-middle">
   <div class="tab-content">
     <h4>
-      {{template "icons/graphUp.html" . }} &nbsp; {{msg $ "admin.dashboard"}}
+      {{template "icons/graphUp.html" .}} &nbsp; {{msg $ "admin.dashboard"}}
     </h4>
     <hr>
   </div>
 </div>
 
-{{template "admin/rightNav.html" . }}
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
 
 <script>
   $(function() {

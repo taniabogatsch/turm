@@ -1,0 +1,173 @@
+<!-- template containing all updates and announcements -->
+
+{{template "header.html" .}}
+
+<div class="page page-side page-left-layout">
+  <h4>
+    {{msg $ "categories"}}
+  </h4>
+  <hr>
+
+  <!-- add new categories -->
+  {{if $.session.userID}}
+    {{if eq $.session.role "admin"}}
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openCategoryModal("news_feed_category", "", "",
+        {{url "Admin.InsertCategory"}}, {{msg $ "category.insert"}});'>
+        {{msg $ "category.add"}}
+      </button>
+      <hr>
+    {{end}}
+  {{end}}
+
+  <!-- range over all categories -->
+  <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+    {{range $key, $value := .categories}}
+      <a class="nav-link btn-outline-darkblue m-1 {{if eq $key 0}}active{{end}}"
+        href='#v-pills-{{$key}}' role="tab" data-toggle="tab">
+        {{.Name}}
+      </a>
+    {{else}}
+      {{if not .errMsg}}
+        {{msg $ "categories.none"}}
+      {{end}}
+    {{end}}
+  </div>
+</div>
+
+<div class="page page-middle">
+  <h4>
+    {{template "icons/newspaper.html" .}}
+    &nbsp; {{msg $ "news.feed.page"}}
+  </h4>
+  <hr>
+
+  <div class="tab-content">
+    {{range $key, $value := .categories}}
+      <div class="tab-pane {{if eq $key 0}}active{{end}}" id='v-pills-{{$key}}' role="tabpanel">
+
+        <!-- category title -->
+        <h5>
+          {{.Name}}
+
+          {{if $.session.userID}}
+            {{if eq $.session.role "admin"}}
+              <!-- update name -->
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='openCategoryModal("news_feed_category", {{.ID}}, {{.Name}},
+                {{url "Admin.UpdateCategory"}}, {{msg $ "category.update"}});'>
+                {{template "icons/pencil.html" . }}
+              </a>
+              {{if not .Entries}}
+                <!-- delete category -->
+                <a href="#no-scroll" class="badge btn-outline-darkblue"
+                  onclick='confirmPOSTModal({{msg $ "category.delete.title"}},
+                  {{msg $ "category.delete.confirm" .Name}},
+                  {{url "Admin.DeleteCategory" .ID "news_feed_category"}});'>
+                  {{template "icons/trash.html" . }}
+                </a>
+              {{end}}
+            {{end}}
+          {{end}}
+        </h5>
+        <hr>
+
+        <!-- insert new entries -->
+        {{if $.session.userID}}
+          {{if eq $.session.role "admin"}}
+            <button type="button" class="btn btn-outline-darkblue"
+              onclick='openEntryModal("", {{url "Admin.InsertHelpPageEntry"}},
+              {{msg $ "entry.insert.title"}}, false, "", "", {{msg $ "entry.content"}}, "", {{.ID}});'>
+              {{msg $ "entry.insert.add"}}
+            </button>
+            <hr>
+          {{end}}
+        {{end}}
+
+        <!-- entries -->
+        {{range $key2, $value2 := .Entries}}
+
+          <!-- last edited -->
+          <small class="text-muted form-text">
+            {{.LastEdited}}
+          </small>
+
+          {{if $.session.userID}}
+            {{if eq $.session.role "admin"}}
+              <!-- update entry -->
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='openEntryModal({{.ID}}, {{url "Admin.UpdateHelpPageEntry"}},
+                {{msg $ "entry.update"}}, false, "news-feed-entry-content-{{$key}}-{{$key2}}",
+                "", {{msg $ "entry.content"}}, "", {{.CategoryID}});'>
+                {{template "icons/pencil.html" . }}
+              </a>
+              <!-- delete entry -->
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='confirmPOSTModal({{msg $ "entry.delete.title"}},
+                {{msg $ "entry.delete.confirm"}}, {{url "Admin.DeleteHelpPageEntry" .ID "news_feed"}});'>
+                {{template "icons/trash.html" . }}
+              </a>
+            {{end}}
+          {{end}}
+
+          <!-- content -->
+          <div id="news-feed-entry-content-{{$key}}-{{$key2}}">
+          </div>
+          <script>
+            //render the html content
+            $(function() {
+              $('#news-feed-entry-content-{{$key}}-{{$key2}}').html('{{.Content}}');
+            });
+          </script>
+
+        {{else}}
+          {{msg $ "entries.none"}}
+        {{end}}
+
+      </div>
+    {{else}}
+      {{if .errMsg}}
+        <div class="val-div w-100 text-danger">
+          {{.errMsg}}
+        </div>
+      {{else}}
+        {{msg $ "categories.none"}}
+      {{end}}
+    {{end}}
+  </div>
+</div>
+
+<!-- insert/update/delete categories and entries -->
+{{template "admin/modals/changeCategory.html" .}}
+{{template "admin/modals/changeEntry.html" .}}
+
+<div class="page page-side">
+  <div class="page-right-layout">
+    <!-- load additional information in the respective language -->
+    {{if eq .currentLocale "en-US"}}
+      {{template "app/newsFeed/info.html.en"}}
+    {{else if eq .currentLocale "de-DE"}}
+      {{template "app/newsFeed/info.html.de"}}
+    {{end}}
+  </div>
+</div>
+
+<script>
+  //initialize Quill editor
+  var quill1;
+
+  $(function() {
+    //set the Quill editor
+    quill1 = new Quill('#admin-entry-modal-content1', {
+      theme: 'snow'
+    });
+
+    //ensure that the form validation behaves correctly
+    quill1.on('text-change', function(delta, oldDelta, source) {
+      const text = quill1.root.innerHTML;
+      detectTextFieldChange(source, "admin-entry-modal-value1", text);
+    });
+  });
+</script>
+
+{{template "footer.html" .}}

@@ -1,0 +1,70 @@
+<!-- German (de-DE) imprint -->
+
+<center>
+  <h4> Impressum </h4>
+</center>
+<br>
+<br>
+
+<strong> Allgemein: </strong>
+<br>
+Turm2 ist ein Einschreibesystem, dass das <a href="https://www.tu-ilmenau.de/zib/"> Zentralinstitut für Bildung </a>
+sowie andere Stabsstellen und Fachgebiete der <a href="https://www.tu-ilmenau.de/impressum/"> Technischen Universität Ilmenau </a> bei deren Arbeit unterstützt.
+Es ist im Rahmen eines Softwareprojekts und anschließender HiWi-Arbeit entstanden.
+Besonderer Dank gilt dem <a href="https://www.tu-ilmenau.de/de/dbis/"> Fachgebiet für Datenbanken und Informationssysteme</a>.
+<br>
+<br>
+Das System gehört der <a href="https://www.tu-ilmenau.de/impressum/"> Technischen Universität Ilmenau</a>.
+
+<hr>
+
+<strong> Kontakt: </strong>
+<br>
+<a href="mailto:{{.serviceMail}}">{{.serviceMail}}</a>
+
+<hr>
+<strong> Team: </strong>
+<br>
+<table class="table">
+  <tr>
+    <td> Tania Bogatsch </td>
+    <td> Project Management and Lead Developer </td>
+  </tr>
+  <tr>
+    <td> Sophie Altenburg </td>
+    <td> Lead Developer and Stakeholder Communication </td>
+  </tr>
+  <tr>
+    <td> Henrik Seufert </td>
+    <td> Lead developer </td>
+  </tr>
+  <tr>
+    <td> M-Wesam Aljajeh </td>
+    <td> Developer </td>
+  </tr>
+</table>
+
+<hr>
+<strong> Konzeption und frühe Entwicklung (Softwareprojekt 2018): </strong>
+<br>
+<table class="table">
+  <tr>
+    <td colspan="2"> Betreuung: Dipl.-Inf. Stefan Hagedorn </td>
+  </tr>
+  <tr>
+    <td> Tania Bogatsch </td>
+    <td> Sophie Altenburg </td>
+  </tr>
+  <tr>
+    <td> Henrik Seufert </td>
+    <td> M-Wesam Aljajeh </td>
+  </tr>
+  <tr>
+    <td> Mohamed Alsabbagh </td>
+    <td> Marco Brodkorb </td>
+  </tr>
+  <tr>
+    <td> Erik Rothamel </td>
+    <td> Christian Machulla </td>
+  </tr>
+</table>

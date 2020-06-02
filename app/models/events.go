@@ -29,7 +29,7 @@ func (event *Event) NewBlank() (err error) {
 
 	err = app.Db.Get(event, stmtInsertBlankEvent, event.CourseID, event.Title)
 	if err != nil {
-		modelsLog.Error("failed to insert blank event", "event", event,
+		log.Error("failed to insert blank event", "event", event,
 			"error", err.Error())
 	}
 	return
@@ -37,18 +37,12 @@ func (event *Event) NewBlank() (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(column string, value interface{}) (err error) {
-	return updateByID(column, value, event.ID, "events", event)
+	return updateByID(column, "events", value, event.ID, event)
 }
 
 /*Delete an event. */
 func (event *Event) Delete() (err error) {
-
-	_, err = app.Db.Exec(stmtDeleteEvent, event.ID)
-	if err != nil {
-		modelsLog.Error("failed to delete event", "eventID", event.ID,
-			"error", err.Error())
-	}
-	return
+	return deleteByID("id", "events", event.ID, nil)
 }
 
 /*Events holds all events of a course. */
@@ -59,7 +53,7 @@ func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
 
 	err = tx.Select(events, stmtSelectEvents, *courseID)
 	if err != nil {
-		modelsLog.Error("failed to get events of course", "course ID", *courseID, "error", err.Error())
+		log.Error("failed to get events of course", "course ID", *courseID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -80,7 +74,7 @@ func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err
 	//get all event IDs
 	err = tx.Select(events, stmtGetEventIDs, *courseIDOld)
 	if err != nil {
-		modelsLog.Error("failed to get all events for duplication", "course ID old",
+		log.Error("failed to get all events for duplication", "course ID old",
 			*courseIDOld, "error", err.Error())
 		tx.Rollback()
 		return
@@ -92,7 +86,7 @@ func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err
 		var newID int
 		err = tx.Get(&newID, stmtDuplicateEvent, *courseIDNew, event.ID)
 		if err != nil {
-			modelsLog.Error("failed to duplicate event", "course ID new",
+			log.Error("failed to duplicate event", "course ID new",
 				*courseIDNew, "error", err.Error())
 			tx.Rollback()
 			return
@@ -114,7 +108,7 @@ func (events *Events) Insert(tx *sqlx.Tx, courseID *int) (err error) {
 		err = tx.Get(&event, stmtInsertEvent, event.Annotation, event.Capacity, *courseID,
 			event.EnrollmentKey, event.HasWaitlist, event.Title)
 		if err != nil {
-			modelsLog.Error("failed to insert event of course", "course ID", *courseID,
+			log.Error("failed to insert event of course", "course ID", *courseID,
 				"error", err.Error())
 			tx.Rollback()
 			return
@@ -151,11 +145,6 @@ const (
 				$1, $2, 1, false
 		)
 		RETURNING id, title
-	`
-
-	stmtDeleteEvent = `
-		DELETE FROM events
-		WHERE id = $1
 	`
 
 	stmtDuplicateEvent = `

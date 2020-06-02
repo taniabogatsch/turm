@@ -1,0 +1,32 @@
+<!-- showing additional information about the buttons/actions for expired courses -->
+
+<h4>
+  {{msg $ "creator.wiki"}}
+</h4>
+<hr>
+
+<p> {{msg $ "creator.courses.expired"}} </p>
+<small class="form-text text-muted">
+  {{msg $ "creator.info.expire"}}
+  <hr>
+
+  {{template "icons/eye.html" . }} &nbsp;
+  {{msg $ "creator.info.expired.goto"}}
+  <hr>
+
+  <div class="d-none admin creator editor">
+    {{template "icons/download.html" . }} &nbsp;
+    {{msg $ "creator.info.expired.download"}}
+    <hr>
+  </div>
+
+  {{template "icons/people.html" . }} &nbsp;
+  {{msg $ "creator.info.expired.user"}}
+
+  <div class="d-none admin creator editor">
+    <hr>
+    {{template "icons/trash.html" . }} &nbsp;
+    {{msg $ "creator.info.expired.delete"}}
+  </div>
+
+</small>

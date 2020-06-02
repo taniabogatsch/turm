@@ -1,0 +1,21 @@
+<!-- small news feed information text -->
+
+<h4>
+  <br>
+</h4>
+<hr>
+Welcome to our update feed!
+<br>
+<small class="text-muted form-text">
+  <br>
+  Here, we try to keep all users of Turm2 posted about current developments and scheduled or new features.
+  <br>
+  <br>
+  We are very delighted that more and more people use Turm2 as their course management tool. However, please understand that we are a very small team of students. That is why new features cannot always be implemented directly and errors occur occasionally.
+  <br>
+  <br>
+  Nonetheless, you are encouraged to tell us about features that are still missing and that would improve Turm2. To do so, just send an e-mail to our <a href="mailto:{{.serviceMail}}">service e-mail address</a>.
+  <br>
+  <br>
+  Just one last thing: We did not have the time to translate all our posts, yet, so if you still got questions about them after using a common translator, you can also send us an e-mail.
+</small>

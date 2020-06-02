@@ -1,34 +1,29 @@
 <!-- all groups created by this user -->
 
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col"> {{msg $ "group.id"}} </th>
-      <th scope="col"> {{msg $ "group.parent.id"}} </th>
-      <th scope="col"> {{msg $ "group.name"}} </th>
-      <th scope="col"> {{msg $ "group.course.limit"}} </th>
-      <th scope="col"> {{msg $ "group.last.edited"}} </th>
-    </tr>
-  </thead>
-  <tbody>
-    {{range .Groups}}
-      <tr>
-        <td class="text-right"> {{.ID}} </td>
-        <td class="text-right">
-          {{if .ParentID.Valid}}
-            {{.ParentID.Int32}}
-          {{end}}
-        </td>
-        <td> {{.Name}} </td>
-        <td>
-          {{if .CourseLimit.Valid}}
-            {{.CourseLimit.Int32}}
-          {{end}}
-        </td>
-        <td>
-          {{.LastEdited}}
-        </td>
-      </tr>
-    {{end}}
-  </tbody>
-</table>
+{{range $key, $value := .Groups}}
+
+  {{if ne $key 0}}
+    <hr>
+  {{end}}
+
+  <!-- group data -->
+  <div class="row mb-2">
+    <div class="col-sm-5">
+      {{msg $ "group.id"}}: {{.ID}}
+      {{if .ParentID.Valid}}
+        <br>
+        {{msg $ "group.parent.id"}}: {{.ParentID.Int32}}
+      {{end}}
+      {{if .CourseLimit.Valid}}
+        <br>
+        {{msg $ "group.course.limit"}}: {{.CourseLimit.Int32}}
+      {{end}}
+    </div>
+    <div class="col-sm-7">
+      {{.Name}}
+      <br>
+      {{msg $ "group.last.edited"}}: {{.LastEdited}}
+    </div>
+  </div>
+  
+{{end}}

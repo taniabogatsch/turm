@@ -1,0 +1,80 @@
+<!-- change-text-area-modal
+
+titleID:        change-text-area-modal-title        html
+fieldID:        change-text-area-modal-field        value
+valueID:        change-text-area-modal-value        value
+infoID:         change-text-area-modal-info              html
+
+formID:         change-text-area-modal-form         action
+-->
+
+<div class="modal fade" id="change-text-area-modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-text-area-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-text-area-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- fieldID -->
+          <input type="hidden" name="fieldID" id="change-text-area-modal-field" required>
+
+          <small class="form-text text-muted" id="change-text-area-modal-info">
+          </small>
+          <!-- editor -->
+          <div id="change-text-area-modal-editor">
+          </div>
+
+          <!-- hidden text area -->
+          <textarea class="d-none" id="change-text-area-modal-value" name="value" required>
+          </textarea>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.text.area"}}
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="button" class="btn btn-darkblue" onclick="submitTextArea();">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  //initialize the Quill editor
+  var quill;
+
+  $(function() {
+    //set the Quill editor
+    quill = new Quill('#change-text-area-modal-editor', {
+      theme: 'snow'
+    });
+
+    //ensure that the form validation behaves correctly
+    quill.on('text-change', function(delta, oldDelta, source) {
+      const text = quill.root.innerHTML;
+      detectTextFieldChange(source, "change-text-area-modal-value", text);
+    });
+  });
+</script>

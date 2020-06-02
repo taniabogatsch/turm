@@ -1,0 +1,91 @@
+<!-- change-user-list-modal
+
+titleID:      change-user-list-modal-title      html
+listID:       change-user-list-modal-list       value
+userID:       change-user-list-modal-user       value
+
+searchID:     change-user-list-modal-search
+checkboxID:   change-user-list-modal-checkbox
+resultsID:    change-user-list-modal-results
+-->
+
+<div class="modal fade" id="change-user-list-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-user-list-modal-form" accept-charset="UTF-8"
+        action='{{url "Edit.ChangeUserList"}}#general-data' method="POST"
+        class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-user-list-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input id="change-user-list-modal-courseID" type="hidden" name="ID" value="{{.ID}}">
+          <!-- user ID -->
+          <input id="change-user-list-modal-user" type="hidden" name="userID">
+          <!-- list type -->
+          <input id="change-user-list-modal-list" type="hidden" name="listType">
+
+          <!--search for users -->
+          <small class="form-text text-muted">
+            {{msg $ "search.criteria"}}
+          </small>
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text border-right-0">
+                  {{template "icons/search.html" . }}
+                </span>
+              </div>
+              <input id="change-user-list-modal-search" type="text"
+                class="form-control rounded-right" placeholder='{{msg $ "search.user"}}'
+                required maxlength="127" minlength="3">
+              <div class="invalid-feedback">
+                {{msg $ "validation.invalid.searchValue"}}
+              </div>
+            </div>
+          </div>
+          <div class="form-group form-check">
+            <input id="change-user-list-modal-checkbox" type="checkbox" class="form-check-input">
+            <label class="form-check-label text-body">
+              {{msg $ "search.inactive.users"}}
+            </label>
+          </div>
+
+          <br>
+          <div id="change-user-list-modal-results"></div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //react to user input
+    $('#change-user-list-modal-search').keyup(function() {
+      reactToListInput();
+    });
+    $('#change-user-list-modal-checkbox').change(function() {
+      reactToListInput();
+    });
+  });
+</script>
