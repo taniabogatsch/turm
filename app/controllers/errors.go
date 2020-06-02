@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"turm/app"
+
 	"github.com/revel/revel"
 )
 
@@ -17,43 +19,37 @@ const (
 )
 
 func (s ErrorType) String() string {
-	return [...]string{"validation failed", "database error",
-		"authentication failed", "e-mail error", "type conversion error",
+	return [...]string{"validation failed", "error.db",
+		"error.auth", "e-mail error", "error.typeConv",
 		"error loading content"}[s]
 }
 
 //flashError flashes an error message and redirects to a page.
 func flashError(errType ErrorType, err error, url string, c *revel.Controller, i interface{}) revel.Result {
 
-	//TODO: this will later allow to send an e-mail if any error occurs
-
 	c.FlashParams()
-	if err != nil {
-		c.Log.Error(err.Error())
+	if err != nil { //log error and send notification e-mail
+		c.Log.Error("flash error", "err", err.Error())
+		app.SendErrorNote()
 	}
+
 	if url == "" {
 		url = c.Session["currPath"].(string)
 	}
-	c.Log.Warn(errType.String(), "redirect", url)
+	c.Log.Debug(errType.String(), "redirect", url)
 
+	//execute the correct error action
 	switch errType {
-
-	case errValidation, errAuth:
+	case errAuth, errDB, errTypeConv:
+		c.Flash.Error(c.Message(errType.String()))
+	case errValidation:
 		c.Validation.Keep()
-
-	case errDB:
-		c.Flash.Error(c.Message("error.db"))
-
 	case errEMail:
 		email, parsed := i.(string)
 		if !parsed {
 			c.Log.Error("error parsing e-mail", "email", email)
 		}
 		c.Flash.Error(c.Message("error.email", email))
-
-	case errTypeConv:
-		c.Flash.Error(c.Message("error.typeConv"))
-
 	default:
 		c.Log.Error("undefined error type", "error type", errType)
 		c.Flash.Error(c.Message("error.undefined"))
@@ -66,10 +62,9 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 //renderError renders a template containing the error.
 func renderError(err error, c *revel.Controller) revel.Result {
 
-	//TODO: this will later allow to send an e-mail if any error occurs
-
-	if err != nil {
-		c.Log.Error(err.Error())
+	if err != nil { //log error and send notification e-mail
+		c.Log.Error("rendering error", "err", err.Error())
+		app.SendErrorNote()
 	}
 
 	templatePath := "errors/render.html"
@@ -84,10 +79,9 @@ func renderError(err error, c *revel.Controller) revel.Result {
 //renderQuietError renders an error message.
 func renderQuietError(errType ErrorType, err error, c *revel.Controller) {
 
-	//TODO: this will later allow to send an e-mail if any error occurs
-
-	if err != nil {
-		c.Log.Error(err.Error())
+	if err != nil { //log error and send notification e-mail
+		c.Log.Error("rendering quiet error", "err", err.Error())
+		app.SendErrorNote()
 	}
 
 	switch errType {

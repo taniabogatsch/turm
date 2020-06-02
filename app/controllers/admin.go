@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 	"turm/app"
@@ -92,20 +91,12 @@ func (c Admin) UserDetails(ID int) revel.Result {
 
 	c.Log.Debug("get user details", "userID", ID)
 
-	c.Validation.Required(ID)
-	if c.Validation.HasErrors() {
-		return renderError(
-			errors.New("missing user ID"),
-			c.Controller,
-		)
-	}
+	//NOTE: no ID validation, if this controller is called with an
+	//invalid ID, then something is going wrong
 
 	user := models.UserDetails{User: models.User{ID: ID}}
 	if err := user.Get(); err != nil {
-		return renderError(
-			err,
-			c.Controller,
-		)
+		return renderError(err, c.Controller)
 	}
 
 	return c.Render(user)

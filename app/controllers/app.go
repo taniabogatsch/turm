@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -25,20 +24,12 @@ func (c App) Groups(prefix string) revel.Result {
 
 	c.Log.Debug("get groups", "prefix", prefix)
 
-	c.Validation.Required(prefix)
-	if c.Validation.HasErrors() {
-		return renderError(
-			errors.New("missing prefix"),
-			c.Controller,
-		)
-	}
+	//NOTE: no prefix validation, if this controller is called with an
+	//invalid prefix, then something is going wrong
 
 	var Groups models.Groups
 	if err := Groups.Select(&prefix); err != nil {
-		return renderError(
-			err,
-			c.Controller,
-		)
+		return renderError(err, c.Controller)
 	}
 
 	return c.Render(Groups)

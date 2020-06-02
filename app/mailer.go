@@ -80,6 +80,20 @@ func mailer(email *EMail) {
 	return
 }
 
+/*SendErrorNote sends an error notification e-mail to the mailer. */
+func SendErrorNote() {
+
+	if !revel.DevMode {
+		email := EMail{
+			Recipient: Mailer.EMail,
+			Subject:   "application error",
+			ReplyTo:   "",
+			Body:      "",
+		}
+		EMailQueue <- email
+	}
+}
+
 /*HTMLToMimeFormat takes a HTML string and doubles it into a e-mail body that contains the HTML and a plaintext (divided by a string sequence).
 This format of sending a HTML or plaintext e-mail is called MIME format. */
 func HTMLToMimeFormat(html *string) (mimeBody string) {

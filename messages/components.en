@@ -53,6 +53,7 @@ button.enroll = Enroll
 
 error.support = Please contact the support.
 
+error.auth = Error connecting to the university server. %(error.support)s
 error.db = Error running a database query. %(error.support)s
 error.email = Error sending e-mail to %s. %(error.support)s
 error.typeConv = Invalid data conversion. %(error.support)s

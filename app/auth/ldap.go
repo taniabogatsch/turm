@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,7 +14,7 @@ import (
 
 /*LDAPServerAuth implements the authentication of an user against the ldap server after the user
 entered his username and password. */
-func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err error) {
+func LDAPServerAuth(credentials *models.Credentials, user *models.User) (success bool, err error) {
 
 	//get a TLS encrypted connection
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
@@ -32,7 +33,9 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	if err != nil {
 		if !strings.Contains(err.Error(), "Invalid Credentials") {
 			log.Error("cannot login the user", "base", base, "error", err.Error())
+			return
 		}
+		err = nil
 		return
 	}
 
@@ -63,8 +66,9 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 	}
 	//must be at least one, because we already logged in with this username
 	if len(sr.Entries) != 1 {
-		log.Error("user does not exist or too many entries returned")
-		return err
+		err = errors.New("user does not exist or too many entries returned")
+		log.Error(err.Error())
+		return
 	}
 
 	//get the entry
@@ -108,11 +112,11 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (err err
 		if err != nil {
 			log.Error("error parsing matriculation number",
 				"matrNr", e.GetAttributeValue("thuEduStudentNumber"), "error", err.Error())
-			return err
+			return false, err
 		}
 		user.MatrNr.Int32 = int32(matrNr)
 		user.MatrNr.Valid = true
 	}
 
-	return
+	return true, nil
 }

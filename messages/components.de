@@ -53,6 +53,7 @@ button.enroll = Einschreiben
 
 error.support = Bitte kontaktieren Sie den Support.
 
+error.auth = Fehler beim Verbinden mit dem Universitätsserver. %(error.support)s
 error.db = Fehler beim Ausführen einer Datenbankanfrage. %(error.support)s
 error.email = Fehler beim Senden der E-Mail an %s. %(error.support)s
 error.typeConv = Ungültige Daten konvertiert. %(error.support)s

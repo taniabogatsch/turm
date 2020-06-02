@@ -21,6 +21,7 @@ func (c Manage) Active() revel.Result {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
 	return c.Render(creator, editor, instructor)
 }
 
@@ -38,6 +39,7 @@ func (c Manage) Drafts() revel.Result {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
 	return c.Render(creator, editor)
 }
 
@@ -55,6 +57,7 @@ func (c Manage) Expired() revel.Result {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
 	return c.Render(creator, editor, instructor)
 }
 
