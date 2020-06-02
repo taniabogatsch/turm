@@ -44,7 +44,7 @@ func initDB() {
 
 	Db = &DB{DB: db}
 
-	// force a connection and test that it worked
+	//force a connection and test that it worked
 	err = Db.Ping()
 	if err != nil {
 		revel.AppLog.Fatal("DB connection test failed", "err", err.Error())

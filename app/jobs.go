@@ -294,6 +294,20 @@ func parse() (err error) {
 	return
 }
 
+//dbConnTest is a small job pinging the db in fixed intervals
+type dbConnTest struct{}
+
+/*Run the db connection test. */
+func (e dbConnTest) Run() {
+
+	revel.AppLog.Warn("running DB connection test...")
+	err := Db.Ping()
+	if err != nil {
+		revel.AppLog.Error("DB connection test failed", "err", err.Error())
+		SendErrorNote()
+	}
+}
+
 //initJobData initializes all job config variables
 func initJobData() {
 
@@ -334,6 +348,13 @@ func initJobSchedules() {
 		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.parseStudies")
 	}
 	jobSchedules["jobs.parseStudies"] = studies
+
+	//ping DB
+	connTest, found := revel.Config.String("jobs.connTest")
+	if !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.connTest")
+	}
+	jobSchedules["jobs.connTest"] = connTest
 }
 
 const (

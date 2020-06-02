@@ -51,6 +51,7 @@ func init() {
 		jobs.Schedule("@every 30s", sendEMails{})
 		jobs.Schedule(jobSchedules["jobs.dbbackup"], backupDB{})
 		jobs.Schedule(jobSchedules["jobs.parseStudies"], parseStudies{})
+		jobs.Schedule(jobSchedules["jobs.connTest"], dbConnTest{})
 	}, 5)
 
 	//close DB connection
