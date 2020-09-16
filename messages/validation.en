@@ -53,7 +53,7 @@ validation.invalid.timestamp = Please provide a valid date and time.
 validation.invalid.text = The provided text must be between 3 - 511 characters.
 validation.invalid.text.short = The provided text must be between 3 - 255 characters.
 validation.invalid.text.area = Please provide text.
-validation.invalid.int = Please provide a number between 1 and 1,000,000.
+validation.invalid.int = Please provide a number between 1 and 10,000.
 
 validation.invalid.fee = Please provide a valid fee between (0, 999999.99].
 
@@ -69,6 +69,8 @@ validation.invalid.meeting.end = Meetings must start before they end.
 
 validation.invalid.len.events = There must be at least one event.
 
+validation.invalid.restriction = Please provide at least a pursued degree, a course of studies or a minimum semester.
+
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
@@ -79,3 +81,5 @@ validation.invalid.params = Please provide valid parameters.
 validation.invalid.delete.course = Only inactive or expired courses can be deleted.
 validation.invalid.file = Invalid file.
 validation.invalid.json = Please provide a file with JSON formatting.
+
+validation.invalid.keys = The enrollment keys do not match.

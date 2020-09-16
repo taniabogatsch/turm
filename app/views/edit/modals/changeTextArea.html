@@ -44,6 +44,40 @@ formID:         change-text-area-modal-form         action
           <div class="invalid-feedback">
             {{msg $ "validation.invalid.text.area"}}
           </div>
+
+          <hr class="only-custom-email">
+          <!-- custom e-mail information -->
+          <div class="only-custom-email">{{msg $ "creator.custom.email.fields"}}</div>
+          <div class="row mt-2 only-custom-email">
+            <div class="col-sm-6">
+              <ul>
+                <li>{{msg $ "user.salutation"}}</li>
+                <li>{{msg $ "user.title"}}</li>
+                <li>{{msg $ "user.academic.title"}}</li>
+                <li>{{msg $ "user.firstname"}}</li>
+                <li>{{msg $ "user.name.affix"}}</li>
+                <li>{{msg $ "user.lastname"}}</li>
+              </ul>
+            </div>
+            <div class="col-sm-6">
+              <ul>
+                <li>{{msg $ "course.title"}}</li>
+                <li>{{msg $ "event.title"}}</li>
+                <li>{{msg $ "event.number.meetings"}}</li>
+                <li>{{msg $ "course.creator.email"}}</li>
+                <li>{{msg $ "course.url"}}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="only-custom-email">{{msg $ "creator.custom.email.fields.info"}}</div>
+          <hr class="only-custom-email">
+          <div class="only-custom-email">
+            {{if eq .currentLocale "en-US"}}
+              {{template "edit/modals/exampleEMailEN.html" .}}
+            {{else if eq .currentLocale "de-DE"}}
+              {{template "edit/modals/exampleEMailDE.html" .}}
+            {{end}}
+          </div>
         </div>
 
         <!-- modal footer -->

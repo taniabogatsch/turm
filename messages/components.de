@@ -80,6 +80,8 @@ user.external = Externer Account
 user.matr.nr = Matrikelnummer
 user.matr.nrs = Matrikelnummern
 user.affiliation = Zugehörigkeit
+user.course.of.studies = Studiengang
+user.degree = Angestrebter Abschluss
 
 user.name = Name
 user.firstname = Vorname
@@ -92,6 +94,9 @@ user.salutation = Anrede
 user.salutation.ms = Frau
 user.salutation.mr = Herr
 user.salutation.none = Keine Anrede
+user.title = Titel
+user.academic.title = Akademischer Titel
+user.name.affix = Namenszusatz
 
 user.id = Nutzer ID
 user.last.login = Letzte Anmeldung

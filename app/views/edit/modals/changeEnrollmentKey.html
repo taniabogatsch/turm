@@ -1,0 +1,75 @@
+<!-- change-enrollment-key-modal -->
+
+<div class="modal fade" id="change-enrollment-key-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-restriction-modal-form" accept-charset="UTF-8"
+        action='{{url "EditEvent.ChangeEnrollmentKey"}}#events' method="POST"
+        class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "event.key.title"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- event ID -->
+          <input id="change-enrollment-key-event-ID" type="hidden" name="ID">
+
+          <!-- key -->
+          <small class="form-text text-muted">
+            {{msg $ "event.key"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="key1" type="password" class="form-control rounded-right" min="3" max="511" required>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+
+          <!-- key repeat -->
+          <small class="form-text text-muted">
+            {{msg $ "event.key.repeat"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="key2" type="password" class="form-control rounded-right" min="3" max="511" required>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

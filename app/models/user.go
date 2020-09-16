@@ -525,7 +525,7 @@ const (
 		UPDATE users
 		SET last_login = $1
 		WHERE email = $2
-			AND password = crypt($3, password)
+			AND password = CRYPT($3, password)
 		RETURNING id, last_name, first_name, email, role, activation_code, language
 	`
 
@@ -534,7 +534,7 @@ const (
 			first_name, last_name, email, salutation, role, last_login,
 			first_login, password, activation_code, language
 		)
-		VALUES ($1, $2, $3, $4, 0, $5, $6, crypt($7, gen_salt('bf')), crypt($8, gen_salt('bf')), $9)
+		VALUES ($1, $2, $3, $4, 0, $5, $6, CRYPT($7, gen_salt('bf')), CRYPT($8, gen_salt('bf')), $9)
 		RETURNING
 			/* data to send notification e-mail containing the activation */
 			id, last_name, first_name, email, role, language, salutation
@@ -557,7 +557,7 @@ const (
 
 	stmtUpdatePassword = `
 		UPDATE users
-		SET password = crypt($1, gen_salt('bf'))
+		SET password = CRYPT($1, gen_salt('bf'))
 		WHERE email = $2
 		RETURNING
 			/* data to send notification e-mail containing the new password */
@@ -585,7 +585,7 @@ const (
 
 	stmtUpdateCodeReturningData = `
 		UPDATE users
-		SET activation_code = crypt($1, gen_salt('bf'))
+		SET activation_code = CRYPT($1, gen_salt('bf'))
 		WHERE id = $2
 		RETURNING
 			/* data to send notification e-mail containing the new code */

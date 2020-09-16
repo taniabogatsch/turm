@@ -85,12 +85,16 @@ POST    /edit/course/changeTimestamp                Edit.ChangeTimestamp
 POST    /edit/course/changeText                     Edit.ChangeText
 POST    /edit/course/changeGroup                    Edit.ChangeGroup
 POST    /edit/course/changeEnrollLimit              Edit.ChangeEnrollLimit
+POST    /edit/course/changeRestriction              Edit.ChangeRestriction
+POST    /edit/course/deleteRestriction              Edit.DeleteRestriction
 
 POST    /edit/event/delete                          EditEvent.Delete
 POST    /edit/event/newMeeting                      EditEvent.NewMeeting
 POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
 POST    /edit/event/changeText                      EditEvent.ChangeText
 POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
+POST    /edit/event/changeEnrollmentKey             EditEvent.ChangeEnrollmentKey
+POST    /edit/event/deleteEnrollmentKey             EditEvent.DeleteEnrollmentKey
 
 POST    /edit/meeting/change                        EditMeeting.Edit
 POST    /edit/meeting/delete                        EditMeeting.Delete

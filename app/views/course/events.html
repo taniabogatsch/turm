@@ -87,13 +87,28 @@
         <br>
       {{end}}
 
+      {{if .EnrollmentKey.Valid}}
+        <small class="form-text text-muted float-left edit-show">
+          {{template "icons/lock.html" . }} &nbsp; {{msg $ "event.key.set"}}
+        </small>
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+          onclick='openEnrollmentKeyModal({{.ID}});'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+          onclick='confirmPOSTModal({{msg $ "event.key.delete.title"}},
+            {{msg $ "event.key.delete.confirm"}}, "{{url "EditEvent.DeleteEnrollmentKey" .ID}}#events");'>
+          {{template "icons/trash.html" . }}
+        </a>
+        <br class="edit-show">
+      {{end}}
+
       <!-- meetings -->
       {{template "course/meetings.html" dict_addLocale $.currentLocale "eventID" .ID "Meetings" .Meetings}}
 
       <!-- add a new meeting -->
       {{if .Meetings}}
         <br class="edit-show d-none">
-        <br class="large-hidden">
         <br class="large-hidden">
       {{end}}
       <br class="edit-show d-none">
@@ -112,9 +127,12 @@
         </button>
       {{end}}
 
-      <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0">
-        + &nbsp; Einschreibeschlüssel
-      </button>
+      {{if not .EnrollmentKey.Valid}}
+        <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
+          onclick="openEnrollmentKeyModal({{.ID}});">
+          + &nbsp; {{msg $ "event.key.title"}}
+        </button>
+      {{end}}
     </li>
   {{end}}
 

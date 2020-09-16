@@ -34,12 +34,12 @@ type Course struct {
 	ParentID          sql.NullInt32   `db:"parent_id"`
 
 	//course data of different tables
-	Events       Events        ``
-	Editors      UserList      ``
-	Instructors  UserList      ``
-	Blacklist    UserList      ``
-	Whitelist    UserList      ``
-	Restrictions []Restriction ``
+	Events       Events       ``
+	Editors      UserList     ``
+	Instructors  UserList     ``
+	Blacklist    UserList     ``
+	Whitelist    UserList     ``
+	Restrictions Restrictions ``
 
 	//additional information required when displaying the course
 	CreatorData User ``
@@ -48,6 +48,10 @@ type Course struct {
 	//used for correct template rendering
 	CreatorID string
 	Expired   bool
+
+	//used to add/edit course restrictions
+	CoursesOfStudies CoursesOfStudies
+	Degrees          Degrees
 }
 
 /*Validate all Course fields. */
@@ -144,8 +148,17 @@ func (course *Course) Get() (err error) {
 	if err = course.Whitelist.Get(tx, &course.ID, "whitelists"); err != nil {
 		return
 	}
+	if err = course.Restrictions.Get(tx, &course.ID); err != nil {
+		return
+	}
 
-	//TODO: get restrictions
+	//get courses of studies and degrees
+	if err = course.CoursesOfStudies.Get(tx); err != nil {
+		return
+	}
+	if err = course.Degrees.Get(tx); err != nil {
+		return
+	}
 
 	//get more detailed creator data
 	if course.Creator.Valid {

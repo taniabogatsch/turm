@@ -270,7 +270,7 @@
         onclick='openTextAreaModal({{msg $ "course.description"}},
           "description", {{.course.Description.Valid}},
           "{{url "Edit.ChangeText"}}#course-registration-period",
-          {{msg $ "course.description.change.info"}});'>
+          {{msg $ "course.description.change.info"}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -295,7 +295,7 @@
         onclick='openTextAreaModal({{msg $ "course.description"}},
           "description", {{.course.Description.Valid}},
           "{{url "Edit.ChangeText"}}#course-registration-period",
-          {{msg $ "course.description.change.info"}});'>
+          {{msg $ "course.description.change.info"}}, false);'>
         {{msg $ "creator.add.description"}}
       </button>
     </div>
@@ -317,7 +317,7 @@
         onclick='openTextAreaModal({{msg $ "course.speaker"}},
           "speaker", {{.course.Speaker.Valid}},
           "{{url "Edit.ChangeText"}}#course-registration-period",
-          {{msg $ "course.speaker.change.info"}});'>
+          {{msg $ "course.speaker.change.info"}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -342,7 +342,7 @@
         onclick='openTextAreaModal({{msg $ "course.speaker"}},
           "speaker", {{.course.Speaker.Valid}},
           "{{url "Edit.ChangeText"}}#course-registration-period",
-          {{msg $ "course.speaker.change.info"}});'>
+          {{msg $ "course.speaker.change.info"}}, false);'>
         {{msg $ "creator.add.speaker"}}
       </button>
     </div>
@@ -372,12 +372,47 @@
     </form>
   </div>
 </div>
+
+<!-- restrictions -->
+{{if .course.Restrictions}}
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "course.restrictions"}}:
+    </div>
+    <div class="col-sm-8">
+      <ul>
+        {{range $k, $v := .course.Restrictions}}
+          <li>
+            {{if .DegreeID.Valid}}{{.DegreeName.String}}{{end}}
+            {{if .CourseOfStudiesID.Valid}}{{.StudiesName.String}}{{end}}
+            {{if .MinimumSemester.Valid}}
+              <small class="text-muted d-inline">
+                {{msg $ "course.minimum.semester"}}:{{.MinimumSemester.Int64}}
+              </small>
+            {{end}}
+
+            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+              onclick='openRestrictionModal({{msg $ "course.restrictions"}}, {{.ID}},
+                {{.DegreeID.Int64}}, {{.CourseOfStudiesID.Int64}}, {{.MinimumSemester.Int64}});'>
+              {{template "icons/pencil.html" . }}
+            </a>
+            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+              onclick='confirmPOSTModal({{msg $ "course.restriction.delete.title"}},
+                {{msg $ "course.restriction.delete.confirm"}}, {{url "Edit.DeleteRestriction" $.course.ID .ID}});'>
+              {{template "icons/trash.html" . }}
+            </a>
+          </li>
+        {{end}}
+      </ul>
+    </div>
+  </div>
+{{end}}
 <div class="row mb-2 edit-show d-none">
   <div class="col-sm-4 text-muted">
   </div>
-  <div class="col-sm-8"> <!-- TODO: restrictions -->
+  <div class="col-sm-8"> <!-- TODO: add restrictions -->
     <button type="button" class="btn btn-outline-darkblue"
-      onclick='openRestrictionModal();'>
+      onclick='openRestrictionModal("{{msg $ "course.restrictions"}}", 0, 0, 0, 0);'>
       {{msg $ "creator.add.restriction"}}
     </button>
   </div>
@@ -503,51 +538,6 @@
   </div>
 </div>
 
-<!-- custom e-mail -->
-{{if .course.CustomEMail.Valid}}
-  <div class="row mb-2 edit-show d-none">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "course.custom.email"}}:
-      <br>
-      <a data-toggle="collapse" href="#course-custom_email" role="button"
-        aria-expanded="true" aria-controls="course-custom_email"
-        id="course-custom_email-btn">
-        {{msg $ "button.collapse"}}
-      </a>
-      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='openTextAreaModal({{msg $ "course.custom.email"}},
-          "custom_email", {{.course.CustomEMail.Valid}},
-          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}});'>
-        {{template "icons/pencil.html" . }}
-      </a>
-      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.customemail.delete.title"}},
-          {{msg $ "course.customemail.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}#more-settings");'>
-        {{template "icons/trash.html" . }}
-      </a>
-    </div>
-    <div class="col-sm-8">
-      <div class="collapse show" id="course-custom_email">
-      </div>
-    </div>
-  </div>
-{{else}}
-  <div class="row mb-2 edit-show d-none">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "course.custom.email"}}:
-    </div>
-    <div class="col-sm-8">
-      <button type="button" class="btn btn-outline-darkblue"
-        onclick='openTextAreaModal({{msg $ "course.custom.email"}},
-          "custom_email", {{.course.CustomEMail.Valid}},
-          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}});'>
-        {{msg $ "creator.add.custom.email"}}
-      </button>
-    </div>
-  </div>
-{{end}}
-
 <!-- enrollment limit events -->
 {{if .course.EnrollLimitEvents.Valid}}
   <div class="row mb-2 edit-show d-none">
@@ -588,6 +578,50 @@
   </div>
 {{end}}
 
+<!-- custom e-mail -->
+{{if .course.CustomEMail.Valid}}
+  <div class="row mb-2 edit-show d-none">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "course.custom.email"}}:
+      <br>
+      <a data-toggle="collapse" href="#course-custom_email" role="button"
+        aria-expanded="true" aria-controls="course-custom_email"
+        id="course-custom_email-btn">
+        {{msg $ "button.collapse"}}
+      </a>
+      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+        onclick='openTextAreaModal({{msg $ "course.custom.email"}},
+          "custom_email", {{.course.CustomEMail.Valid}},
+          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}}, true);'>
+        {{template "icons/pencil.html" . }}
+      </a>
+      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+        onclick='confirmPOSTModal({{msg $ "course.customemail.delete.title"}},
+          {{msg $ "course.customemail.delete.confirm"}},
+          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}#more-settings");'>
+        {{template "icons/trash.html" . }}
+      </a>
+    </div>
+    <div class="col-sm-8">
+      <div class="collapse show" id="course-custom_email">
+      </div>
+    </div>
+  </div>
+{{else}}
+  <div class="row mb-2 edit-show d-none">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "course.custom.email"}}:
+    </div>
+    <div class="col-sm-8">
+      <button type="button" class="btn btn-outline-darkblue"
+        onclick='openTextAreaModal({{msg $ "course.custom.email"}}, "custom_email", {{.course.CustomEMail.Valid}},
+          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}}, true);'>
+        {{msg $ "creator.add.custom.email"}}
+      </button>
+    </div>
+  </div>
+{{end}}
+
 <!-- whitelist -->
 {{if .course.Whitelist}}
   <div class="row mb-2 edit-show d-none">
@@ -614,7 +648,6 @@
 {{end}}
 <div class="row mb-2 edit-show d-none">
   <div class="col-sm-4 text-muted">
-    {{msg $ "course.whitelist"}}:
   </div>
   <div class="col-sm-8">
     <button type="button" class="btn btn-outline-darkblue"
@@ -650,7 +683,6 @@
 {{end}}
 <div class="row mb-2 edit-show d-none">
   <div class="col-sm-4 text-muted">
-    {{msg $ "course.blacklist"}}:
   </div>
   <div class="col-sm-8">
     <button type="button" class="btn btn-outline-darkblue"

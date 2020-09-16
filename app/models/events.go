@@ -40,6 +40,17 @@ func (event *Event) Update(column string, value interface{}) (err error) {
 	return updateByID(column, "events", value, event.ID, event)
 }
 
+/*UpdateKey updates the enrollment key of an event. */
+func (event *Event) UpdateKey() (err error) {
+
+	err = app.Db.Get(event, stmtUpdateEnrollmentKey, event.EnrollmentKey, event.ID)
+	if err != nil {
+		log.Error("failed to update enrollment key", "event", *event,
+			"error", err.Error())
+	}
+	return
+}
+
 /*Delete an event. */
 func (event *Event) Delete() (err error) {
 	return deleteByID("id", "events", event.ID, nil)
@@ -169,6 +180,13 @@ const (
 		INSERT INTO events
 			(annotation, capacity, course_id, enrollment_key, has_waitlist, title)
 		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id
+	`
+
+	stmtUpdateEnrollmentKey = `
+		UPDATE events
+		SET enrollment_key = CRYPT($1, gen_salt('bf'))
+		WHERE id = $2
 		RETURNING id
 	`
 )

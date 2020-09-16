@@ -32,3 +32,9 @@ function showChosenOption() {
     $("#custom-file-upload").prop('required', false);
   }
 }
+
+function submitDownloadCourse() {
+
+  $('#download-course-modal').modal('hide');
+  $('#download-course-modal-form').submit();
+}

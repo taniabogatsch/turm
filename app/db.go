@@ -28,7 +28,7 @@ type dbConn struct {
 	Driver   string
 }
 
-//initDB sets up a database connection.
+//initDB sets up a database connection
 func initDB() {
 
 	revel.AppLog.Info("init DB")

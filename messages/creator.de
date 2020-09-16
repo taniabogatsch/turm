@@ -122,6 +122,8 @@ creator.add.restriction = + &nbsp; Studiengangbeschränkung
 creator.add.event = + &nbsp; Veranstaltung
 creator.add.meeting = + &nbsp; Termin
 
+creator.custom.email.fields = Zum Individualisieren der E-Mail können Sie die folgenden Felder einbauen:
+creator.custom.email.fields.info = Schreiben Sie dazu die fettgedruckten Bezeichnungen in doppelte eckige Klammern in den E-Mail-Text. <strong>Groß- und Kleinschreibung muss beachtet werden!</strong> Zum Beispiel:
 
 # --- side info course lists
 

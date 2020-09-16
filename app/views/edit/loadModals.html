@@ -1,8 +1,10 @@
 <!-- load all modals used for editing course information -->
 
 {{template "edit/modals/changeBool.html" dict_addLocale $.currentLocale}}
+{{template "edit/modals/changeEnrollmentKey.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/changeGroup.html" dict_addLocale $.currentLocale "ID" .course.ID "Path" .course.Path}}
 {{template "edit/modals/changeInt.html" dict_addLocale $.currentLocale}}
+{{template "edit/modals/changeRestriction.html" dict_addLocale $.currentLocale "ID" .course.ID "Degrees" .course.Degrees "CoursesOfStudies" .course.CoursesOfStudies}}
 {{template "edit/modals/changeText.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/changeTextArea.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 {{template "edit/modals/changeTimestamp.html" dict_addLocale $.currentLocale}}

@@ -12,6 +12,8 @@ course.description = Course description
 course.speaker = Speaker
 course.audience = Audience
 course.only.ldap = Only users with an university account.
+course.restrictions = Restrictions to courses of studies
+course.minimum.semester = Minimum semester
 
 course.clock =
 course.from = From
@@ -28,6 +30,9 @@ course.visibility = Visibility
 course.whitelist = Whitelist
 course.blacklist = Blacklist
 
+course.url = Course URL
+course.creator.email = E-mail address of course creator
+
 course.events = Events
 course.events.info = A course can have a multitude of events. You can enroll in these events.
 
@@ -39,6 +44,11 @@ event.title = Event title
 event.annotation = Annotation
 event.waitlist.yes = A waiting list exists
 event.waitlist.no = There is no waiting list
+event.key.set = Set enrollment key
+event.key = Enrollment key
+event.key.repeat = Repeat enrollment key
+
+event.number.meetings = Number of meetings
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -119,6 +129,12 @@ event.annotation.delete.title = Delete annotation
 event.waitlist.change.success = Changed waiting list option.
 event.waitlist.change.title = Change waiting list option.
 
+event.key.title = Set enrollment key
+event.key.change.success = Set enrollment key.
+event.key.delete.confirm = Please confirm the deletion of the enrollment key.
+event.key.delete.success = Deleted enrollment key.
+event.key.delete.title = Delete enrollment key
+
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
@@ -192,6 +208,11 @@ course.visibility.public = The course is publicly (without login) visible.
 course.visible.change.success = Changed visibility, course ID = %d.
 
 course.only_ldap.change.success = Changed audience, course ID = %d.
+
+course.restriction.change.success = Updated restriction to course of studies, course ID = %d.
+course.restriction.delete.success = Deleted restriction to course of studies, course ID = %d.
+course.restriction.delete.confirm = Confirm deletion of restriction to course of studies?
+course.restriction.delete.title = Delete restriction to course of studies
 
 course.whitelists.change.success = Added user to whitelist: %s, course ID = %d.
 course.whitelists.delete.success = Deleted user from whitelist, course ID = %d.

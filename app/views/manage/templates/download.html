@@ -5,7 +5,7 @@
     <div class="modal-content">
 
       <!-- form -->
-      <form accept-charset="UTF-8" action='{{url "Edit.Download"}}'
+      <form accept-charset="UTF-8" action='{{url "Edit.Download"}}' id="download-course-modal-form"
         method="POST" class="needs-validation" novalidate>
 
         <!-- modal header -->
@@ -47,7 +47,7 @@
           <button type="button" class="btn btn-darkblue" data-dismiss="modal">
             {{msg $ "button.close"}}
           </button>
-          <button type="submit" class="btn btn-darkblue">
+          <button type="button" class="btn btn-darkblue" onclick="submitDownloadCourse();">
             {{msg $ "button.download"}}
           </button>
         </div>

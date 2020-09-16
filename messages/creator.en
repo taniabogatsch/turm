@@ -123,6 +123,8 @@ creator.add.restriction = + &nbsp; Restriction to course of studies
 creator.add.event = + &nbsp; Event
 creator.add.meeting = + &nbsp; Meeting
 
+creator.custom.email.fields = To customize the e-mail further the following components can be used:
+creator.custom.email.fields.info = To use these components they have to be wrapped in double square brackets within the e-mail text. <strong>All component names are case sensitive!</strong> For example:
 
 # --- side info course lists
 

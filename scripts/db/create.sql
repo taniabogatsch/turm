@@ -155,9 +155,9 @@ CREATE TABLE whitelists (
 CREATE TABLE enrollment_restrictions (
   id                        serial    PRIMARY KEY,
   course_id                 integer   NOT NULL,
-  minimum_semester          integer   NOT NULL,
-  degree_id                 integer   NOT NULL,
-  courses_of_studies_id     integer   NOT NULL,
+  minimum_semester          integer,
+  degree_id                 integer,
+  courses_of_studies_id     integer,
 
   FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
   FOREIGN KEY (degree_id) REFERENCES degrees (id) ON DELETE CASCADE,

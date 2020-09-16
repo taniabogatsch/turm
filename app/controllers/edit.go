@@ -357,7 +357,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 	valid := (value != "")
 
 	//NOTE: the interceptor assures that the course ID is valid
-	if value != "" || fieldID == "title" {
+	if valid || fieldID == "title" {
 
 		if fieldID == "title" || fieldID == "subtitle" {
 			c.Validation.Check(value,
@@ -506,6 +506,59 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 			course.ID,
 		))
 	}
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*ChangeRestriction adds/edits a degree/course of study/semester restriction.
+- Roles: creator and editors of the course */
+func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Result {
+
+	c.Log.Debug("change enrollment restriction", "ID", ID, "restriction", restriction)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	restriction.CourseID = ID
+	restriction.Validate(c.Validation)
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	if restriction.ID == 0 { //insert
+		if err := restriction.Insert(); err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
+	} else { //update
+		if err := restriction.Update(); err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
+	}
+
+	c.Flash.Success(c.Message("course.restriction.change.success",
+		restriction.CourseID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*DeleteRestriction deletes a restriction. */
+func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
+
+	c.Log.Debug("delete enrollment restriction", "ID", ID, "restrictionID", restrictionID)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	//delete
+	restriction := models.Restriction{ID: restrictionID}
+	if err := restriction.Delete(); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("course.restriction.delete.success",
+		ID,
+	))
 	return c.Redirect(c.Session["currPath"])
 }
 

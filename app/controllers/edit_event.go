@@ -169,3 +169,55 @@ func (c EditEvent) ChangeWaitlist(ID int, option bool) revel.Result {
 	c.Flash.Success(c.Message("event.waitlist.change.success"))
 	return c.Redirect(c.Session["currPath"])
 }
+
+/*ChangeEnrollmentKey sets an enrollment key. */
+func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2 string) revel.Result {
+
+	c.Log.Debug("change enrollment key", "ID", ID, "key1", key1, "key2", key2)
+
+	//NOTE: the interceptor assures that the event ID is valid
+
+	key1 = strings.TrimSpace(key1)
+	key2 = strings.TrimSpace(key2)
+	if key1 == key2 {
+		c.Validation.Check(key1,
+			revel.MinSize{3},
+			revel.MaxSize{511}).
+			MessageKey("validation.invalid.keys")
+	} else {
+		c.Validation.ErrorKey("validation.invalid.keys")
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	event := models.Event{ID: ID, EnrollmentKey: sql.NullString{Valid: true, String: key1}}
+	if err := event.UpdateKey(); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("event.key.change.success"))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*DeleteEnrollmentKey of an event. */
+func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
+
+	c.Log.Debug("delete enrollment key", "ID", ID)
+
+	//NOTE: the interceptor assures that the event ID is valid
+
+	event := models.Event{ID: ID}
+	err := event.Update("enrollment_key", sql.NullString{"", false})
+
+	if err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("event.key.delete.success"))
+	return c.Redirect(c.Session["currPath"])
+}

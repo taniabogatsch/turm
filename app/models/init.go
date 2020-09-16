@@ -18,7 +18,7 @@ var (
 //deleteByID deletes an entry from a table by its ID
 func deleteByID(column, table string, value interface{}, tx *sqlx.Tx) (err error) {
 
-	stmt := `DELETE FROM ` + table + `WHERE ` + column + ` = $1	`
+	stmt := `DELETE FROM ` + table + ` WHERE ` + column + ` = $1`
 
 	if tx == nil {
 		_, err = app.Db.Exec(stmt, value)

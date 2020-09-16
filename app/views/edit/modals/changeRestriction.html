@@ -1,0 +1,91 @@
+<!-- change-restriction-modal
+
+titleID:          change-restriction-modal-title              html
+restrictionID:    change-restriction-modal-restriction-ID     value
+degreeID:         change-restriction-modal-select-degree      value
+studiesID:        change-restriction-modal-select-studies     value
+minSemester:      change-restriction-modal-minimum-semester   value
+-->
+
+<div class="modal fade" id="change-restriction-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-restriction-modal-form" accept-charset="UTF-8"
+        action='{{url "Edit.ChangeRestriction"}}#general-data' method="POST"
+        class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-restriction-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- restriction ID -->
+          <input id="change-restriction-modal-restriction-ID" type="hidden" name="restriction.ID">
+
+          <!-- degree -->
+          <small class="form-text text-muted">
+            {{msg $ "user.degree"}}
+          </small>
+          <select name="restriction.DegreeID.Int64" class="form-control"
+            id="change-restriction-modal-select-degree">
+            <option value="0">-</option>
+            {{range $k, $v := .Degrees}}
+              <option value="{{.ID}}">{{.Name}}</option>
+            {{end}}
+          </select>
+
+          <!-- course of studies -->
+          <small class="form-text text-muted">
+            {{msg $ "user.course.of.studies"}}
+          </small>
+          <select name="restriction.CourseOfStudiesID.Int64" class="form-control"
+            id="change-restriction-modal-select-studies">
+            <option value="0">-</option>
+            {{range $k, $v := .CoursesOfStudies}}
+              <option value="{{.ID}}">{{.Name}}</option>
+            {{end}}
+          </select>
+
+          <!-- minimum semester -->
+          <small class="form-text text-muted">
+            {{msg $ "course.minimum.semester"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="restriction.MinimumSemester.Int64" id="change-restriction-modal-minimum-semester"
+              type="number" class="form-control rounded-right" min="1" max="100">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.int"}}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

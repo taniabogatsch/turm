@@ -118,7 +118,7 @@ func (meeting *Meeting) Update() (err error) {
 			meeting.ID, meeting.WeekDay)
 	}
 	if err != nil {
-		log.Error("failed to update meeting", "meeting", meeting,
+		log.Error("failed to update meeting", "meeting", *meeting,
 			"error", err.Error())
 	}
 	return

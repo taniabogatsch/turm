@@ -12,6 +12,8 @@ course.description = Kursbeschreibung
 course.speaker = ReferentIn
 course.audience = Zielgruppe
 course.only.ldap = Nur NutzerInnen mit Universitätsaccount.
+course.restrictions = Studiengangbeschränkungen
+course.minimum.semester = Mindestsemester
 
 course.clock = Uhr
 course.from = Von
@@ -28,6 +30,9 @@ course.visibility = Sichtbarkeit
 course.whitelist = Whitelist
 course.blacklist = Blacklist
 
+course.url = URL zum Kurs
+course.creator.email = E-Mail-Adresse KurserstellerIn
+
 course.events = Veranstaltungen
 course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
 
@@ -39,6 +44,11 @@ event.title = Veranstaltungstitel
 event.annotation = Anmerkung
 event.waitlist.yes = Warteliste vorhanden
 event.waitlist.no = Keine Warteliste vorhanden
+event.key.set = Einschreibeschlüssel gesetzt
+event.key = Einschreibeschlüssel
+event.key.repeat = Einschreibeschlüssel wiederholen
+
+event.number.meetings = Anzahl der Termine
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -119,6 +129,12 @@ event.annotation.delete.title = Anmerkung löschen
 event.waitlist.change.success = Wartelistenoption angepasst.
 event.waitlist.change.title = Wartelistenoption ändern.
 
+event.key.title = Einschreibeschlüssel setzen
+event.key.change.success = Einschreibeschlüssel gesetzt.
+event.key.delete.confirm = Einschreibeschlüssel wirklich löschen?
+event.key.delete.success = Einschreibeschlüssel gelöscht.
+event.key.delete.title = Einschreibeschlüssel löschen
+
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
@@ -192,6 +208,11 @@ course.visibility.public = Der Kurs ist öffentlich (ohne Anmeldung) sichtbar.
 course.visible.change.success = Sichtbarkeit geändert, Kurs ID = %d.
 
 course.only_ldap.change.success = Zielgruppe geändert, Kurs ID = %d.
+
+course.restriction.change.success = Studiengangbeschränkung wurde aktualisiert, Kurs ID = %d.
+course.restriction.delete.success = Studiengangbeschränkung entfernt, Kurs ID = %d.
+course.restriction.delete.confirm = Studiengangbeschränkung wirklich löschen?
+course.restriction.delete.title = Studiengangbeschränkung löschen
 
 course.whitelists.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.
 course.whitelists.delete.success = NutzerIn aus Whitelist entfernt, Kurs ID = %d.

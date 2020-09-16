@@ -139,12 +139,21 @@ function openBoolModal(title, action, option1, option2, value, userID, listType,
   $('#change-bool-modal').modal('show');
 }
 
-function openTextAreaModal(title, field, valid, action, info) {
+function openTextAreaModal(title, field, valid, action, info, isEMail) {
 
   $('#change-text-area-modal-title').html(title);
   $('#change-text-area-modal-field').val(field);
   $('#change-text-area-modal-form').attr("action", action);
   $('#change-text-area-modal-info').html(info);
+
+  let fields = document.getElementsByClassName("only-custom-email");
+  for (let i = 0; i < fields.length; i++) {
+    if (isEMail) {
+      fields[i].classList.remove('d-none');
+    } else {
+      fields[i].classList.add('d-none');
+    }
+  }
 
   //set content
   if (valid) {
@@ -227,4 +236,27 @@ function editCourse() {
   });
   $('#preview-btn').removeClass('d-none');
   $('#hide-preview-btn').addClass('d-none');
+}
+
+function openRestrictionModal(title, ID, degreeID, studiesID, minSemester) {
+
+  $('#change-restriction-modal-title').html(title);
+  $('#change-restriction-modal-restriction-ID').val(ID);
+  $('#change-restriction-modal-select-degree').val(degreeID);
+  $('#change-restriction-modal-select-studies').val(studiesID);
+
+  if (minSemester != 0) {
+    $('#change-restriction-modal-minimum-semester').val(minSemester);
+  } else {
+    $('#change-restriction-modal-minimum-semester').val('');
+  }
+
+  //show the modal
+  $('#change-restriction-modal').modal('show');
+}
+
+function openEnrollmentKeyModal(eventID) {
+
+  $('#change-enrollment-key-event-ID').val(eventID);
+  $('#change-enrollment-key-modal').modal('show');
 }
