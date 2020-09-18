@@ -3,12 +3,12 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"math"
 	"regexp"
 	"strconv"
 	"time"
 	"turm/app"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
 
@@ -52,6 +52,10 @@ type Course struct {
 	//used to add/edit course restrictions
 	CoursesOfStudies CoursesOfStudies
 	Degrees          Degrees
+
+	//used for enrollment
+	CourseStatus CourseStatus
+	Manage       bool
 }
 
 /*Validate all Course fields. */
@@ -111,31 +115,35 @@ func (course *Course) Validate(v *revel.Validation) {
 }
 
 /*Update the specified column in the course table. */
-func (course *Course) Update(column string, value interface{}) (err error) {
-	return updateByID(column, "courses", value, course.ID, course)
+func (course *Course) Update(tx *sqlx.Tx, column string, value interface{}) (err error) {
+	return updateByID(tx, column, "courses", value, course.ID, course)
 }
 
-/*Get all course data. */
-func (course *Course) Get() (err error) {
+/*Get all course data. If manage is false, only get publicly available course
+data. Also, if it is false, get enrollment information for this user for each
+event. */
+func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 
-	tx, err := app.Db.Beginx()
-	if err != nil {
-		log.Error("failed to begin tx", "error", err.Error())
-		return
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
 	}
 
+	course.Manage = manage
+
+	//get general course data
 	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
 	if err != nil {
 		log.Error("failed to get course", "course ID", course.ID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
-	if course.Fee.Valid {
-		course.Fee.Float64 = math.Round(course.Fee.Float64*100) / 100
-	}
-	if err = course.Events.Get(tx, &course.ID); err != nil {
-		return
-	}
+
+	//get additional fields
 	if err = course.Editors.Get(tx, &course.ID, "editors"); err != nil {
 		return
 	}
@@ -152,12 +160,25 @@ func (course *Course) Get() (err error) {
 		return
 	}
 
-	//get courses of studies and degrees
-	if err = course.CoursesOfStudies.Get(tx); err != nil {
+	if !manage && userID != 0 {
+		if err = course.validateEnrollment(tx, userID); err != nil {
+			return
+		}
+	}
+
+	//get the events of the course
+	if err = course.Events.Get(tx, &userID, &course.ID, manage, &course.EnrollLimitEvents); err != nil {
 		return
 	}
-	if err = course.Degrees.Get(tx); err != nil {
-		return
+
+	if manage {
+		//get courses of studies and degrees
+		if err = course.CoursesOfStudies.Get(tx); err != nil {
+			return
+		}
+		if err = course.Degrees.Get(tx); err != nil {
+			return
+		}
 	}
 
 	//get more detailed creator data
@@ -167,15 +188,139 @@ func (course *Course) Get() (err error) {
 			return
 		}
 	}
+	course.CreatorID = strconv.Itoa(int(course.Creator.Int32))
 
 	//get the path of the course in the groups tree
 	if err = course.Path.SelectPath(&course.ID, tx); err != nil {
 		return
 	}
 
-	course.CreatorID = strconv.Itoa(int(course.Creator.Int32))
+	//reset some data
+	if manage {
+		course.Blacklist = UserList{}
+		course.Whitelist = UserList{}
+	}
 
-	tx.Commit()
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
+//validateEnrollment validates whether a user can enroll in a course
+func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
+
+	//if the user is at the blacklist
+	for _, user := range course.Blacklist {
+		if user.UserID == userID {
+			course.CourseStatus.AtBlacklist = true
+			return
+		}
+	}
+
+	//validate if the user is at the whitelist
+	for _, user := range course.Whitelist {
+		if user.UserID == userID {
+			course.CourseStatus.AtWhitelist = true
+		}
+	}
+
+	//skip some validation if the user is at the whitelist
+	if !course.CourseStatus.AtWhitelist {
+
+		//validate if the user complies with the course restrictions
+		//therefore, first get more user information
+		user := User{ID: userID}
+		if err = user.Get(tx); err != nil {
+			return
+		}
+
+		//validate the NotLDAP field
+		if course.OnlyLDAP && !user.IsLDAP {
+			course.CourseStatus.NotLDAP = true
+			return
+		}
+
+		//validate if the user complies with specific restrictions
+		complies := false
+		for _, restriction := range course.Restrictions {
+
+			for _, value := range user.Studies {
+
+				//validate degree
+				if restriction.DegreeID.Valid {
+					if restriction.DegreeID.Int64 != int64(value.DegreeID) {
+						continue
+					}
+				}
+
+				//validate studies
+				if restriction.CourseOfStudiesID.Valid {
+					if restriction.CourseOfStudiesID.Int64 != int64(value.CourseOfStudiesID) {
+						continue
+					}
+				}
+
+				//validate minimum semester
+				if restriction.MinimumSemester.Valid {
+					if restriction.MinimumSemester.Int64 > int64(value.Semester) {
+						continue
+					}
+				}
+
+				complies = true
+				break
+			}
+
+			if complies {
+				break
+			}
+		}
+		if !complies && len(course.Restrictions) > 0 {
+			course.CourseStatus.NotSatisfyRestrictions = true
+			return
+		}
+	}
+
+	//validate if the enrollment period is active
+	if err = tx.Get(&course.CourseStatus, stmtValidateEnrollmentPeriod, course.ID); err != nil {
+		log.Error("failed to validate the enrollment period", "courseID", course.ID,
+			"err", err.Error())
+		tx.Rollback()
+		return
+	}
+	if course.CourseStatus.NoEnrollmentPeriod {
+		return
+	}
+
+	//get the course enrollment limit for this course
+	err = tx.Get(&course.CourseStatus.MaxEnrollCourses, stmtParentsGetCourseLimit,
+		course.ParentID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Error("failed to retrieve information for this parent's course limit",
+				"parentID", course.ParentID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
+	if course.CourseStatus.MaxEnrollCourses != 0 {
+		//validate if the user reached the maximum enroll limit
+		var enrollments int
+		err = tx.Get(&enrollments, stmtGetCountUserEnrollments, course.ParentID, userID)
+		if err != nil {
+			log.Error("failed to count user enrollments", "parentID", course.ParentID,
+				"userID", userID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		if course.CourseStatus.MaxEnrollCourses <= enrollments {
+			course.CourseStatus.MaxEnrollCoursesReached = true
+		}
+	}
+
 	return
 }
 
@@ -213,6 +358,32 @@ func (course *Course) Delete() (valid bool, err error) {
 		if err = deleteByID("id", "courses", course.ID, tx); err != nil {
 			return
 		}
+	}
+
+	tx.Commit()
+	return
+}
+
+/*Activate a course. */
+func (course *Course) Activate(v *revel.Validation) (invalid bool, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	if err = course.Get(tx, true, 0); err != nil {
+		return
+	}
+
+	if course.Validate(v); v.HasErrors() {
+		invalid = true
+		return
+	}
+
+	if err = course.Update(tx, "active", true); err != nil {
+		return
 	}
 
 	tx.Commit()
@@ -391,5 +562,15 @@ const (
 		VALUES
 			(false, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 		RETURNING id, title
+	`
+
+	stmtValidateEnrollmentPeriod = `
+		SELECT
+			(current_timestamp < enrollment_start OR
+				current_timestamp > enrollment_end) AS no_enrollment_period,
+			(current_timestamp > unsubscribe_end AND
+				unsubscribe_end IS NOT NULL) AS unsubscribe_over
+		FROM courses
+		WHERE id = $1
 	`
 )

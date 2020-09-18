@@ -30,6 +30,8 @@ course.visibility = Sichtbarkeit
 course.whitelist = Whitelist
 course.blacklist = Blacklist
 
+course.not.visible.info = Bitte melden Sie sich an, um auf diesen Kurs zuzugreifen!
+
 course.url = URL zum Kurs
 course.creator.email = E-Mail-Adresse KurserstellerIn
 

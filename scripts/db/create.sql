@@ -69,7 +69,7 @@ CREATE TABLE courses (
   creation_date         timestamp with time zone  NOT NULL,
   description           text,
   speaker               text,
-  fee                   real,
+  fee                   numeric,
   custom_email          text,
   enroll_limit_events   integer,
   enrollment_start      timestamp with time zone  NOT NULL,

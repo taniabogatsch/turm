@@ -1,0 +1,16 @@
+<!-- template rendering information about the enrollment status (if required) -->
+
+<div class="text-danger float-right">
+  {{.cStatus}}
+  {{if .cStatus.AtBlacklist}}
+    Sie sind auf der Blacklist des Kurses.
+  {{else if .cStatus.NotLDAP}}
+    Dieser Kurs ist nur für Nutzer mit Universitätslogin.
+  {{else if .cStatus.NotSatisfyRestrictions}}
+    Sie erfüllen die Studiumsbeschränkungen nicht.
+  {{else if .cStatus.MaxEnrollCoursesReached}}
+    Sie haben sich bereits in das Maximum der Kurse dieser Kursgruppe eingeschrieben.
+  {{end}}
+  <hr>
+  {{.eStatus}}
+</div>

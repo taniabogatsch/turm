@@ -2,36 +2,38 @@
 
 {{template "header.html" .}}
 
-<div class="page page-side page-left-layout">
-  <h4>
-    {{msg $ "categories"}}
-  </h4>
-  <hr>
+<div class="page page-side">
+  <div class="page-left-layout">
+    <h4>
+      {{msg $ "categories"}}
+    </h4>
+    <hr>
 
-  <!-- add new categories -->
-  {{if $.session.userID}}
-    {{if eq $.session.role "admin"}}
-      <button type="button" class="btn btn-outline-darkblue"
-        onclick='openCategoryModal("faq_category", "", "", {{url "Admin.InsertCategory"}},
-        {{msg $ "category.insert"}});'>
-        {{msg $ "category.add"}}
-      </button>
-      <hr>
-    {{end}}
-  {{end}}
-
-  <!-- range over all categories -->
-  <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-    {{range $key, $value := .categories}}
-      <a class="nav-link btn-outline-darkblue m-1 {{if eq $key 0}}active{{end}}"
-        href='#v-pills-{{$key}}' role="tab" data-toggle="tab">
-        {{.Name}}
-      </a>
-    {{else}}
-      {{if not .errMsg}}
-        {{msg $ "categories.none"}}
+    <!-- add new categories -->
+    {{if $.session.userID}}
+      {{if eq $.session.role "admin"}}
+        <button type="button" class="btn btn-outline-darkblue"
+          onclick='openCategoryModal("faq_category", "", "", {{url "Admin.InsertCategory"}},
+          {{msg $ "category.insert"}});'>
+          {{msg $ "category.add"}}
+        </button>
+        <hr>
       {{end}}
     {{end}}
+
+    <!-- range over all categories -->
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      {{range $key, $value := .categories}}
+        <a class="nav-link btn-outline-darkblue m-1 {{if eq $key 0}}active{{end}}"
+          href='#v-pills-{{$key}}' role="tab" data-toggle="tab">
+          {{.Name}}
+        </a>
+      {{else}}
+        {{if not .errMsg}}
+          {{msg $ "categories.none"}}
+        {{end}}
+      {{end}}
+    </div>
   </div>
 </div>
 

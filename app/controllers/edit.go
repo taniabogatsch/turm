@@ -27,7 +27,7 @@ func (c Edit) Open(ID int) revel.Result {
 
 	//get the course data
 	course := models.Course{ID: ID}
-	if err := course.Get(); err != nil {
+	if err := course.Get(nil, true, 0); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -50,7 +50,7 @@ func (c Edit) Download(ID int, filename string) revel.Result {
 	//NOTE: the interceptor assures that the course ID is valid
 
 	course := models.Course{ID: ID}
-	if err := course.Get(); err != nil {
+	if err := course.Get(nil, true, 0); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -105,7 +105,7 @@ func (c Edit) Validate(ID int) revel.Result {
 	//NOTE: the interceptor assures that the course ID is valid
 
 	course := models.Course{ID: ID}
-	if err := course.Get(); err != nil {
+	if err := course.Get(nil, true, 0); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -122,9 +122,9 @@ func (c Edit) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c Edit) NewEvent(ID int, fieldID, value string) revel.Result {
+func (c Edit) NewEvent(ID int, value string) revel.Result {
 
-	c.Log.Debug("create a new event", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Log.Debug("create a new event", "ID", ID, "value", value)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -161,6 +161,7 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 		"time", time, "fieldID", fieldID)
 
 	//NOTE: the interceptor assures that the course ID is valid
+
 	timestamp := date + " " + time
 	valid := (timestamp != " ")
 	if valid || fieldID != "unsubscribe_end" { //only the unsubscribeend can be null
@@ -192,9 +193,9 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 	var err error
 
 	if fieldID == "unsubscribe_end" {
-		err = course.Update(fieldID, sql.NullString{timestamp, valid})
+		err = course.Update(nil, fieldID, sql.NullString{timestamp, valid})
 	} else {
-		err = course.Update(fieldID, timestamp)
+		err = course.Update(nil, fieldID, timestamp)
 	}
 
 	if err != nil {
@@ -222,6 +223,7 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 	c.Log.Debug("add user to user list", "ID", ID, "userID", userID, "listType", listType)
 
 	//NOTE: the interceptor assures that the course ID is valid
+
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
@@ -229,7 +231,8 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 		listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
-	//TODO: if edit, get course, set new timestamp value and validate
+
+	//TODO: if edit, get course, set new user and validate
 
 	if c.Validation.HasErrors() {
 		return flashError(
@@ -242,7 +245,7 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 			errDB, err, "", c.Controller, "")
 	}
 
-	//NOTE: if the course is active, the user should get a notification e-mail
+	//TODO: if the course is active, the user should get a notification e-mail
 
 	c.Flash.Success(c.Message("course."+listType+".change.success",
 		entry.EMail,
@@ -258,6 +261,7 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 	c.Log.Debug("delete user from user list", "ID", ID, "userID", userID, "listType", listType)
 
 	//NOTE: the interceptor assures that the course ID is valid
+
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
@@ -293,6 +297,7 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 		"listType", listType, "option", option)
 
 	//NOTE: the interceptor assures that the course ID is valid
+
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
@@ -336,7 +341,7 @@ func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 	}
 
 	course := models.Course{ID: ID}
-	if err := course.Update(listType, option); err != nil {
+	if err := course.Update(nil, listType, option); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -353,10 +358,11 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
+	//NOTE: the interceptor assures that the course ID is valid
+
 	value = strings.TrimSpace(value)
 	valid := (value != "")
 
-	//NOTE: the interceptor assures that the course ID is valid
 	if valid || fieldID == "title" {
 
 		if fieldID == "title" || fieldID == "subtitle" {
@@ -401,10 +407,10 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 			return flashError(
 				errContent, err, "", c.Controller, "")
 		}
-		err = course.Update(fieldID, sql.NullFloat64{fee, valid})
+		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid})
 
 	} else {
-		err = course.Update(fieldID, sql.NullString{value, valid})
+		err = course.Update(nil, fieldID, sql.NullString{value, valid})
 	}
 
 	if err != nil {
@@ -438,6 +444,7 @@ func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 	c.Log.Debug("change group", "ID", ID, "parentID", parentID)
 
 	//NOTE: the interceptor assures that the course ID is valid
+
 	c.Validation.Required(parentID).
 		MessageKey("validation.invalid.params")
 
@@ -450,7 +457,7 @@ func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 		ID:       ID,
 		ParentID: sql.NullInt32{Int32: int32(parentID), Valid: true},
 	}
-	if err := course.Update("parent_id", course.ParentID); err != nil {
+	if err := course.Update(nil, "parent_id", course.ParentID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -468,7 +475,6 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 	c.Log.Debug("change enrollment limit", "ID", ID, "fieldID", fieldID, "value", value)
 
 	//NOTE: the interceptor assures that the course ID is valid
-	//NOTE: set to null, if value is 0
 
 	c.Validation.Check(value,
 		revel.Min{0},
@@ -490,7 +496,7 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 	}
 
 	course := models.Course{ID: ID}
-	err := course.Update(fieldID, sql.NullInt32{int32(value), valid})
+	err := course.Update(nil, fieldID, sql.NullInt32{int32(value), valid})
 	if err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -568,6 +574,8 @@ func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) re
 
 	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
 
+	//NOTE: the interceptor assures that the course ID is valid
+
 	value = strings.TrimSpace(value)
 	c.Validation.Check(value,
 		revel.MinSize{3},
@@ -578,8 +586,6 @@ func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) re
 		listType != "instructors" && listType != "editors" {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
-
-	//NOTE: the interceptor assures that the course ID is valid
 
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()

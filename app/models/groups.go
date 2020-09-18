@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 	"turm/app"
@@ -66,14 +65,7 @@ func (group *Group) Validate(v *revel.Validation) {
 }
 
 /*Insert a new group into the groups table. */
-func (group *Group) Insert(userIDSession *string) (err error) {
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
+func (group *Group) Insert(userID *int) (err error) {
 
 	err = app.Db.Get(group, stmtInsertGroup, group.ParentID, group.Name,
 		group.CourseLimit, userID, time.Now().Format(revel.TimeFormats[0]))
@@ -85,14 +77,7 @@ func (group *Group) Insert(userIDSession *string) (err error) {
 }
 
 /*Update a group in the groups table. */
-func (group *Group) Update(userIDSession *string) (err error) {
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
+func (group *Group) Update(userID *int) (err error) {
 
 	err = app.Db.Get(group, stmtUpdateGroup, group.Name, group.CourseLimit, userID,
 		time.Now().Format(revel.TimeFormats[0]), group.ID)
@@ -124,6 +109,17 @@ func (group *Group) Delete() (err error) {
 	}
 
 	tx.Commit()
+	return
+}
+
+/*Get a group by its ID. */
+func (group *Group) Get(tx *sqlx.Tx) (err error) {
+
+	err = tx.Get(group, stmtGetGroup, group.ID)
+	if err != nil {
+		log.Error("failed to get group", "group", group, "error", err.Error())
+		tx.Rollback()
+	}
 	return
 }
 
@@ -251,16 +247,16 @@ func (courseLimit ParentHasCourseLimit) IsSatisfied(i interface{}) bool {
 		return true
 	}
 
-	var group Group
-	err := app.Db.Get(&group, stmtParentHasCourseLimit, parentID)
+	var limit int
+	err := app.Db.Get(&limit, stmtParentsGetCourseLimit, parentID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Error("failed to retrieve information for this group",
 				"parentID", parentID, "error", err.Error())
 		}
-		return false
+		return true
 	}
-	return !group.ParentID.Valid
+	return false
 }
 
 /*DefaultMessage returns the default message of ParentHasCourseLimit. */
@@ -321,26 +317,26 @@ func (noneActive NoActiveChildren) DefaultMessage() string {
 }
 
 const (
-	stmtParentHasCourseLimit = `
-		WITH RECURSIVE path (id, parent_id)
+	stmtParentsGetCourseLimit = `
+		WITH RECURSIVE path (parent_id, id, course_limit)
 			AS (
 				/* starting entry */
-				SELECT id, parent_id
+				SELECT parent_id, id, course_limit
 				FROM groups
 				WHERE id = $1
-					AND course_limit IS NULL
 
 				UNION ALL
 
 				/* construct path */
-				SELECT g.id, g.parent_id
+				SELECT g.parent_id, g.id, g.course_limit
 				FROM groups g, path p
 				WHERE p.parent_id = g.id
-					AND g.course_limit IS NULL
 			)
 
-		/* select the root element of the constructed path */
-		SELECT id, parent_id FROM path ORDER BY parent_id DESC LIMIT 1
+		/* select the course limit */
+		SELECT course_limit AS limit
+		FROM path
+		WHERE course_limit IS NOT NULL
 	`
 
 	stmtChildHasCourseLimit = `
@@ -475,7 +471,14 @@ const (
 				WHERE p.parent_id = g.id
 			)
 
-		/* select the root element of the constructed path */
+		/* get all path entries */
 		SELECT id, parent_id, name FROM path ORDER BY id ASC
+	`
+
+	stmtGetGroup = `
+		SELECT
+			id, parent_id, name, course_limit
+		FROM groups
+		WHERE id = $1
 	`
 )

@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"strconv"
 	"strings"
 	"time"
 	"turm/app"
@@ -33,7 +32,7 @@ func (category *Category) Validate(v *revel.Validation) {
 }
 
 /*Insert a new category into either faq_category or news_feed_category. */
-func (category *Category) Insert(table, userIDSession *string) (err error) {
+func (category *Category) Insert(table *string, userID *int) (err error) {
 
 	stmt := `
 		INSERT INTO ` + *table + `
@@ -41,13 +40,6 @@ func (category *Category) Insert(table, userIDSession *string) (err error) {
 		VALUES ($1, $2, $3)
 		RETURNING id, name
 	`
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
 
 	err = app.Db.Get(category, stmt, category.Name, userID,
 		time.Now().Format(revel.TimeFormats[0]))
@@ -59,7 +51,7 @@ func (category *Category) Insert(table, userIDSession *string) (err error) {
 }
 
 /*Update a category in either faq_category or news_feed_category. */
-func (category *Category) Update(table, userIDSession *string) (err error) {
+func (category *Category) Update(table *string, userID *int) (err error) {
 
 	stmt := `
 		UPDATE ` + *table + `
@@ -67,13 +59,6 @@ func (category *Category) Update(table, userIDSession *string) (err error) {
 		WHERE id = $4
 		RETURNING id, name
 	`
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
 
 	err = app.Db.Get(category, stmt, category.Name, userID,
 		time.Now().Format(revel.TimeFormats[0]), category.ID)
@@ -183,14 +168,7 @@ func (entry *HelpPageEntry) Validate(v *revel.Validation) {
 }
 
 /*Insert a help page entry into either the faq or the news_feed table. */
-func (entry *HelpPageEntry) Insert(userIDSession *string) (err error) {
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
+func (entry *HelpPageEntry) Insert(userID *int) (err error) {
 
 	if entry.IsFAQ {
 		err = app.Db.Get(entry, stmtInsertFAQ, entry.Question, entry.Answer, entry.CategoryID,
@@ -208,14 +186,7 @@ func (entry *HelpPageEntry) Insert(userIDSession *string) (err error) {
 }
 
 /*Update a help page entry in either the faq or the news_feed table. */
-func (entry *HelpPageEntry) Update(userIDSession *string) (err error) {
-
-	userID, err := strconv.Atoi(*userIDSession)
-	if err != nil {
-		log.Error("failed to parse userID from userIDSession",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
+func (entry *HelpPageEntry) Update(userID *int) (err error) {
 
 	if entry.IsFAQ {
 		err = app.Db.Get(entry, stmtUpdateFAQ, entry.Question, entry.Answer, entry.CategoryID,

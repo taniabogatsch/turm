@@ -12,7 +12,22 @@
       {{.errMsg}}
     </div>
   {{else}}
-    {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+
+    {{if not .session.userID}}
+      {{if not .course.Visible}}
+        {{.session.userID}}
+        <h4>
+          {{.course.Title}}
+        </h4>
+        <div class="text-info">
+          {{msg $ "course.not.visible.info"}}
+        </div>
+      {{end}}
+    {{end}}
+
+    {{if or .session.userID .course.Visible}}
+      {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+    {{end}}
   {{end}}
 </div>
 

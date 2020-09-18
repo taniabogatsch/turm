@@ -36,14 +36,22 @@ func deleteByID(column, table string, value interface{}, tx *sqlx.Tx) (err error
 }
 
 //updateByID updates a column in a table and binds the new value to the provided struct
-func updateByID(column, table string, value, selection, model interface{}) (err error) {
+func updateByID(tx *sqlx.Tx, column, table string, value, selection, model interface{}) (err error) {
 
 	update := `UPDATE ` + table + ` SET ` + column + ` = $2 WHERE id = $1 RETURNING id, ` + column
 
-	err = app.Db.Get(model, update, selection, value)
+	if tx == nil {
+		err = app.Db.Get(model, update, selection, value)
+	} else {
+		err = tx.Get(model, update, selection, value)
+	}
+
 	if err != nil {
 		log.Error("failed to update value", "selection", selection,
 			"value", value, "error", err.Error())
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }

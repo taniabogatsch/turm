@@ -22,6 +22,9 @@ type Event struct {
 	Fullness int ``
 	//Percentage is (Fullness * 100) / Capacity
 	Percentage int ``
+
+	//used for enrollment
+	EventStatus EventStatus
 }
 
 /*NewBlank creates a new blank event. */
@@ -37,7 +40,7 @@ func (event *Event) NewBlank() (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(column string, value interface{}) (err error) {
-	return updateByID(column, "events", value, event.ID, event)
+	return updateByID(nil, column, "events", value, event.ID, event)
 }
 
 /*UpdateKey updates the enrollment key of an event. */
@@ -56,11 +59,45 @@ func (event *Event) Delete() (err error) {
 	return deleteByID("id", "events", event.ID, nil)
 }
 
+//validateEnrollment validates whether a user can enroll in an event
+func (event *Event) validateEnrollment(tx *sqlx.Tx, userID *int,
+	limit *sql.NullInt32) (err error) {
+
+	enrollments := Enrollments{}
+	if err = enrollments.GetByCourse(tx, userID, &event.CourseID); err != nil {
+		return
+	}
+
+	event.EventStatus.Full = (event.Capacity <= event.Fullness)
+
+	//validate if the user already enrolled in this event
+	for _, enrollment := range enrollments {
+		if enrollment.EventID == event.ID {
+			if enrollment.Status == ONWAITLIST {
+				event.EventStatus.OnWaitlist = true
+			} else {
+				event.EventStatus.Enrolled = true
+			}
+			return
+		}
+	}
+
+	//validate if the user already enrolled in another event and there are event limitations
+	if limit.Valid {
+		if len(enrollments) >= int(limit.Int32) {
+			event.EventStatus.EnrollLimitReached = true
+		}
+	}
+
+	return
+}
+
 /*Events holds all events of a course. */
 type Events []Event
 
 /*Get all events of a course. */
-func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
+func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
+	limit *sql.NullInt32) (err error) {
 
 	err = tx.Select(events, stmtSelectEvents, *courseID)
 	if err != nil {
@@ -69,8 +106,16 @@ func (events *Events) Get(tx *sqlx.Tx, courseID *int) (err error) {
 		return
 	}
 
-	//get all meetings of this event
 	for key := range *events {
+
+		//validate if the user is allowed to enroll in this event
+		if !manage && *userID != 0 {
+			if err = (*events)[key].validateEnrollment(tx, userID, limit); err != nil {
+				return
+			}
+		}
+
+		//get all meetings of this event
 		(*events)[key].Percentage = ((*events)[key].Fullness * 100) / (*events)[key].Capacity
 		if err = (*events)[key].Meetings.Get(tx, &(*events)[key].ID); err != nil {
 			return

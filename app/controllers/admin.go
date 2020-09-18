@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"strconv"
 	"strings"
-	"turm/app"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -124,7 +122,7 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 			errDB, err, "", c.Controller, "")
 	}
 
-	err := c.sendEMail(&user,
+	err := sendEMail(c.Controller, &user,
 		"email.subject.new.role",
 		"newRole")
 	if err != nil {
@@ -133,10 +131,8 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 	}
 
 	//update the session if the user updated his own role
-	sessionID, err := strconv.Atoi(c.Session["userID"].(string))
+	sessionID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		c.Log.Error("failed to parse userID from session",
-			"session", c.Session, "error", err.Error())
 		return flashError(
 			errTypeConv, err, "", c.Controller, "")
 	}
@@ -163,8 +159,13 @@ func (c Admin) InsertGroup(group models.Group) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
-	if err := group.Insert(&userID); err != nil {
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
+	if err = group.Insert(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -190,8 +191,13 @@ func (c Admin) UpdateGroup(group models.Group) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
-	if err := group.Update(&userID); err != nil {
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
+	if err = group.Update(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -249,8 +255,13 @@ func (c Admin) InsertCategory(category models.Category, table string) revel.Resu
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
-	if err := category.Insert(&table, &userID); err != nil {
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
+	if err = category.Insert(&table, &userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -280,7 +291,12 @@ func (c Admin) UpdateCategory(category models.Category, table string) revel.Resu
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
 	if err := category.Update(&table, &userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -334,7 +350,12 @@ func (c Admin) InsertHelpPageEntry(entry models.HelpPageEntry) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
 	if err := entry.Insert(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -362,7 +383,12 @@ func (c Admin) UpdateHelpPageEntry(entry models.HelpPageEntry) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	userID := c.Session["userID"].(string)
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
 	if err := entry.Update(&userID); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -403,37 +429,4 @@ func (c Admin) DeleteHelpPageEntry(ID int, table string) revel.Result {
 		entry.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
-}
-
-//sendEMail sends an notification e-mail about a new user role.
-func (c Admin) sendEMail(user *models.User, subjectKey string, filename string) (err error) {
-
-	c.Log.Debug("sending EMail", "user", user, "subjectKey", subjectKey,
-		"filename", filename)
-
-	data := models.EMailData{User: *user}
-
-	if !user.Language.Valid {
-		user.Language.String = app.DefaultLanguage
-	}
-
-	email := app.EMail{
-		Recipient: user.EMail,
-	}
-
-	err = models.GetEMailSubjectBody(
-		&data,
-		&user.Language.String,
-		subjectKey,
-		filename,
-		&email,
-		c.Controller,
-	)
-	if err != nil {
-		return
-	}
-
-	c.Log.Debug("assembled e-mail", "email", email)
-	app.EMailQueue <- email
-	return
 }

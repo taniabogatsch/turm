@@ -64,7 +64,7 @@ type User struct {
 	Title         sql.NullString   `db:"title"`
 	NameAffix     sql.NullString   `db:"name_affix"`
 	Affiliations  NullAffiliations `db:"affiliations"`
-	Studies       []Studies        ``
+	Studies       Studies          ``
 
 	//external user fields
 	Password       sql.NullString `db:"password"`
@@ -74,6 +74,9 @@ type User struct {
 	//not a field in the resprective table
 	IsEditor     bool
 	IsInstructor bool
+
+	//used for event enrollment
+	IsLDAP bool `db:"is_ldap"`
 }
 
 /*Validate User fields of newly registered users. */
@@ -183,8 +186,11 @@ func (credentials *Credentials) Validate(v *revel.Validation) {
 	).MessageKey("validation.invalid.password")
 }
 
-/*Studies is a model of the studies table. */
-type Studies struct {
+/*Studies holds all courses of study of an user. */
+type Studies []Study
+
+/*Study is a model of the studies table. */
+type Study struct {
 	UserID            int    `db:"user_id, primarykey"`
 	Semester          int    `db:"semester"`
 	DegreeID          int    `db:"degree_id, primarykey"`
@@ -194,8 +200,20 @@ type Studies struct {
 }
 
 /*Validate Studies fields when loaded from the user enrollment file. */
-func (studies Studies) Validate(v *revel.Validation) {
+func (studies *Study) Validate(v *revel.Validation) {
 	//TODO
+}
+
+/*Select all courses of studies of a user. */
+func (studies *Studies) Select(tx *sqlx.Tx, userID *int) (err error) {
+
+	err = tx.Select(studies, stmtSelectUserCoursesOfStudies, *userID)
+	if err != nil {
+		log.Error("failed to get courses of studies of user", "userID", *userID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+	return
 }
 
 /*Get all data of an user. */
@@ -207,7 +225,9 @@ func (user *User) Get(tx *sqlx.Tx) (err error) {
 		tx.Rollback()
 	}
 
-	//TODO: get courses of studies
+	if user.IsLDAP {
+		err = user.Studies.Select(tx, &user.ID)
+	}
 
 	return
 }
@@ -545,7 +565,8 @@ const (
 			id, last_name, first_name, email, salutation, role, activation_code,
 			language, matr_nr, academic_title, title, name_affix, affiliations,
 			TO_CHAR (last_login AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as last_login,
-			TO_CHAR (first_login AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as first_login
+			TO_CHAR (first_login AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as first_login,
+			(password IS NULL) AS is_ldap
 		FROM users
 		WHERE id = $2
 	`
@@ -685,5 +706,15 @@ const (
 		FROM courses
 		WHERE id = $2
 			AND creator = $1
+	`
+
+	stmtSelectUserCoursesOfStudies = `
+		SELECT user_id, semester, degree_id,
+			course_of_studies_id, d.name AS degree,
+			c.name AS course_of_studies
+		FROM studies s LEFT OUTER JOIN
+			degrees d ON s.degree_id = d.id LEFT OUTER JOIN
+			courses_of_studies c ON s.course_of_studies_id = c.id
+		WHERE user_id = $1
 	`
 )

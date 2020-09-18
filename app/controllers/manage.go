@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"strconv"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -65,6 +64,8 @@ func (c Manage) Expired() revel.Result {
 func (c Manage) getCourseLists(active, expired bool) (
 	creator, editor, instructor models.CourseList, err error) {
 
+	//TODO: one DB transaction
+
 	//if the user is an admin, render all active courses
 	if c.Session["role"] == models.ADMIN.String() {
 		userID := 0
@@ -73,10 +74,8 @@ func (c Manage) getCourseLists(active, expired bool) (
 	}
 
 	//get the user
-	userID, err := strconv.Atoi(c.Session["userID"].(string))
+	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		c.Log.Error("failed to parse userID from session",
-			"session", c.Session, "error", err.Error())
 		return
 	}
 

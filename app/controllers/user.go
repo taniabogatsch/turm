@@ -150,7 +150,7 @@ func (c User) Registration(user models.User) revel.Result {
 	c.setSession(&user)
 	c.Session["notActivated"] = "true"
 
-	err := c.sendEMail(&user,
+	err := sendEMail(c.Controller, &user,
 		"email.subject.activation",
 		"activation")
 	if err != nil {
@@ -225,7 +225,7 @@ func (c User) NewPassword(email string) revel.Result {
 	}
 	c.Log.Debug("set new password", "user", user)
 
-	err := c.sendEMail(&user,
+	err := sendEMail(c.Controller, &user,
 		"email.subject.new.pw",
 		"newPw")
 	if err != nil {
@@ -322,7 +322,7 @@ func (c User) NewActivationCode() revel.Result {
 			errDB, err, "", c.Controller, "")
 	}
 
-	err = c.sendEMail(&user,
+	err = sendEMail(c.Controller, &user,
 		"email.subject.activation",
 		"activation")
 	if err != nil {
@@ -390,38 +390,4 @@ func (c User) setSession(user *models.User) {
 	c.Session["isInstructor"] = strconv.FormatBool(user.IsInstructor)
 	c.Session["eMail"] = user.EMail
 	c.Session["prefLanguage"] = user.Language.String
-}
-
-//sendEMail sends an activation e-mail or a new password e-mail.
-func (c User) sendEMail(user *models.User, subjectKey string, filename string) (err error) {
-
-	c.Log.Debug("sending EMail", "user", user, "subjectKey", subjectKey,
-		"filename", filename)
-
-	data := models.EMailData{User: *user}
-
-	if !user.Language.Valid {
-		user.Language.String = app.DefaultLanguage
-	}
-
-	email := app.EMail{
-		Recipient: user.EMail,
-	}
-
-	err = models.GetEMailSubjectBody(
-		&data,
-		&user.Language.String,
-		subjectKey,
-		filename,
-		&email,
-		c.Controller,
-	)
-	if err != nil {
-		return
-	}
-
-	c.Log.Debug("assembled e-mail", "email", email)
-
-	app.EMailQueue <- email
-	return
 }
