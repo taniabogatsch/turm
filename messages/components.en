@@ -46,6 +46,8 @@ button.collapse = Collapse
 button.show = Show
 
 button.enroll = Enroll
+button.unsubscribe = Unsubscribe
+button.to.waitlist = To wait list
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS

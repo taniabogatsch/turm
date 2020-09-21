@@ -181,6 +181,13 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		}
 	}
 
+	//get enroll information for each event
+	if !manage {
+		for key := range course.Events {
+			course.Events[key].validateEnrollment(course)
+		}
+	}
+
 	//get more detailed creator data
 	if course.Creator.Valid {
 		course.CreatorData.ID = int(course.Creator.Int32)
@@ -204,6 +211,31 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	if txWasNil {
 		tx.Commit()
 	}
+	return
+}
+
+/*GetForEnrollment returns only the information required for enrollment. */
+func (course *Course) GetForEnrollment(tx *sqlx.Tx, userID, eventID *int) (err error) {
+
+	//get general course data
+	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get course", "course ID", course.ID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if err = course.Blacklist.Get(tx, &course.ID, "blacklists"); err != nil {
+		return
+	}
+	if err = course.Whitelist.Get(tx, &course.ID, "whitelists"); err != nil {
+		return
+	}
+	if err = course.Restrictions.Get(tx, &course.ID); err != nil {
+		return
+	}
+
+	err = course.validateEnrollment(tx, *userID)
 	return
 }
 

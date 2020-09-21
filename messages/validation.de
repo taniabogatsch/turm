@@ -83,3 +83,16 @@ validation.invalid.file = Ungültige Datei.
 validation.invalid.json = Bitte laden Sie eine Datei im JSON-Format hoch.
 
 validation.invalid.keys = Die Einschreibeschlüssel stimmen nicht überein.
+
+# -------------------------------------------------------------------------------------------------- #
+# ENROLLMENT
+# -------------------------------------------------------------------------------------------------- #
+
+validation.enrollment.at.blacklist = Sie wurden für diesen Kurs nicht zugelassen. Bitte wenden Sie sich an die Kursorganisation.
+validation.enrollment.no.ldap = Dieser Kurs ist nur für NutzerInnen mit Universitätszugang.
+validation.enrollment.not.satisfy.restrictions = Sie erfüllen die Einschreibebeschränkungen des Kurses nicht.
+validation.enrollment.max.enroll.reached = Sie haben sich bereits in die maximale Anzahl an Veranstaltungen in dieser Kursgruppe eingeschrieben.
+validation.enrollment.limit.reached = Sie haben sich bereits in die maximale Anzahl an Veranstaltungen dieses Kurses eingeschrieben.
+validation.enrollment.period.over = Der Einschreibe- und Austragezeitraum ist abgelaufen.
+validation.enrollment.not.started = Der Einschreibezeitraum hat noch nicht begonnen.
+validation.enrollment.full = Diese Veranstaltung ist bereits voll.

@@ -17,6 +17,11 @@ type Course struct {
 	*revel.Controller
 }
 
+/*Enrollment implements logic to enroll in events. */
+type Enrollment struct {
+	*revel.Controller
+}
+
 /*Edit implements logic to edit course data. */
 type Edit struct {
 	*revel.Controller

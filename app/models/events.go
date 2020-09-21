@@ -24,7 +24,9 @@ type Event struct {
 	Percentage int ``
 
 	//used for enrollment
-	EventStatus EventStatus
+	EventStatus  EventStatus
+	EnrollOption EnrollOption
+	EnrollMsg    string
 }
 
 /*NewBlank creates a new blank event. */
@@ -59,8 +61,14 @@ func (event *Event) Delete() (err error) {
 	return deleteByID("id", "events", event.ID, nil)
 }
 
-//validateEnrollment validates whether a user can enroll in an event
-func (event *Event) validateEnrollment(tx *sqlx.Tx, userID *int,
+/*Get returns all data of one event. */
+func (event *Event) Get() (err error) {
+	//TODO
+	return
+}
+
+//validateEnrollStatus sets the fields of the enroll status of an event
+func (event *Event) validateEnrollStatus(tx *sqlx.Tx, userID *int,
 	limit *sql.NullInt32) (err error) {
 
 	enrollments := Enrollments{}
@@ -92,6 +100,72 @@ func (event *Event) validateEnrollment(tx *sqlx.Tx, userID *int,
 	return
 }
 
+//validateEnrollment validates whether a user can enroll in an event
+func (event *Event) validateEnrollment(c *Course) {
+
+	//all options disabling enrollment
+	event.EnrollOption = NOENROLL
+	if c.CourseStatus.AtBlacklist {
+		event.EnrollMsg = "validation.enrollment.at.blacklist"
+		return
+	}
+	if c.CourseStatus.NotLDAP {
+		event.EnrollMsg = "validation.enrollment.no.ldap"
+		return
+	}
+	if c.CourseStatus.NotSatisfyRestrictions {
+		event.EnrollMsg = "validation.enrollment.not.satisfy.restrictions"
+		return
+	}
+	if c.CourseStatus.MaxEnrollCoursesReached {
+		event.EnrollMsg = "validation.enrollment.max.enroll.reached"
+		return
+	}
+	if event.EventStatus.EnrollLimitReached {
+		event.EnrollMsg = "validation.enrollment.limit.reached"
+		return
+	}
+
+	//unsubscribe period is over
+	if c.CourseStatus.UnsubscribeOver {
+		if event.EventStatus.Enrolled || event.EventStatus.OnWaitlist {
+			event.EnrollOption = NOUNSUBSCRIBE
+		}
+		event.EnrollMsg = "validation.enrollment.period.over"
+		return
+	}
+
+	//enrollment period has not yet started
+	if c.CourseStatus.NoEnrollmentPeriod {
+		event.EnrollMsg = "validation.enrollment.not.started"
+		return
+	}
+
+	//user is enrolled or on wait list
+	if event.EventStatus.Enrolled || event.EventStatus.OnWaitlist {
+		event.EnrollOption = UNSUBSCRIBE
+		return
+	}
+
+	//full and no wait list
+	if event.EventStatus.Full && !event.HasWaitlist {
+		event.EnrollMsg = "validation.enrollment.full"
+		return
+	}
+
+	//waitlist enrollment
+	if event.EventStatus.Full && event.HasWaitlist {
+		//not enrolled, course is full, not on wait list
+		if !event.EventStatus.OnWaitlist {
+			event.EnrollOption = ENROLLTOWAITLIST
+			return
+		}
+	}
+
+	event.EnrollOption = ENROLL
+	return
+}
+
 /*Events holds all events of a course. */
 type Events []Event
 
@@ -110,7 +184,7 @@ func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 
 		//validate if the user is allowed to enroll in this event
 		if !manage && *userID != 0 {
-			if err = (*events)[key].validateEnrollment(tx, userID, limit); err != nil {
+			if err = (*events)[key].validateEnrollStatus(tx, userID, limit); err != nil {
 				return
 			}
 		}

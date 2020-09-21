@@ -1,1 +1,43 @@
 <!-- template rendering the enrollment button -->
+
+<!-- option 0, 1, 4 are enroll/unsubscribe/to waitlist -->
+
+{{if eq .option 0}}
+  <!-- enroll button -->
+  <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll'
+    role="button">
+    {{msg $ "button.enroll"}}
+  </button>
+{{end}}
+
+{{if eq .option 1}}
+  <!-- unsubscribe button -->
+  <button class="btn btn-outline-danger float-right ml-3 edit-hide" href='#no-scroll'
+    role="button">
+    {{msg $ "button.unsubscribe"}}
+  </button>
+{{end}}
+
+{{if eq .option 2}}
+  <!-- disabled enroll button -->
+  <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll'
+    role="button" disabled>
+    {{msg $ "button.enroll"}}
+  </button>
+{{end}}
+
+{{if eq .option 3}}
+  <!-- disabled unsubscribe button -->
+  <button class="btn btn-outline-danger float-right ml-3 edit-hide" href='#no-scroll'
+    role="button" disabled>
+    {{msg $ "button.unsubscribe"}}
+  </button>
+{{end}}
+
+{{if eq .option 4}}
+  <!-- enroll to waitlist button -->
+  <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll'
+    role="button">
+    {{msg $ "button.to.waitlist"}}
+  </button>
+{{end}}

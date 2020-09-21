@@ -224,6 +224,20 @@ func (c User) auth() revel.Result {
 	return c.Redirect(App.Index)
 }
 
+//auth prevents unauthorized access to controllers of type Enrollment
+func (c Enrollment) auth() revel.Result {
+
+	c.Log.Debug("executing auth enrollment interceptor")
+
+	//authorizes all logged in users
+	if c.Session["userID"] != nil {
+		return nil
+	}
+
+	c.Flash.Error(c.Message("intercept.invalid.action"))
+	return c.Redirect(App.Index)
+}
+
 //evalEditAuth evaluates if a user is authorized to edit a course/event/meeting.
 func evalEditAuth(c *revel.Controller, table string) (authorized bool, err error) {
 

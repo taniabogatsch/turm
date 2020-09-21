@@ -17,10 +17,8 @@
         {{template "icons/trash.html" . }}
       </a>
 
-      <!-- disabled enroll button -->
-      <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll' role="button" disabled>
-        {{msg $ "button.enroll"}}
-      </button>
+      <!-- enrollment button -->
+      {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption}}
 
       <!-- fullness and capacity -->
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
@@ -134,7 +132,8 @@
         </button>
       {{end}}
 
-      {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "cStatus" $.course.CourseStatus "eStatus" .EventStatus}}
+      <!-- enrollment information (if enrollment is not possible) -->
+      {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "option" .EnrollOption "msg" .EnrollMsg}}
     </li>
   {{end}}
 

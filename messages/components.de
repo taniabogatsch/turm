@@ -46,6 +46,8 @@ button.collapse = Einklappen
 button.show = Anzeigen
 
 button.enroll = Einschreiben
+button.unsubscribe = Austragen
+button.to.waitlist = Auf Warteliste
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS

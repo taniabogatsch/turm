@@ -1,6 +1,8 @@
 package models
 
 import (
+	"turm/app"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
@@ -23,6 +25,26 @@ const (
 
 func (status EnrollmentStatus) String() string {
 	return [...]string{"enrolled", "on waitlist", "awaiting payment", "paid", "freed"}[status]
+}
+
+/*EnrollOption is a type for encoding different enrollment options. */
+type EnrollOption int
+
+const (
+	//ENROLL is for normally enrolling in an event
+	ENROLL EnrollOption = iota
+	//UNSUBSCRIBE is for normally unsubscribing from an event
+	UNSUBSCRIBE
+	//NOENROLL disables the enrollment button
+	NOENROLL
+	//NOUNSUBSCRIBE disables the unsubscribe button
+	NOUNSUBSCRIBE
+	//ENROLLTOWAITLIST is for enrolling to the wait list
+	ENROLLTOWAITLIST
+)
+
+func (s EnrollOption) String() string {
+	return [...]string{"enroll", "unsubscribe", "noenroll", "nounsubscribe", "enrolltowaitlist"}[s]
 }
 
 /*Enrollments of a user. */
@@ -84,6 +106,37 @@ type EventStatus struct {
 	Full               bool
 	EnrollLimitReached bool //important to evaluate EnrollLimitEvents
 	OnWaitlist         bool
+}
+
+/*Enroll a user in an event. */
+func Enroll(userID, eventID *int) (msg string, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//get relevant event information
+	event := Event{ID: *eventID}
+
+	//get relevant course information
+	course := Course{ID: event.CourseID}
+	if err = course.GetForEnrollment(tx, userID, eventID); err != nil {
+		return
+	}
+
+	//validate if allowed to enroll (to wait list)
+
+	//enroll
+
+	tx.Commit()
+	return
+}
+
+/*Unsubscribe a user from an event. */
+func Unsubscribe(userID, eventID *int) (msg string, err error) {
+	return
 }
 
 const (
