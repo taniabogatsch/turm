@@ -106,10 +106,11 @@ type EventStatus struct {
 	Full               bool
 	EnrollLimitReached bool //important to evaluate EnrollLimitEvents
 	OnWaitlist         bool
+	InOtherEvent       bool
 }
 
-/*Enroll a user in an event. */
-func Enroll(userID, eventID *int) (msg string, err error) {
+/*EnrollOrUnsubscribe a user in/from an event. */
+func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -119,6 +120,9 @@ func Enroll(userID, eventID *int) (msg string, err error) {
 
 	//get relevant event information
 	event := Event{ID: *eventID}
+	if err = event.Get(tx, userID); err != nil {
+		return
+	}
 
 	//get relevant course information
 	course := Course{ID: event.CourseID}
@@ -126,16 +130,88 @@ func Enroll(userID, eventID *int) (msg string, err error) {
 		return
 	}
 
-	//validate if allowed to enroll (to wait list)
+	//get the event enroll status
+	if err = event.validateEnrollStatus(tx, userID, &course.EnrollLimitEvents); err != nil {
+		return
+	}
 
-	//enroll
+	//validate if allowed to enroll (to wait list)
+	event.validateEnrollment(&course)
+
+	if event.EnrollOption == NOENROLL || event.EnrollOption == NOUNSUBSCRIBE {
+		//the user is not allowed to enroll or unsubscribe
+		msg = event.EnrollMsg
+		tx.Rollback()
+		return
+	}
+
+	//enroll the user
+	if action == ENROLL {
+
+		if event.EnrollOption == UNSUBSCRIBE {
+			//the user is already enrolled in this event
+			msg = "validation.enrollment.already.enrolled"
+			tx.Rollback()
+			return
+		}
+
+		//set enroll status
+		status := ENROLLED
+		if course.Fee.Valid {
+			status = AWAITINGPAYMENT
+		}
+		if event.EnrollOption == ENROLLTOWAITLIST {
+			status = ONWAITLIST
+		}
+
+		//enroll
+		if _, err = tx.Exec(stmtEnrollUser, *userID, *eventID, status); err != nil {
+			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
+				"status", status, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		//try to remove the user from the unsubscribed table
+		if _, err = tx.Exec(stmtDeleteUserFromUnsubscribed, *userID, *eventID); err != nil {
+			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+	} else { //unsubscribe the user
+
+		if event.EnrollOption == ENROLL || event.EnrollOption == ENROLLTOWAITLIST {
+			//the user is already unsubscribed from this event
+			msg = "validation.enrollment.already.unsubscribed"
+			tx.Rollback()
+			return
+		}
+
+		//unsubscribe
+		if _, err = tx.Exec(stmtUnsubscribeUser, *userID, *eventID); err != nil {
+			log.Error("failed to unsubscribe user", "userID", *userID, "eventID", *eventID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		//insert into unsubscribed table
+		if _, err = tx.Exec(stmtInsertUserIntoUnsubscribed, *userID, *eventID); err != nil {
+			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		//handle users who get enrolled from the wait list
+		if event.HasWaitlist {
+			//TODO
+		}
+	}
 
 	tx.Commit()
-	return
-}
-
-/*Unsubscribe a user from an event. */
-func Unsubscribe(userID, eventID *int) (msg string, err error) {
 	return
 }
 
@@ -153,10 +229,10 @@ const (
 		/* get all children */
 		WITH RECURSIVE path (id, parent_id, course_limit)
 			AS (
-				/* starting entries */
+				/* starting entry */
 				SELECT id, parent_id, course_limit
 				FROM groups
-				WHERE parent_id = (
+				WHERE id = (
 
 					/* get the starting group id */
 					WITH RECURSIVE path (parent_id, id, course_limit)
@@ -198,5 +274,29 @@ const (
 			courses c ON ev.course_id = c.id JOIN
 			path p ON c.parent_id = p.id
 		WHERE e.user_id = $2
+	`
+
+	stmtEnrollUser = `
+		INSERT INTO enrolled
+			(user_id, event_id, status)
+		VALUES ($1, $2, $3)
+	`
+
+	stmtDeleteUserFromUnsubscribed = `
+		DELETE FROM unsubscribed
+		WHERE user_id = $1
+			AND event_id = $2
+	`
+
+	stmtUnsubscribeUser = `
+		DELETE FROM enrolled
+		WHERE user_id = $1
+			AND event_id = $2
+	`
+
+	stmtInsertUserIntoUnsubscribed = `
+		INSERT INTO unsubscribed
+			(user_id, event_id)
+		VALUES ($1, $2)
 	`
 )

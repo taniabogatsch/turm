@@ -169,8 +169,8 @@ CREATE TABLE enrolled (
   user_id               integer                   NOT NULL,
   event_id              integer                   NOT NULL,
   status                integer                   NOT NULL,
-  email_traffic         boolean                   NOT NULL,
-  time_of_enrollment    timestamp with time zone  NOT NULL,
+  email_traffic         boolean                   NOT NULL false,
+  time_of_enrollment    timestamp with time zone  NOT NULL DEFAULT now(),
 
   PRIMARY KEY(user_id, event_id),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

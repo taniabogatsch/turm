@@ -350,7 +350,7 @@
 {{end}}
 
 <!-- only ldap -->
-<div class="row mb-2" id="events">
+<div class="row mb-2 {{if not .course.OnlyLDAP}}edit-show d-none{{end}}" id="events">
   <div class="col-sm-4 text-muted">
     {{msg $ "course.audience"}}:
   </div>

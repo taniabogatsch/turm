@@ -52,6 +52,9 @@ event.key.repeat = Einschreibeschlüssel wiederholen
 
 event.number.meetings = Anzahl der Termine
 
+event.enroll.success = Sie haben sich erfolgreich eingeschrieben.
+event.unsubscribe.success = Sie haben sich erfolgreich ausgetragen.
+
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
 # -------------------------------------------------------------------------------------------------- #

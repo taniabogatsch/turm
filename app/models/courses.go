@@ -335,6 +335,7 @@ func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
 			tx.Rollback()
 			return
 		}
+		err = nil
 	}
 
 	if course.CourseStatus.MaxEnrollCourses != 0 {
@@ -352,7 +353,6 @@ func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
 			course.CourseStatus.MaxEnrollCoursesReached = true
 		}
 	}
-
 	return
 }
 

@@ -112,8 +112,8 @@ user.details = User details
 # EMAIL
 # -------------------------------------------------------------------------------------------------- #
 
-email.dear.ms = Dear Ms.
-email.dear.mr = Dear Mr.
+email.dear.ms = Dear Ms
+email.dear.mr = Dear Mr
 email.none = Hello
 
 email.regards.plain = Sincerely
