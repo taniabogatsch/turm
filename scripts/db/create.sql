@@ -231,3 +231,55 @@ CREATE TABLE news_feed (
   FOREIGN KEY (last_editor) REFERENCES users (id) ON DELETE SET NULL,
   FOREIGN KEY (category_id) REFERENCES news_feed_category (id) /* Prevent the deletion of categories if they still contain news. */
 );
+
+CREATE TABLE calendar_events (
+  id              serial                    PRIMARY KEY,
+  course_id       integer                   NOT NULL,
+  title           varchar(255)              NOT NULL,
+  annotations     varchar(255),
+
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+CREATE TABLE day_templates (
+  id                  serial                      PRIMARY KEY,
+  calendar_event_id   integer                     NOT NULL,
+  start_time          time with time zone         NOT NULL,
+  end_time            time with time zone         NOT NULL,
+  day_of_week         integer                     NOT NULL,
+  active              boolean                     DEFAULT true,
+  deactivation_date   timestamp with time zone,
+
+  FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
+);
+
+CREATE TABLE days (
+  id                  serial                    PRIMARY KEY,
+  calendar_date       date                      NOT NULL,
+  day_template_id     integer                   NOT NULL,
+  /* unit: minutes */
+  intervall           integer                   DEFAULT 60,
+
+  FOREIGN KEY (day_template_id) REFERENCES day_templates (id) ON DELETE CASCADE
+);
+
+CREATE TABLE slots (
+  id                  serial                    PRIMARY KEY,
+  user_id             integer                   NOT NULL,
+  day_id              integer                   NOT NULL,
+  start_time          time with time zone       NOT NULL,
+  end_time            time with time zone       NOT NULL,
+
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (day_id) REFERENCES days (id) ON DELETE CASCADE
+);
+
+CREATE TABLE calendar_exceptions (
+  id                  serial                    PRIMARY KEY,
+  day_id              integer                   NOT NULL,
+  start_time          time with time zone,
+  end_time            time with time zone,
+  annotations         varchar(255),
+
+  FOREIGN KEY (day_id) REFERENCES days (id) ON DELETE CASCADE
+);

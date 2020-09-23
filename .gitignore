@@ -2,3 +2,5 @@ test-results/
 tmp/
 routes/
 conf/passwords.json
+none
+target/
