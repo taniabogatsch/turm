@@ -62,8 +62,17 @@ func (event *Event) Delete() (err error) {
 }
 
 /*Get returns all data of one event. */
-func (event *Event) Get() (err error) {
-	//TODO
+func (event *Event) Get(tx *sqlx.Tx, userID *int) (err error) {
+
+	err = tx.Get(event, stmtGetEvent, event.ID)
+	if err != nil {
+		log.Error("failed to get event by ID", "event", *event, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//set the percentage field
+	event.Percentage = (event.Fullness * 100) / event.Capacity
 	return
 }
 
@@ -78,15 +87,20 @@ func (event *Event) validateEnrollStatus(tx *sqlx.Tx, userID *int,
 
 	event.EventStatus.Full = (event.Capacity <= event.Fullness)
 
-	//validate if the user already enrolled in this event
 	for _, enrollment := range enrollments {
+
+		//validate if the user already enrolled in this event
 		if enrollment.EventID == event.ID {
 			if enrollment.Status == ONWAITLIST {
 				event.EventStatus.OnWaitlist = true
 			} else {
 				event.EventStatus.Enrolled = true
 			}
-			return
+
+		} else {
+
+			//validate if the user already enrolled in other events of this course
+			event.EventStatus.InOtherEvent = true
 		}
 	}
 
@@ -118,12 +132,20 @@ func (event *Event) validateEnrollment(c *Course) {
 		return
 	}
 	if c.CourseStatus.MaxEnrollCoursesReached {
-		event.EnrollMsg = "validation.enrollment.max.enroll.reached"
-		return
+		if !event.EventStatus.Enrolled && !event.EventStatus.OnWaitlist {
+			if !event.EventStatus.InOtherEvent {
+				event.EnrollMsg = "validation.enrollment.max.enroll.reached"
+				return
+			}
+		}
+		c.CourseStatus.MaxEnrollCoursesReached = false
 	}
 	if event.EventStatus.EnrollLimitReached {
-		event.EnrollMsg = "validation.enrollment.limit.reached"
-		return
+		if !event.EventStatus.Enrolled && !event.EventStatus.OnWaitlist {
+			event.EnrollMsg = "validation.enrollment.limit.reached"
+			return
+		}
+		event.EventStatus.EnrollLimitReached = false
 	}
 
 	//unsubscribe period is over
@@ -137,8 +159,10 @@ func (event *Event) validateEnrollment(c *Course) {
 
 	//enrollment period has not yet started
 	if c.CourseStatus.NoEnrollmentPeriod {
-		event.EnrollMsg = "validation.enrollment.not.started"
-		return
+		if !event.EventStatus.Enrolled && !event.EventStatus.OnWaitlist {
+			event.EnrollMsg = "validation.enrollment.no.period"
+			return
+		}
 	}
 
 	//user is enrolled or on wait list
@@ -307,5 +331,19 @@ const (
 		SET enrollment_key = CRYPT($1, gen_salt('bf'))
 		WHERE id = $2
 		RETURNING id
+	`
+
+	stmtGetEvent = `
+		SELECT
+			e.id, e.course_id, e.capacity, e.has_waitlist,
+			e.title, e.annotation, e.enrollment_key,
+			(
+				SELECT COUNT(en.user_id)
+				FROM enrolled en
+				WHERE en.event_id = e.id
+					AND status != 1 /*on waitlist*/
+			) AS fullness
+		FROM events e
+		WHERE id = $1
 	`
 )

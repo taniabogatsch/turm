@@ -17,7 +17,7 @@ func (c Enrollment) Enroll(ID int) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
-	if msg, err := models.Enroll(&userID, &ID); err != nil {
+	if msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.ENROLL); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	} else if msg != "" {
@@ -26,7 +26,7 @@ func (c Enrollment) Enroll(ID int) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("enroll.success"))
+	c.Flash.Success(c.Message("event.enroll.success"))
 	return c.Redirect(c.Session["currPath"])
 }
 
@@ -41,7 +41,7 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
-	if msg, err := models.Unsubscribe(&userID, &ID); err != nil {
+	if msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.UNSUBSCRIBE); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	} else if msg != "" {
@@ -50,6 +50,6 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("unsubscribe.success"))
+	c.Flash.Success(c.Message("event.unsubscribe.success"))
 	return c.Redirect(c.Session["currPath"])
 }

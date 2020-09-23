@@ -4,18 +4,18 @@
 
 {{if eq .option 0}}
   <!-- enroll button -->
-  <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll'
-    role="button">
+  <a class="btn btn-outline-darkblue float-right ml-3 edit-hide"
+    href='{{url "Enrollment.Enroll" .ID}}'>
     {{msg $ "button.enroll"}}
-  </button>
+  </a>
 {{end}}
 
 {{if eq .option 1}}
   <!-- unsubscribe button -->
-  <button class="btn btn-outline-danger float-right ml-3 edit-hide" href='#no-scroll'
-    role="button">
+  <a class="btn btn-outline-danger float-right ml-3 edit-hide"
+    href='{{url "Enrollment.Unsubscribe" .ID}}'>
     {{msg $ "button.unsubscribe"}}
-  </button>
+  </a>
 {{end}}
 
 {{if eq .option 2}}
@@ -36,8 +36,8 @@
 
 {{if eq .option 4}}
   <!-- enroll to waitlist button -->
-  <button class="btn btn-outline-darkblue float-right ml-3 edit-hide" href='#no-scroll'
-    role="button">
+  <a class="btn btn-outline-darkblue float-right ml-3 edit-hide"
+    href='{{url "Enrollment.Enroll" .ID}}'>
     {{msg $ "button.to.waitlist"}}
-  </button>
+  </a>
 {{end}}

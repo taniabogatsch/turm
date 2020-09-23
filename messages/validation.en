@@ -83,3 +83,18 @@ validation.invalid.file = Invalid file.
 validation.invalid.json = Please provide a file with JSON formatting.
 
 validation.invalid.keys = The enrollment keys do not match.
+
+# -------------------------------------------------------------------------------------------------- #
+# ENROLLMENT
+# -------------------------------------------------------------------------------------------------- #
+
+validation.enrollment.at.blacklist = You have no permission to enroll in this course. Please contact the course organization.
+validation.enrollment.no.ldap = You need an university account to enroll in this course.
+validation.enrollment.not.satisfy.restrictions = You do not satisfy the enrollment restrictions of this course.
+validation.enrollment.max.enroll.reached = You already enrolled in the maximum number of events of this course group.
+validation.enrollment.limit.reached = You already enrolled in the maximum number of events of this course.
+validation.enrollment.period.over = The enrollment and unsubscribe period is over.
+validation.enrollment.no.period = Outside of enrollment period.
+validation.enrollment.full = This event is full.
+validation.enrollment.already.enrolled = You already enrolled in this event.
+validation.enrollment.already.unsubscribed = You already unsubscribed from this event.
