@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -51,5 +52,21 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	}
 
 	c.Flash.Success(c.Message("event.unsubscribe.success"))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*EnrollInCalendarSlot to enroll into a time slot of a day*/
+func (c Enrollment) EnrollInCalendarSlot() revel.Result {
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(
+			errTypeConv, err, "", c.Controller, "")
+	}
+
+	fmt.Println(userID)
+
+	//models.calendar_events.newSlot
+
+	c.Flash.Success(c.Message("event.enroll.success"))
 	return c.Redirect(c.Session["currPath"])
 }

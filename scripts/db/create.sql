@@ -25,6 +25,8 @@ CREATE TABLE degrees (
   id    serial        PRIMARY KEY,
   name  varchar(255)  NOT NULL UNIQUE
 );
+
+
 CREATE TABLE courses_of_studies (
   id    serial        PRIMARY KEY,
   name  varchar(511)  NOT NULL UNIQUE
@@ -232,54 +234,53 @@ CREATE TABLE news_feed (
   FOREIGN KEY (category_id) REFERENCES news_feed_category (id) /* Prevent the deletion of categories if they still contain news. */
 );
 
+
 CREATE TABLE calendar_events (
   id              serial                    PRIMARY KEY,
   course_id       integer                   NOT NULL,
   title           varchar(255)              NOT NULL,
   annotations     varchar(255),
+  created         timestamp with time zone  DEFAULT now(),
+  creator_id      integer,
 
-  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
+  FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE day_templates (
   id                  serial                      PRIMARY KEY,
   calendar_event_id   integer                     NOT NULL,
   start_time          time with time zone         NOT NULL,
   end_time            time with time zone         NOT NULL,
+  intervall           integer                     NOT NULL DEFAULT 60,
   day_of_week         integer                     NOT NULL,
+  created             timestamp with time zone    DEFAULT now(),
+  creator_id          integer,
   active              boolean                     DEFAULT true,
   deactivation_date   timestamp with time zone,
 
-  FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
-);
-
-CREATE TABLE days (
-  id                  serial                    PRIMARY KEY,
-  calendar_date       date                      NOT NULL,
-  day_template_id     integer                   NOT NULL,
-  /* unit: minutes */
-  intervall           integer                   DEFAULT 60,
-
-  FOREIGN KEY (day_template_id) REFERENCES day_templates (id) ON DELETE CASCADE
+  FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE,
+  FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
 CREATE TABLE slots (
   id                  serial                    PRIMARY KEY,
   user_id             integer                   NOT NULL,
-  day_id              integer                   NOT NULL,
-  start_time          time with time zone       NOT NULL,
-  end_time            time with time zone       NOT NULL,
+  day_tmpl_id         integer                   NOT NULL,
+  start_time          timestamp with time zone  NOT NULL,
+  end_time            timestamp with time zone  NOT NULL,
+  created             timestamp with time zone  DEFAULT now(),
 
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (day_id) REFERENCES days (id) ON DELETE CASCADE
+  FOREIGN KEY (day_tmpl_id) REFERENCES day_templates (id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE calendar_exceptions (
   id                  serial                    PRIMARY KEY,
-  day_id              integer                   NOT NULL,
-  start_time          time with time zone,
-  end_time            time with time zone,
+  start_time          timestamp with time zone,
+  end_time            timestamp with time zone,
   annotations         varchar(255),
-
-  FOREIGN KEY (day_id) REFERENCES days (id) ON DELETE CASCADE
+  created             timestamp with time zone  DEFAULT now()
 );

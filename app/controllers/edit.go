@@ -153,6 +153,39 @@ func (c Edit) NewEvent(ID int, value string) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
+/*NewCalendarEvent creates a new blank event in a course.
+- Roles: creator and editors of this course. */
+func (c Edit) NewCalendarEvent(ID int, value string) revel.Result {
+
+	c.Log.Debug("create a new calendar event", "ID", ID, "value", value)
+
+	//NOTE: the interceptor assures that the course ID is valid
+
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
+		revel.MinSize{3},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.text.short")
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	event := models.CalendarEvent{CourseID: ID, Title: value}
+	err := event.NewBlank()
+	if err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("event.new.success",
+		event.Title,
+		event.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
+}
+
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
 func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
