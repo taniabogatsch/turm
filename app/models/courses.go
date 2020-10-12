@@ -172,10 +172,13 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		return
 	}
 
-	//get the calander events of a course
-	if err = course.CalendarEvents.Get(tx, &course.ID, day); err != nil {
-		return
-	}
+	//TODO
+	/*
+		//get the calander events of a course
+		if err = course.CalendarEvents.Get(tx, &course.ID, day); err != nil {
+			return
+		}
+	*/
 
 	if manage {
 		//get courses of studies and degrees

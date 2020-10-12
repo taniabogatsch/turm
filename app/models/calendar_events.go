@@ -169,8 +169,12 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, day time.Time, weekday int) 
 
 /*Validate the startTime and endTime of a slot  */
 func (slot *Slot) Validate(v *revel.Validation) {
-	v.Check(slot.StartTimestamp.After(time.Now())).MessageKey("validation.calendarEvent.startInPast")
-	v.Check(slot.StartTimestamp.Before(slot.EndTimestamp)).MessageKey("validation.calendarEvent.startAfterEndTime")
+
+	startInPast := slot.StartTimestamp.After(time.Now())
+	v.Check(startInPast).MessageKey("validation.calendarEvent.startInPast")
+
+	startAfterEndTime := slot.StartTimestamp.Before(slot.EndTimestamp)
+	v.Check(startAfterEndTime).MessageKey("validation.calendarEvent.startAfterEndTime")
 
 	dayTmpls := []DayTmpl{}
 
@@ -211,10 +215,12 @@ func (slot *Slot) Validate(v *revel.Validation) {
 	//schrittweite prüfen
 	//types ok?
 	intervallSteps := float64(slotStartTime.Sub(tmplStartTime) / dayTmpls[indexDayTmpl].Intervall)
-	v.Check((intervallSteps - float64(int(intervallSteps))) == 0).MessageKey("validation.calendarEvent.startTimeWrongStepDistance")
+	startWrongStepDistance := (intervallSteps - float64(int(intervallSteps))) == 0
+	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.startTimeWrongStepDistance")
 
 	intervallSteps = float64(slotEndTime.Sub(tmplStartTime) / dayTmpls[indexDayTmpl].Intervall)
-	v.Check((intervallSteps - float64(int(intervallSteps))) == 0).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
+	endWrongStepDistance := (intervallSteps - float64(int(intervallSteps))) == 0
+	v.Check(endWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
 
 	//schon besetzt?
 }
