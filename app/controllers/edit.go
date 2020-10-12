@@ -416,18 +416,16 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 		}
 
 		if c.Validation.HasErrors() {
-			return flashError(
-				errValidation, nil, "", c.Controller, "")
+			return c.RenderJSON(
+				response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 		}
 	}
 
 	if fieldID != "description" && fieldID != "custom_email" &&
 		fieldID != "speaker" && fieldID != "title" &&
 		fieldID != "subtitle" && fieldID != "fee" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	course := models.Course{ID: ID}
@@ -437,8 +435,8 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 		value = strings.ReplaceAll(value, ",", ".")
 		fee, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return flashError(
-				errContent, err, "", c.Controller, "")
+			return c.RenderJSON(
+				response{Status: ERROR, Msg: c.Message("error.undefined")})
 		}
 		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid})
 
@@ -447,27 +445,21 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 	}
 
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
 		if fieldID == "title" || fieldID == "subtitle" || fieldID == "fee" {
-			c.Flash.Success(c.Message("course."+fieldID+".change.success",
-				value,
-				course.ID,
-			))
+			msg = c.Message("course."+fieldID+".change.success", value, course.ID)
 		} else {
-			c.Flash.Success(c.Message("course."+fieldID+".change.success",
-				course.ID,
-			))
+			msg = c.Message("course."+fieldID+".change.success", course.ID)
 		}
-	} else {
-		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
-			course.ID,
-		))
 	}
-	return c.Redirect(c.Session["currPath"])
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value})
 }
 
 /*ChangeGroup changes the group of a course.

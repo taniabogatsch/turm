@@ -151,7 +151,7 @@ course.group.change.success = Der Kurs ist nun Teil einer Gruppe, Kurs ID = %d.
 
 course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
 course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
-course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr von %g€ löschen wollen?
+course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr löschen wollen?
 course.fee.delete.title = Teilnahmegebühr löschen
 course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15 oder 15,0 oder 15,00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
@@ -175,7 +175,7 @@ course.speaker.change.info = Hier können Sie eine detaillierte Beschreibung zur
 
 course.subtitle.change.success = Untertitel zu '%s' geändert, Kurs ID = %d.
 course.subtitle.delete.success = Untertitel gelöscht, Kurs ID = %d.
-course.subtitle.delete.confirm = Untertitel '%s' wirklich löschen?
+course.subtitle.delete.confirm = Untertitel wirklich löschen?
 course.subtitle.delete.title = Untertitel löschen
 course.subtitle.change.info = Der Untertitel kann den Titel näher spezifizieren.
 

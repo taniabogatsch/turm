@@ -6,7 +6,10 @@ function submitChangeGroupModal(parentID) {
   $('#change-group-modal-form').submit();
 }
 
-function openChangeModal(title, field, value, valid, action, modal, max, info, ID) {
+function openChangeModal(title, field, valid, action, modal, max, info, ID) {
+
+  let value = $('#div-' + field).html();
+  value = value.trim();
 
   $('#change-' + modal + '-modal-ID').val(ID);
   $('#change-' + modal + '-modal-title').html(title);
@@ -157,7 +160,7 @@ function openTextAreaModal(title, field, valid, action, info, isEMail) {
 
   //set content
   if (valid) {
-    quill.root.innerHTML = $('#course-' + field).html();
+    quill.root.innerHTML = $('#div-' + field).html();
   } else {
     quill.root.innerHTML = "";
   }
@@ -259,4 +262,35 @@ function openEnrollmentKeyModal(eventID) {
 
   $('#change-enrollment-key-event-ID').val(eventID);
   $('#change-enrollment-key-modal').modal('show');
+}
+
+function handleEditResult(response) {
+
+  if (response.FieldID == "title") {
+    $('#div-' + response.FieldID).html(response.Value);
+
+  } else  if (response.FieldID == "subtitle" || response.FieldID == "fee" ||
+    response.FieldID == "speaker" || response.FieldID == "description" ||
+    response.FieldID == "custom_email") {
+
+    if (response.Value != "") {
+      document.getElementById("div-edit-" + response.FieldID).classList.remove("d-none");
+      document.getElementById("div-add-" + response.FieldID).classList.add("d-none");
+      $('#div-' + response.FieldID).html(response.Value);
+
+    } else {
+      document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
+      document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+    }
+  }
+}
+
+function confirmDeleteModal(title, content, action) {
+
+  $('#confirm-delete-modal-title').html(title);
+  $('#confirm-delete-modal-form').attr("action", action);
+  $('#confirm-delete-modal-content').html(content);
+
+  //show the modal
+  $('#confirm-delete-modal').modal('show');
 }

@@ -15,10 +15,12 @@
 <div class="row mb-2">
   <div class="col">
     <h4>
-      {{.course.Title}}
+      <div id="div-title" class="d-inline">
+        {{.course.Title}}
+      </div>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='openChangeModal({{msg $ "course.title"}}, "title", {{.course.Title}},
-          true, "{{url "Edit.ChangeText"}}#", "text", "511",
+        onclick='openChangeModal({{msg $ "course.title"}}, "title",
+          true, "{{url "Edit.ChangeText"}}", "text", "511",
           {{msg $ "course.title.change.info"}}, {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
@@ -27,40 +29,41 @@
 </div>
 
 <!-- subtitle -->
-{{if .course.Subtitle.Valid}}
+<div id="div-edit-subtitle" {{if not .course.Subtitle.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col">
       <h5>
-        {{.course.Subtitle.String}}
+        <div id="div-subtitle" class="d-inline">
+          {{.course.Subtitle.String}}
+        </div>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-          onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
-            {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
-            "{{url "Edit.ChangeText"}}#", "text", "511",
+          onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle", true,
+            "{{url "Edit.ChangeText"}}", "text", "511",
             {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-          onclick='confirmPOSTModal({{msg $ "course.subtitle.delete.title"}},
-            {{msg $ "course.subtitle.delete.confirm" .course.Subtitle.String}},
-            "{{url "Edit.ChangeText" .course.ID "subtitle" ""}}#");'>
+          onclick='confirmDeleteModal({{msg $ "course.subtitle.delete.title"}},
+            {{msg $ "course.subtitle.delete.confirm"}},
+            "{{url "Edit.ChangeText" .course.ID "subtitle" ""}}");'>
           {{template "icons/trash.html" . }}
         </a>
       </h5>
     </div>
   </div>
-{{else}}
-  <div class="row edit-show d-none mb-2">
+</div>
+<div id="div-add-subtitle" {{if .course.Subtitle.Valid}}class="d-none"{{end}}>
+  <div class="row edit-show d-none mb-2" id="div-add-subtitle">
     <div class="col">
       <button type="button" class="btn btn-outline-darkblue"
-        onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle",
-          {{.course.Subtitle.String}}, {{.course.Subtitle.Valid}},
-          "{{url "Edit.ChangeText"}}#", "text", "511",
+        onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle", false,
+          "{{url "Edit.ChangeText"}}", "text", "511",
           {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
         {{msg $ "creator.add.subtitle"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <hr class="edit-hide">
 
@@ -216,76 +219,76 @@
 {{end}}
 
 <!-- show fee if there is one -->
-{{if .course.Fee.Valid}}
+<div id="div-edit-fee" {{if not .course.Fee.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col-sm-4 text-muted">
        {{msg $ "course.fee"}}:
      </div>
      <div class="col-sm-8">
-       {{.course.Fee.Float64}}€
+       <div id="div-fee" class="d-inline">
+       {{.course.Fee.Float64}}</div>€
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-         onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
-           {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
-           "{{url "Edit.ChangeText"}}#", "text", "",
+         onclick='openChangeModal({{msg $ "course.fee"}}, "fee", true,
+           "{{url "Edit.ChangeText"}}", "text", "",
            {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
          {{template "icons/pencil.html" . }}
        </a>
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-         onclick='confirmPOSTModal({{msg $ "course.fee.delete.title"}},
-           {{msg $ "course.fee.delete.confirm" .course.Fee.Float64}},
-           "{{url "Edit.ChangeText" .course.ID "fee" ""}}#");'>
+         onclick='confirmDeleteModal({{msg $ "course.fee.delete.title"}},
+           {{msg $ "course.fee.delete.confirm"}},
+           "{{url "Edit.ChangeText" .course.ID "fee" ""}}");'>
          {{template "icons/trash.html" . }}
        </a>
      </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-fee" {{if .course.Fee.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
        {{msg $ "course.fee"}}:
      </div>
      <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
-        onclick='openChangeModal({{msg $ "course.fee"}}, "fee",
-          {{.course.Fee.Float64}}, {{.course.Fee.Valid}},
-          "{{url "Edit.ChangeText"}}#", "text", "",
+        onclick='openChangeModal({{msg $ "course.fee"}}, "fee", false,
+          "{{url "Edit.ChangeText"}}", "text", "",
           {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
         {{msg $ "creator.add.fee"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- description -->
-{{if .course.Description.Valid}}
+<div id="div-edit-description" {{if not .course.Description.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.description"}}:
       <br>
-      <a data-toggle="collapse" href="#course-description" role="button"
-        aria-expanded="true" aria-controls="course-description"
+      <a data-toggle="collapse" href="#div-description" role="button"
+        aria-expanded="true" aria-controls="div-description"
         id="course-description-btn">
         {{msg $ "button.collapse"}}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.description"}},
-          "description", {{.course.Description.Valid}},
-          "{{url "Edit.ChangeText"}}#course-registration-period",
+          "description", true, "{{url "Edit.ChangeText"}}",
           {{msg $ "course.description.change.info"}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.description.delete.title"}},
+        onclick='confirmDeleteModal({{msg $ "course.description.delete.title"}},
           {{msg $ "course.description.delete.confirm"}},
           "{{url "Edit.ChangeText" .course.ID  "description" ""}}#course-registration-period");'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
     <div class="col-sm-8">
-      <div class="collapse show" id="course-description">
+      <div class="collapse show" id="div-description">
       </div>
     </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-description" {{if .course.Description.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.description"}}:
@@ -293,46 +296,45 @@
     <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openTextAreaModal({{msg $ "course.description"}},
-          "description", {{.course.Description.Valid}},
-          "{{url "Edit.ChangeText"}}#course-registration-period",
+          "description", false, "{{url "Edit.ChangeText"}}",
           {{msg $ "course.description.change.info"}}, false);'>
         {{msg $ "creator.add.description"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- speaker -->
-{{if .course.Speaker.Valid}}
+<div id="div-edit-speaker" {{if not .course.Speaker.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.speaker"}}:
       <br>
-      <a data-toggle="collapse" href="#course-speaker" role="button"
-        aria-expanded="true" aria-controls="course-speaker"
+      <a data-toggle="collapse" href="#div-speaker" role="button"
+        aria-expanded="true" aria-controls="div-speaker"
         id="course-speaker-btn">
         {{msg $ "button.collapse"}}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.speaker"}},
-          "speaker", {{.course.Speaker.Valid}},
-          "{{url "Edit.ChangeText"}}#course-registration-period",
+          "speaker", true, "{{url "Edit.ChangeText"}}",
           {{msg $ "course.speaker.change.info"}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.speaker.delete.title"}},
+        onclick='confirmDeleteModal({{msg $ "course.speaker.delete.title"}},
           {{msg $ "course.speaker.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "speaker" ""}}#course-registration-period");'>
+          "{{url "Edit.ChangeText" .course.ID  "speaker" ""}}");'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
     <div class="col-sm-8">
-      <div class="collapse show" id="course-speaker">
+      <div class="collapse show" id="div-speaker">
       </div>
     </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-speaker" {{if .course.Speaker.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.speaker"}}:
@@ -340,14 +342,13 @@
     <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openTextAreaModal({{msg $ "course.speaker"}},
-          "speaker", {{.course.Speaker.Valid}},
-          "{{url "Edit.ChangeText"}}#course-registration-period",
+          "speaker", false, "{{url "Edit.ChangeText"}}",
           {{msg $ "course.speaker.change.info"}}, false);'>
         {{msg $ "creator.add.speaker"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- only ldap -->
 <div class="row mb-2 {{if not .course.OnlyLDAP}}edit-show d-none{{end}}" id="events">
@@ -579,48 +580,50 @@
 {{end}}
 
 <!-- custom e-mail -->
-{{if .course.CustomEMail.Valid}}
+<div id="div-edit-custom_email" {{if not .course.CustomEMail.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.custom.email"}}:
       <br>
-      <a data-toggle="collapse" href="#course-custom_email" role="button"
-        aria-expanded="true" aria-controls="course-custom_email"
+      <a data-toggle="collapse" href="#div-custom_email" role="button"
+        aria-expanded="true" aria-controls="div-custom_email"
         id="course-custom_email-btn">
         {{msg $ "button.collapse"}}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.custom.email"}},
-          "custom_email", {{.course.CustomEMail.Valid}},
-          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}}, true);'>
+          "custom_email", true, "{{url "Edit.ChangeText"}}",
+          {{msg $ "course.custom.email.change.info"}}, true);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.customemail.delete.title"}},
+        onclick='confirmDeleteModal({{msg $ "course.customemail.delete.title"}},
           {{msg $ "course.customemail.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}#more-settings");'>
+          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}");'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
     <div class="col-sm-8">
-      <div class="collapse show" id="course-custom_email">
+      <div class="collapse show" id="div-custom_email">
       </div>
     </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-custom_email" {{if .course.CustomEMail.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.custom.email"}}:
     </div>
     <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
-        onclick='openTextAreaModal({{msg $ "course.custom.email"}}, "custom_email", {{.course.CustomEMail.Valid}},
-          "{{url "Edit.ChangeText"}}#more-settings", {{msg $ "course.custom.email.change.info"}}, true);'>
+        onclick='openTextAreaModal({{msg $ "course.custom.email"}},
+          "custom_email", false, "{{url "Edit.ChangeText"}}",
+          {{msg $ "course.custom.email.change.info"}}, true);'>
         {{msg $ "creator.add.custom.email"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- whitelist -->
 {{if .course.Whitelist}}
@@ -695,28 +698,28 @@
 <script>
   //render all html content
   $(function() {
-    $('#course-description').html('{{.course.Description.String}}');
-    $('#course-speaker').html('{{.course.Speaker.String}}');
-    $('#course-custom_email').html('{{.course.CustomEMail.String}}');
+    $('#div-description').html('{{.course.Description.String}}');
+    $('#div-speaker').html('{{.course.Speaker.String}}');
+    $('#div-custom_email').html('{{.course.CustomEMail.String}}');
 
-    $('#course-description').on('hidden.bs.collapse', function () {
+    $('#div-description').on('hidden.bs.collapse', function () {
       $('#course-description-btn').html('{{msg $ "button.show"}}');
     })
-    $('#course-description').on('shown.bs.collapse', function () {
+    $('#div-description').on('shown.bs.collapse', function () {
       $('#course-description-btn').html('{{msg $ "button.collapse"}}');
     })
 
-    $('#course-speaker').on('hidden.bs.collapse', function () {
+    $('#div-speaker').on('hidden.bs.collapse', function () {
       $('#course-speaker-btn').html('{{msg $ "button.show"}}');
     })
-    $('#course-speaker').on('shown.bs.collapse', function () {
+    $('#div-speaker').on('shown.bs.collapse', function () {
       $('#course-speaker-btn').html('{{msg $ "button.collapse"}}');
     })
 
-    $('#course-custom_email').on('hidden.bs.collapse', function () {
+    $('#div-custom_email').on('hidden.bs.collapse', function () {
       $('#course-custom_email-btn').html('{{msg $ "button.show"}}');
     })
-    $('#course-custom_email').on('shown.bs.collapse', function () {
+    $('#div-custom_email').on('shown.bs.collapse', function () {
       $('#course-custom_email-btn').html('{{msg $ "button.collapse"}}');
     })
   });

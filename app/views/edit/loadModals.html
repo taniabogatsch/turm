@@ -13,3 +13,66 @@
 {{template "edit/modals/newMeeting.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
+
+{{template "edit/modals/deleteField.html" dict_addLocale $.currentLocale}}
+
+<script>
+  $('#change-text-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-text-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitForm("#change-text-modal-form", "#change-text-modal");
+    event.preventDefault();
+  });
+
+  $('#change-text-area-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-text-area-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitForm("#change-text-area-modal-form", "#change-text-area-modal");
+    event.preventDefault();
+  });
+
+  $('#confirm-delete-modal-form').submit(function (event) {
+    submitForm("#confirm-delete-modal-form", "#confirm-delete-modal");
+    event.preventDefault();
+  });
+
+  function submitForm(form, modal) {
+
+    $.ajax({
+      type: 'POST',
+      url: $(form).attr("action"),
+      data: $(form).serialize(),
+
+      success: function(response) {
+        if (response.Status == "success") {
+          handleEditResult(response);
+          showToast(response.Msg, 'success');
+          $(modal).modal('hide');
+
+        } else {
+          showToast(response.Msg, 'danger');
+          $(modal).modal('hide');
+        }
+      },
+
+      error: function (error) {
+        showToast("error", 'danger');
+        $(modal).modal('hide');
+      },
+    });
+  }
+</script>
