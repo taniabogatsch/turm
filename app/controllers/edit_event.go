@@ -103,7 +103,7 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
+func (c EditEvent) ChangeText(ID int, fieldID, value string, forCalendarEvent bool) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -131,12 +131,22 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 			"", c.Controller, "")
 	}
 
-	event := models.Event{ID: ID}
-	err := event.Update(fieldID, sql.NullString{value, valid})
+	if forCalendarEvent {
+		event := models.CalendarEvent{ID: ID}
+		err := event.Update(fieldID, sql.NullString{value, valid})
 
-	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		if err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
+	} else {
+		event := models.Event{ID: ID}
+		err := event.Update(fieldID, sql.NullString{value, valid})
+
+		if err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
 	}
 
 	if valid {

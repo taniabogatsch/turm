@@ -34,12 +34,13 @@ type Course struct {
 	ParentID          sql.NullInt32   `db:"parent_id"`
 
 	//course data of different tables
-	Events       Events       ``
-	Editors      UserList     ``
-	Instructors  UserList     ``
-	Blacklist    UserList     ``
-	Whitelist    UserList     ``
-	Restrictions Restrictions ``
+	Events         Events         ``
+	CalendarEvents CalendarEvents ``
+	Editors        UserList       ``
+	Instructors    UserList       ``
+	Blacklist      UserList       ``
+	Whitelist      UserList       ``
+	Restrictions   Restrictions   ``
 
 	//additional information required when displaying the course
 	CreatorData User ``
@@ -168,6 +169,11 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 
 	//get the events of the course
 	if err = course.Events.Get(tx, &userID, &course.ID, manage, &course.EnrollLimitEvents); err != nil {
+		return
+	}
+
+	//get the calander events of a course
+	if err = course.CalendarEvents.Get(tx, &course.ID, day); err != nil {
 		return
 	}
 
