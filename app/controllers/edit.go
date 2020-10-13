@@ -121,42 +121,10 @@ func (c Edit) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c Edit) NewEvent(ID int, value string) revel.Result {
+func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 
-	c.Log.Debug("create a new event", "ID", ID, "value", value)
-
-	//NOTE: the interceptor assures that the course ID is valid
-
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{3},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.text.short")
-
-	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
-	}
-
-	event := models.Event{CourseID: ID, Title: value}
-	err := event.NewBlank()
-	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
-	}
-
-	c.Flash.Success(c.Message("event.new.success",
-		event.Title,
-		event.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
-}
-
-/*NewCalendarEvent creates a new blank event in a course.
-- Roles: creator and editors of this course. */
-func (c Edit) NewCalendarEvent(ID int, value string) revel.Result {
-
-	c.Log.Debug("create a new calendar event", "ID", ID, "value", value)
+	c.Log.Debug("create a new event", "ID", ID, "value", value,
+		"eventType", eventType)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -166,23 +134,45 @@ func (c Edit) NewCalendarEvent(ID int, value string) revel.Result {
 		revel.MaxSize{255},
 	).MessageKey("validation.invalid.text.short")
 
+	if eventType != "normal" && eventType != "calendar" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/events?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
-	event := models.CalendarEvent{CourseID: ID, Title: value}
-	err := event.NewBlank()
-	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
-	}
+	//normal event
+	if eventType == "normal" {
 
-	c.Flash.Success(c.Message("event.new.success",
-		event.Title,
-		event.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+		event := models.Event{CourseID: ID, Title: value}
+		if err := event.NewBlank(); err != nil {
+			return flashError(
+				errDB, err, "/course/events?ID="+strconv.Itoa(ID),
+				c.Controller, "")
+		}
+
+		c.Flash.Success(c.Message("event.new.success",
+			event.Title,
+			event.ID,
+		))
+
+	} else { //calendar event
+
+		event := models.CalendarEvent{CourseID: ID, Title: value}
+		if err := event.NewBlank(); err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
+
+		c.Flash.Success(c.Message("event.new.calendar.success",
+			event.Title,
+			event.ID,
+		))
+	}
+	return c.Redirect(Course.Events, ID)
 }
 
 /*ChangeTimestamp changes the specified timestamp.

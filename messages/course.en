@@ -113,6 +113,11 @@ meeting.weekly.edit = Edit weekly meeting
 # -------------------------------------------------------------------------------------------------- #
 
 event.new.success = Added event '%s', course ID = %d.
+event.new.calendar.success = Added calendar event '%s', course ID = %d.
+
+event.type = Event type
+event.type.normal = Normal event
+event.type.calendar = Calendar event
 
 event.delete.success = Deleted event, ID = %d.
 event.delete.confirm = Please confirm the deletion of event '%s'.

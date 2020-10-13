@@ -197,6 +197,15 @@ type Events []Event
 func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 	limit *sql.NullInt32) (err error) {
 
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
 	err = tx.Select(events, stmtSelectEvents, *courseID)
 	if err != nil {
 		log.Error("failed to get events of course", "course ID", *courseID, "error", err.Error())
@@ -218,6 +227,10 @@ func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 		if err = (*events)[key].Meetings.Get(tx, &(*events)[key].ID); err != nil {
 			return
 		}
+	}
+
+	if txWasNil {
+		tx.Commit()
 	}
 	return
 }

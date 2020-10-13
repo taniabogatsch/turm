@@ -313,7 +313,7 @@
 <br>
 <br>
 
-<!-- events -->
+<!-- events info -->
 <div class="row edit-show d-none mb-2">
   <div class="col">
     <h5>
@@ -331,17 +331,18 @@
 <div class="row mb-2 edit-show d-none">
   <div class="col">
     <button type="button" class="btn btn-outline-darkblue"
-      onclick='openChangeModal({{msg $ "creator.event.new"}}, "event",
-        {{msg $ "event.title"}}, false, "{{url "Edit.NewEvent"}}#events",
-        "text", "255", {{msg $ "creator.title.event.working.info"}},
-        {{.course.ID}});'>
+      onclick='openNewEventModal({{msg $ "creator.event.new"}},
+        "{{url "Edit.NewEvent"}}", {{.course.ID}},
+        {{msg $ "creator.title.event.working.info"}});'>
       {{msg $ "creator.add.event"}}
     </button>
   </div>
 </div>
 
 <!-- event list -->
-{{template "course/events.html" dict_addLocale $.currentLocale "course" .course}}
+<div id="div-events">
+  {{template "course/events.html" dict_addLocale $.currentLocale "events" .course.Events}}
+</div>
 
 <br id="more-settings">
 <br>

@@ -113,10 +113,15 @@ meeting.weekly.edit = Wiederkehrenden Termin bearbeiten
 # -------------------------------------------------------------------------------------------------- #
 
 event.new.success = Veranstaltung '%s' hinzugefügt, Kurs ID = %d.
+event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
 
 event.delete.success = Veranstaltung gelöscht, ID = %d.
 event.delete.confirm = Veranstaltung '%s' wirklich löschen?
 event.delete.title = Veranstaltung löschen
+
+event.type = Art der Veranstaltung
+event.type.normal = Normale Veranstaltung
+event.type.calendar = Kalenderveranstaltung
 
 event.capacity = Teilnehmeranzahl
 event.capacity.change.info = Die Teilnehmeranzahl ist die maximale Anzahl an TeilnehmerInnen, die sich in diese Veranstaltung einschreiben dürfen.

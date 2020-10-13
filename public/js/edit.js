@@ -33,9 +33,6 @@ function openChangeModal(title, field, valid, action, modal, max, info, ID) {
       $('#change-timestamp-modal-time').val("");
     } else {
       $('#change-' + modal + '-modal-value').val("");
-      if (field == "event") {
-        title = value;
-      }
       $('#change-' + modal + '-modal-value').attr("placeholder", title);
     }
   }
@@ -58,11 +55,7 @@ function openChangeModal(title, field, valid, action, modal, max, info, ID) {
     $('#change-text-modal-validation').html($('#change-text-validation-text').html());
   }
 
-  if (field == "event") {
-    $('#change-text-modal-btn').html($('#change-text-add').html());
-  } else {
-    $('#change-text-modal-btn').html($('#change-text-save').html());
-  }
+  $('#change-text-modal-btn').html($('#change-text-save').html());
 
   //show the modal
   $('#change-' + modal + '-modal').modal('show');
@@ -372,4 +365,16 @@ function submitRenderForm(form, modal) {
       $(modal).modal('hide');
     },
   });
+}
+
+function openNewEventModal(title, action, ID, info) {
+
+  $('#change-event-modal-ID').val(ID);
+  $('#change-event-modal-title').html(title);
+  $('#change-event-modal-form').attr('action', action);
+  $('#change-event-modal-info').html(info);
+  $('#change-event-modal-value').val("");
+
+  //show the modal
+  $('#change-event-modal').modal('show');
 }

@@ -10,6 +10,8 @@
 {{template "edit/modals/changeTimestamp.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/changeUserList.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 
+{{template "edit/modals/newEvent.html" dict_addLocale $.currentLocale}}
+
 {{template "edit/modals/newMeeting.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
@@ -100,6 +102,11 @@
 
   $('#change-restriction-modal-form').submit(function (event) {
     submitRenderForm("#change-restriction-modal-form", "#change-restriction-modal");
+    event.preventDefault();
+  });
+
+  $('#change-event-modal-form').submit(function (event) {
+    submitRenderForm("#change-event-modal-form", "#change-event-modal");
     event.preventDefault();
   });
 

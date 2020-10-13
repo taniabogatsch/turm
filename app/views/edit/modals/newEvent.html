@@ -1,0 +1,67 @@
+<!-- new event modal -->
+
+<div class="modal fade" id="change-event-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="change-event-modal-form" accept-charset="UTF-8"
+        method="POST" class="needs-validation" novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="change-event-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" id="change-event-modal-ID">
+          <!-- fieldID -->
+          <input type="hidden" value="events" id="change-event-modal-list">
+
+          <!-- event type -->
+          <small class="form-text text-muted">
+            {{msg $ "event.type"}}
+          </small>
+          <select name="eventType" class="form-control">
+            <option value="normal" selected>{{msg $ "event.type.normal"}}</option>
+            <option value="calendar">{{msg $ "event.type.calendar"}}</option>
+          </select>
+          <br>
+
+          <!-- value -->
+          <small class="form-text text-muted" id="change-event-modal-info">
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="value" placeholder='{{msg $ "event.title"}}' type="text" maxlength="255" value=""
+              class="form-control rounded-right" required minlength="3" id="change-event-modal-value">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.create"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

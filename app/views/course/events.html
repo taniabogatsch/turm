@@ -1,5 +1,32 @@
 <!-- template rendering all events of a course -->
 
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-events" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-events').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
 <ul class="list-group">
 
   <script>
@@ -7,13 +34,13 @@
     var clockMsg = '{{msg $ "course.clock"}}';
   </script>
 
-  {{range .course.Events}}
+  {{range .events}}
     <li class="list-group-item mb-2 border rounded">
 
       <!-- delete event -->
       <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none" href='#no-scroll' role="button"
         onclick='confirmPOSTModal({{msg $ "event.delete.title"}},
-          {{msg $ "event.delete.confirm" .Title}}, "{{url "EditEvent.Delete" .ID}}#events");'>
+          {{msg $ "event.delete.confirm" .Title}}, "{{url "EditEvent.Delete" .ID}}");'>
         {{template "icons/trash.html" . }}
       </a>
 
@@ -23,7 +50,7 @@
       <!-- fullness and capacity -->
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
         onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", {{.Capacity}}, true,
-          "{{url "EditEvent.ChangeCapacity"}}#events", "int", "", {{msg $ "event.capacity.change.info"}}, {{.ID}});'>
+          "{{url "EditEvent.ChangeCapacity"}}", "int", "", {{msg $ "event.capacity.change.info"}}, {{.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
       <small class="float-right">

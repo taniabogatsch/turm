@@ -57,6 +57,7 @@ GET      /course/whitelist                           Course.Whitelist
 GET      /course/blacklist                           Course.Blacklist
 GET      /course/path                                Course.Path
 GET      /course/restrictions                        Course.Restrictions
+GET      /course/events                              Course.Events
 
 
 # ---------------------------------------------------------------------------- #

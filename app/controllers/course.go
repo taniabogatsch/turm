@@ -137,3 +137,22 @@ func (c Course) Restrictions(ID int) revel.Result {
 	c.Log.Debug("loaded restrictions", "restrictions", restrictions)
 	return c.Render(restrictions)
 }
+
+/*Events of a course. */
+func (c Course) Events(ID int) revel.Result {
+
+	c.Log.Debug("load events of course", "ID", ID)
+
+	//TODO: make sure that the course is visible
+	//TODO: only accessible if user is creator, editor
+
+	events := models.Events{}
+	userID := 0
+	if err := events.Get(nil, &userID, &ID, true, nil); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	c.Log.Debug("loaded events", "events", events)
+	return c.Render(events)
+}
