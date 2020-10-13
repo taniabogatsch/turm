@@ -128,11 +128,18 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 		WHERE l.user_id = u.id
 			AND l.course_id = $1
 	`
-	err = tx.Select(users, selectUsers, *courseID)
+
+	if tx == nil {
+		err = app.Db.Select(users, selectUsers, *courseID)
+	} else {
+		err = tx.Select(users, selectUsers, *courseID)
+	}
 	if err != nil {
 		log.Error("failed to get user list", "table", table, "course ID",
 			*courseID, "error", err.Error())
-		tx.Rollback()
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }

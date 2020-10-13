@@ -266,31 +266,110 @@ function openEnrollmentKeyModal(eventID) {
 
 function handleEditResult(response) {
 
-  if (response.FieldID == "title") {
+  if (response.FieldID == "title" || response.FieldID == "enrollment_start" ||
+    response.FieldID == "enrollment_end" || response.FieldID == "expiration_date") {
     $('#div-' + response.FieldID).html(response.Value);
 
   } else  if (response.FieldID == "subtitle" || response.FieldID == "fee" ||
     response.FieldID == "speaker" || response.FieldID == "description" ||
-    response.FieldID == "custom_email") {
+    response.FieldID == "custom_email" || response.FieldID == "unsubscribe_end" ||
+    response.FieldID == "enroll_limit_events") {
 
     if (response.Value != "") {
       document.getElementById("div-edit-" + response.FieldID).classList.remove("d-none");
       document.getElementById("div-add-" + response.FieldID).classList.add("d-none");
       $('#div-' + response.FieldID).html(response.Value);
 
+      if (response.Value == "0"){
+        document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+      }
+
     } else {
       document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
       document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
     }
+
+  } else if (response.FieldID == "visible" || response.FieldID == "only_ldap") {
+    document.getElementById("change-" + response.FieldID + "-switch").checked = response.Valid;
   }
 }
 
-function confirmDeleteModal(title, content, action) {
+function confirmDeleteJSONModal(title, content, action) {
 
-  $('#confirm-delete-modal-title').html(title);
-  $('#confirm-delete-modal-form').attr("action", action);
-  $('#confirm-delete-modal-content').html(content);
+  $('#confirm-delete-JSON-modal-title').html(title);
+  $('#confirm-delete-JSON-modal-form').attr("action", action);
+  $('#confirm-delete-JSON-modal-content').html(content);
 
   //show the modal
-  $('#confirm-delete-modal').modal('show');
+  $('#confirm-delete-JSON-modal').modal('show');
+}
+
+function confirmDeleteRenderModal(title, content, action, fieldID) {
+
+  $('#confirm-delete-render-modal-title').html(title);
+  $('#confirm-delete-render-modal-form').attr("action", action);
+  $('#confirm-delete-render-modal-content').html(content);
+  $('#confirm-delete-render-modal-list').val(fieldID);
+
+  //show the modal
+  $('#confirm-delete-render-modal').modal('show');
+}
+
+function submitJSONForm(form, modal) {
+
+  $.ajax({
+    type: 'POST',
+    url: $(form).attr("action"),
+    data: $(form).serialize(),
+
+    success: function(response) {
+      if (response.Status == "success") {
+        handleEditResult(response);
+        showToast(response.Msg, 'success');
+
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+
+      } else {
+        showToast(response.Msg, 'danger');
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+      }
+    },
+
+    error: function (error) {
+      showToast("error", 'danger');
+      if (modal != "") {
+        $(modal).modal('hide');
+      }
+    },
+  });
+}
+
+function submitRenderForm(form, modal) {
+
+  $.ajax({
+    type: 'POST',
+    url: $(form).attr("action"),
+    data: $(form).serialize(),
+
+    success: function(response) {
+      let fieldID = $(modal + "-list").val();
+      if (fieldID == "editors" || fieldID == "instructors") {
+        $('#div-editor-instructor-list').html(response);
+      } else {
+        $('#div-' + fieldID).html(response);
+      }
+      editCourse();
+      $(modal).modal('hide');
+    },
+
+    error: function (error) {
+      showToast("error", 'danger');
+      $(modal).modal('hide');
+    },
+  });
 }

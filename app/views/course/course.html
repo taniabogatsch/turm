@@ -43,7 +43,7 @@
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-          onclick='confirmDeleteModal({{msg $ "course.subtitle.delete.title"}},
+          onclick='confirmDeleteJSONModal({{msg $ "course.subtitle.delete.title"}},
             {{msg $ "course.subtitle.delete.confirm"}},
             "{{url "Edit.ChangeText" .course.ID "subtitle" ""}}");'>
           {{template "icons/trash.html" . }}
@@ -82,76 +82,8 @@
 </div>
 
 <!-- course editors and instructors -->
-{{if or .course.Editors .course.Instructors}}
-  <div class="row mb-2">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "user.role.instructors"}}:
-    </div>
-    <div class="col-sm-8">
-      {{range $key, $user := .course.Editors}}
-        {{if ne $key 0}}<br>{{end}}
-        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
-        <a href="mailto:{{.EMail}}" target="_top">
-          {{template "icons/envelope.html" .}}
-          {{.EMail}}
-        </a>
-        <div class="edit-show d-none text-muted">
-          {{msg $ "user.role.editor"}}
-          |
-          {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
-          <a href="#no-scroll" class="badge btn-outline-darkblue"
-            onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}#", {{msg $ "course.see.matr.nr.info"}},
-              {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "editors", {{$.course.ID}});'>
-            {{template "icons/pencil.html" . }}
-          </a>
-          |
-          <a href="#no-scroll" class="badge btn-outline-darkblue"
-            onclick='confirmPOSTModal({{msg $ "course.editor.delete.title"}}, {{msg $ "course.editor.delete.confirm" .EMail}},
-              "{{url "Edit.DeleteFromUserList" .CourseID .UserID "editors"}}#");'>
-            {{template "icons/trash.html" . }}
-          </a>
-        </div>
-      {{end}}
-      {{range $key, $user := .course.Instructors}}
-        {{if $.course.Editors}}<br>{{else if ne $key 0}}<br>{{end}}
-        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
-        <a href="mailto:{{.EMail}}" target="_top">
-          {{template "icons/envelope.html" .}}
-          {{.EMail}}
-        </a>
-        <div class="edit-show d-none text-muted">
-          {{msg $ "user.role.instructor"}}
-          |
-          {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
-          <a href="#no-scroll" class="badge btn-outline-darkblue"
-            onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}#", {{msg $ "course.see.matr.nr.info"}},
-              {{msg $ "course.not.see.matr.nr.info"}}, {{.ViewMatrNr}}, {{.UserID}}, "instructors", {{$.course.ID}});'>
-            {{template "icons/pencil.html" . }}
-          </a>
-          |
-          <a href="#no-scroll" class="badge btn-outline-darkblue"
-            onclick='confirmPOSTModal({{msg $ "course.instructor.delete.title"}}, {{msg $ "course.instructor.delete.confirm" .EMail}},
-              "{{url "Edit.DeleteFromUserList" .CourseID .UserID "instructors"}}#");'>
-            {{template "icons/trash.html" . }}
-          </a>
-        </div>
-      {{end}}
-    </div>
-  </div>
-{{end}}
-<div class="row edit-show d-none mb-2">
-  <div class="col-sm-4 text-muted">
-  </div>
-  <div class="col-sm-8">
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.editor"}}, "editors");'>
-      {{msg $ "creator.add.editor"}}
-    </button>
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.instructor"}}, "instructors");'>
-      {{msg $ "creator.add.instructor"}}
-    </button>
-  </div>
+<div id="div-editor-instructor-list">
+  {{template "course/editorInstructorList.html" dict_addLocale $.currentLocale "editors" .course.Editors "instructors" .course.Instructors}}
 </div>
 
 <!-- registration period -->
@@ -160,63 +92,62 @@
     {{msg $ "course.enrollment.period"}}:
   </div>
   <div class="col-sm-8">
-    {{msg $ "course.from"}} {{.course.EnrollmentStart}} {{msg $ "course.clock"}}
+    {{msg $ "course.from"}} <div id="div-enrollment_start" class="d-inline">{{.course.EnrollmentStart}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollment_start",
-        {{.course.EnrollmentStart}}, true, "{{url "Edit.ChangeTimestamp"}}#",
-        "timestamp", "", {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}});'>
+        true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
+        {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}});'>
       {{template "icons/pencil.html" . }}
     </a>
     <br>
-    {{msg $ "course.to"}} {{.course.EnrollmentEnd}} {{msg $ "course.clock"}}
+    {{msg $ "course.to"}} <div id="div-enrollment_end" class="d-inline">{{.course.EnrollmentEnd}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollment_end",
-        {{.course.EnrollmentEnd}}, true, "{{url "Edit.ChangeTimestamp"}}#",
-        "timestamp", "", {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}});'>
+        true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
+        {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}});'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
 </div>
 
 <!-- if the course has a time up to which users can unsubscribe -->
-{{if .course.UnsubscribeEnd.Valid}}
+<div id="div-edit-unsubscribe_end" {{if not .course.UnsubscribeEnd.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.unsubscribe.end"}}:
     </div>
     <div class="col-sm-8">
-      {{.course.UnsubscribeEnd.String}} {{msg $ "course.clock"}}
+      <div id="div-unsubscribe_end" class="d-inline">{{.course.UnsubscribeEnd.String}}</div> {{msg $ "course.clock"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end",
-          {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
-          "{{url "Edit.ChangeTimestamp"}}#", "timestamp", "",
+        onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", true,
+          "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
           {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.unsubscribe.end.delete.title"}},
-          {{msg $ "course.unsubscribe.end.delete.confirm" .course.UnsubscribeEnd.String}},
-          "{{url "Edit.ChangeTimestamp" .course.ID "unsubscribe_end" "" ""}}#");'>
+        onclick='confirmDeleteJSONModal({{msg $ "course.unsubscribe.end.delete.title"}},
+          {{msg $ "course.unsubscribe.end.delete.confirm"}},
+          "{{url "Edit.ChangeTimestamp" .course.ID "unsubscribe_end" "" ""}}");'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-unsubscribe_end" {{if .course.UnsubscribeEnd.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.unsubscribe.end"}}:
     </div>
     <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
-        onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end",
-          {{.course.UnsubscribeEnd.String}}, {{.course.UnsubscribeEnd.Valid}},
-          "{{url "Edit.ChangeTimestamp"}}#", "timestamp", "",
+        onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", false,
+          "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
           {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
         {{msg $ "creator.add.unsubscribe.end"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- show fee if there is one -->
 <div id="div-edit-fee" {{if not .course.Fee.Valid}}class="d-none"{{end}}>
@@ -234,7 +165,7 @@
          {{template "icons/pencil.html" . }}
        </a>
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-         onclick='confirmDeleteModal({{msg $ "course.fee.delete.title"}},
+         onclick='confirmDeleteJSONModal({{msg $ "course.fee.delete.title"}},
            {{msg $ "course.fee.delete.confirm"}},
            "{{url "Edit.ChangeText" .course.ID "fee" ""}}");'>
          {{template "icons/trash.html" . }}
@@ -276,7 +207,7 @@
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmDeleteModal({{msg $ "course.description.delete.title"}},
+        onclick='confirmDeleteJSONModal({{msg $ "course.description.delete.title"}},
           {{msg $ "course.description.delete.confirm"}},
           "{{url "Edit.ChangeText" .course.ID  "description" ""}}#course-registration-period");'>
         {{template "icons/trash.html" . }}
@@ -322,7 +253,7 @@
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmDeleteModal({{msg $ "course.speaker.delete.title"}},
+        onclick='confirmDeleteJSONModal({{msg $ "course.speaker.delete.title"}},
           {{msg $ "course.speaker.delete.confirm"}},
           "{{url "Edit.ChangeText" .course.ID  "speaker" ""}}");'>
         {{template "icons/trash.html" . }}
@@ -363,7 +294,7 @@
       <input type="hidden" name="listType" value="only_ldap">
       <!-- option -->
       <label class="switch edit-show d-none">
-        <input type="checkbox" name="option" id="change-ldap-switch"
+        <input type="checkbox" name="option" id="change-only_ldap-switch"
           {{if .course.OnlyLDAP}}checked{{end}}>
         <span class="slider round"></span>
       </label>
@@ -375,48 +306,8 @@
 </div>
 
 <!-- restrictions -->
-{{if .course.Restrictions}}
-  <div class="row mb-2">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "course.restrictions"}}:
-    </div>
-    <div class="col-sm-8">
-      <ul>
-        {{range $k, $v := .course.Restrictions}}
-          <li>
-            {{if .DegreeID.Valid}}{{.DegreeName.String}}{{end}}
-            {{if .CourseOfStudiesID.Valid}}{{.StudiesName.String}}{{end}}
-            {{if .MinimumSemester.Valid}}
-              <small class="text-muted d-inline">
-                {{msg $ "course.minimum.semester"}}:{{.MinimumSemester.Int64}}
-              </small>
-            {{end}}
-
-            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-              onclick='openRestrictionModal({{msg $ "course.restrictions"}}, {{.ID}},
-                {{.DegreeID.Int64}}, {{.CourseOfStudiesID.Int64}}, {{.MinimumSemester.Int64}});'>
-              {{template "icons/pencil.html" . }}
-            </a>
-            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-              onclick='confirmPOSTModal({{msg $ "course.restriction.delete.title"}},
-                {{msg $ "course.restriction.delete.confirm"}}, {{url "Edit.DeleteRestriction" $.course.ID .ID}});'>
-              {{template "icons/trash.html" . }}
-            </a>
-          </li>
-        {{end}}
-      </ul>
-    </div>
-  </div>
-{{end}}
-<div class="row mb-2 edit-show d-none">
-  <div class="col-sm-4 text-muted">
-  </div>
-  <div class="col-sm-8"> <!-- TODO: add restrictions -->
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openRestrictionModal("{{msg $ "course.restrictions"}}", 0, 0, 0, 0);'>
-      {{msg $ "creator.add.restriction"}}
-    </button>
-  </div>
+<div id="div-restrictions">
+  {{template "course/restrictions.html" dict_addLocale $.currentLocale "restrictions" .course.Restrictions}}
 </div>
 
 <br>
@@ -475,26 +366,8 @@
   <div class="col-sm-4 text-muted">
     {{msg $ "course.path"}}:
   </div>
-  <div class="col-sm-8">
-    {{if .course.Path}}
-      <ol class="breadcrumb bg-white m-0 p-0">
-        {{range .course.Path}}
-          <li class="breadcrumb-item">{{.Name}}</li>
-          {{if eq .Name $.course.Title}}
-            &nbsp;
-            <a href="#no-scroll" class="badge btn-outline-darkblue float-right"
-              data-toggle="modal" data-target="#change-group-modal">
-              {{template "icons/pencil.html" . }}
-            </a>
-          {{end}}
-        {{end}}
-      </ol>
-    {{else}}
-      <button type="button" class="btn btn-outline-darkblue"
-        data-toggle="modal" data-target="#change-group-modal">
-        {{msg $ "creator.add.path"}}
-      </button>
-    {{end}}
+  <div class="col-sm-8" id="div-path">
+    {{template "course/path.html" dict_addLocale $.currentLocale "path" .course.Path}}
   </div>
 </div>
 
@@ -511,7 +384,7 @@
       <input type="hidden" name="listType" value="visible">
       <!-- option -->
       <label class="switch">
-        <input type="checkbox" name="option" id="change-visibility-switch"
+        <input type="checkbox" name="option" id="change-visible-switch"
           {{if .course.Visible}}checked{{end}}>
         <span class="slider round"></span>
       </label>
@@ -528,41 +401,40 @@
     {{msg $ "course.expiration.date"}}:
   </div>
   <div class="col-sm-8">
-    {{.course.ExpirationDate}} {{msg $ "course.clock"}}
+    <div id="div-expiration_date" class="d-inline">{{.course.ExpirationDate}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expiration_date",
-        {{.course.ExpirationDate}}, true, "{{url "Edit.ChangeTimestamp"}}#more-settings",
-        "timestamp", "", {{msg $ "course.expiration.date.change.info"}},
-        {{.course.ID}});'>
+        true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
+        {{msg $ "course.expiration.date.change.info"}}, {{.course.ID}});'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
 </div>
 
 <!-- enrollment limit events -->
-{{if .course.EnrollLimitEvents.Valid}}
+<div id="div-edit-enroll_limit_events" {{if not .course.EnrollLimitEvents.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.enroll.limit.events"}}:
     </div>
     <div class="col-sm-8">
-      {{.course.EnrollLimitEvents.Int32}} {{msg $ "course.events"}}
+      <div id="div-enroll_limit_events" class="d-inline">{{.course.EnrollLimitEvents.Int32}}</div> {{msg $ "course.events"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enroll_limit_events",
-          {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
-          "{{url "Edit.ChangeEnrollLimit"}}#more-settings", "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
-          {{.course.ID}});'>
+          true, "{{url "Edit.ChangeEnrollLimit"}}", "int", "",
+          {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}});'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmPOSTModal({{msg $ "course.enroll.limit.events.delete.title"}},
-          {{msg $ "course.enroll.limit.events.delete.confirm" .course.EnrollLimitEvents.Int32}},
-          "{{url "Edit.ChangeEnrollLimit" .course.ID "enroll_limit_events" ""}}#more-settings");'>
+        onclick='confirmDeleteJSONModal({{msg $ "course.enroll.limit.events.delete.title"}},
+          {{msg $ "course.enroll.limit.events.delete.confirm"}},
+          "{{url "Edit.ChangeEnrollLimit" .course.ID "enroll_limit_events" ""}}");'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
   </div>
-{{else}}
+</div>
+<div id="div-add-enroll_limit_events" {{if .course.EnrollLimitEvents.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.enroll.limit.events"}}:
@@ -570,14 +442,13 @@
     <div class="col-sm-8">
       <button type="button" class="btn btn-outline-darkblue"
       onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enroll_limit_events",
-        {{.course.EnrollLimitEvents.Int32}}, {{.course.EnrollLimitEvents.Valid}},
-        "{{url "Edit.ChangeEnrollLimit"}}#more-settings", "int", "", {{msg $ "course.enroll.limit.events.change.info"}},
-        {{.course.ID}});'>
+        false, "{{url "Edit.ChangeEnrollLimit"}}", "int", "",
+        {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}});'>
         {{msg $ "creator.add.enroll.limit"}}
       </button>
     </div>
   </div>
-{{end}}
+</div>
 
 <!-- custom e-mail -->
 <div id="div-edit-custom_email" {{if not .course.CustomEMail.Valid}}class="d-none"{{end}}>
@@ -597,7 +468,7 @@
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='confirmDeleteModal({{msg $ "course.customemail.delete.title"}},
+        onclick='confirmDeleteJSONModal({{msg $ "course.customemail.delete.title"}},
           {{msg $ "course.customemail.delete.confirm"}},
           "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}");'>
         {{template "icons/trash.html" . }}
@@ -626,73 +497,13 @@
 </div>
 
 <!-- whitelist -->
-{{if .course.Whitelist}}
-  <div class="row mb-2 edit-show d-none">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "course.whitelist"}}:
-    </div>
-    <div class="col-sm-8">
-      {{range $key, $user := .course.Whitelist}}
-        {{if ne $key 0}}<br>{{end}}
-        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
-        <a href="mailto:{{.EMail}}" target="_top">
-          {{template "icons/envelope.html" .}}
-          {{.EMail}}
-        </a>
-        |
-        <a href="#no-scroll" class="badge btn-outline-darkblue"
-          onclick='confirmPOSTModal({{msg $ "course.whitelist.delete.title"}}, {{msg $ "course.whitelist.delete.confirm" .EMail}},
-            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "whitelists"}}#more-settings");'>
-          {{template "icons/trash.html" . }}
-        </a>
-      {{end}}
-    </div>
-  </div>
-{{end}}
-<div class="row mb-2 edit-show d-none">
-  <div class="col-sm-4 text-muted">
-  </div>
-  <div class="col-sm-8">
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.whitelist"}}, "whitelists");'>
-      {{msg $ "creator.add.whitelist"}}
-    </button>
-  </div>
+<div id="div-whitelists">
+  {{template "course/whitelist.html" dict_addLocale $.currentLocale "whitelist" .course.Whitelist}}
 </div>
 
 <!-- blacklist -->
-{{if .course.Blacklist}}
-  <div class="row mb-2 edit-show d-none">
-    <div class="col-sm-4 text-muted">
-      {{msg $ "course.blacklist"}}:
-    </div>
-    <div class="col-sm-8">
-      {{range $key, $user := .course.Blacklist}}
-        {{if ne $key 0}}<br>{{end}}
-        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
-        <a href="mailto:{{.EMail}}" target="_top">
-          {{template "icons/envelope.html" .}}
-          {{.EMail}}
-        </a>
-        |
-        <a href="#no-scroll" class="badge btn-outline-darkblue"
-          onclick='confirmPOSTModal({{msg $ "course.blacklist.delete.title"}}, {{msg $ "course.blacklist.delete.confirm" .EMail}},
-            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "blacklists"}}#more-settings");'>
-          {{template "icons/trash.html" . }}
-        </a>
-      {{end}}
-    </div>
-  </div>
-{{end}}
-<div class="row mb-2 edit-show d-none">
-  <div class="col-sm-4 text-muted">
-  </div>
-  <div class="col-sm-8">
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.blacklist"}}, "blacklists");'>
-      {{msg $ "creator.add.blacklist"}}
-    </button>
-  </div>
+<div id="div-blacklists">
+  {{template "course/blacklist.html" dict_addLocale $.currentLocale "blacklist" .course.Blacklist}}
 </div>
 
 <script>

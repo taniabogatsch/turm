@@ -191,7 +191,7 @@ course.expiration.date.change.info = Ab diesem Zeitpunkt ist der Kurs nicht mehr
 course.unsubscribe_end.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
 course.unsubscribe_end.delete.success = Austragen bis gelöscht, Kurs ID = %d.
 course.unsubscribe.end.info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
-course.unsubscribe.end.delete.confirm = Austragen bis zum %s Uhr wirklich löschen?
+course.unsubscribe.end.delete.confirm = "Austragen bis" wirklich löschen?
 course.unsubscribe.end.delete.title = Austragen bis löschen
 
 course.editors.change.success = EditorIn hinzugefügt: %s, Kurs ID = %d.
@@ -231,6 +231,6 @@ course.blacklist.delete.title = NutzerIn aus Blacklist löschen
 
 course.enroll_limit_events.change.success = Das Einschreibelimit für Veranstaltungen ist nun %d, Kurs ID = %d.
 course.enroll_limit_events.delete.success = Einschreibelimit für Veranstaltungen gelöscht, Kurs ID = %d.
-course.enroll.limit.events.delete.confirm = Wollen Sie das Einschreibelimit von %d für Veranstaltungen wirklich löschen?
+course.enroll.limit.events.delete.confirm = Wollen Sie das Einschreibelimit wirklich löschen?
 course.enroll.limit.events.delete.title = Einschreibelimit löschen
 course.enroll.limit.events.change.info = Das Einschreibelimit für Veranstaltungen gibt die maximale Anzahl an Veranstaltungen an, in die sich einE NutzerIn in diesem Kurs einschreiben darf.

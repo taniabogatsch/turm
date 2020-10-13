@@ -114,7 +114,7 @@ user.details = Nutzerdetails
 
 email.dear.ms = Sehr geehrte Frau
 email.dear.mr = Sehr geehrter Herr
-email.none = Hallo
+email.dear.none = Hallo
 
 email.regards.plain = Mit freundlichen Grüßen
 email.dev.team = Ihr Turm2 Entwicklerteam

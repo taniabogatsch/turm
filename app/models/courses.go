@@ -212,7 +212,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	}
 
 	//reset some data
-	if manage {
+	if !manage {
 		course.Blacklist = UserList{}
 		course.Whitelist = UserList{}
 	}

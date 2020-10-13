@@ -191,7 +191,7 @@ course.expiration.date.change.info = After this point the course is no longer ac
 course.unsubscribe_end.change.success = Set unsubscribe end to %s, course ID = %d.
 course.unsubscribe_end.delete.success = Deleted unsubscribe end, course ID = %d.
 course.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
-course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end %s?
+course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end?
 course.unsubscribe.end.delete.title = Delete unsubscribe end
 
 course.editors.change.success = Added editor: %s, course ID = %d.
@@ -231,6 +231,6 @@ course.blacklist.delete.title = Delete from blacklist
 
 course.enroll_limit_events.change.success = Set enroll limit for events to %d, course ID = %d.
 course.enroll_limit_events.delete.success = Deleted enroll limit for events, course ID = %d.
-course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit for events of %d.
+course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit.
 course.enroll.limit.events.delete.title = Delete enroll limit
 course.enroll.limit.events.change.info = The enrollment limit for events is the maximum number of events in which a user can enroll in this course.

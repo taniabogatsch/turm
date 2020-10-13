@@ -17,6 +17,9 @@
 {{template "edit/modals/deleteField.html" dict_addLocale $.currentLocale}}
 
 <script>
+
+  // -- JSON
+
   $('#change-text-modal-form').submit(function (event) {
 
     let form = document.getElementById("change-text-modal-form");
@@ -27,7 +30,21 @@
       return;
     }
 
-    submitForm("#change-text-modal-form", "#change-text-modal");
+    submitJSONForm("#change-text-modal-form", "#change-text-modal");
+    event.preventDefault();
+  });
+
+  $('#change-int-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-int-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-int-modal-form", "#change-int-modal");
     event.preventDefault();
   });
 
@@ -41,38 +58,63 @@
       return;
     }
 
-    submitForm("#change-text-area-modal-form", "#change-text-area-modal");
+    submitJSONForm("#change-text-area-modal-form", "#change-text-area-modal");
     event.preventDefault();
   });
 
-  $('#confirm-delete-modal-form').submit(function (event) {
-    submitForm("#confirm-delete-modal-form", "#confirm-delete-modal");
+  $('#change-timestamp-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-timestamp-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-timestamp-modal-form", "#change-timestamp-modal");
     event.preventDefault();
   });
 
-  function submitForm(form, modal) {
+  $('#change-ldap-form').submit(function (event) {
+    submitJSONForm("#change-ldap-form", "");
+    event.preventDefault();
+  });
 
-    $.ajax({
-      type: 'POST',
-      url: $(form).attr("action"),
-      data: $(form).serialize(),
+  $('#change-visibility-form').submit(function (event) {
+    submitJSONForm("#change-visibility-form", "");
+    event.preventDefault();
+  });
 
-      success: function(response) {
-        if (response.Status == "success") {
-          handleEditResult(response);
-          showToast(response.Msg, 'success');
-          $(modal).modal('hide');
+  $('#confirm-delete-JSON-modal-form').submit(function (event) {
+    submitJSONForm("#confirm-delete-JSON-modal-form", "#confirm-delete-JSON-modal");
+    event.preventDefault();
+  });
 
-        } else {
-          showToast(response.Msg, 'danger');
-          $(modal).modal('hide');
-        }
-      },
+  // -- render
 
-      error: function (error) {
-        showToast("error", 'danger');
-        $(modal).modal('hide');
-      },
-    });
-  }
+  $('#change-user-list-modal-form').submit(function (event) {
+    submitRenderForm("#change-user-list-modal-form", "#change-user-list-modal");
+    event.preventDefault();
+  });
+
+  $('#change-restriction-modal-form').submit(function (event) {
+    submitRenderForm("#change-restriction-modal-form", "#change-restriction-modal");
+    event.preventDefault();
+  });
+
+  $('#change-group-modal-form').submit(function (event) {
+    submitRenderForm("#change-group-modal-form", "#change-group-modal");
+    event.preventDefault();
+  });
+
+  $('#change-bool-modal-form').submit(function (event) {
+    submitRenderForm("#change-bool-modal-form", "#change-bool-modal");
+    event.preventDefault();
+  });
+
+  $('#confirm-delete-render-modal-form').submit(function (event) {
+    submitRenderForm("#confirm-delete-render-modal-form", "#confirm-delete-render-modal");
+    event.preventDefault();
+  });
 </script>
