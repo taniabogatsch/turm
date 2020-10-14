@@ -144,7 +144,7 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 	//@TODO Marco: get exeptions & slots
 	for i := range *dayTmpls {
 		(*dayTmpls)[i].Slots.Get(tx, (*dayTmpls)[i].ID, monday, (*dayTmpls)[i].DayOfWeek)
-		//(*dayTmpls)[i].Exceptions.Get(ty, (*dayTmpls)[i].ID, monday, (*dayTmpls)[i].DayOfWeek)
+		(*dayTmpls)[i].Exceptions.Get(tx, monday, (*dayTmpls)[i].DayOfWeek)
 	}
 	return
 }
@@ -169,7 +169,6 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, day time.Time, weekday int) 
 		tx.Rollback()
 		return
 	}
-
 	return
 }
 
@@ -231,6 +230,23 @@ func (slot *Slot) Validate(v *revel.Validation) {
 	//schon besetzt?
 }
 
+/*Get all exeptions for a weekday following a specific monday */
+func (exepts *Exceptions) Get(tx *sqlx.Tx, day time.Time, weekday int) (err error) {
+
+	//calculate start of and end timestamp for this day for db query
+	startTime := day.AddDate(0, 0, weekday-1)
+	endTime := startTime.Add(1000000000 * 60 * 60 * 24) //24h
+
+	err = tx.Select(exepts, stmtSelectExeptions, startTime, endTime)
+	if err != nil {
+		log.Error("failed to get slots of dayTemplate", "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	return
+}
+
 const (
 	stmtInsertCalendarEvent = `
 		INSERT INTO calendar_events (
@@ -275,5 +291,11 @@ const (
 	SELECT id, user_id, day_tmpl_id, start_time, end_time, created
 	FROM slots
 	WHERE day_tmpl_id = $1 AND start_time BETWEEN ($2) AND ($3);
+	`
+
+	stmtSelectExeptions = `
+	SELECT id, calendar_event_id, start_time, end_time, annotations, created
+	FROM calendar_exceptions
+	WHERE start_time BETWEEN ($1) AND ($2);
 	`
 )
