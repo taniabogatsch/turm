@@ -38,23 +38,27 @@
     <li class="list-group-item mb-2 border rounded">
 
       <!-- delete event -->
-      <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none" href='#no-scroll' role="button"
-        onclick='confirmPOSTModal({{msg $ "event.delete.title"}},
-          {{msg $ "event.delete.confirm" .Title}}, "{{url "EditEvent.Delete" .ID}}");'>
+      <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+        href='#no-scroll' role="button"
+        onclick='confirmDeleteRenderModal({{msg $ "event.delete.title"}},
+          {{msg $ "event.delete.confirm" .Title}},
+          "{{url "EditEvent.Delete" .ID .CourseID}}", "events");'>
         {{template "icons/trash.html" . }}
       </a>
 
+      <!-- TODO: disable enrollment during edit -->
       <!-- enrollment button -->
       {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID}}
 
       <!-- fullness and capacity -->
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
-        onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", {{.Capacity}}, true,
-          "{{url "EditEvent.ChangeCapacity"}}", "int", "", {{msg $ "event.capacity.change.info"}}, {{.ID}});'>
+        onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", true,
+          "{{url "EditEvent.ChangeCapacity"}}", "int", "",
+          {{msg $ "event.capacity.change.info"}}, {{.ID}}, true);'>
         {{template "icons/pencil.html" . }}
       </a>
       <small class="float-right">
-        {{.Fullness}} / {{.Capacity}}
+        {{.Fullness}} / <div id="div-capacity-{{.ID}}" class="d-inline">{{.Capacity}}</div>
       </small>
 
       <!-- progress bar -->
@@ -66,11 +70,13 @@
       </div>
 
       <!-- event title -->
-      {{.Title}}
+      <div id="div-title-{{.ID}}" class="d-inline">
+        {{.Title}}
+      </div>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='openChangeModal({{msg $ "event.title"}}, "title", {{.Title}},
-          true, "{{url "EditEvent.ChangeText"}}#events", "text", "255",
-          {{msg $ "event.title.change.info"}}, {{.ID}});'>
+        onclick='openChangeModal({{msg $ "event.title"}}, "title",
+          true, "{{url "EditEvent.ChangeText"}}", "text", "255",
+          {{msg $ "event.title.change.info"}}, {{.ID}}, true);'>
         {{template "icons/pencil.html" . }}
       </a>
       <br>

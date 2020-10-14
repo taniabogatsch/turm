@@ -239,7 +239,7 @@ CREATE TABLE calendar_events (
   id              serial                    PRIMARY KEY,
   course_id       integer                   NOT NULL,
   title           varchar(255)              NOT NULL,
-  annotations     varchar(255),
+  annotation      varchar(255),
   created         timestamp with time zone  DEFAULT now(),
   creator_id      integer,
 
@@ -263,6 +263,7 @@ CREATE TABLE day_templates (
   FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE,
   FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE slots (
   id                  serial                    PRIMARY KEY,

@@ -21,7 +21,7 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.title"}}, "title",
           true, "{{url "Edit.ChangeText"}}", "text", "511",
-          {{msg $ "course.title.change.info"}}, {{.course.ID}});'>
+          {{msg $ "course.title.change.info"}}, {{.course.ID}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
     </h4>
@@ -39,7 +39,7 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
           onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle", true,
             "{{url "Edit.ChangeText"}}", "text", "511",
-            {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
+            {{msg $ "course.subtitle.change.info"}}, {{.course.ID}}, false);'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -58,7 +58,7 @@
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle", false,
           "{{url "Edit.ChangeText"}}", "text", "511",
-          {{msg $ "course.subtitle.change.info"}}, {{.course.ID}});'>
+          {{msg $ "course.subtitle.change.info"}}, {{.course.ID}}, false);'>
         {{msg $ "creator.add.subtitle"}}
       </button>
     </div>
@@ -96,7 +96,7 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollment_start",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}});'>
+        {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}}, false);'>
       {{template "icons/pencil.html" . }}
     </a>
     <br>
@@ -104,7 +104,7 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollment_end",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}});'>
+        {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}}, false);'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
@@ -121,7 +121,7 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", true,
           "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
+          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -142,7 +142,7 @@
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", false,
           "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}});'>
+          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}}, false);'>
         {{msg $ "creator.add.unsubscribe.end"}}
       </button>
     </div>
@@ -161,7 +161,7 @@
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
          onclick='openChangeModal({{msg $ "course.fee"}}, "fee", true,
            "{{url "Edit.ChangeText"}}", "text", "",
-           {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
+           {{msg $ "course.fee.change.info"}}, {{.course.ID}}, false);'>
          {{template "icons/pencil.html" . }}
        </a>
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -182,7 +182,7 @@
       <button type="button" class="btn btn-outline-darkblue"
         onclick='openChangeModal({{msg $ "course.fee"}}, "fee", false,
           "{{url "Edit.ChangeText"}}", "text", "",
-          {{msg $ "course.fee.change.info"}}, {{.course.ID}});'>
+          {{msg $ "course.fee.change.info"}}, {{.course.ID}}, false);'>
         {{msg $ "creator.add.fee"}}
       </button>
     </div>
@@ -406,7 +406,7 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expiration_date",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.expiration.date.change.info"}}, {{.course.ID}});'>
+        {{msg $ "course.expiration.date.change.info"}}, {{.course.ID}}, false);'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
@@ -423,7 +423,7 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enroll_limit_events",
           true, "{{url "Edit.ChangeEnrollLimit"}}", "int", "",
-          {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}});'>
+          {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}}, false);'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
@@ -444,7 +444,7 @@
       <button type="button" class="btn btn-outline-darkblue"
       onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enroll_limit_events",
         false, "{{url "Edit.ChangeEnrollLimit"}}", "int", "",
-        {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}});'>
+        {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}}, false);'>
         {{msg $ "creator.add.enroll.limit"}}
       </button>
     </div>

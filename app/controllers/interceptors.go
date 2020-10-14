@@ -168,6 +168,22 @@ func (c EditEvent) auth() revel.Result {
 	return c.Redirect(App.Index)
 }
 
+//auth prevents unauthorized access to controllers of type EditCalendarEvent.
+func (c EditCalendarEvent) auth() revel.Result {
+
+	c.Log.Debug("executing auth edit calendar events interceptor")
+
+	if authorized, err := evalEditAuth(c.Controller, "calendar_events"); err == nil && authorized {
+		return nil
+	} else if err != nil {
+		return flashError(
+			errTypeConv, err, "/", c.Controller, "")
+	}
+
+	c.Flash.Error(c.Message("intercept.invalid.action"))
+	return c.Redirect(App.Index)
+}
+
 //auth prevents unauthorized access to controllers of type EditMeeting.
 func (c EditMeeting) auth() revel.Result {
 

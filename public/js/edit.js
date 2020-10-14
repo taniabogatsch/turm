@@ -6,9 +6,14 @@ function submitChangeGroupModal(parentID) {
   $('#change-group-modal-form').submit();
 }
 
-function openChangeModal(title, field, valid, action, modal, max, info, ID) {
+function openChangeModal(title, field, valid, action, modal, max, info, ID, isEvent) {
 
-  let value = $('#div-' + field).html();
+  let value = "";
+  if (isEvent) {
+    value = $('#div-' + field + "-" + ID).html();
+  } else {
+    value = $('#div-' + field).html();
+  }
   value = value.trim();
 
   $('#change-' + modal + '-modal-ID').val(ID);
@@ -285,6 +290,10 @@ function handleEditResult(response) {
 
   } else if (response.FieldID == "visible" || response.FieldID == "only_ldap") {
     document.getElementById("change-" + response.FieldID + "-switch").checked = response.Valid;
+
+  } else if (response.ID != 0 && (response.FieldID == "capacity"
+    || response.FieldID == "title")) {
+    $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
   }
 }
 

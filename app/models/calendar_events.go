@@ -14,12 +14,12 @@ type CalendarEvents []CalendarEvent
 
 /*CalendarEvent is a special calendar-based event of a course. */
 type CalendarEvent struct {
-	ID          int            `db:"id"`
-	CourseID    int            `db:"course_id"`
-	Title       string         `db:"title"`
-	Annotations sql.NullString `db:"annotations"`
-	Created     string         `db:"created"`
-	Creator     sql.NullInt64  `db:"creator"`
+	ID         int            `db:"id"`
+	CourseID   int            `db:"course_id"`
+	Title      string         `db:"title"`
+	Annotation sql.NullString `db:"annotation"`
+	Created    string         `db:"created"`
+	Creator    sql.NullInt64  `db:"creator"`
 
 	//loaded week
 	Week int
@@ -107,9 +107,15 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, day time.Time) (er
 	return
 }
 
-/*Update the specific column in the CalendarEvent*/
+/*Update the specific column in the CalendarEvent. */
 func (event *CalendarEvent) Update(column string, value interface{}) (err error) {
 	return updateByID(nil, column, "calendar_events", value, event.ID, event)
+}
+
+/*Delete a calendar event. */
+func (event *CalendarEvent) Delete() (err error) {
+	//TODO
+	return
 }
 
 /*Insert a DayTemplate. */

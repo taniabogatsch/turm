@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"errors"
+	"strconv"
 	"strings"
 	"turm/app/models"
 
@@ -11,7 +12,7 @@ import (
 
 /*Delete event data.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) Delete(ID int) revel.Result {
+func (c EditEvent) Delete(ID, courseID int) revel.Result {
 
 	c.Log.Debug("delete event", "ID", ID)
 
@@ -21,16 +22,14 @@ func (c EditEvent) Delete(ID int) revel.Result {
 	//TODO: if users unsubscribed from this event, also remove them from the unsubscribed table
 
 	event := models.Event{ID: ID}
-	err := event.Delete()
-	if err != nil {
+	if err := event.Delete(); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/events?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("event.delete.success",
-		ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+	c.Flash.Success(c.Message("event.delete.success", ID))
+	return c.Redirect(Course.Events, courseID)
 }
 
 /*NewMeeting creates a new blank meeting in an event.
@@ -77,33 +76,30 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 	).MessageKey("validation.invalid.int")
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
 	if fieldID != "capacity" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.Event{ID: ID}
 	err := event.Update(fieldID, value)
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
-	c.Flash.Success(c.Message("event.capacity.change.success",
-		event.Capacity,
-	))
-	return c.Redirect(c.Session["currPath"])
+	msg := c.Message("event.capacity.change.success", event.Capacity)
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: strconv.Itoa(value), ID: ID})
 }
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) ChangeText(ID int, fieldID, value string, forCalendarEvent bool) revel.Result {
+func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -119,44 +115,30 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string, forCalendarEvent bo
 		).MessageKey("validation.invalid.text.short")
 
 		if c.Validation.HasErrors() {
-			return flashError(
-				errValidation, nil, "", c.Controller, "")
+			return c.RenderJSON(
+				response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 		}
 	}
 
 	if fieldID != "title" && fieldID != "annotation" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
-	if forCalendarEvent {
-		event := models.CalendarEvent{ID: ID}
-		err := event.Update(fieldID, sql.NullString{value, valid})
-
-		if err != nil {
-			return flashError(
-				errDB, err, "", c.Controller, "")
-		}
-	} else {
-		event := models.Event{ID: ID}
-		err := event.Update(fieldID, sql.NullString{value, valid})
-
-		if err != nil {
-			return flashError(
-				errDB, err, "", c.Controller, "")
-		}
+	event := models.Event{ID: ID}
+	err := event.Update(fieldID, sql.NullString{value, valid})
+	if err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	msg := c.Message("event." + fieldID + ".delete.success")
 	if valid {
-		c.Flash.Success(c.Message("event."+fieldID+".change.success",
-			value,
-		))
-	} else {
-		c.Flash.Success(c.Message("event." + fieldID + ".delete.success"))
+		msg = c.Message("event."+fieldID+".change.success", value)
 	}
-	return c.Redirect(c.Session["currPath"])
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value, ID: ID})
 }
 
 /*ChangeWaitlist toggles the waitlist setting of an event.

@@ -444,6 +444,8 @@ func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (autho
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
 	case "events":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditEvent, user.ID, *ID)
+	case "calendar_events":
+		err = app.Db.Get(&authorized, stmtAuthorizedToEditCalendarEvent, user.ID, *ID)
 	case "meetings":
 		err = app.Db.Get(&authorized, stmtAuthorizedToEditMeeting, user.ID, *ID)
 	case "onlyCreator":
@@ -659,6 +661,25 @@ const (
 
 			SELECT true
 			FROM editors ed, events e
+			WHERE e.id = $2
+				AND ed.user_id = $1
+				AND e.course_id = ed.course_id
+
+		) AS authorized
+	`
+
+	stmtAuthorizedToEditCalendarEvent = `
+		SELECT EXISTS (
+			SELECT true
+			FROM courses c, calendar_events e
+			WHERE e.id = $2
+				AND c.creator = $1
+				AND c.id = e.course_id
+
+			UNION
+
+			SELECT true
+			FROM editors ed, calendar_events e
 			WHERE e.id = $2
 				AND ed.user_id = $1
 				AND e.course_id = ed.course_id

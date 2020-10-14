@@ -146,6 +146,8 @@ func (c Course) Events(ID int) revel.Result {
 	//TODO: make sure that the course is visible
 	//TODO: only accessible if user is creator, editor
 
+	//TODO: load normal events and calendar events
+
 	events := models.Events{}
 	userID := 0
 	if err := events.Get(nil, &userID, &ID, true, nil); err != nil {
