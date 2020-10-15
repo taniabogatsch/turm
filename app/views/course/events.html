@@ -46,7 +46,6 @@
         {{template "icons/trash.html" . }}
       </a>
 
-      <!-- TODO: disable enrollment during edit -->
       <!-- enrollment button -->
       {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID}}
 
@@ -132,7 +131,8 @@
         <br>
       </div>
 
-      {{if .EnrollmentKey.Valid}}
+      <!-- enrollment key -->
+      <div id="div-edit-enrollment_key-{{.ID}}" class="{{if not .EnrollmentKey.Valid}}d-none{{end}}">
         <small class="form-text text-muted float-left edit-show">
           {{template "icons/lock.html" . }} &nbsp; {{msg $ "event.key.set"}}
         </small>
@@ -141,21 +141,20 @@
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='confirmPOSTModal({{msg $ "event.key.delete.title"}},
-            {{msg $ "event.key.delete.confirm"}}, "{{url "EditEvent.DeleteEnrollmentKey" .ID}}#events");'>
+          onclick='confirmDeleteJSONModal({{msg $ "event.key.delete.title"}},
+            {{msg $ "event.key.delete.confirm"}},
+            "{{url "EditEvent.DeleteEnrollmentKey" .ID}}");'>
           {{template "icons/trash.html" . }}
         </a>
         <br class="edit-show">
-      {{end}}
+      </div>
 
       <!-- meetings -->
-      {{template "course/meetings.html" dict_addLocale $.currentLocale "eventID" .ID "Meetings" .Meetings}}
+      <div id="div-meetings-{{.ID}}">
+        {{template "course/meetings.html" dict_addLocale $.currentLocale "ID" .ID "meetings" .Meetings}}
+      </div>
 
       <!-- add a new meeting -->
-      {{if .Meetings}}
-        <br class="edit-show d-none">
-        <br class="large-hidden">
-      {{end}}
       <br class="edit-show d-none">
       <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
         onclick='openNewMeetingModal({{.ID}});'>
@@ -163,7 +162,7 @@
       </button>
 
       <!-- add annotation button -->
-      <div id="div-add-annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{end}} d-inline">
+      <div id="div-add-annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{else}}d-inline{{end}}">
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
           onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
             "{{url "EditEvent.ChangeText"}}", "text", "255",
@@ -172,12 +171,12 @@
         </button>
       </div>
 
-      {{if not .EnrollmentKey.Valid}}
+      <div id="div-add-enrollment_key-{{.ID}}" class="{{if .EnrollmentKey.Valid}}d-none{{else}}d-inline{{end}}">
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
           onclick="openEnrollmentKeyModal({{.ID}});">
           + &nbsp; {{msg $ "event.key.title"}}
         </button>
-      {{end}}
+      </div>
 
       <!-- enrollment information (if enrollment is not possible) -->
       {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "option" .EnrollOption "msg" .EnrollMsg}}

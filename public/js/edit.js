@@ -186,16 +186,32 @@ function submitTextArea() {
 function openNewMeetingModal(eventID) {
 
   $('#new-meeting-modal-ID').val(eventID);
+  $('#new-meeting-modal-list').val("meetings-" + eventID);
   $('#new-meeting-modal').modal('show');
 }
 
-function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval) {
+function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval, eventID) {
 
   let meetingType = "single";
+
   if (interval != 0) {
     meetingType = "weekly";
-    //$('#meeting-weekly-interval').val(interval); //TODO
-    //$('#meeting-weekly-weekday').val(weekday); //TODO
+
+    //set the interval
+    switch(interval) {
+    case "weekly":
+      $('#meeting-weekly-interval').val(1);
+      break;
+    case "even":
+      $('#meeting-weekly-interval').val(2);
+      break;
+    default:
+      $('#meeting-weekly-interval').val(3);
+      break;
+    }
+
+    //set the weekday
+    $('#meeting-weekly-weekday').val(weekday);
   }
 
   $('#edit-meeting-' + meetingType + '-ID').val(meetingID);
@@ -210,6 +226,9 @@ function openEditMeeting(meetingID, start, end, place, annotation, weekday, inte
     $('#' + meetingType + '-end-date').val(endParts[0]);
     $('#' + meetingType + '-end-time').val(endParts[1]);
   }
+
+  $('#edit-meeting-' + meetingType + '-eventID').val(eventID);
+  $('#edit-meeting-' + meetingType + '-list').val("meetings-" + eventID);
 
   $('#meeting-' + meetingType + '-place').val(place);
   $('#meeting-' + meetingType + '-annotation').val(annotation);
@@ -229,6 +248,7 @@ function plainCourse() {
 }
 
 function editCourse() {
+  
   $(".edit-show").each(function() {
     $(this).removeClass("d-none");
   });
@@ -237,6 +257,14 @@ function editCourse() {
   });
   $('#preview-btn').removeClass('d-none');
   $('#hide-preview-btn').addClass('d-none');
+}
+
+function disableEnrollmentButtons() {
+
+  $(".enroll-btn").each(function() {
+    $(this).attr("href", "#no-scroll");
+    $(this).addClass('disabled');
+  });
 }
 
 function openRestrictionModal(title, ID, degreeID, studiesID, minSemester) {
@@ -306,16 +334,21 @@ function handleEditResult(response) {
       $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
 
     //not mandatory
-  } else if (response.FieldID == "annotation") {
+  } else if (response.FieldID == "annotation" || response.FieldID == "enrollment_key") {
 
     if (response.Value != "") {
       document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
       document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-none");
-      $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-inline");
+
+      if (response.FieldID != "enrollment_key") {
+        $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+      }
 
     } else {
       document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.add("d-none");
       document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-inline");
     }
 
     //switches
@@ -387,13 +420,16 @@ function submitRenderForm(form, modal) {
     data: $(form).serialize(),
 
     success: function(response) {
+
       let fieldID = $(modal + "-list").val();
+
       if (fieldID == "editors" || fieldID == "instructors") {
         $('#div-editor-instructor-list').html(response);
       } else {
         $('#div-' + fieldID).html(response);
       }
       editCourse();
+      disableEnrollmentButtons();
       $(modal).modal('hide');
     },
 

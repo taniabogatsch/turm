@@ -115,7 +115,7 @@ func (meeting *Meeting) Update() (err error) {
 	} else {
 		err = app.Db.Get(meeting, stmtUpdateWeeklyMeeting, meeting.Place,
 			meeting.Annotation, meeting.MeetingStart, meeting.MeetingEnd,
-			meeting.ID, meeting.WeekDay)
+			meeting.ID, meeting.WeekDay, meeting.MeetingInterval)
 	}
 	if err != nil {
 		log.Error("failed to update meeting", "meeting", *meeting,
@@ -135,10 +135,17 @@ type Meetings []Meeting
 /*Get all meetings of an event. */
 func (meetings *Meetings) Get(tx *sqlx.Tx, eventID *int) (err error) {
 
-	err = tx.Select(meetings, stmtSelectMeetings, &eventID, app.TimeZone)
+	if tx == nil {
+		err = app.Db.Select(meetings, stmtSelectMeetings, &eventID, app.TimeZone)
+	} else {
+		err = tx.Select(meetings, stmtSelectMeetings, &eventID, app.TimeZone)
+	}
+
 	if err != nil {
 		log.Error("failed to get meetings of event", "event ID", *eventID, "error", err.Error())
-		tx.Rollback()
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }
@@ -202,7 +209,8 @@ const (
 
 	stmtUpdateWeeklyMeeting = `
 		UPDATE meetings
-		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4, weekday = $6
+		SET place = $1, annotation = $2, meeting_start = $3, meeting_end = $4, weekday = $6,
+			meeting_interval = $7
 		WHERE id = $5
 		RETURNING id
 	`
@@ -222,5 +230,11 @@ const (
 		INSERT INTO meetings
 			(annotation, event_id, meeting_end, meeting_interval, meeting_start, place, weekday)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+
+	stmtGetCourseIDByMeeting = `
+		SELECT e.course_id
+		FROM meetings m JOIN events e ON m.event_id = e.id
+		WHERE m.id = $1
 	`
 )

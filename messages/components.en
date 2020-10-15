@@ -15,6 +15,7 @@ toast.success = Success
 language.change.success = Set the page language to '%s'.
 
 intercept.invalid.action = You are not authorized for this action.
+intercept.course.expired = This course expired.
 
 # -------------------------------------------------------------------------------------------------- #
 # BUTTONS

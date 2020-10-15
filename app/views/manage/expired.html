@@ -58,12 +58,14 @@
                 {{template "icons/download.html" . }}
               </a>
 
-              <!-- TODO: go to -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+              <!-- go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Course.Open" .ID}}'
+                role="button">
                 {{template "icons/eye.html" . }}
               </a>
 
-              <a class="text-body" href='#'> <!-- TODO: go to -->
+              <!-- title and go to -->
+              <a class="text-body" href='{{url "Course.Open" .ID}}'>
                 {{.Title}}
               </a>
 
@@ -95,12 +97,14 @@
                 {{template "icons/people.html" . }}
               </a>
 
-              <!-- TODO: go to -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+              <!-- go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" role="button"
+                href='{{url "Course.Open" .ID}}'>
                 {{template "icons/eye.html" . }}
               </a>
 
-              <a class="text-body" href='#'> <!-- TODO: go to -->
+              <!-- title and go to -->
+              <a class="text-body" href='{{url "Course.Open" .ID}}'>
                 {{.Title}}
               </a>
 

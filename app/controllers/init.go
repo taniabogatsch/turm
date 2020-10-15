@@ -13,6 +13,7 @@ func init() {
 	//prevent unauthorized actions
 	revel.InterceptMethod(Admin.auth, revel.BEFORE)
 	revel.InterceptMethod(App.auth, revel.BEFORE)
+	revel.InterceptMethod(Course.auth, revel.BEFORE)
 	revel.InterceptMethod(Creator.auth, revel.BEFORE)
 	revel.InterceptMethod(Edit.auth, revel.BEFORE)
 	revel.InterceptMethod(EditEvent.auth, revel.BEFORE)

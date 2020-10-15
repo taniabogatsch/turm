@@ -71,6 +71,8 @@ validation.invalid.len.events = There must be at least one event.
 
 validation.invalid.restriction = Please provide at least a pursued degree, a course of studies or a minimum semester.
 
+validation.invalid.delete = You cannot delete events in which users are enrolled. Please manually unsubscribe all users first.
+
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
@@ -88,6 +90,7 @@ validation.invalid.keys = The enrollment keys do not match.
 # ENROLLMENT
 # -------------------------------------------------------------------------------------------------- #
 
+validation.enrollment.not.active = The course is not active.
 validation.enrollment.at.blacklist = You have no permission to enroll in this course. Please contact the course organization.
 validation.enrollment.no.ldap = You need an university account to enroll in this course.
 validation.enrollment.not.satisfy.restrictions = You do not satisfy the enrollment restrictions of this course.

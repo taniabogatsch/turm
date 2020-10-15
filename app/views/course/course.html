@@ -1,5 +1,8 @@
 <!-- course shows all course information -->
 
+<!-- disable enrollment buttons if manage is true -->
+<input type="hidden" id="input-course-manage" value="{{.course.Manage}}">
+
 <!-- general course information -->
 <div class="row edit-show d-none mb-2">
   <div class="col">
@@ -10,6 +13,13 @@
     <hr>
   </div>
 </div>
+
+{{if .course.Expired}}
+  <div class="text-danger edit-hide">
+    {{msg $ "validation.enrollment.not.active"}}
+  </div>
+  <br>
+{{end}}
 
 <!-- title -->
 <div class="row mb-2">

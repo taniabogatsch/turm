@@ -120,7 +120,7 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 
 	//get relevant event information
 	event := Event{ID: *eventID}
-	if err = event.Get(tx, userID); err != nil {
+	if err = event.Get(tx); err != nil {
 		return
 	}
 

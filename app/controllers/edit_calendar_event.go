@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"database/sql"
+	"errors"
 	"strconv"
 	"strings"
 	"turm/app/models"
@@ -72,4 +73,37 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 
 	c.Flash.Success(c.Message("event.delete.success", ID))
 	return c.Redirect(Course.Events, courseID)
+}
+
+/*CreateDayTemplate creates a repeatable blueprint of a day.
+- Roles: creator and editors of the course of the calendar event */
+func (c EditEvent) CreateDayTemplate(ID int, startTime, endTime string, intervall int, dayOfWeek int) revel.Result {
+	c.Log.Debug("create a day template on course", "CourseID", ID,
+		"startTime", startTime, "endTime", endTime, "dayOfWeek", dayOfWeek)
+
+	time := models.CustomTime{}
+	isValidTime1 := time.SetTime(startTime)
+	isValidTime2 := time.SetTime(endTime)
+
+	if isValidTime1 == false || isValidTime2 == false {
+		err := errors.New("Inserted value is not a valid Time ")
+		return flashError(
+			errAuth, err, "", c.Controller, "")
+	}
+
+	dayT := models.DayTmpl{CalendarEventID: ID, StartTime: startTime,
+		EndTime: endTime, Intervall: intervall, DayOfWeek: dayOfWeek}
+
+	err := dayT.Insert()
+	if err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("DayTemplate.new.success",
+		dayT.StartTime,
+		dayT.EndTime,
+		dayT.ID,
+	))
+	return c.Redirect(c.Session["currPath"])
 }

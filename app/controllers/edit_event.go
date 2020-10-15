@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 	"strings"
 	"turm/app/models"
@@ -18,13 +17,14 @@ func (c EditEvent) Delete(ID, courseID int) revel.Result {
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	//TODO: do not allow the deletion of an event if users are enrolled in it
-	//TODO: if users unsubscribed from this event, also remove them from the unsubscribed table
-
 	event := models.Event{ID: ID}
-	if err := event.Delete(); err != nil {
+	if err := event.Delete(c.Validation); err != nil {
 		return flashError(
 			errDB, err, "/course/events?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "/course/events?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
 
@@ -46,20 +46,19 @@ func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval) revel.Resul
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/meetings?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	meeting := models.Meeting{EventID: ID, MeetingInterval: option}
-	err := meeting.NewBlank()
-	if err != nil {
+	if err := meeting.NewBlank(); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/meetings?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("meeting.new.success",
-		meeting.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+	c.Flash.Success(c.Message("meeting.new.success", meeting.ID))
+	return c.Redirect(Course.Meetings, ID)
 }
 
 /*ChangeCapacity changes the capacity of an event.
@@ -167,10 +166,11 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 		response{Status: SUCCESS, Msg: msg, FieldID: listType, Valid: option, ID: ID})
 }
 
-/*ChangeEnrollmentKey sets an enrollment key. */
-func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2 string) revel.Result {
+/*ChangeEnrollmentKey sets an enrollment key.
+- Roles: creator and editors of the course of the event */
+func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2, fieldID string) revel.Result {
 
-	c.Log.Debug("change enrollment key", "ID", ID, "key1", key1, "key2", key2)
+	c.Log.Debug("change enrollment key", "ID", ID, "key1", key1, "key2", key2, "fieldID", fieldID)
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -186,21 +186,23 @@ func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2 string) revel.Result {
 	}
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
 	event := models.Event{ID: ID, EnrollmentKey: sql.NullString{Valid: true, String: key1}}
 	if err := event.UpdateKey(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
-	c.Flash.Success(c.Message("event.key.change.success"))
-	return c.Redirect(c.Session["currPath"])
+	msg := c.Message("event.key.change.success")
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: "key", ID: ID})
 }
 
-/*DeleteEnrollmentKey of an event. */
+/*DeleteEnrollmentKey of an event.
+- Roles: creator and editors of the course of the event */
 func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
 
 	c.Log.Debug("delete enrollment key", "ID", ID)
@@ -211,42 +213,11 @@ func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
 	err := event.Update("enrollment_key", sql.NullString{"", false})
 
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
-	c.Flash.Success(c.Message("event.key.delete.success"))
-	return c.Redirect(c.Session["currPath"])
-}
-
-/*CreateDayTemplate is used for crating a repeatable blueprint if a day*/
-func (c EditEvent) CreateDayTemplate(ID int, startTime, endTime string, intervall int, dayOfWeek int) revel.Result {
-	c.Log.Debug("create a day template on course", "CourseID", ID,
-		"startTime", startTime, "endTime", endTime, "dayOfWeek", dayOfWeek)
-
-	time := models.CustomTime{}
-	isValidTime1 := time.SetTime(startTime)
-	isValidTime2 := time.SetTime(endTime)
-
-	if isValidTime1 == false || isValidTime2 == false {
-		err := errors.New("Inserted value is not a valid Time ")
-		return flashError(
-			errAuth, err, "", c.Controller, "")
-	}
-
-	dayT := models.DayTmpl{CalendarEventID: ID, StartTime: startTime,
-		EndTime: endTime, Intervall: intervall, DayOfWeek: dayOfWeek}
-
-	err := dayT.Insert()
-	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
-	}
-
-	c.Flash.Success(c.Message("DayTemplate.new.success",
-		dayT.StartTime,
-		dayT.EndTime,
-		dayT.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+	msg := c.Message("event.key.delete.success")
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: "enrollment_key", ID: ID})
 }

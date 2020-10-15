@@ -71,6 +71,8 @@ validation.invalid.len.events = Kurse müssen mindestens eine Veranstaltung besi
 
 validation.invalid.restriction = Bitte geben Sie mindestens einen angestrebten Abschluss, einen Studiengang oder ein Mindestsemester an.
 
+validation.invalid.delete = Veranstaltungen, in denen TeilnehmerInnen eingeschrieben sind, können nicht gelöscht werden. Bitte tragen Sie zunächst alle TeilnehmerInnen manuell aus.
+
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
 # -------------------------------------------------------------------------------------------------- #
@@ -88,6 +90,7 @@ validation.invalid.keys = Die Einschreibeschlüssel stimmen nicht überein.
 # ENROLLMENT
 # -------------------------------------------------------------------------------------------------- #
 
+validation.enrollment.not.active = Der Kurs ist nicht aktiv.
 validation.enrollment.at.blacklist = Sie wurden für diesen Kurs nicht zugelassen. Bitte wenden Sie sich an die Kursorganisation.
 validation.enrollment.no.ldap = Dieser Kurs ist nur für NutzerInnen mit Universitätszugang.
 validation.enrollment.not.satisfy.restrictions = Sie erfüllen die Einschreibebeschränkungen des Kurses nicht.
@@ -99,7 +102,7 @@ validation.enrollment.full = Diese Veranstaltung ist bereits voll.
 validation.enrollment.already.enrolled = Sie sind bereits in diese Veranstaltung eingeschrieben.
 validation.enrollment.already.unsubscribed = Sie haben sich bereits aus dieser Veranstaltung ausgetragen.
 validation.calendarEvent.startInPast = Die Startzeit befindet sich in der Vergangenheit.
-validation.calendarEvent.startAfterEndTime = Der Startzeitpunkt darf nicht nach dem Endzeitpunkt sein. 
+validation.calendarEvent.startAfterEndTime = Der Startzeitpunkt darf nicht nach dem Endzeitpunkt sein.
 validation.calendarEvent.noTemplateFitting = Der ausgewählte Zeitraum ist nicht innerhalb der in dem Tag zur verfügung stehenden Zeit.
 validation.calendarEvent.startTimeWrongStepDistance = Die Startzeit muss ein vielfaches der Schrittweite entsprechen.
 validation.calendarEvent.endTimeWrongStepDistance = Die Endzeit muss ein vielfaches der Schrittweite entsprechen.

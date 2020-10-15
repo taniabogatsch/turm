@@ -1,6 +1,33 @@
 <!-- template rendering all meetings of an event -->
 
-{{range $key, $value := .Meetings}}
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-meetings-{{.ID}}" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-meetings-{{.ID}}').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
+{{range $key, $value := .meetings}}
 
   {{if ne $key 0}}
     <br>
@@ -61,7 +88,6 @@
         });
       </script>
     {{end}}
-    <br>
 
     <!-- place -->
     {{if .Place.Valid}}
@@ -80,22 +106,27 @@
   {{if eq .MeetingInterval 0}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}},
-      {{.Place.String}}, {{.Annotation.String}}, 0, 0);'>
+      {{.Place.String}}, {{.Annotation.String}}, 0, 0, {{.EventID}});'>
       {{template "icons/pencil.html" . }}
     </a>
 
   {{else}} <!-- edit weekly meeting -->
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}}, {{.Place.String}},
-      {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}});'>
+      {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}}, {{.EventID}});'>
       {{template "icons/pencil.html" . }}
     </a>
   {{end}}
 
   <!-- delete meeting -->
   <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-    onclick='confirmPOSTModal({{msg $ "meeting.delete.title"}}, {{msg $ "meeting.delete.confirm"}},
-      "{{url "EditMeeting.Delete" .ID}}#events");'>
+    onclick='confirmDeleteRenderModal({{msg $ "meeting.delete.title"}},
+      {{msg $ "meeting.delete.confirm"}},
+      "{{url "EditMeeting.Delete" .ID .EventID}}", "meetings-{{.EventID}}");'>
     {{template "icons/trash.html" . }}
   </a>
+{{end}}
+
+{{if .meetings}}
+  <br class="edit-show d-none">
 {{end}}

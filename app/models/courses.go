@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"regexp"
 	"strconv"
 	"time"
@@ -113,6 +114,25 @@ func (course *Course) Validate(v *revel.Validation) {
 	if len(course.Events) == 0 {
 		v.ErrorKey("validation.invalid.len.events")
 	}
+}
+
+/*GetVisible of a course. */
+func (course *Course) GetVisible(elem string) (err error) {
+
+	switch elem {
+	case "course":
+		err = app.Db.Get(course, stmtGetCourseVisible, course.ID)
+	case "event":
+		err = app.Db.Get(course, stmtGetEventVisible, course.ID)
+	default:
+		err = errors.New("invalid parameter type")
+	}
+
+	if err != nil {
+		log.Error("failed to get if course is visible", "course", *course,
+			"elem", elem, "error", err.Error())
+	}
+	return
 }
 
 /*Update the specified column in the course table. */
@@ -612,6 +632,18 @@ const (
 				current_timestamp > enrollment_end) AS no_enrollment_period,
 			(current_timestamp > unsubscribe_end AND
 				unsubscribe_end IS NOT NULL) AS unsubscribe_over
+		FROM courses
+		WHERE id = $1
+	`
+
+	stmtGetCourseVisible = `
+		SELECT visible
+		FROM courses
+		WHERE id = $1
+	`
+
+	stmtCourseExpired = `
+		SELECT (current_timestamp >= expiration_date) AS expired
 		FROM courses
 		WHERE id = $1
 	`
