@@ -72,6 +72,7 @@ validation.invalid.len.events = There must be at least one event.
 validation.invalid.restriction = Please provide at least a pursued degree, a course of studies or a minimum semester.
 
 validation.invalid.delete = You cannot delete events in which users are enrolled. Please manually unsubscribe all users first.
+validation.invalid.at.wait.list = You cannot deactivate the wait list because users already enrolled to it.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR

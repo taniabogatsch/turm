@@ -643,7 +643,10 @@ const (
 	`
 
 	stmtCourseExpired = `
-		SELECT (current_timestamp >= expiration_date) AS expired
+		SELECT (
+			current_timestamp >= expiration_date
+			AND active
+		) AS expired
 		FROM courses
 		WHERE id = $1
 	`

@@ -248,7 +248,7 @@ function plainCourse() {
 }
 
 function editCourse() {
-  
+
   $(".edit-show").each(function() {
     $(this).removeClass("d-none");
   });
@@ -397,6 +397,11 @@ function submitJSONForm(form, modal) {
 
       } else {
         showToast(response.Msg, 'danger');
+
+        if (response.FieldID == "has_waitlist") {
+          document.getElementById("change-" + response.FieldID + "-switch-" + response.ID).checked = !response.Valid;
+        }
+
         if (modal != "") {
           $(modal).modal('hide');
         }

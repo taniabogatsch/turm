@@ -72,6 +72,7 @@ validation.invalid.len.events = Kurse müssen mindestens eine Veranstaltung besi
 validation.invalid.restriction = Bitte geben Sie mindestens einen angestrebten Abschluss, einen Studiengang oder ein Mindestsemester an.
 
 validation.invalid.delete = Veranstaltungen, in denen TeilnehmerInnen eingeschrieben sind, können nicht gelöscht werden. Bitte tragen Sie zunächst alle TeilnehmerInnen manuell aus.
+validation.invalid.at.wait.list = Die Warteliste kann nicht deaktiviert werden, da sich bereits NutzerInnen auf diese eingeschrieben haben.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR

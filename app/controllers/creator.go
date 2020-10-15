@@ -28,7 +28,7 @@ func (c Creator) Activate(ID int) revel.Result {
 		course.Title,
 		course.ID,
 	))
-	//TODO: redirect to course?
+
 	return c.Redirect(Manage.Active)
 }
 

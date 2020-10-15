@@ -57,6 +57,39 @@ func (event *Event) UpdateKey() (err error) {
 	return
 }
 
+/*UpdateWaitlist of an event. */
+func (event *Event) UpdateWaitlist(option bool, v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//check if users are at the wait list
+	if !option {
+		var notEmpty bool
+		if err = tx.Get(&notEmpty, stmtGetWaitlistEmpty, event.ID); err != nil {
+			log.Error("failed to get if wait list ist empty", "event", *event,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		} else if notEmpty {
+			v.ErrorKey("validation.invalid.at.wait.list")
+			tx.Commit()
+			return
+		}
+	}
+
+	//update the wait list
+	if err = updateByID(tx, "has_waitlist", "events", option, event.ID, event); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 /*Delete an event. */
 func (event *Event) Delete(v *revel.Validation) (err error) {
 
@@ -411,5 +444,14 @@ const (
 			FROM enrolled
 			WHERE event_id = $1
 		) AS not_empty
+	`
+
+	stmtGetWaitlistEmpty = `
+		SELECT EXISTS (
+			SELECT true
+			FROM enrolled
+			WHERE event_id = $1
+				AND status = 1 /*on waitlist*/
+		)
 	`
 )

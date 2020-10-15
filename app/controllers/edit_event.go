@@ -148,17 +148,19 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	//TODO: only allow to toggle waitlist to false if there are no users at the wait list
-
 	if listType != "has_waitlist" {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.Event{ID: ID}
-	if err := event.Update(listType, option); err != nil {
+	if err := event.UpdateWaitlist(option, c.Validation); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	} else if c.Validation.HasErrors() {
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors),
+				FieldID: listType, Valid: option, ID: ID})
 	}
 
 	msg := c.Message("event.waitlist.change.success")
