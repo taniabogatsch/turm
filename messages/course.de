@@ -133,7 +133,7 @@ event.title.change.success = Veranstaltungstitel zu '%s' geändert.
 event.annotation.change.info = Hier können Sie zusätzliche Informationen zur Veranstaltung angeben, um diese näher zu spezifizieren.
 event.annotation.change.success = Anmerkung zu '%s' geändert.
 event.annotation.delete.success = Anmerkung gelöscht.
-event.annotation.delete.confirm = Anmerkung '%s' wirklich löschen?
+event.annotation.delete.confirm = Anmerkung wirklich löschen?
 event.annotation.delete.title = Anmerkung löschen
 
 event.waitlist.change.success = Wartelistenoption angepasst.

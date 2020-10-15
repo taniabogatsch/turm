@@ -141,25 +141,30 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value, ID: ID})
 }
 
-/*ChangeWaitlist toggles the waitlist setting of an event.
+/*ChangeBool toggles the provided boolean value of an event.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) ChangeWaitlist(ID int, option bool) revel.Result {
+func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result {
 
-	c.Log.Debug("update waitlist setting", "ID", ID, "option", option)
+	c.Log.Debug("update bool", "ID", ID, "listType", listType, "option", option)
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	//TODO: only allow to toggle the waitlist setting if it is not true
-	//and there are users enrolled in the event
+	//TODO: only allow to toggle waitlist to false if there are no users at the wait list
 
-	event := models.Event{ID: ID, HasWaitlist: option}
-	if err := event.Update("has_waitlist", event.HasWaitlist); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+	if listType != "has_waitlist" {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
-	c.Flash.Success(c.Message("event.waitlist.change.success"))
-	return c.Redirect(c.Session["currPath"])
+	event := models.Event{ID: ID}
+	if err := event.Update(listType, option); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	}
+
+	msg := c.Message("event.waitlist.change.success")
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: listType, Valid: option, ID: ID})
 }
 
 /*ChangeEnrollmentKey sets an enrollment key. */

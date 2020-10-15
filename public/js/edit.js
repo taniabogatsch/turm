@@ -264,36 +264,64 @@ function openEnrollmentKeyModal(eventID) {
 
 function handleEditResult(response) {
 
-  if (response.FieldID == "title" || response.FieldID == "enrollment_start" ||
-    response.FieldID == "enrollment_end" || response.FieldID == "expiration_date") {
-    $('#div-' + response.FieldID).html(response.Value);
+  //course fields
+  if (response.ID == 0) {
 
-  } else  if (response.FieldID == "subtitle" || response.FieldID == "fee" ||
-    response.FieldID == "speaker" || response.FieldID == "description" ||
-    response.FieldID == "custom_email" || response.FieldID == "unsubscribe_end" ||
-    response.FieldID == "enroll_limit_events") {
-
-    if (response.Value != "") {
-      document.getElementById("div-edit-" + response.FieldID).classList.remove("d-none");
-      document.getElementById("div-add-" + response.FieldID).classList.add("d-none");
+    //mandatory
+    if (response.FieldID == "title" || response.FieldID == "enrollment_start" ||
+      response.FieldID == "enrollment_end" || response.FieldID == "expiration_date") {
       $('#div-' + response.FieldID).html(response.Value);
 
-      if (response.Value == "0"){
+    //not mandatory
+    } else  if (response.FieldID == "subtitle" || response.FieldID == "fee" ||
+      response.FieldID == "speaker" || response.FieldID == "description" ||
+      response.FieldID == "custom_email" || response.FieldID == "unsubscribe_end" ||
+      response.FieldID == "enroll_limit_events") {
+
+      if (response.Value != "") {
+        document.getElementById("div-edit-" + response.FieldID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID).classList.add("d-none");
+        $('#div-' + response.FieldID).html(response.Value);
+
+        if (response.Value == "0") {
+          document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
+          document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+        }
+
+      } else {
         document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
         document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
       }
 
-    } else {
-      document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
-      document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+    //switches
+    } else if (response.FieldID == "visible" || response.FieldID == "only_ldap") {
+      document.getElementById("change-" + response.FieldID + "-switch").checked = response.Valid;
     }
 
-  } else if (response.FieldID == "visible" || response.FieldID == "only_ldap") {
-    document.getElementById("change-" + response.FieldID + "-switch").checked = response.Valid;
+  //event fields
+  } else {
 
-  } else if (response.ID != 0 && (response.FieldID == "capacity"
-    || response.FieldID == "title")) {
-    $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+    //mandatory
+    if (response.FieldID == "capacity" || response.FieldID == "title") {
+      $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+
+    //not mandatory
+  } else if (response.FieldID == "annotation") {
+
+    if (response.Value != "") {
+      document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+      $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+
+    } else {
+      document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+    }
+
+    //switches
+    } else if (response.FieldID == "has_waitlist") {
+      document.getElementById("change-" + response.FieldID + "-switch-" + response.ID).checked = response.Valid;
+    }
   }
 }
 

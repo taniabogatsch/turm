@@ -322,6 +322,8 @@
     </h5>
     <small class="text-muted">
       {{msg $ "course.events.info"}}
+      <br>
+      Es gibt zwei Arten von Veranstaltungen: Normale Veranstaltungen und Kalenderveranstaltungen. Sie können diese gemischt verwenden.
     </small>
     <hr>
   </div>
@@ -339,9 +341,26 @@
   </div>
 </div>
 
+<hr>
+{{template "icons/easel.html" .}}
+&nbsp; Normale Veranstaltungen
+<br>
+<br>
+
 <!-- event list -->
 <div id="div-events">
   {{template "course/events.html" dict_addLocale $.currentLocale "events" .course.Events}}
+</div>
+
+<br>
+{{template "icons/calendarDate.html" .}}
+&nbsp; Kalenderveranstaltungen
+<br>
+<br>
+
+<!-- event list -->
+<div id="div-events">
+  {{template "course/calendarEvents.html" dict_addLocale $.currentLocale "events" .course.CalendarEvents}}
 </div>
 
 <br id="more-settings">

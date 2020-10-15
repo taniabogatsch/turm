@@ -18,8 +18,6 @@ type CalendarEvent struct {
 	CourseID   int            `db:"course_id"`
 	Title      string         `db:"title"`
 	Annotation sql.NullString `db:"annotation"`
-	Created    string         `db:"created"`
-	Creator    sql.NullInt64  `db:"creator"`
 
 	//loaded week
 	Week int
@@ -41,8 +39,6 @@ type DayTmpl struct {
 	DayOfWeek        int            `db:"day_of_week"`
 	Active           bool           `db:"active"`
 	DeactiavtionDate sql.NullString `db:"deactivation_date"`
-	Created          string         `db:"created"`
-	Creator          sql.NullInt64  `db:"creator"`
 
 	Slots      Slots
 	Exceptions Exceptions
@@ -73,8 +69,7 @@ type Exception struct {
 	//date + time
 	StartTimestamp string         `db:"start_time"`
 	EndTimestamp   string         `db:"end_time"`
-	Annotations    sql.NullString `db:"annotations"`
-	Created        string         `db:"created"`
+	Annotation     sql.NullString `db:"annotation"`
 }
 
 /*NewBlank creates a new blank CalendarEvent. */
@@ -100,9 +95,10 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, day time.Time) (er
 
 	for i := range *events {
 		//get all day_templates of this event
-
-		(*events)[i].Days.Get(tx, &(*events)[i].ID, day)
-
+		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, day)
+		if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -141,10 +137,17 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 		return
 	}
 
-	//@TODO Marco: get exeptions & slots
 	for i := range *dayTmpls {
-		(*dayTmpls)[i].Slots.Get(tx, (*dayTmpls)[i].ID, monday, (*dayTmpls)[i].DayOfWeek)
-		(*dayTmpls)[i].Exceptions.Get(tx, monday, (*dayTmpls)[i].DayOfWeek)
+		//get slots
+		err = (*dayTmpls)[i].Slots.Get(tx, (*dayTmpls)[i].ID, monday, (*dayTmpls)[i].DayOfWeek)
+		if err != nil {
+			return
+		}
+		//get exceptions
+		err = (*dayTmpls)[i].Exceptions.Get(tx, monday, (*dayTmpls)[i].DayOfWeek)
+		if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -167,7 +170,6 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, day time.Time, weekday int) 
 	if err != nil {
 		log.Error("failed to get slots of dayTemplate", "DayTmplID", dayTmplID, "error", err.Error())
 		tx.Rollback()
-		return
 	}
 	return
 }
@@ -241,9 +243,7 @@ func (exepts *Exceptions) Get(tx *sqlx.Tx, day time.Time, weekday int) (err erro
 	if err != nil {
 		log.Error("failed to get slots of dayTemplate", "error", err.Error())
 		tx.Rollback()
-		return
 	}
-
 	return
 }
 
@@ -269,33 +269,36 @@ const (
 	`
 
 	stmtGetDayTemplateFromWeekDay = `
-	SELECT id, start_time, end_time, intevall
-	FROM day_templates
-	WHERE day_of_week = $1
-		AND active = true
+		SELECT id, start_time, end_time, intevall
+		FROM day_templates
+		WHERE day_of_week = $1
+			AND active = true
 	`
 
 	stmtSelectCalendarEvents = `
-		SELECT id, course_id, title, annotations, created, creator_id
+		SELECT id, course_id, title, annotation
 		FROM calendar_events
 		WHERE course_id = $1
 	`
 
 	stmtSelectDayTmpls = `
-		SELECT id, calendar_event_id, start_time, end_time, intervall, day_of_week, created, creator_id, active, deactivation_date
+		SELECT id, calendar_event_id, start_time, end_time, intervall,
+			day_of_week, active, deactivation_date
 		FROM day_templates
-		WHERE calendar_event_id = $1 AND active = true
+		WHERE calendar_event_id = $1
+			AND active = true
 	`
 
 	stmtSelectSlots = `
-	SELECT id, user_id, day_tmpl_id, start_time, end_time, created
-	FROM slots
-	WHERE day_tmpl_id = $1 AND start_time BETWEEN ($2) AND ($3);
+		SELECT id, user_id, day_tmpl_id, start_time, end_time, created
+		FROM slots
+		WHERE day_tmpl_id = $1
+			AND start_time BETWEEN ($2) AND ($3);
 	`
 
 	stmtSelectExeptions = `
-	SELECT id, calendar_event_id, start_time, end_time, annotations, created
-	FROM calendar_exceptions
-	WHERE start_time BETWEEN ($1) AND ($2);
+		SELECT id, calendar_event_id, start_time, end_time, annotation
+		FROM calendar_exceptions
+		WHERE start_time BETWEEN ($1) AND ($2);
 	`
 )

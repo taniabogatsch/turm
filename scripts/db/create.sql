@@ -240,11 +240,8 @@ CREATE TABLE calendar_events (
   course_id       integer                   NOT NULL,
   title           varchar(255)              NOT NULL,
   annotation      varchar(255),
-  created         timestamp with time zone  DEFAULT now(),
-  creator_id      integer,
 
-  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
-  FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
+  FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
 );
 
 
@@ -255,13 +252,10 @@ CREATE TABLE day_templates (
   end_time            time with time zone         NOT NULL,
   intervall           integer                     NOT NULL DEFAULT 60,
   day_of_week         integer                     NOT NULL,
-  created             timestamp with time zone    DEFAULT now(),
-  creator_id          integer,
   active              boolean                     DEFAULT true,
   deactivation_date   timestamp with time zone,
 
-  FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE,
-  FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE SET NULL
+  FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
 );
 
 
@@ -284,7 +278,6 @@ CREATE TABLE calendar_exceptions (
   start_time          timestamp with time zone,
   end_time            timestamp with time zone,
   annotations         varchar(255),
-  created             timestamp with time zone  DEFAULT now(),
 
   FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
 );

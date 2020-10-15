@@ -82,41 +82,55 @@
       <br>
 
       <!-- waiting list information -->
-      <small class="form-text text-muted float-left">
-        {{template "icons/listUL.html" . }} &nbsp;
-        {{if .HasWaitlist}}
-          {{msg $ "event.waitlist.yes"}}
-        {{else}}
-          {{msg $ "event.waitlist.no"}}
-        {{end}}
+      <small class="form-text text-muted">
+        <form id="change-has_waitlist-form-{{.ID}}" accept-charset="UTF-8" method="POST"
+          action='{{url "EditEvent.ChangeBool"}}'>
+          <!-- event ID -->
+          <input type="hidden" name="ID" value="{{.ID}}">
+          <!-- list type -->
+          <input type="hidden" name="listType" value="has_waitlist">
+          <!-- option -->
+          <label class="switch edit-show d-none">
+            <input type="checkbox" name="option" id="change-has_waitlist-switch-{{.ID}}"
+              {{if .HasWaitlist}}checked{{end}}>
+            <span class="slider round"></span>
+          </label>
+          <label class="form-check-label">
+            {{template "icons/listUL.html" . }} &nbsp; {{msg $ "event.waitlist.yes"}}
+          </label>
+        </form>
       </small>
-      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-        onclick='openBoolModal({{msg $ "event.waitlist.change.title"}},
-          "{{url "EditEvent.ChangeWaitlist"}}#events", {{msg $ "event.waitlist.yes"}},
-          {{msg $ "event.waitlist.no"}}, {{.HasWaitlist}}, "", "", {{.ID}});'>
-        {{template "icons/pencil.html" . }}
-      </a>
-      <br>
+      <script>
+        //react to has_waitlist switch events
+        $('#change-has_waitlist-switch-{{.ID}}').change(function() {
+          $('#change-has_waitlist-form-{{.ID}}').submit();
+        });
+
+        $('#change-has_waitlist-form-{{.ID}}').submit(function (event) {
+          submitJSONForm("#change-has_waitlist-form-{{.ID}}", "");
+          event.preventDefault();
+        });
+      </script>
 
       <!-- annotation -->
-      {{if .Annotation.Valid}}
+      <div id="div-edit-annotation-{{.ID}}" class="{{if not .Annotation.Valid}}d-none{{end}}">
         <small class="form-text text-muted float-left">
-          {{template "icons/infoSquare.html" . }} &nbsp; {{.Annotation.String}}
+          {{template "icons/infoSquare.html" . }} &nbsp; <div id="div-annotation-{{.ID}}" class="d-inline">{{.Annotation.String}}</div>
         </small>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
           onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
-            {{.Annotation.String}}, {{.Annotation.Valid}}, "{{url "EditEvent.ChangeText"}}#events",
-            "text", "255", {{msg $ "event.annotation.change.info"}}, {{.ID}});'>
+            true, "{{url "EditEvent.ChangeText"}}", "text", "255",
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, true);'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='confirmPOSTModal({{msg $ "event.annotation.delete.title"}},
-            {{msg $ "event.annotation.delete.confirm" .Annotation.String}},
-            "{{url "EditEvent.ChangeText" .ID "annotation" ""}}#events");'>
+          onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
+            {{msg $ "event.annotation.delete.confirm"}},
+            "{{url "EditEvent.ChangeText" .ID "annotation" ""}}");'>
           {{template "icons/trash.html" . }}
         </a>
         <br>
-      {{end}}
+      </div>
 
       {{if .EnrollmentKey.Valid}}
         <small class="form-text text-muted float-left edit-show">
@@ -148,15 +162,15 @@
         {{msg $ "creator.add.meeting"}}
       </button>
 
-      {{if not .Annotation.Valid}}
-        <!-- add annotation button -->
+      <!-- add annotation button -->
+      <div id="div-add-annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{end}} d-inline">
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
-          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
-            {{.Annotation.String}}, {{.Annotation.Valid}}, "{{url "EditEvent.ChangeText"}}#events",
-            "text", "255", {{msg $ "event.annotation.change.info"}}, {{.ID}});'>
+          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
+            "{{url "EditEvent.ChangeText"}}", "text", "255",
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, true);'>
           + &nbsp; {{msg $ "event.annotation"}}
         </button>
-      {{end}}
+      </div>
 
       {{if not .EnrollmentKey.Valid}}
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"

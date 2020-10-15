@@ -1,0 +1,28 @@
+<!-- template rendering all calendar events of a course -->
+
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-calendar-events" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-calendar-events').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>

@@ -99,7 +99,7 @@ POST    /edit/event/delete                          EditEvent.Delete
 POST    /edit/event/newMeeting                      EditEvent.NewMeeting
 POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
 POST    /edit/event/changeText                      EditEvent.ChangeText
-POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
+POST    /edit/event/changeBool                      EditEvent.ChangeBool
 POST    /edit/event/changeEnrollmentKey             EditEvent.ChangeEnrollmentKey
 POST    /edit/event/deleteEnrollmentKey             EditEvent.DeleteEnrollmentKey
 

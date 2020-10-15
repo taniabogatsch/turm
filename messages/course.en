@@ -133,7 +133,7 @@ event.title.change.success = Changed event title to '%s'.
 event.annotation.change.info = Here, you can provide additional information to further specify the event's purpose.
 event.annotation.change.success = Changed annotation to '%s'.
 event.annotation.delete.success = Deleted annotation.
-event.annotation.delete.confirm = Please confirm the deletion of the annotation '%s'.
+event.annotation.delete.confirm = Please confirm the deletion of the annotation.
 event.annotation.delete.title = Delete annotation
 
 event.waitlist.change.success = Changed waiting list option.
