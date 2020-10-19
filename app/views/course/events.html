@@ -53,7 +53,7 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
         onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", true,
           "{{url "EditEvent.ChangeCapacity"}}", "int", "",
-          {{msg $ "event.capacity.change.info"}}, {{.ID}}, true);'>
+          {{msg $ "event.capacity.change.info"}}, {{.ID}}, 1);'>
         {{template "icons/pencil.html" . }}
       </a>
       <small class="float-right">
@@ -75,7 +75,7 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "event.title"}}, "title",
           true, "{{url "EditEvent.ChangeText"}}", "text", "255",
-          {{msg $ "event.title.change.info"}}, {{.ID}}, true);'>
+          {{msg $ "event.title.change.info"}}, {{.ID}}, 1);'>
         {{template "icons/pencil.html" . }}
       </a>
       <br>
@@ -119,7 +119,7 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
           onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
             true, "{{url "EditEvent.ChangeText"}}", "text", "255",
-            {{msg $ "event.annotation.change.info"}}, {{.ID}}, true);'>
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
@@ -166,11 +166,12 @@
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
           onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
             "{{url "EditEvent.ChangeText"}}", "text", "255",
-            {{msg $ "event.annotation.change.info"}}, {{.ID}}, true);'>
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
           + &nbsp; {{msg $ "event.annotation"}}
         </button>
       </div>
 
+      <!-- add enrollment key button -->
       <div id="div-add-enrollment_key-{{.ID}}" class="{{if .EnrollmentKey.Valid}}d-none{{else}}d-inline{{end}}">
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
           onclick="openEnrollmentKeyModal({{.ID}});">
@@ -181,6 +182,10 @@
       <!-- enrollment information (if enrollment is not possible) -->
       {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "option" .EnrollOption "msg" .EnrollMsg}}
     </li>
+  {{else}}
+    <small class="text-muted">
+      {{msg $ "course.events.normal.none"}}
+    </small>
   {{end}}
 
 </ul>

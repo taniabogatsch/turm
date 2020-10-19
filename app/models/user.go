@@ -439,6 +439,8 @@ func (user *User) AuthorizedToEdit(table *string, ID *int) (authorized, expired 
 	}
 
 	switch *table {
+	case "calendar_events":
+		err = tx.Get(ID, stmtGetCourseIDByCalendarEvent, *ID)
 	case "events":
 		err = tx.Get(ID, stmtGetCourseIDByEvent, *ID)
 	case "meetings":

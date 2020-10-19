@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 	"strings"
 	"turm/app/models"
@@ -45,13 +44,14 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
-	msg := c.Message("event." + fieldID + ".delete.success")
+	msg := c.Message("event.calendar." + fieldID + ".delete.success")
 	if valid {
-		msg = c.Message("event."+fieldID+".change.success", value)
+		msg = c.Message("event.calendar."+fieldID+".change.success", value)
 	}
 
 	return c.RenderJSON(
-		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value, ID: ID})
+		response{Status: SUCCESS, Msg: msg, FieldID: "calendar_" + fieldID,
+			Value: value, ID: ID})
 }
 
 /*Delete calendar event data.
@@ -62,48 +62,40 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
-	//TODO: do not allow the deletion of a calendar event if users are enrolled in it
-
 	event := models.CalendarEvent{ID: ID}
-	if err := event.Delete(); err != nil {
+	if err := event.Delete(c.Validation); err != nil {
 		return flashError(
-			errDB, err, "/course/events?ID="+strconv.Itoa(courseID),
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("event.delete.success", ID))
-	return c.Redirect(Course.Events, courseID)
+	c.Flash.Success(c.Message("event.calendar.delete.success", ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*CreateDayTemplate creates a repeatable blueprint of a day.
+/*NewDayTemplate creates a repeatable blueprint of a day.
 - Roles: creator and editors of the course of the calendar event */
-func (c EditEvent) CreateDayTemplate(ID int, startTime, endTime string, intervall int, dayOfWeek int) revel.Result {
-	c.Log.Debug("create a day template on course", "CourseID", ID,
-		"startTime", startTime, "endTime", endTime, "dayOfWeek", dayOfWeek)
+func (c EditCalendarEvent) NewDayTemplate(ID int, tmpl models.DayTmpl) revel.Result {
 
-	time := models.CustomTime{}
-	isValidTime1 := time.SetTime(startTime)
-	isValidTime2 := time.SetTime(endTime)
+	c.Log.Debug("create a new day template", "ID", ID, "tmpl", tmpl)
 
-	if isValidTime1 == false || isValidTime2 == false {
-		err := errors.New("Inserted value is not a valid Time ")
-		return flashError(
-			errAuth, err, "", c.Controller, "")
-	}
-
-	dayT := models.DayTmpl{CalendarEventID: ID, StartTime: startTime,
-		EndTime: endTime, Intervall: intervall, DayOfWeek: dayOfWeek}
-
-	err := dayT.Insert()
-	if err != nil {
+	tmpl.ID = ID
+	if err := tmpl.Insert(c.Validation); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("DayTemplate.new.success",
-		dayT.StartTime,
-		dayT.EndTime,
-		dayT.ID,
+		tmpl.StartTime,
+		tmpl.EndTime,
+		tmpl.ID,
 	))
 	return c.Redirect(c.Session["currPath"])
 }

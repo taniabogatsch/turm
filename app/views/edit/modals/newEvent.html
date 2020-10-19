@@ -28,7 +28,7 @@
           <small class="form-text text-muted">
             {{msg $ "event.type"}}
           </small>
-          <select name="eventType" class="form-control">
+          <select name="eventType" class="form-control" id="change-event-modal-select">
             <option value="normal" selected>{{msg $ "event.type.normal"}}</option>
             <option value="calendar">{{msg $ "event.type.calendar"}}</option>
           </select>
@@ -65,3 +65,13 @@
     </div>
   </div>
 </div>
+
+<script>
+  $("#change-event-modal-select").change(function() {
+    if ($('#change-event-modal-select').val() == "normal") {
+      $('#change-event-modal-list').val("events");
+    } else {
+      $('#change-event-modal-list').val("calendar_events");
+    }
+  });
+</script>

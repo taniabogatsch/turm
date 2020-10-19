@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -59,36 +57,38 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 /*EnrollInCalendarSlot to enroll into a time slot of a day*/
 func (c Enrollment) EnrollInCalendarSlot(ID int, startTime, endTime, date string) revel.Result {
 
-	userID, err := getIntFromSession(c.Controller, "userID")
-	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
-	}
+	/*
+		userID, err := getIntFromSession(c.Controller, "userID")
+		if err != nil {
+			return flashError(
+				errTypeConv, err, "", c.Controller, "")
+		}
 
-	fmt.Println(userID)
+		fmt.Println(userID)
 
-	sT := date + "T" + startTime + "Z"
-	sTime, err := time.Parse("2006-01-02T15:04:05Z", sT)
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
+		sT := date + "T" + startTime + "Z"
+		sTime, err := time.Parse("2006-01-02T15:04:05Z", sT)
+		if err != nil {
+			return flashError(errTypeConv, err, "", c.Controller, "")
+		}
 
-	eT := date + "T" + endTime + "Z"
-	eTime, err := time.Parse("2006-01-02T15:04:05Z", eT)
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
+		eT := date + "T" + endTime + "Z"
+		eTime, err := time.Parse("2006-01-02T15:04:05Z", eT)
+		if err != nil {
+			return flashError(errTypeConv, err, "", c.Controller, "")
+		}
 
-	slot := models.Slot{
-		StartTimestamp: sTime,
-		EndTimestamp:   eTime,
-	}
+		slot := models.Slot{
+			StartTimestamp: sTime,
+			EndTimestamp:   eTime,
+		}
 
-	slot.Validate(c.Validation)
+		slot.Validate(c.Validation)
 
-	//check if start time/date is in future and end time/date is afterwards (and valid)
+		//check if start time/date is in future and end time/date is afterwards (and valid)
 
-	//models.calendar_events.newSlot
+		//models.calendar_events.newSlot
+	*/
 
 	c.Flash.Success(c.Message("event.enroll.success"))
 	return c.Redirect(c.Session["currPath"])

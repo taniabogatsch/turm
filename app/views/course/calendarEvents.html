@@ -26,3 +26,116 @@
 		{{end}}
 	});
 </script>
+
+<ul class="list-group">
+
+  <script>
+    var fromMsg = '{{msg $ "meeting.from"}}';
+    var clockMsg = '{{msg $ "course.clock"}}';
+  </script>
+
+  {{range .events}}
+    <li class="list-group-item mb-2 border rounded">
+
+      <!-- delete event -->
+      <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+        href='#no-scroll' role="button"
+        onclick='confirmDeleteRenderModal({{msg $ "event.calendar.delete.title"}},
+          {{msg $ "event.calendar.delete.confirm" .Title}},
+          "{{url "EditCalendarEvent.Delete" .ID .CourseID}}", "calendar_events");'>
+        {{template "icons/trash.html" . }}
+      </a>
+
+      <!-- event title -->
+      <div id="div-calendar_title-{{.ID}}" class="d-inline">
+        {{.Title}}
+      </div>
+      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+        onclick='openChangeModal({{msg $ "event.calendar.title"}}, "title",
+          true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+          {{msg $ "event.calendar.title.change.info"}}, {{.ID}}, 2);'>
+        {{template "icons/pencil.html" . }}
+      </a>
+      <br>
+
+      <!-- annotation -->
+      <div id="div-edit-calendar_annotation-{{.ID}}"
+        class="{{if not .Annotation.Valid}}d-none{{end}}">
+        <small class="form-text text-muted float-left">
+          {{template "icons/infoSquare.html" . }} &nbsp; <div id="div-calendar_annotation-{{.ID}}" class="d-inline">{{.Annotation.String}}</div>
+        </small>
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
+            true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 2);'>
+          {{template "icons/pencil.html" . }}
+        </a>
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+          onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
+            {{msg $ "event.annotation.delete.confirm"}},
+            "{{url "EditCalendarEvent.ChangeText" .ID "annotation" ""}}");'>
+          {{template "icons/trash.html" . }}
+        </a>
+        <br>
+      </div>
+
+      <!-- add annotation button -->
+      <div id="div-add-calendar_annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{else}}d-inline{{end}}">
+        <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-1"
+          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
+            "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 2);'>
+          + &nbsp; {{msg $ "event.annotation"}}
+        </button>
+      </div>
+
+      <div class="row border rounded mt-2">
+        <div class="col-sm-12">
+          <div class="row text-center">
+            <div class="col-sm-12 rounded-top">
+              <strong>Woche {{.Week}}</strong>
+            </div>
+          </div>
+          <!-- week days header -->
+          <div class="row border-top">
+            <div class="col-sm-2">
+              Mo
+            </div>
+            <div class="col-sm-2">
+              Di
+            </div>
+            <div class="col-sm-2">
+              Mi
+            </div>
+            <div class="col-sm-2">
+              Do
+            </div>
+            <div class="col-sm-2">
+              Fr
+            </div>
+            <div class="col-sm-1">
+              Sa
+            </div>
+            <div class="col-sm-1">
+              So
+            </div>
+          </div>
+
+          <!-- content -->
+          <div class="row">
+            <!-- range templates -->
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-darkblue edit-show d-none">
+        + &nbsp; Template
+      </button>
+
+    </li>
+  {{else}}
+    <small class="text-muted">
+      {{msg $ "course.events.calendar.none"}}
+    </small>
+  {{end}}
+
+</ul>

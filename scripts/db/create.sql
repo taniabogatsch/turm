@@ -250,7 +250,7 @@ CREATE TABLE day_templates (
   calendar_event_id   integer                     NOT NULL,
   start_time          time with time zone         NOT NULL,
   end_time            time with time zone         NOT NULL,
-  intervall           integer                     NOT NULL DEFAULT 60,
+  interval            integer                     NOT NULL DEFAULT 60,
   day_of_week         integer                     NOT NULL,
   active              boolean                     DEFAULT true,
   deactivation_date   timestamp with time zone,

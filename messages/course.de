@@ -38,6 +38,9 @@ course.creator.email = E-Mail-Adresse KurserstellerIn
 course.events = Veranstaltungen
 course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
 
+course.events.normal.none = Dieser Kurs enthält keine normalen Veranstaltungen.
+course.events.calendar.none = Dieser Kurs enthält keine Kalenderveranstaltungen.
+
 # -------------------------------------------------------------------------------------------------- #
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
@@ -54,6 +57,12 @@ event.number.meetings = Anzahl der Termine
 
 event.enroll.success = Sie haben sich erfolgreich eingeschrieben.
 event.unsubscribe.success = Sie haben sich erfolgreich ausgetragen.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+event.calendar.title = Kalenderveranstaltungstitel
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -113,7 +122,6 @@ meeting.weekly.edit = Wiederkehrenden Termin bearbeiten
 # -------------------------------------------------------------------------------------------------- #
 
 event.new.success = Veranstaltung '%s' hinzugefügt, Kurs ID = %d.
-event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
 
 event.delete.success = Veranstaltung gelöscht, ID = %d.
 event.delete.confirm = Veranstaltung '%s' wirklich löschen?
@@ -121,7 +129,6 @@ event.delete.title = Veranstaltung löschen
 
 event.type = Art der Veranstaltung
 event.type.normal = Normale Veranstaltung
-event.type.calendar = Kalenderveranstaltung
 
 event.capacity = Teilnehmeranzahl
 event.capacity.change.info = Die Teilnehmeranzahl ist die maximale Anzahl an TeilnehmerInnen, die sich in diese Veranstaltung einschreiben dürfen.
@@ -144,6 +151,23 @@ event.key.change.success = Einschreibeschlüssel gesetzt.
 event.key.delete.confirm = Einschreibeschlüssel wirklich löschen?
 event.key.delete.success = Einschreibeschlüssel gelöscht.
 event.key.delete.title = Einschreibeschlüssel löschen
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+event.type.calendar = Kalenderveranstaltung
+event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
+
+event.calendar.delete.success = Kalenderveranstaltung gelöscht, ID = %d.
+event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen?
+event.calendar.delete.title = Kalenderveranstaltung löschen
+
+event.calendar.title.change.info = Der Kalenderveranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Maschine 1', 'Raum 1', ...
+event.calendar.title.change.success = Kalenderveranstaltungstitel zu '%s' geändert.
+
+event.calendar.annotation.change.success = Anmerkung zu '%s' geändert.
+event.calendar.annotation.delete.success = Anmerkung gelöscht.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

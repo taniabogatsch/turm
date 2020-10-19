@@ -172,7 +172,10 @@ func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 			event.ID,
 		))
 	}
-	return c.Redirect(Course.Events, ID)
+	if eventType == "normal" {
+		return c.Redirect(Course.Events, ID)
+	}
+	return c.Redirect(Course.CalendarEvents, ID)
 }
 
 /*ChangeTimestamp changes the specified timestamp.

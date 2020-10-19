@@ -6,11 +6,13 @@ function submitChangeGroupModal(parentID) {
   $('#change-group-modal-form').submit();
 }
 
-function openChangeModal(title, field, valid, action, modal, max, info, ID, isEvent) {
+function openChangeModal(title, field, valid, action, modal, max, info, ID, eventType) {
 
   let value = "";
-  if (isEvent) {
+  if (eventType == 1) {
     value = $('#div-' + field + "-" + ID).html();
+  } else if (eventType == 2) {
+    value = $('#div-calendar_' + field + "-" + ID).html();
   } else {
     value = $('#div-' + field).html();
   }
@@ -330,26 +332,28 @@ function handleEditResult(response) {
   } else {
 
     //mandatory
-    if (response.FieldID == "capacity" || response.FieldID == "title") {
+    if (response.FieldID == "capacity" || response.FieldID == "title" ||
+      response.FieldID == "calendar_title") {
       $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
 
-    //not mandatory
-  } else if (response.FieldID == "annotation" || response.FieldID == "enrollment_key") {
+      //not mandatory
+    } else if (response.FieldID == "annotation" || response.FieldID == "enrollment_key" ||
+      response.FieldID == "calendar_annotation") {
 
-    if (response.Value != "") {
-      document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
-      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-none");
-      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-inline");
+      if (response.Value != "") {
+        document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-inline");
 
-      if (response.FieldID != "enrollment_key") {
-        $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+        if (response.FieldID != "enrollment_key") {
+          $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+        }
+
+      } else {
+        document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-inline");
       }
-
-    } else {
-      document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.add("d-none");
-      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
-      document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-inline");
-    }
 
     //switches
     } else if (response.FieldID == "has_waitlist") {
@@ -388,6 +392,7 @@ function submitJSONForm(form, modal) {
 
     success: function(response) {
       if (response.Status == "success") {
+
         handleEditResult(response);
         showToast(response.Msg, 'success');
 
@@ -452,6 +457,9 @@ function openNewEventModal(title, action, ID, info) {
   $('#change-event-modal-form').attr('action', action);
   $('#change-event-modal-info').html(info);
   $('#change-event-modal-value').val("");
+
+  $('#change-event-modal-list').val("events");
+  $('#change-event-modal-select').val("normal");
 
   //show the modal
   $('#change-event-modal').modal('show');

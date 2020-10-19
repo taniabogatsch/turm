@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"time"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -162,4 +163,25 @@ func (c Course) Meetings(ID int) revel.Result {
 
 	c.Log.Debug("loaded meetings", "meetings", meetings)
 	return c.Render(meetings, ID)
+}
+
+/*CalendarEvents of a course.
+- Roles: if public all, else logged in users. */
+func (c Course) CalendarEvents(ID int) revel.Result {
+
+	c.Log.Debug("load calendar events of course", "ID", ID)
+
+	//get the last (current) monday
+	now := time.Now()
+	weekday := time.Now().Weekday()
+	monday := now.AddDate(0, 0, -1*int(weekday))
+
+	events := models.CalendarEvents{}
+	if err := events.Get(nil, &ID, monday); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	c.Log.Debug("loaded calendar events", "calendar events", events)
+	return c.Render(events)
 }
