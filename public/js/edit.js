@@ -6,7 +6,17 @@ function submitChangeGroupModal(parentID) {
   $('#change-group-modal-form').submit();
 }
 
-function openChangeModal(title, field, value, valid, action, modal, max, info, ID) {
+function openChangeModal(title, field, valid, action, modal, max, info, ID, eventType) {
+
+  let value = "";
+  if (eventType == 1) {
+    value = $('#div-' + field + "-" + ID).html();
+  } else if (eventType == 2) {
+    value = $('#div-calendar_' + field + "-" + ID).html();
+  } else {
+    value = $('#div-' + field).html();
+  }
+  value = value.trim();
 
   $('#change-' + modal + '-modal-ID').val(ID);
   $('#change-' + modal + '-modal-title').html(title);
@@ -30,9 +40,6 @@ function openChangeModal(title, field, value, valid, action, modal, max, info, I
       $('#change-timestamp-modal-time').val("");
     } else {
       $('#change-' + modal + '-modal-value').val("");
-      if (field == "event") {
-        title = value;
-      }
       $('#change-' + modal + '-modal-value').attr("placeholder", title);
     }
   }
@@ -55,11 +62,7 @@ function openChangeModal(title, field, value, valid, action, modal, max, info, I
     $('#change-text-modal-validation').html($('#change-text-validation-text').html());
   }
 
-  if (field == "event") {
-    $('#change-text-modal-btn').html($('#change-text-add').html());
-  } else {
-    $('#change-text-modal-btn').html($('#change-text-save').html());
-  }
+  $('#change-text-modal-btn').html($('#change-text-save').html());
 
   //show the modal
   $('#change-' + modal + '-modal').modal('show');
@@ -157,7 +160,7 @@ function openTextAreaModal(title, field, valid, action, info, isEMail) {
 
   //set content
   if (valid) {
-    quill.root.innerHTML = $('#course-' + field).html();
+    quill.root.innerHTML = $('#div-' + field).html();
   } else {
     quill.root.innerHTML = "";
   }
@@ -185,16 +188,32 @@ function submitTextArea() {
 function openNewMeetingModal(eventID) {
 
   $('#new-meeting-modal-ID').val(eventID);
+  $('#new-meeting-modal-list').val("meetings-" + eventID);
   $('#new-meeting-modal').modal('show');
 }
 
-function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval) {
+function openEditMeeting(meetingID, start, end, place, annotation, weekday, interval, eventID) {
 
   let meetingType = "single";
+
   if (interval != 0) {
     meetingType = "weekly";
-    //$('#meeting-weekly-interval').val(interval); //TODO
-    //$('#meeting-weekly-weekday').val(weekday); //TODO
+
+    //set the interval
+    switch(interval) {
+    case "weekly":
+      $('#meeting-weekly-interval').val(1);
+      break;
+    case "even":
+      $('#meeting-weekly-interval').val(2);
+      break;
+    default:
+      $('#meeting-weekly-interval').val(3);
+      break;
+    }
+
+    //set the weekday
+    $('#meeting-weekly-weekday').val(weekday);
   }
 
   $('#edit-meeting-' + meetingType + '-ID').val(meetingID);
@@ -209,6 +228,9 @@ function openEditMeeting(meetingID, start, end, place, annotation, weekday, inte
     $('#' + meetingType + '-end-date').val(endParts[0]);
     $('#' + meetingType + '-end-time').val(endParts[1]);
   }
+
+  $('#edit-meeting-' + meetingType + '-eventID').val(eventID);
+  $('#edit-meeting-' + meetingType + '-list').val("meetings-" + eventID);
 
   $('#meeting-' + meetingType + '-place').val(place);
   $('#meeting-' + meetingType + '-annotation').val(annotation);
@@ -228,6 +250,7 @@ function plainCourse() {
 }
 
 function editCourse() {
+
   $(".edit-show").each(function() {
     $(this).removeClass("d-none");
   });
@@ -236,6 +259,14 @@ function editCourse() {
   });
   $('#preview-btn').removeClass('d-none');
   $('#hide-preview-btn').addClass('d-none');
+}
+
+function disableEnrollmentButtons() {
+
+  $(".enroll-btn").each(function() {
+    $(this).attr("href", "#no-scroll");
+    $(this).addClass('disabled');
+  });
 }
 
 function openRestrictionModal(title, ID, degreeID, studiesID, minSemester) {
@@ -259,4 +290,177 @@ function openEnrollmentKeyModal(eventID) {
 
   $('#change-enrollment-key-event-ID').val(eventID);
   $('#change-enrollment-key-modal').modal('show');
+}
+
+function handleEditResult(response) {
+
+  //course fields
+  if (response.ID == 0) {
+
+    //mandatory
+    if (response.FieldID == "title" || response.FieldID == "enrollment_start" ||
+      response.FieldID == "enrollment_end" || response.FieldID == "expiration_date") {
+      $('#div-' + response.FieldID).html(response.Value);
+
+    //not mandatory
+    } else  if (response.FieldID == "subtitle" || response.FieldID == "fee" ||
+      response.FieldID == "speaker" || response.FieldID == "description" ||
+      response.FieldID == "custom_email" || response.FieldID == "unsubscribe_end" ||
+      response.FieldID == "enroll_limit_events") {
+
+      if (response.Value != "") {
+        document.getElementById("div-edit-" + response.FieldID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID).classList.add("d-none");
+        $('#div-' + response.FieldID).html(response.Value);
+
+        if (response.Value == "0") {
+          document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
+          document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+        }
+
+      } else {
+        document.getElementById("div-edit-" + response.FieldID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID).classList.remove("d-none");
+      }
+
+    //switches
+    } else if (response.FieldID == "visible" || response.FieldID == "only_ldap") {
+      document.getElementById("change-" + response.FieldID + "-switch").checked = response.Valid;
+    }
+
+  //event fields
+  } else {
+
+    //mandatory
+    if (response.FieldID == "capacity" || response.FieldID == "title" ||
+      response.FieldID == "calendar_title") {
+      $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+
+      //not mandatory
+    } else if (response.FieldID == "annotation" || response.FieldID == "enrollment_key" ||
+      response.FieldID == "calendar_annotation") {
+
+      if (response.Value != "") {
+        document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-inline");
+
+        if (response.FieldID != "enrollment_key") {
+          $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+        }
+
+      } else {
+        document.getElementById("div-edit-" + response.FieldID + "-" + response.ID).classList.add("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.remove("d-none");
+        document.getElementById("div-add-" + response.FieldID + "-" + response.ID).classList.add("d-inline");
+      }
+
+    //switches
+    } else if (response.FieldID == "has_waitlist") {
+      document.getElementById("change-" + response.FieldID + "-switch-" + response.ID).checked = response.Valid;
+    }
+  }
+}
+
+function confirmDeleteJSONModal(title, content, action) {
+
+  $('#confirm-delete-JSON-modal-title').html(title);
+  $('#confirm-delete-JSON-modal-form').attr("action", action);
+  $('#confirm-delete-JSON-modal-content').html(content);
+
+  //show the modal
+  $('#confirm-delete-JSON-modal').modal('show');
+}
+
+function confirmDeleteRenderModal(title, content, action, fieldID) {
+
+  $('#confirm-delete-render-modal-title').html(title);
+  $('#confirm-delete-render-modal-form').attr("action", action);
+  $('#confirm-delete-render-modal-content').html(content);
+  $('#confirm-delete-render-modal-list').val(fieldID);
+
+  //show the modal
+  $('#confirm-delete-render-modal').modal('show');
+}
+
+function submitJSONForm(form, modal) {
+
+  $.ajax({
+    type: 'POST',
+    url: $(form).attr("action"),
+    data: $(form).serialize(),
+
+    success: function(response) {
+      if (response.Status == "success") {
+
+        handleEditResult(response);
+        showToast(response.Msg, 'success');
+
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+
+      } else {
+        showToast(response.Msg, 'danger');
+
+        if (response.FieldID == "has_waitlist") {
+          document.getElementById("change-" + response.FieldID + "-switch-" + response.ID).checked = !response.Valid;
+        }
+
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+      }
+    },
+
+    error: function (error) {
+      showToast("error", 'danger');
+      if (modal != "") {
+        $(modal).modal('hide');
+      }
+    },
+  });
+}
+
+function submitRenderForm(form, modal) {
+
+  $.ajax({
+    type: 'POST',
+    url: $(form).attr("action"),
+    data: $(form).serialize(),
+
+    success: function(response) {
+
+      let fieldID = $(modal + "-list").val();
+
+      if (fieldID == "editors" || fieldID == "instructors") {
+        $('#div-editor-instructor-list').html(response);
+      } else {
+        $('#div-' + fieldID).html(response);
+      }
+      editCourse();
+      disableEnrollmentButtons();
+      $(modal).modal('hide');
+    },
+
+    error: function (error) {
+      showToast("error", 'danger');
+      $(modal).modal('hide');
+    },
+  });
+}
+
+function openNewEventModal(title, action, ID, info) {
+
+  $('#change-event-modal-ID').val(ID);
+  $('#change-event-modal-title').html(title);
+  $('#change-event-modal-form').attr('action', action);
+  $('#change-event-modal-info').html(info);
+  $('#change-event-modal-value').val("");
+
+  $('#change-event-modal-list').val("events");
+  $('#change-event-modal-select').val("normal");
+
+  //show the modal
+  $('#change-event-modal').modal('show');
 }

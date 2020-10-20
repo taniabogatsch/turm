@@ -38,6 +38,9 @@ course.creator.email = E-mail address of course creator
 course.events = Events
 course.events.info = A course can have a multitude of events. You can enroll in these events.
 
+course.events.normal.none = This course has no normal events.
+course.events.calendar.none = This course has no calendar events.
+
 # -------------------------------------------------------------------------------------------------- #
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
@@ -54,6 +57,12 @@ event.number.meetings = Number of meetings
 
 event.enroll.success = You enrolled successfully.
 event.unsubscribe.success = You unsubscribed successfully.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+event.calendar.title = Calendar event title
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -114,6 +123,9 @@ meeting.weekly.edit = Edit weekly meeting
 
 event.new.success = Added event '%s', course ID = %d.
 
+event.type = Event type
+event.type.normal = Normal event
+
 event.delete.success = Deleted event, ID = %d.
 event.delete.confirm = Please confirm the deletion of event '%s'.
 event.delete.title = Delete event
@@ -128,7 +140,7 @@ event.title.change.success = Changed event title to '%s'.
 event.annotation.change.info = Here, you can provide additional information to further specify the event's purpose.
 event.annotation.change.success = Changed annotation to '%s'.
 event.annotation.delete.success = Deleted annotation.
-event.annotation.delete.confirm = Please confirm the deletion of the annotation '%s'.
+event.annotation.delete.confirm = Please confirm the deletion of the annotation.
 event.annotation.delete.title = Delete annotation
 
 event.waitlist.change.success = Changed waiting list option.
@@ -141,6 +153,23 @@ event.key.delete.success = Deleted enrollment key.
 event.key.delete.title = Delete enrollment key
 
 # -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+event.type.calendar = Calendar event
+event.new.calendar.success = Added calendar event '%s', course ID = %d.
+
+event.calendar.delete.success = Deleted calendar event, ID = %d.
+event.calendar.delete.confirm = Please confirm the deletion of the calendar event '%s'.
+event.calendar.delete.title = Delete calendar event
+
+event.calendar.title.change.info = The calendar event title comprises the purpose of the event, e.g. 'Machine 1', 'Room 3', ...
+event.calendar.title.change.success = Changed calendar event title to '%s'.
+
+event.calendar.annotation.change.success = Changed annotation to '%s'.
+event.calendar.annotation.delete.success = Deleted annotation.
+
+# -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
 
@@ -151,7 +180,7 @@ course.group.change.success = Set the course group, course ID = %d.
 
 course.fee.change.success = Changes course fee to %s€, course ID = %d.
 course.fee.delete.success = Deleted course fee, course ID = %d.
-course.fee.delete.confirm = Please confirm the deletion of the course fee of %g€, course ID = %d.
+course.fee.delete.confirm = Please confirm the deletion of the course fee.
 course.fee.delete.title = Delete course fee
 course.fee.change.info = Please provide the course fee in euros (€). Allowed formats are 15 or 15.0 or 15.00 (<strong>no euro sign!</strong>) for a fee of fifteen euros.
 
@@ -175,7 +204,7 @@ course.speaker.change.info = Here, you can provide detailed information about th
 
 course.subtitle.change.success = Changed subtitle to '%s', course ID = %d.
 course.subtitle.delete.success = Deleted subtitle, course ID = %d.
-course.subtitle.delete.confirm = Confirm deletion of subtitle '%s'.
+course.subtitle.delete.confirm = Confirm deletion of the subtitle.
 course.subtitle.delete.title = Delete subtitle
 course.subtitle.change.info = The subtitle can contain further information about the course title.
 
@@ -191,7 +220,7 @@ course.expiration.date.change.info = After this point the course is no longer ac
 course.unsubscribe_end.change.success = Set unsubscribe end to %s, course ID = %d.
 course.unsubscribe_end.delete.success = Deleted unsubscribe end, course ID = %d.
 course.unsubscribe.end.info = Up to this point, users can unsubscribe from the course.
-course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end %s?
+course.unsubscribe.end.delete.confirm = Confirm deletion of unsubscribe end?
 course.unsubscribe.end.delete.title = Delete unsubscribe end
 
 course.editors.change.success = Added editor: %s, course ID = %d.
@@ -231,6 +260,6 @@ course.blacklist.delete.title = Delete from blacklist
 
 course.enroll_limit_events.change.success = Set enroll limit for events to %d, course ID = %d.
 course.enroll_limit_events.delete.success = Deleted enroll limit for events, course ID = %d.
-course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit for events of %d.
+course.enroll.limit.events.delete.confirm = Please confirm the deletion of the enrollment limit.
 course.enroll.limit.events.delete.title = Delete enroll limit
 course.enroll.limit.events.change.info = The enrollment limit for events is the maximum number of events in which a user can enroll in this course.

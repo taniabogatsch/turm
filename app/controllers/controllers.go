@@ -32,6 +32,11 @@ type EditEvent struct {
 	*revel.Controller
 }
 
+/*EditCalendarEvent implements logic to edit calendar event data. */
+type EditCalendarEvent struct {
+	*revel.Controller
+}
+
 /*EditMeeting implements logic to edit meeting data. */
 type EditMeeting struct {
 	*revel.Controller
@@ -44,6 +49,11 @@ type Creator struct {
 
 /*Manage implements the course management page. */
 type Manage struct {
+	*revel.Controller
+}
+
+/*Participants implements logic to CRUD participants. */
+type Participants struct {
 	*revel.Controller
 }
 

@@ -5,6 +5,7 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/revel/revel"
 )
 
 /*Event is a model of the event table. */
@@ -56,13 +57,73 @@ func (event *Event) UpdateKey() (err error) {
 	return
 }
 
+/*UpdateWaitlist of an event. */
+func (event *Event) UpdateWaitlist(option bool, v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//check if users are at the wait list
+	if !option {
+		var notEmpty bool
+		if err = tx.Get(&notEmpty, stmtGetWaitlistEmpty, event.ID); err != nil {
+			log.Error("failed to get if wait list ist empty", "event", *event,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		} else if notEmpty {
+			v.ErrorKey("validation.invalid.at.wait.list")
+			tx.Commit()
+			return
+		}
+	}
+
+	//update the wait list
+	if err = updateByID(tx, "has_waitlist", "events", option, event.ID, event); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 /*Delete an event. */
-func (event *Event) Delete() (err error) {
-	return deleteByID("id", "events", event.ID, nil)
+func (event *Event) Delete(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//don't allow the deletion of events if users are enrolled in them
+	var notEmpty bool
+	if err = tx.Get(&notEmpty, stmtGetEventIsEmpty, event.ID); err != nil {
+		log.Error("failed to get if the event is empty or not", "event",
+			*event, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+	if notEmpty {
+		v.ErrorKey("validation.invalid.delete")
+		tx.Commit()
+		return
+	}
+
+	//delete event
+	if err = deleteByID("id", "events", event.ID, tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
 }
 
 /*Get returns all data of one event. */
-func (event *Event) Get(tx *sqlx.Tx, userID *int) (err error) {
+func (event *Event) Get(tx *sqlx.Tx) (err error) {
 
 	err = tx.Get(event, stmtGetEvent, event.ID)
 	if err != nil {
@@ -119,6 +180,11 @@ func (event *Event) validateEnrollment(c *Course) {
 
 	//all options disabling enrollment
 	event.EnrollOption = NOENROLL
+
+	if c.Expired || !c.Active {
+		event.EnrollMsg = "validation.enrollment.not.active"
+		return
+	}
 	if c.CourseStatus.AtBlacklist {
 		event.EnrollMsg = "validation.enrollment.at.blacklist"
 		return
@@ -165,9 +231,15 @@ func (event *Event) validateEnrollment(c *Course) {
 		}
 	}
 
-	//user is enrolled or on wait list
-	if event.EventStatus.Enrolled || event.EventStatus.OnWaitlist {
+	//user is enrolled
+	if event.EventStatus.Enrolled {
 		event.EnrollOption = UNSUBSCRIBE
+		return
+	}
+
+	//user is on wait list
+	if event.EventStatus.OnWaitlist {
+		event.EnrollOption = UNSUBSCRIBEFROMWAITLIST
 		return
 	}
 
@@ -197,6 +269,15 @@ type Events []Event
 func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 	limit *sql.NullInt32) (err error) {
 
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
 	err = tx.Select(events, stmtSelectEvents, *courseID)
 	if err != nil {
 		log.Error("failed to get events of course", "course ID", *courseID, "error", err.Error())
@@ -218,6 +299,10 @@ func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 		if err = (*events)[key].Meetings.Get(tx, &(*events)[key].ID); err != nil {
 			return
 		}
+	}
+
+	if txWasNil {
+		tx.Commit()
 	}
 	return
 }
@@ -345,5 +430,34 @@ const (
 			) AS fullness
 		FROM events e
 		WHERE id = $1
+	`
+
+	stmtGetEventVisible = `
+		SELECT c.visible
+		FROM courses c JOIN events e ON c.id = e.course_id
+		WHERE e.id = $1
+	`
+
+	stmtGetCourseIDByEvent = `
+		SELECT course_id
+		FROM events
+		WHERE id = $1
+	`
+
+	stmtGetEventIsEmpty = `
+		SELECT EXISTS (
+			SELECT true
+			FROM enrolled
+			WHERE event_id = $1
+		) AS not_empty
+	`
+
+	stmtGetWaitlistEmpty = `
+		SELECT EXISTS (
+			SELECT true
+			FROM enrolled
+			WHERE event_id = $1
+				AND status = 1 /*on waitlist*/
+		)
 	`
 )

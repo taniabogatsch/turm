@@ -10,6 +10,183 @@
 {{template "edit/modals/changeTimestamp.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/changeUserList.html" dict_addLocale $.currentLocale "ID" .course.ID}}
 
+{{template "edit/modals/newEvent.html" dict_addLocale $.currentLocale}}
+
 {{template "edit/modals/newMeeting.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
+
+{{template "edit/modals/deleteField.html" dict_addLocale $.currentLocale}}
+
+<script>
+
+  // -- JSON
+
+  $('#change-text-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-text-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-text-modal-form", "#change-text-modal");
+    event.preventDefault();
+  });
+
+  $('#change-int-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-int-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-int-modal-form", "#change-int-modal");
+    event.preventDefault();
+  });
+
+  $('#change-text-area-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-text-area-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-text-area-modal-form", "#change-text-area-modal");
+    event.preventDefault();
+  });
+
+  $('#change-timestamp-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-timestamp-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-timestamp-modal-form", "#change-timestamp-modal");
+    event.preventDefault();
+  });
+
+  $('#change-ldap-form').submit(function (event) {
+    submitJSONForm("#change-ldap-form", "");
+    event.preventDefault();
+  });
+
+  $('#change-visibility-form').submit(function (event) {
+    submitJSONForm("#change-visibility-form", "");
+    event.preventDefault();
+  });
+
+  $('#change-enrollment-key-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-enrollment-key-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitJSONForm("#change-enrollment-key-modal-form", "#change-enrollment-key-modal");
+    event.preventDefault();
+  });
+
+  $('#confirm-delete-JSON-modal-form').submit(function (event) {
+    submitJSONForm("#confirm-delete-JSON-modal-form", "#confirm-delete-JSON-modal");
+    event.preventDefault();
+  });
+
+  // -- render
+
+  $('#change-user-list-modal-form').submit(function (event) {
+    submitRenderForm("#change-user-list-modal-form", "#change-user-list-modal");
+    event.preventDefault();
+  });
+
+  $('#change-restriction-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-restriction-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#change-restriction-modal-form", "#change-restriction-modal");
+    event.preventDefault();
+  });
+
+  $('#change-event-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-event-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#change-event-modal-form", "#change-event-modal");
+    event.preventDefault();
+  });
+
+  $('#change-group-modal-form').submit(function (event) {
+    submitRenderForm("#change-group-modal-form", "#change-group-modal");
+    event.preventDefault();
+  });
+
+  $('#change-bool-modal-form').submit(function (event) {
+    submitRenderForm("#change-bool-modal-form", "#change-bool-modal");
+    event.preventDefault();
+  });
+
+  $('#confirm-delete-render-modal-form').submit(function (event) {
+    submitRenderForm("#confirm-delete-render-modal-form", "#confirm-delete-render-modal");
+    event.preventDefault();
+  });
+
+  $('#new-meeting-modal-form').submit(function (event) {
+    submitRenderForm("#new-meeting-modal-form", "#new-meeting-modal");
+    event.preventDefault();
+  });
+
+  $('#edit-meeting-single-form').submit(function (event) {
+
+    let form = document.getElementById("edit-meeting-single-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#edit-meeting-single-form", "#edit-meeting-single");
+    event.preventDefault();
+  });
+
+  $('#edit-meeting-weekly-form').submit(function (event) {
+
+    let form = document.getElementById("edit-meeting-weekly-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#edit-meeting-weekly-form", "#edit-meeting-weekly");
+    event.preventDefault();
+  });
+</script>

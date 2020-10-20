@@ -5,7 +5,7 @@
     <div class="modal-content">
 
       <!-- form -->
-      <form id="change-restriction-modal-form" accept-charset="UTF-8"
+      <form id="change-enrollment-key-modal-form" accept-charset="UTF-8"
         action='{{url "EditEvent.ChangeEnrollmentKey"}}#events' method="POST"
         class="needs-validation" novalidate>
 
@@ -24,6 +24,8 @@
 
           <!-- event ID -->
           <input id="change-enrollment-key-event-ID" type="hidden" name="ID">
+          <!-- fieldID-->
+          <input type="hidden" name="fieldID" value="enrollment_key">
 
           <!-- key -->
           <small class="form-text text-muted">

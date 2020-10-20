@@ -48,8 +48,9 @@
           {{range .editor}}
             <li class="list-group-item">
 
-              <!-- TODO: participants -->
-              <a class="btn btn-outline-darkblue float-right" href="#no-scroll" role="button">
+              <!-- participants -->
+              <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .ID}}'
+                role="button">
                 {{template "icons/people.html" . }}
               </a>
 
@@ -60,16 +61,19 @@
               </a>
 
               <!-- edit -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
+              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}'
+                role="button">
                 {{template "icons/pencil.html" . }}
               </a>
 
-              <!-- TODO: go to -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+              <!-- go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" role="button"
+                href='{{url "Course.Open" .ID}}'>
                 {{template "icons/eye.html" . }}
               </a>
 
-              <a class="text-body" href='#'> <!-- TODO: go to -->
+              <!-- title and go to -->
+              <a class="text-body" href='{{url "Course.Open" .ID}}'>
                 {{.Title}}
               </a>
 
@@ -96,17 +100,20 @@
           {{range .instructor}}
             <li class="list-group-item">
 
-              <!-- TODO: participants -->
-              <a class="btn btn-outline-darkblue float-right" href="#no-scroll" role="button">
+              <!-- participants -->
+              <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .ID}}'
+                role="button">
                 {{template "icons/people.html" . }}
               </a>
 
-              <!-- TODO: go to -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+              <!-- go to -->
+              <a class="btn btn-outline-darkblue float-right mr-3" role="button"
+                href='{{url "Course.Open" .ID}}'>
                 {{template "icons/eye.html" . }}
               </a>
 
-              <a class="text-body" href='#'> <!-- TODO: go to -->
+              <!-- title and go to -->
+              <a class="text-body" href='{{url "Course.Open" .ID}}'>
                 {{.Title}}
               </a>
 

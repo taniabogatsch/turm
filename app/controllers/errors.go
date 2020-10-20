@@ -91,3 +91,34 @@ func renderQuietError(errType ErrorType, err error, c *revel.Controller) {
 		c.ViewArgs["errMsg"] = c.Message("error.undefined")
 	}
 }
+
+//append all validation errors
+func getErrorString(errs []*revel.ValidationError) (str string) {
+
+	for i, err := range errs {
+		if i != 0 {
+			str += "<br>"
+		}
+		str += (*err).String()
+	}
+	return
+}
+
+//response of an ajax request
+type response struct {
+	Status  string
+	Msg     string
+	FieldID string
+	Valid   bool
+	Value   string
+	ID      int
+}
+
+const (
+	//SUCCESS result type
+	SUCCESS = "success"
+	//ERROR result type
+	ERROR = "error"
+	//INVALID validation result type
+	INVALID = "invalid"
+)

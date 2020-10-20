@@ -1,0 +1,63 @@
+<!-- template loading the whitelist -->
+
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-whitelists" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-whitelists').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
+{{if .whitelist}}
+  <div class="row mb-2 edit-show d-none">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "course.whitelist"}}:
+    </div>
+    <div class="col-sm-8">
+      {{range $key, $user := .whitelist}}
+        {{if ne $key 0}}<br>{{end}}
+        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+        <a href="mailto:{{.EMail}}" target="_top">
+          {{template "icons/envelope.html" .}}
+          {{.EMail}}
+        </a>
+        |
+        <a href="#no-scroll" class="badge btn-outline-darkblue"
+          onclick='confirmDeleteRenderModal({{msg $ "course.whitelist.delete.title"}},
+            {{msg $ "course.whitelist.delete.confirm" .EMail}},
+            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "whitelists"}}", "whitelists");'>
+          {{template "icons/trash.html" . }}
+        </a>
+      {{end}}
+    </div>
+  </div>
+{{end}}
+<div class="row mb-2 edit-show d-none">
+  <div class="col-sm-4 text-muted">
+  </div>
+  <div class="col-sm-8">
+    <button type="button" class="btn btn-outline-darkblue"
+      onclick='openUserListModal({{msg $ "creator.add.whitelist"}}, "whitelists");'>
+      {{msg $ "creator.add.whitelist"}}
+    </button>
+  </div>
+</div>

@@ -49,8 +49,17 @@ GET     /app/news                                   App.News
 # Course
 # ---------------------------------------------------------------------------- #
 
-POST     /course/open                                Course.Open
-GET      /course/open                                Course.Open
+POST    /course/open                                Course.Open
+GET     /course/open                                Course.Open
+
+GET     /course/editorInstructorList                Course.EditorInstructorList
+GET     /course/whitelist                           Course.Whitelist
+GET     /course/blacklist                           Course.Blacklist
+GET     /course/path                                Course.Path
+GET     /course/restrictions                        Course.Restrictions
+GET     /course/events                              Course.Events
+GET     /course/calendarEvents                      Course.CalendarEvents
+GET     /course/meetings                            Course.Meetings
 
 
 # ---------------------------------------------------------------------------- #
@@ -65,7 +74,7 @@ POST    /creator/new                                Creator.New
 
 
 # ---------------------------------------------------------------------------- #
-# Edit (course, event, meeting)
+# Edit (course, event, meeting, calendar event)
 # ---------------------------------------------------------------------------- #
 
 GET     /edit/open                                  Edit.Open
@@ -92,12 +101,15 @@ POST    /edit/event/delete                          EditEvent.Delete
 POST    /edit/event/newMeeting                      EditEvent.NewMeeting
 POST    /edit/event/changeCapacity                  EditEvent.ChangeCapacity
 POST    /edit/event/changeText                      EditEvent.ChangeText
-POST    /edit/event/changeWaitlist                  EditEvent.ChangeWaitlist
+POST    /edit/event/changeBool                      EditEvent.ChangeBool
 POST    /edit/event/changeEnrollmentKey             EditEvent.ChangeEnrollmentKey
 POST    /edit/event/deleteEnrollmentKey             EditEvent.DeleteEnrollmentKey
 
 POST    /edit/meeting/change                        EditMeeting.Edit
 POST    /edit/meeting/delete                        EditMeeting.Delete
+
+POST    /edit/calendar/changeText                   EditCalendarEvent.ChangeText
+POST    /edit/calendar/delete                       EditCalendarEvent.Delete
 
 
 # ---------------------------------------------------------------------------- #
@@ -115,6 +127,13 @@ GET     /enrollment/unsubscribe                     Enrollment.Unsubscribe
 GET     /manageCourses/active                       Manage.Active
 GET     /manageCourses/drafts                       Manage.Drafts
 GET     /manageCourses/expired                      Manage.Expired
+
+
+# ---------------------------------------------------------------------------- #
+# Course
+# ---------------------------------------------------------------------------- #
+
+GET     /participants/open                          Participants.Open
 
 
 # ---------------------------------------------------------------------------- #

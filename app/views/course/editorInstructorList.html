@@ -1,0 +1,107 @@
+<!-- template loading editors and instructors -->
+
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-instructors" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-instructors').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
+<!-- course editors and instructors -->
+{{if or .editors .instructors}}
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "user.role.instructors"}}:
+    </div>
+    <div class="col-sm-8">
+      {{range $key, $user := .editors}}
+        {{if ne $key 0}}<br>{{end}}
+        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+        <a href="mailto:{{.EMail}}" target="_top">
+          {{template "icons/envelope.html" .}}
+          {{.EMail}}
+        </a>
+        <div class="edit-show d-none text-muted">
+          {{msg $ "user.role.editor"}}
+          |
+          {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}",
+              {{msg $ "course.see.matr.nr.info"}}, {{msg $ "course.not.see.matr.nr.info"}},
+              {{.ViewMatrNr}}, {{.UserID}}, "editors", {{.CourseID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          |
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='confirmDeleteRenderModal({{msg $ "course.editor.delete.title"}},
+              {{msg $ "course.editor.delete.confirm" .EMail}},
+              "{{url "Edit.DeleteFromUserList" .CourseID .UserID "editors"}}",
+              "editors");'>
+            {{template "icons/trash.html" . }}
+          </a>
+        </div>
+      {{end}}
+      {{range $key, $user := .instructors}}
+        {{if $.editors}}<br>{{else if ne $key 0}}<br>{{end}}
+        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
+        <a href="mailto:{{.EMail}}" target="_top">
+          {{template "icons/envelope.html" .}}
+          {{.EMail}}
+        </a>
+        <div class="edit-show d-none text-muted">
+          {{msg $ "user.role.instructor"}}
+          |
+          {{if .ViewMatrNr}}{{template "icons/eye.html" . }}{{msg $ "user.matr.nrs"}}{{else}}{{template "icons/eyeSlash.html" . }}{{msg $ "user.matr.nrs"}}{{end}}
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}",
+              {{msg $ "course.see.matr.nr.info"}}, {{msg $ "course.not.see.matr.nr.info"}},
+              {{.ViewMatrNr}}, {{.UserID}}, "instructors", {{.CourseID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          |
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='confirmDeleteRenderModal({{msg $ "course.instructor.delete.title"}},
+              {{msg $ "course.instructor.delete.confirm" .EMail}},
+              "{{url "Edit.DeleteFromUserList" .CourseID .UserID "instructors"}}",
+              "instructors");'>
+            {{template "icons/trash.html" . }}
+          </a>
+        </div>
+      {{end}}
+    </div>
+  </div>
+{{end}}
+<div class="row edit-show d-none mb-2">
+  <div class="col-sm-4 text-muted">
+  </div>
+  <div class="col-sm-8">
+    <button type="button" class="btn btn-outline-darkblue"
+      onclick='openUserListModal({{msg $ "creator.add.editor"}}, "editors");'>
+      {{msg $ "creator.add.editor"}}
+    </button>
+    <button type="button" class="btn btn-outline-darkblue"
+      onclick='openUserListModal({{msg $ "creator.add.instructor"}}, "instructors");'>
+      {{msg $ "creator.add.instructor"}}
+    </button>
+  </div>
+</div>

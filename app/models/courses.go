@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"regexp"
 	"strconv"
 	"time"
@@ -34,12 +35,13 @@ type Course struct {
 	ParentID          sql.NullInt32   `db:"parent_id"`
 
 	//course data of different tables
-	Events       Events       ``
-	Editors      UserList     ``
-	Instructors  UserList     ``
-	Blacklist    UserList     ``
-	Whitelist    UserList     ``
-	Restrictions Restrictions ``
+	Events         Events         ``
+	CalendarEvents CalendarEvents ``
+	Editors        UserList       ``
+	Instructors    UserList       ``
+	Blacklist      UserList       ``
+	Whitelist      UserList       ``
+	Restrictions   Restrictions   ``
 
 	//additional information required when displaying the course
 	CreatorData User ``
@@ -114,6 +116,25 @@ func (course *Course) Validate(v *revel.Validation) {
 	}
 }
 
+/*GetVisible of a course. */
+func (course *Course) GetVisible(elem string) (err error) {
+
+	switch elem {
+	case "course":
+		err = app.Db.Get(course, stmtGetCourseVisible, course.ID)
+	case "event":
+		err = app.Db.Get(course, stmtGetEventVisible, course.ID)
+	default:
+		err = errors.New("invalid parameter type")
+	}
+
+	if err != nil {
+		log.Error("failed to get if course is visible", "course", *course,
+			"elem", elem, "error", err.Error())
+	}
+	return
+}
+
 /*Update the specified column in the course table. */
 func (course *Course) Update(tx *sqlx.Tx, column string, value interface{}) (err error) {
 	return updateByID(tx, column, "courses", value, course.ID, course)
@@ -171,6 +192,15 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		return
 	}
 
+	//get the last (current) monday
+	now := time.Now()
+	weekday := time.Now().Weekday()
+	monday := now.AddDate(0, 0, -1*int(weekday))
+	//get the calander events of a course
+	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
+		return
+	}
+
 	if manage {
 		//get courses of studies and degrees
 		if err = course.CoursesOfStudies.Get(tx); err != nil {
@@ -203,7 +233,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	}
 
 	//reset some data
-	if manage {
+	if !manage {
 		course.Blacklist = UserList{}
 		course.Whitelist = UserList{}
 	}
@@ -602,6 +632,21 @@ const (
 				current_timestamp > enrollment_end) AS no_enrollment_period,
 			(current_timestamp > unsubscribe_end AND
 				unsubscribe_end IS NOT NULL) AS unsubscribe_over
+		FROM courses
+		WHERE id = $1
+	`
+
+	stmtGetCourseVisible = `
+		SELECT visible
+		FROM courses
+		WHERE id = $1
+	`
+
+	stmtCourseExpired = `
+		SELECT (
+			current_timestamp >= expiration_date
+			AND active
+		) AS expired
 		FROM courses
 		WHERE id = $1
 	`

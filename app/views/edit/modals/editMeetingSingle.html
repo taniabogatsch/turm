@@ -5,8 +5,8 @@
     <div class="modal-content">
 
       <!-- form -->
-      <form accept-charset="UTF-8" action='{{url "EditMeeting.Edit"}}#events'
-        method="POST" class="needs-validation" novalidate>
+      <form accept-charset="UTF-8" action='{{url "EditMeeting.Edit"}}'
+        method="POST" class="needs-validation" novalidate id="edit-meeting-single-form">
 
         <!-- modal header -->
         <div class="modal-header bg-darkblue border-radius-2">
@@ -24,6 +24,11 @@
           <!-- meeting ID -->
           <input type="hidden" name="ID" id="edit-meeting-single-ID">
           <input type="hidden" name="meeting.MeetingInterval" value="0">
+          <!-- event ID -->
+          <input type="hidden" name="meeting.EventID" id="edit-meeting-single-eventID">
+
+          <!-- field ID -->
+          <input type="hidden" id="edit-meeting-single-list">
 
           <!-- start -->
           <p>

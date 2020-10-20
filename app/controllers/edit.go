@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -122,9 +121,10 @@ func (c Edit) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c Edit) NewEvent(ID int, value string) revel.Result {
+func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 
-	c.Log.Debug("create a new event", "ID", ID, "value", value)
+	c.Log.Debug("create a new event", "ID", ID, "value", value,
+		"eventType", eventType)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -134,23 +134,48 @@ func (c Edit) NewEvent(ID int, value string) revel.Result {
 		revel.MaxSize{255},
 	).MessageKey("validation.invalid.text.short")
 
+	if eventType != "normal" && eventType != "calendar" {
+		c.Validation.ErrorKey("validation.invalid.params")
+	}
+
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/events?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
-	event := models.Event{CourseID: ID, Title: value}
-	err := event.NewBlank()
-	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
-	}
+	//normal event
+	if eventType == "normal" {
 
-	c.Flash.Success(c.Message("event.new.success",
-		event.Title,
-		event.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+		event := models.Event{CourseID: ID, Title: value}
+		if err := event.NewBlank(); err != nil {
+			return flashError(
+				errDB, err, "/course/events?ID="+strconv.Itoa(ID),
+				c.Controller, "")
+		}
+
+		c.Flash.Success(c.Message("event.new.success",
+			event.Title,
+			event.ID,
+		))
+
+	} else { //calendar event
+
+		event := models.CalendarEvent{CourseID: ID, Title: value}
+		if err := event.NewBlank(); err != nil {
+			return flashError(
+				errDB, err, "", c.Controller, "")
+		}
+
+		c.Flash.Success(c.Message("event.new.calendar.success",
+			event.Title,
+			event.ID,
+		))
+	}
+	if eventType == "normal" {
+		return c.Redirect(Course.Events, ID)
+	}
+	return c.Redirect(Course.CalendarEvents, ID)
 }
 
 /*ChangeTimestamp changes the specified timestamp.
@@ -177,16 +202,14 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 	//TODO: if edit, get course, set new timestamp value and validate
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
 	if fieldID != "enrollment_start" && fieldID != "enrollment_end" &&
 		fieldID != "unsubscribe_end" && fieldID != "expiration_date" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	course := models.Course{ID: ID}
@@ -199,21 +222,17 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 	}
 
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
-		c.Flash.Success(c.Message("course."+fieldID+".change.success",
-			timestamp,
-			course.ID,
-		))
-	} else {
-		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
-			course.ID,
-		))
+		msg = c.Message("course."+fieldID+".change.success", timestamp, course.ID)
 	}
-	return c.Redirect(c.Session["currPath"])
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: strings.TrimSpace(timestamp)})
 }
 
 /*ChangeUserList adds a user to the user list of a course.
@@ -233,16 +252,17 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 	}
 
 	//TODO: if edit, get course, set new user and validate
-
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
 	if err := entry.Insert(listType); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	//TODO: if the course is active, the user should get a notification e-mail
@@ -251,7 +271,13 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 		entry.EMail,
 		entry.CourseID,
 	))
-	return c.Redirect(c.Session["currPath"])
+
+	if listType == "instructors" || listType == "editors" {
+		return c.Redirect(Course.EditorInstructorList, ID)
+	} else if listType == "whitelists" {
+		return c.Redirect(Course.Whitelist, ID)
+	}
+	return c.Redirect(Course.Blacklist, ID)
 }
 
 /*DeleteFromUserList removes a from the user list of a course.
@@ -272,13 +298,15 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
 	if err := entry.Delete(listType); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	//TODO: if the course is active, the user should get a notification e-mail
@@ -286,7 +314,13 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 	c.Flash.Success(c.Message("course."+listType+".delete.success",
 		ID,
 	))
-	return c.Redirect(c.Session["currPath"])
+
+	if listType == "instructors" || listType == "editors" {
+		return c.Redirect(Course.EditorInstructorList, ID)
+	} else if listType == "whitelists" {
+		return c.Redirect(Course.Whitelist, ID)
+	}
+	return c.Redirect(Course.Blacklist, ID)
 }
 
 /*ChangeViewMatrNr toggles the matriculation number restrictions for an editor/instructor.
@@ -307,13 +341,15 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID, ViewMatrNr: option}
 	if err := entry.Update(listType); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	//TODO: if the course is active, the user should get a notification e-mail
@@ -322,7 +358,7 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 		entry.EMail,
 		entry.CourseID,
 	))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.EditorInstructorList, ID)
 }
 
 /*ChangeBool toggles the provided boolean value of a course.
@@ -334,22 +370,19 @@ func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 	//NOTE: the interceptor assures that the course ID is valid
 
 	if listType != "visible" && listType != "only_ldap" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	course := models.Course{ID: ID}
 	if err := course.Update(nil, listType, option); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
-	c.Flash.Success(c.Message("course."+listType+".change.success",
-		course.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+	msg := c.Message("course."+listType+".change.success", course.ID)
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: listType, Valid: option})
 }
 
 /*ChangeText changes the text of the provided column.
@@ -383,18 +416,16 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 		}
 
 		if c.Validation.HasErrors() {
-			return flashError(
-				errValidation, nil, "", c.Controller, "")
+			return c.RenderJSON(
+				response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 		}
 	}
 
 	if fieldID != "description" && fieldID != "custom_email" &&
 		fieldID != "speaker" && fieldID != "title" &&
 		fieldID != "subtitle" && fieldID != "fee" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	course := models.Course{ID: ID}
@@ -404,8 +435,8 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 		value = strings.ReplaceAll(value, ",", ".")
 		fee, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return flashError(
-				errContent, err, "", c.Controller, "")
+			return c.RenderJSON(
+				response{Status: ERROR, Msg: c.Message("error.undefined")})
 		}
 		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid})
 
@@ -414,27 +445,21 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 	}
 
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
 		if fieldID == "title" || fieldID == "subtitle" || fieldID == "fee" {
-			c.Flash.Success(c.Message("course."+fieldID+".change.success",
-				value,
-				course.ID,
-			))
+			msg = c.Message("course."+fieldID+".change.success", value, course.ID)
 		} else {
-			c.Flash.Success(c.Message("course."+fieldID+".change.success",
-				course.ID,
-			))
+			msg = c.Message("course."+fieldID+".change.success", course.ID)
 		}
-	} else {
-		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
-			course.ID,
-		))
 	}
-	return c.Redirect(c.Session["currPath"])
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value})
 }
 
 /*ChangeGroup changes the group of a course.
@@ -450,7 +475,8 @@ func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/path?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	course := models.Course{
@@ -459,13 +485,14 @@ func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 	}
 	if err := course.Update(nil, "parent_id", course.ParentID); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/path?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("course.group.change.success",
 		course.ID,
 	))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.Path, ID)
 }
 
 /*ChangeEnrollLimit changes the enrollment limit of a course.
@@ -482,37 +509,30 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 	).MessageKey("validation.invalid.int")
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
 	valid := (value != 0)
 
 	if fieldID != "enroll_limit_events" {
-		return flashError(
-			errContent,
-			errors.New("invalid column value"),
-			"", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	course := models.Course{ID: ID}
 	err := course.Update(nil, fieldID, sql.NullInt32{int32(value), valid})
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
-		c.Flash.Success(c.Message("course."+fieldID+".change.success",
-			value,
-			course.ID,
-		))
-	} else {
-		c.Flash.Success(c.Message("course."+fieldID+".delete.success",
-			course.ID,
-		))
+		msg = c.Message("course."+fieldID+".change.success", value, course.ID)
 	}
-	return c.Redirect(c.Session["currPath"])
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: strconv.Itoa(value)})
 }
 
 /*ChangeRestriction adds/edits a degree/course of study/semester restriction.
@@ -527,25 +547,28 @@ func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Re
 	restriction.Validate(c.Validation)
 	if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, nil, "", c.Controller, "")
+			errValidation, nil, "/course/restrictions?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	if restriction.ID == 0 { //insert
 		if err := restriction.Insert(); err != nil {
 			return flashError(
-				errDB, err, "", c.Controller, "")
+				errDB, err, "/course/restrictions?ID="+strconv.Itoa(ID),
+				c.Controller, "")
 		}
 	} else { //update
 		if err := restriction.Update(); err != nil {
 			return flashError(
-				errDB, err, "", c.Controller, "")
+				errDB, err, "/course/restrictions?ID="+strconv.Itoa(ID),
+				c.Controller, "")
 		}
 	}
 
 	c.Flash.Success(c.Message("course.restriction.change.success",
 		restriction.CourseID,
 	))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.Restrictions, ID)
 }
 
 /*DeleteRestriction deletes a restriction. */
@@ -559,13 +582,14 @@ func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 	restriction := models.Restriction{ID: restrictionID}
 	if err := restriction.Delete(); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/restrictions?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("course.restriction.delete.success",
 		ID,
 	))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.Restrictions, ID)
 }
 
 /*SearchUser searches for users for the different user lists.

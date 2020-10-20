@@ -38,6 +38,9 @@ course.creator.email = E-Mail-Adresse KurserstellerIn
 course.events = Veranstaltungen
 course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
 
+course.events.normal.none = Dieser Kurs enthält keine normalen Veranstaltungen.
+course.events.calendar.none = Dieser Kurs enthält keine Kalenderveranstaltungen.
+
 # -------------------------------------------------------------------------------------------------- #
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
@@ -54,6 +57,12 @@ event.number.meetings = Anzahl der Termine
 
 event.enroll.success = Sie haben sich erfolgreich eingeschrieben.
 event.unsubscribe.success = Sie haben sich erfolgreich ausgetragen.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT FIELDS
+# -------------------------------------------------------------------------------------------------- #
+
+event.calendar.title = Kalenderveranstaltungstitel
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -118,6 +127,9 @@ event.delete.success = Veranstaltung gelöscht, ID = %d.
 event.delete.confirm = Veranstaltung '%s' wirklich löschen?
 event.delete.title = Veranstaltung löschen
 
+event.type = Art der Veranstaltung
+event.type.normal = Normale Veranstaltung
+
 event.capacity = Teilnehmeranzahl
 event.capacity.change.info = Die Teilnehmeranzahl ist die maximale Anzahl an TeilnehmerInnen, die sich in diese Veranstaltung einschreiben dürfen.
 event.capacity.change.success = Teilnehmeranzahl zu %d geändert.
@@ -128,7 +140,7 @@ event.title.change.success = Veranstaltungstitel zu '%s' geändert.
 event.annotation.change.info = Hier können Sie zusätzliche Informationen zur Veranstaltung angeben, um diese näher zu spezifizieren.
 event.annotation.change.success = Anmerkung zu '%s' geändert.
 event.annotation.delete.success = Anmerkung gelöscht.
-event.annotation.delete.confirm = Anmerkung '%s' wirklich löschen?
+event.annotation.delete.confirm = Anmerkung wirklich löschen?
 event.annotation.delete.title = Anmerkung löschen
 
 event.waitlist.change.success = Wartelistenoption angepasst.
@@ -141,6 +153,23 @@ event.key.delete.success = Einschreibeschlüssel gelöscht.
 event.key.delete.title = Einschreibeschlüssel löschen
 
 # -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENT CHANGE MODALS
+# -------------------------------------------------------------------------------------------------- #
+
+event.type.calendar = Kalenderveranstaltung
+event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
+
+event.calendar.delete.success = Kalenderveranstaltung gelöscht, ID = %d.
+event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen?
+event.calendar.delete.title = Kalenderveranstaltung löschen
+
+event.calendar.title.change.info = Der Kalenderveranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Maschine 1', 'Raum 1', ...
+event.calendar.title.change.success = Kalenderveranstaltungstitel zu '%s' geändert.
+
+event.calendar.annotation.change.success = Anmerkung zu '%s' geändert.
+event.calendar.annotation.delete.success = Anmerkung gelöscht.
+
+# -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #
 
@@ -151,7 +180,7 @@ course.group.change.success = Der Kurs ist nun Teil einer Gruppe, Kurs ID = %d.
 
 course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
 course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
-course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr von %g€ löschen wollen?
+course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr löschen wollen?
 course.fee.delete.title = Teilnahmegebühr löschen
 course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15 oder 15,0 oder 15,00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
@@ -175,7 +204,7 @@ course.speaker.change.info = Hier können Sie eine detaillierte Beschreibung zur
 
 course.subtitle.change.success = Untertitel zu '%s' geändert, Kurs ID = %d.
 course.subtitle.delete.success = Untertitel gelöscht, Kurs ID = %d.
-course.subtitle.delete.confirm = Untertitel '%s' wirklich löschen?
+course.subtitle.delete.confirm = Untertitel wirklich löschen?
 course.subtitle.delete.title = Untertitel löschen
 course.subtitle.change.info = Der Untertitel kann den Titel näher spezifizieren.
 
@@ -191,7 +220,7 @@ course.expiration.date.change.info = Ab diesem Zeitpunkt ist der Kurs nicht mehr
 course.unsubscribe_end.change.success = NutzerInnen können sich nun bis zum %s Uhr austragen, Kurs ID = %d.
 course.unsubscribe_end.delete.success = Austragen bis gelöscht, Kurs ID = %d.
 course.unsubscribe.end.info = Bis zu diesem Zeitpunkt können sich TeilnehmerInnen wieder austragen.
-course.unsubscribe.end.delete.confirm = Austragen bis zum %s Uhr wirklich löschen?
+course.unsubscribe.end.delete.confirm = "Austragen bis" wirklich löschen?
 course.unsubscribe.end.delete.title = Austragen bis löschen
 
 course.editors.change.success = EditorIn hinzugefügt: %s, Kurs ID = %d.
@@ -231,6 +260,6 @@ course.blacklist.delete.title = NutzerIn aus Blacklist löschen
 
 course.enroll_limit_events.change.success = Das Einschreibelimit für Veranstaltungen ist nun %d, Kurs ID = %d.
 course.enroll_limit_events.delete.success = Einschreibelimit für Veranstaltungen gelöscht, Kurs ID = %d.
-course.enroll.limit.events.delete.confirm = Wollen Sie das Einschreibelimit von %d für Veranstaltungen wirklich löschen?
+course.enroll.limit.events.delete.confirm = Wollen Sie das Einschreibelimit wirklich löschen?
 course.enroll.limit.events.delete.title = Einschreibelimit löschen
 course.enroll.limit.events.change.info = Das Einschreibelimit für Veranstaltungen gibt die maximale Anzahl an Veranstaltungen an, in die sich einE NutzerIn in diesem Kurs einschreiben darf.

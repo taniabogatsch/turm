@@ -168,11 +168,18 @@ func (groups *Groups) Select(prefix *string) (err error) {
 /*SelectPath selects the path of a course in the groups tree. */
 func (groups *Groups) SelectPath(courseID *int, tx *sqlx.Tx) (err error) {
 
-	err = tx.Select(groups, stmtGetPath, *courseID)
+	if tx == nil {
+		err = app.Db.Select(groups, stmtGetPath, *courseID)
+	} else {
+		err = tx.Select(groups, stmtGetPath, *courseID)
+	}
+
 	if err != nil {
 		log.Error("failed to select path", "courseID", *courseID,
 			"error", err.Error())
-		tx.Rollback()
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }

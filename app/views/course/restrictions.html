@@ -1,0 +1,73 @@
+<!-- template containing all enrollment restrictions -->
+
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-restrictions" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-restrictions').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
+{{if .restrictions}}
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">
+      {{msg $ "course.restrictions"}}:
+    </div>
+    <div class="col-sm-8">
+      <ul>
+        {{range $k, $v := .restrictions}}
+          <li>
+            {{if .DegreeID.Valid}}{{.DegreeName.String}}{{end}}
+            {{if .CourseOfStudiesID.Valid}}{{.StudiesName.String}}{{end}}
+            {{if .MinimumSemester.Valid}}
+              <small class="text-muted d-inline">
+                {{msg $ "course.minimum.semester"}}:{{.MinimumSemester.Int64}}
+              </small>
+            {{end}}
+
+            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+              onclick='openRestrictionModal({{msg $ "course.restrictions"}}, {{.ID}},
+                {{.DegreeID.Int64}}, {{.CourseOfStudiesID.Int64}}, {{.MinimumSemester.Int64}});'>
+              {{template "icons/pencil.html" . }}
+            </a>
+            <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+              onclick='confirmDeleteRenderModal({{msg $ "course.restriction.delete.title"}},
+                {{msg $ "course.restriction.delete.confirm"}},
+                {{url "Edit.DeleteRestriction" .CourseID .ID}}, "restrictions");'>
+              {{template "icons/trash.html" . }}
+            </a>
+          </li>
+        {{end}}
+      </ul>
+    </div>
+  </div>
+{{end}}
+<div class="row mb-2 edit-show d-none">
+  <div class="col-sm-4 text-muted">
+  </div>
+  <div class="col-sm-8">
+    <button type="button" class="btn btn-outline-darkblue"
+      onclick='openRestrictionModal("{{msg $ "course.restrictions"}}", 0, 0, 0, 0);'>
+      {{msg $ "creator.add.restriction"}}
+    </button>
+  </div>
+</div>

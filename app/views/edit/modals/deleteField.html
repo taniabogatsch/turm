@@ -1,0 +1,77 @@
+<!-- delete a course field
+
+titleID:        confirm-delete-JSON/render-modal-title        html
+formID:         confirm-delete-JSON/render-modal-form         action
+contentID:      confirm-delete-JSON/render-modal-content      html
+-->
+
+<div class="modal fade" id="confirm-delete-JSON-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="confirm-delete-JSON-modal-form" accept-charset="UTF-8" method="POST">
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="confirm-delete-JSON-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body" id="confirm-delete-JSON-modal-content">
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+            {{msg $ "button.confirm"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirm-delete-render-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="confirm-delete-render-modal-form" accept-charset="UTF-8" method="POST">
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white" id="confirm-delete-render-modal-title"></h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- fieldID -->
+        <input type="hidden" name="fieldID" id="confirm-delete-render-modal-list" required>
+
+        <!-- modal body -->
+        <div class="modal-body" id="confirm-delete-render-modal-content">
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="group-confirm-btn" type="submit" class="btn btn-darkblue">
+            {{msg $ "button.confirm"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

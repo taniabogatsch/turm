@@ -15,6 +15,7 @@ toast.success = Erfolg
 language.change.success = Die Sprache der Seite ist nun '%s'.
 
 intercept.invalid.action = Für diese Aktion fehlt Ihnen die Berechtigung.
+intercept.course.expired = Dieser Kurs ist bereits abgelaufen.
 
 # -------------------------------------------------------------------------------------------------- #
 # BUTTONS
@@ -114,7 +115,7 @@ user.details = Nutzerdetails
 
 email.dear.ms = Sehr geehrte Frau
 email.dear.mr = Sehr geehrter Herr
-email.none = Hallo
+email.dear.none = Hallo
 
 email.regards.plain = Mit freundlichen Grüßen
 email.dev.team = Ihr Turm2 Entwicklerteam

@@ -45,11 +45,18 @@ type Degree struct {
 /*Get all restrictions of a course. */
 func (rests *Restrictions) Get(tx *sqlx.Tx, courseID *int) (err error) {
 
-	err = tx.Select(rests, stmtSelectRestrictions, *courseID)
+	if tx == nil {
+		err = app.Db.Select(rests, stmtSelectRestrictions, *courseID)
+	} else {
+		err = tx.Select(rests, stmtSelectRestrictions, *courseID)
+	}
+
 	if err != nil {
 		log.Error("failed to get restrictions", "courseID", *courseID,
 			"error", err.Error())
-		tx.Rollback()
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }

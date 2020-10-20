@@ -13,7 +13,7 @@ minSemester:      change-restriction-modal-minimum-semester   value
 
       <!-- form -->
       <form id="change-restriction-modal-form" accept-charset="UTF-8"
-        action='{{url "Edit.ChangeRestriction"}}#general-data' method="POST"
+        action='{{url "Edit.ChangeRestriction"}}' method="POST"
         class="needs-validation" novalidate>
 
         <!-- modal header -->
@@ -31,6 +31,8 @@ minSemester:      change-restriction-modal-minimum-semester   value
           <input type="hidden" name="ID" value="{{.ID}}">
           <!-- restriction ID -->
           <input id="change-restriction-modal-restriction-ID" type="hidden" name="restriction.ID">
+          <!-- list -->
+          <input id="change-restriction-modal-list" type="hidden" value="restrictions">
 
           <!-- degree -->
           <small class="form-text text-muted">

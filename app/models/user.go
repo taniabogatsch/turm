@@ -430,32 +430,87 @@ func (user *User) IsEditorInstructor(tx *sqlx.Tx) (bool, bool, error) {
 }
 
 /*AuthorizedToEdit returns whether a user is authorized to edit a course or not. */
-func (user *User) AuthorizedToEdit(userIDSession, table *string, ID *int) (authorized bool, err error) {
+func (user *User) AuthorizedToEdit(table *string, ID *int) (authorized, expired bool, err error) {
 
-	user.ID, err = strconv.Atoi(*userIDSession)
+	tx, err := app.Db.Beginx()
 	if err != nil {
-		log.Error("failed to parse userID from session",
-			"userIDSession", *userIDSession, "error", err.Error())
+		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
 	switch *table {
-	case "courses":
-		err = app.Db.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
+	case "calendar_events":
+		err = tx.Get(ID, stmtGetCourseIDByCalendarEvent, *ID)
 	case "events":
-		err = app.Db.Get(&authorized, stmtAuthorizedToEditEvent, user.ID, *ID)
+		err = tx.Get(ID, stmtGetCourseIDByEvent, *ID)
 	case "meetings":
-		err = app.Db.Get(&authorized, stmtAuthorizedToEditMeeting, user.ID, *ID)
-	case "onlyCreator":
-		err = app.Db.Get(&authorized, stmtIsCreator, user.ID, *ID)
-	default:
-		return false, nil
+		err = tx.Get(ID, stmtGetCourseIDByMeeting, *ID)
 	}
 
 	if err != nil {
-		log.Error("failed to retrieve whether the user is authorized or not", "userID", user.ID,
-			"ID", *ID, "error", err.Error())
+		log.Error("failed to get course ID", "ID", *ID, "error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	err = tx.Get(&expired, stmtCourseExpired, *ID)
+	if err != nil {
+		log.Error("failed to get whether the course expired or not", "ID", *ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if user.ID != 0 {
+
+		switch *table {
+		case "courses", "events", "calendar_events", "meetings":
+			err = tx.Get(&authorized, stmtAuthorizedToEditCourse, user.ID, *ID)
+		case "onlyCreator":
+			err = tx.Get(&authorized, stmtIsCreator, user.ID, *ID)
+		}
+
+		if err != nil {
+			log.Error("failed to retrieve whether the user is authorized or not", "userID", user.ID,
+				"ID", *ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
+	tx.Commit()
+	return
+}
+
+/*HasElevatedRights returns whether a user is an instructor, editor, creator or
+admin (of a course). */
+func (user *User) HasElevatedRights(ID *int) (authorized, expired bool, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(&expired, stmtCourseExpired, *ID)
+	if err != nil {
+		log.Error("failed to get whether the course expired or not", "userID", user.ID,
+			"ID", *ID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if user.ID != 0 {
+		err = tx.Get(&authorized, stmtAuthorizedToManageParticipants, user.ID, *ID)
+		if err != nil {
+			log.Error("failed to get whether the user has elevated rights or not", "userID", user.ID,
+				"ID", *ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
+	tx.Commit()
 	return
 }
 
@@ -647,46 +702,6 @@ const (
 		) AS authorized
 	`
 
-	stmtAuthorizedToEditEvent = `
-		SELECT EXISTS (
-			SELECT true
-			FROM courses c, events e
-			WHERE e.id = $2
-				AND c.creator = $1
-				AND c.id = e.course_id
-
-			UNION
-
-			SELECT true
-			FROM editors ed, events e
-			WHERE e.id = $2
-				AND ed.user_id = $1
-				AND e.course_id = ed.course_id
-
-		) AS authorized
-	`
-
-	stmtAuthorizedToEditMeeting = `
-		SELECT EXISTS (
-			SELECT true
-			FROM meetings m, events e, courses c
-			WHERE m.id = $2
-				AND c.creator = $1
-				AND e.id = m.event_id
-				AND e.course_id = c.id
-
-			UNION
-
-			SELECT true
-			FROM editors ed, meetings m, events e
-			WHERE m.id = $2
-				AND ed.user_id = $1
-				AND m.event_id = e.id
-				AND e.course_id = ed.course_id
-
-		) AS authorized
-	`
-
 	stmtIsEditorInstructor = `
 		SELECT
 			EXISTS (
@@ -716,5 +731,29 @@ const (
 			degrees d ON s.degree_id = d.id LEFT OUTER JOIN
 			courses_of_studies c ON s.course_of_studies_id = c.id
 		WHERE user_id = $1
+	`
+
+	stmtAuthorizedToManageParticipants = `
+		SELECT EXISTS (
+			SELECT true
+			FROM courses
+			WHERE id = $2
+				AND creator = $1
+
+			UNION
+
+			SELECT true
+			FROM editors
+			WHERE user_id = $1
+				AND course_id = $2
+
+			UNION
+
+			SELECT true
+			FROM instructors
+			WHERE user_id = $1
+				AND course_id = $2
+
+		) AS authorized
 	`
 )

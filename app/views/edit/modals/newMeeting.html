@@ -8,8 +8,8 @@ ID:             new-meeting-modal-ID            value
     <div class="modal-content">
 
       <!-- form -->
-      <form accept-charset="UTF-8" action='{{url "EditEvent.NewMeeting"}}#events'
-        method="POST" class="needs-validation" novalidate>
+      <form accept-charset="UTF-8" action='{{url "EditEvent.NewMeeting"}}'
+        method="POST" class="needs-validation" novalidate id="new-meeting-modal-form">
 
         <!-- modal header -->
         <div class="modal-header bg-darkblue border-radius-2">
@@ -26,6 +26,9 @@ ID:             new-meeting-modal-ID            value
 
           <!-- event ID -->
           <input type="hidden" name="ID" id="new-meeting-modal-ID">
+
+          <!-- field ID -->
+          <input type="hidden" id="new-meeting-modal-list">
 
           <!-- load option -->
           <small class="form-text text-muted">
