@@ -96,12 +96,11 @@ func (c Manage) auth() revel.Result {
 			return nil
 		}
 
-		//editors and instructors are not authorized to create new courses
 		if c.Session["isEditor"].(string) == cTrue {
 			return nil
 		}
 
-		//instructors are only allowed to see active and inactive courses
+		//instructors are only allowed to see active and expired courses
 		if c.Session["isInstructor"].(string) == cTrue && (c.MethodName == "Active" ||
 			c.MethodName == "GetActive" || c.MethodName == "Expired" || c.MethodName == "GetExpired") {
 			return nil

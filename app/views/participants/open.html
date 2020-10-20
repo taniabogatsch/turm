@@ -1,0 +1,137 @@
+<!-- template containing the participants managment -->
+
+{{template "header.html" .}}
+
+{{template "manage/templates/leftNav.html" . }}
+
+<div class="page page-middle">
+  <div class="tab-content">
+
+    <h4>
+      <!-- show either an open draft or an open course -->
+      {{template "icons/people.html" . }}
+      &nbsp; Teilnehmerverwaltung
+    </h4>
+    <hr>
+
+    {{if .errMsg}}
+      <div class="val-div w-100 text-danger">
+        {{.errMsg}}
+      </div>
+    {{else}}
+
+      <!-- title -->
+      <div class="row">
+        <div class="col">
+          <h4>
+            {{.participants.Title}}
+          </h4>
+        </div>
+      </div>
+      <hr>
+
+      <div class="row">
+        <div class="col-sm-3">
+          Einschreibestart:
+          <br>
+          {{.participants.EnrollmentStart}}
+        </div>
+        <div class="col-sm-3">
+          Einschreibeende:
+          <br>
+          {{.participants.EnrollmentEnd}}
+        </div>
+        <div class="col-sm-3">
+          Austragen bis:
+          <br>
+          {{if .participants.UnsubscribeEnd.Valid}}
+            {{.participants.UnsubscribeEnd.String}}
+          {{else}}
+            -
+          {{end}}
+        </div>
+        <div class="col-sm-3">
+          Ablaufdatum:
+          <br>
+          {{.participants.ExpirationDate}}
+        </div>
+      </div>
+      <hr>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <select class="custom-select" id="parts-select-event">
+            <option value="all" selected>Alle Veranstaltungen</option>
+            {{range .participants.Lists}}
+              <option value="{{.ID}}">{{.Title}}</option>
+            {{end}}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-outline-darkblue w-100">
+            {{template "icons/download.html" . }}
+            &nbsp; Teilnehmerliste
+          </button>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-outline-darkblue w-100">
+            {{template "icons/envelope.html" . }}
+            &nbsp; E-Mail senden
+          </button>
+        </div>
+      </div>
+      <hr>
+
+      <div class="collapse show select-option select-option-all">
+        - manuell einschreiben
+        <br>
+        Alle Veranstaltungen
+      </div>
+      {{range .participants.Lists}}
+        <div class="collapse select-option select-option-{{.ID}}">
+          - manuell einschreiben
+          <br>
+          {{.Title}}
+        </div>
+      {{end}}
+
+    {{end}}
+  </div>
+</div>
+
+<div class="page page-side">
+  <div class="page-right-layout">
+    <small class="text-muted">
+      Hier können Sie spezifizieren für welche Veranstaltung Sie die Teilnehmerlisten anzeigen möchten. Außerdem können Sie für die gewählte Option die Teilnehmerliste herunterladen oder E-Mails versenden.
+    </small>
+  </div>
+</div>
+
+<script src="/public/js/participants.js"></script>
+
+<script>
+  $(function() {
+    //adjust the nav pills
+    {{if .participants.Active}}
+      $('#pills-opened-draft').addClass("d-none");
+      $('#pills-opened-active').removeClass("d-none");
+      $('#pills-opened-expired').addClass("d-none");
+    {{else}}
+      $('#pills-opened-draft').addClass("d-none");
+      $('#pills-opened-active').addClass("d-none");
+      $('#pills-opened-expired').removeClass("d-none");
+    {{end}}
+
+    //on change hide all divs linked to select and show only linked to selected option
+    $('#parts-select-event').change(function(){
+      //get the wanted div
+      let selector = '.select-option-' + $(this).val();
+      //hide all elements
+      $('.select-option').collapse('hide');
+      //show element connected to selected option
+      $(selector).collapse('show');
+    });
+  });
+</script>
+
+{{template "footer.html" .}}

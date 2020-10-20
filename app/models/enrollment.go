@@ -41,6 +41,8 @@ const (
 	NOUNSUBSCRIBE
 	//ENROLLTOWAITLIST is for enrolling to the wait list
 	ENROLLTOWAITLIST
+	//UNSUBSCRIBEFROMWAITLIST is for unsubscribing from the wait list
+	UNSUBSCRIBEFROMWAITLIST
 )
 
 func (s EnrollOption) String() string {
@@ -117,6 +119,8 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
+
+	//TODO: enrollment key!
 
 	//get relevant event information
 	event := Event{ID: *eventID}

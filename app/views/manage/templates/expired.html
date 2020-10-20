@@ -11,8 +11,9 @@
       {{template "icons/trash.html" . }}
     </button>
 
-    <!-- TODO: participants -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+    <!-- participants -->
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Participants.Open" .ID}}'
+      role="button">
       {{template "icons/people.html" . }}
     </a>
 

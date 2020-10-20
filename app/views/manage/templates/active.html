@@ -3,8 +3,9 @@
 {{range .entries}}
   <li class="list-group-item">
 
-    <!-- TODO: participants -->
-    <a class="btn btn-outline-darkblue float-right" href="#no-scroll" role="button">
+    <!-- participants -->
+    <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .ID}}'
+      role="button">
       {{template "icons/people.html" . }}
     </a>
 

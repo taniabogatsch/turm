@@ -52,6 +52,11 @@ type Manage struct {
 	*revel.Controller
 }
 
+/*Participants implements logic to CRUD participants. */
+type Participants struct {
+	*revel.Controller
+}
+
 /*Admin implements logic to CRUD data for admin functions. */
 type Admin struct {
 	*revel.Controller
