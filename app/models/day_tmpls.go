@@ -87,15 +87,32 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 //validate a day template.
 func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 
-	time := CustomTime{}
-	isValidTime1 := time.SetTime(tmpl.StartTime)
-	isValidTime2 := time.SetTime(tmpl.EndTime)
+	//check for valid times
+	startTime := Custom_time{}
+	isValidTime1 := startTime.SetTime(tmpl.StartTime)
 
-	if isValidTime1 == false || isValidTime2 == false {
-		v.ErrorKey("validation.invalid.timestamp")
-	}
+	endTime := Custom_time{}
+	isValidTime2 := endTime.SetTime(tmpl.EndTime)
 
-	//TODO!
+	v.Check(isValidTime1 == false || isValidTime2 == false).
+		MessageKey("validation.invalid.timestamp")
+
+	//check startTime before endTime
+	v.Check(startTime.Before(endTime)).
+		MessageKey("validation.calendarEvent.startInPast")
+
+	//chek if startTime and endTime is on same date
+	y1, m1, d1 := slot.StartTimestamp.Date()
+	y2, m2, d2 := slot.EndTimestamp.Date()
+	v.Check(y1 == y2 && m1 == m2 && d1 == d2).
+		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
+
+	//check step distance
+	intervalSteps := float64(startTime.Sub(endTime) / tmpl.Interval)
+	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
+	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
+
+	//TODO! check for, other tmpl on this day
 }
 
 /*Update a day tmpl. */

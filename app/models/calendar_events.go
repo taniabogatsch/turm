@@ -74,8 +74,37 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, day time.Time) (er
 }
 
 /*Get a calendar event by its ID and a monday. */
-func (event *CalendarEvent) Get(courseID *int, monday time.Time) (err error) {
-	//TODO
+func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	err = tx.Get(event, stmtSelectCalendarEvent, *courseID, event.ID)
+	if err != nil {
+		log.Error("failed to get CalendarEvents of course", "monday", monday, "course ID", *courseID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get all day_templates of this event
+	err = event.Days.Get(tx, &event.ID, monday)
+	if err != nil {
+		return
+	}
+	//set the current week
+	_, event.Week = monday.ISOWeek()
+
+	if txWasNil {
+		tx.Commit()
+	}
+
 	return
 }
 
@@ -94,8 +123,14 @@ func (event *CalendarEvent) Delete(v *revel.Validation) (err error) {
 	}
 
 	var notEmpty bool
-	//TODO @Marco:
 	//don't allow the deletion of calendar events if users are enrolled in them
+	tx.Get(notEmpty, stmtUsersExist, event.ID)
+	if err != nil {
+		log.Error("failed to get CalendarEvents of course", "event ID", event.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
 
 	if notEmpty {
 		v.ErrorKey("validation.invalid.delete")
@@ -130,9 +165,25 @@ const (
 		ORDER BY id ASC
 	`
 
+	stmtSelectCalendarEvent = `
+		SELECT id, course_id, title, annotation
+		FROM calendar_events
+		WHERE course_id = $1
+			AND id = $2
+		ORDER BY id ASC
+	`
+
 	stmtGetCourseIDByCalendarEvent = `
 		SELECT course_id
 		FROM calendar_events
 		WHERE id = $1
+	`
+
+	stmtUsersExist = `
+		SELECT EXISTS (
+			SELECT true
+			FROM day_templates t JOIN slots s ON t.id = s.day_tmpl_id
+			WHERE calendar_event_id = $1
+		) AS not_empty
 	`
 )

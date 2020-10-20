@@ -71,6 +71,12 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	v.Check(startAfterEndTime).
 		MessageKey("validation.calendarEvent.startAfterEndTime")
 
+	//chek if startTime and endTime is on same date
+	y1, m1, d1 := slot.StartTimestamp.Date()
+	y2, m2, d2 := slot.EndTimestamp.Date()
+	v.Check(y1 == y2 && m1 == m2 && d1 == d2).
+		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
+
 	dayTmpls := []DayTmpl{}
 
 	weekday := int(slot.StartTimestamp.Weekday())
@@ -81,14 +87,14 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 			"error", err.Error())
 	}
 
-	slotStartTime := CustomTime{}
+	slotStartTime := Custom_time{}
 	slotStartTime.Hour, slotStartTime.Min, _ = slot.StartTimestamp.Clock()
 
-	slotEndTime := CustomTime{}
+	slotEndTime := Custom_time{}
 	slotEndTime.Hour, slotEndTime.Min, _ = slot.EndTimestamp.Clock()
 
-	tmplStartTime := CustomTime{}
-	tmplEndTime := CustomTime{}
+	tmplStartTime := Custom_time{}
+	tmplEndTime := Custom_time{}
 
 	isInTemplate := false
 	indexDayTmpl := 0
@@ -117,7 +123,7 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	endWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(endWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
 
-	//schon besetzt?
+	//TODO: schon besetzt?
 }
 
 //TODO: delete (unsubscribe)
