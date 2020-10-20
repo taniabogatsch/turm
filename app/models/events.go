@@ -231,9 +231,15 @@ func (event *Event) validateEnrollment(c *Course) {
 		}
 	}
 
-	//user is enrolled or on wait list
-	if event.EventStatus.Enrolled || event.EventStatus.OnWaitlist {
+	//user is enrolled
+	if event.EventStatus.Enrolled {
 		event.EnrollOption = UNSUBSCRIBE
+		return
+	}
+
+	//user is on wait list
+	if event.EventStatus.OnWaitlist {
+		event.EnrollOption = UNSUBSCRIBEFROMWAITLIST
 		return
 	}
 

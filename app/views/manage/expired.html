@@ -47,8 +47,9 @@
           {{range .editor}}
             <li class="list-group-item">
 
-              <!-- TODO: participants -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll" role="button">
+              <!-- participants -->
+              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Participants.Open" .ID}}'
+                role="button">
                 {{template "icons/people.html" . }}
               </a>
 
@@ -93,7 +94,8 @@
             <li class="list-group-item">
 
               <!-- TODO: participants -->
-              <a class="btn btn-outline-darkblue float-right" href="#no-scroll" role="button">
+              <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .ID}}'
+                role="button">
                 {{template "icons/people.html" . }}
               </a>
 

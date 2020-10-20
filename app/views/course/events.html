@@ -94,12 +94,22 @@
               {{if .HasWaitlist}}checked{{end}}>
             <span class="slider round"></span>
           </label>
-          <label class="form-check-label">
+          <label class="form-check-label edit-show d-none" id="change-has_waitlist-info-{{.ID}}">
             {{template "icons/listUL.html" . }} &nbsp; {{msg $ "event.waitlist.yes"}}
           </label>
         </form>
       </small>
       <script>
+
+        $(function() {
+          let switchWaitlist = document.getElementById("change-has_waitlist-switch-{{.ID}}");
+          if (switchWaitlist.checked) {
+            document.getElementById('change-has_waitlist-info-{{.ID}}').classList.remove("d-none");
+          } else {
+            document.getElementById('change-has_waitlist-info-{{.ID}}').classList.add("d-none");
+          }
+        });
+
         //react to has_waitlist switch events
         $('#change-has_waitlist-switch-{{.ID}}').change(function() {
           $('#change-has_waitlist-form-{{.ID}}').submit();

@@ -2,6 +2,8 @@
 
 <!-- option 0, 1, 4 are enroll/unsubscribe/to waitlist -->
 
+<!-- TODO: add button to unsubscribe from a wait list and also print information that the user is at the wait list -->
+
 {{if eq .option 0}}
   <!-- enroll button -->
   <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
@@ -39,5 +41,13 @@
   <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
     href='{{url "Enrollment.Enroll" .ID}}'>
     {{msg $ "button.to.waitlist"}}
+  </a>
+{{end}}
+
+{{if eq .option 5}}
+  <!-- unsubscribe from wait list button -->
+  <a class="btn btn-outline-danger float-right ml-3 edit-hide enroll-btn"
+    href='{{url "Enrollment.Unsubscribe" .ID}}'>
+    Aus Warteliste
   </a>
 {{end}}

@@ -1,0 +1,1 @@
+/* This file comprises functios for managing participants of a course. */
