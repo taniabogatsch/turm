@@ -102,6 +102,7 @@ validation.enrollment.no.period = Kein Einschreibezeitraum.
 validation.enrollment.full = Diese Veranstaltung ist bereits voll.
 validation.enrollment.already.enrolled = Sie sind bereits in diese Veranstaltung eingeschrieben.
 validation.enrollment.already.unsubscribed = Sie haben sich bereits aus dieser Veranstaltung ausgetragen.
+validation.enrollment.invalid.key = Ungültiger Einschreibeschlüssel.
 
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EVENTS

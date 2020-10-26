@@ -2,14 +2,19 @@
 
 <!-- option 0, 1, 4 are enroll/unsubscribe/to waitlist -->
 
-<!-- TODO: add button to unsubscribe from a wait list and also print information that the user is at the wait list -->
-
 {{if eq .option 0}}
   <!-- enroll button -->
-  <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
-    href='{{url "Enrollment.Enroll" .ID}}'>
-    {{msg $ "button.enroll"}}
-  </a>
+  {{if .hasKey}}
+    <button class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
+      onclick='enterKeyModal({{url "Enrollment.Enroll"}}, {{msg $ "button.enroll"}}, {{.ID}});'>
+      {{msg $ "button.enroll"}}
+    </button>
+  {{else}}
+    <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
+      href='{{url "Enrollment.Enroll" .ID}}'>
+      {{msg $ "button.enroll"}}
+    </a>
+  {{end}}
 {{end}}
 
 {{if eq .option 1}}
@@ -38,16 +43,76 @@
 
 {{if eq .option 4}}
   <!-- enroll to waitlist button -->
-  <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
-    href='{{url "Enrollment.Enroll" .ID}}'>
-    {{msg $ "button.to.waitlist"}}
-  </a>
+  {{if .hasKey}}
+    <button class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
+      onclick='enterKeyModal({{url "Enrollment.Enroll"}}, {{msg $ "button.to.waitlist"}}, {{.ID}});'>
+      {{msg $ "button.to.waitlist"}}
+    </button>
+  {{else}}
+    <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
+      href='{{url "Enrollment.Enroll" .ID}}'>
+      {{msg $ "button.to.waitlist"}}
+    </a>
+  {{end}}
 {{end}}
 
 {{if eq .option 5}}
   <!-- unsubscribe from wait list button -->
   <a class="btn btn-outline-danger float-right ml-3 edit-hide enroll-btn"
     href='{{url "Enrollment.Unsubscribe" .ID}}'>
-    Aus Warteliste
+    {{msg $ "button.from.waitlist"}}
   </a>
 {{end}}
+
+<div class="modal fade" id="enter-enroll-key-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form id="enter-enroll-key-modal-form" accept-charset="UTF-8" method="GET">
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            Einschreibeschlüssel eingeben
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+          <input type="hidden" name="ID" id="enter-enroll-key-modal-ID">
+
+          <!-- key -->
+          <small class="form-text text-muted">
+            {{msg $ "event.key"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="key" type="password" class="form-control rounded-right" min="3" max="511"
+              required>
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.abort"}}
+          </button>
+          <button id="enter-enroll-key-modal-btn" type="submit" class="btn btn-darkblue">
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

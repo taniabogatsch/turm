@@ -122,7 +122,8 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 			errDB, err, "", c.Controller, "")
 	}
 
-	err := sendEMail(c.Controller, &user,
+	data := models.EMailData{User: user}
+	err := sendEMail(c.Controller, &data,
 		"email.subject.new.role",
 		"newRole")
 	if err != nil {

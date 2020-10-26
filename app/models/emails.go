@@ -9,8 +9,17 @@ import (
 
 /*EMailData holds all data that is rendered in the different e-mail templates. */
 type EMailData struct {
+
+	//used for salutation, user specific changes (new pw, role, activation, ...)
 	User User
-	URL  string
+
+	//used for linking to the page
+	URL string
+
+	//used for enrollment
+	CourseTitle string
+	EventTitle  string
+	CourseID    int
 }
 
 /*GetEMailSubjectBody assigns the template content to the e-mail body and sets the e-mail subject. */

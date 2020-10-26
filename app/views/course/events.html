@@ -47,7 +47,7 @@
       </a>
 
       <!-- enrollment button -->
-      {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID}}
+      {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
 
       <!-- fullness and capacity -->
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
@@ -101,14 +101,16 @@
       </small>
       <script>
 
-        $(function() {
-          let switchWaitlist = document.getElementById("change-has_waitlist-switch-{{.ID}}");
-          if (switchWaitlist.checked) {
-            document.getElementById('change-has_waitlist-info-{{.ID}}').classList.remove("d-none");
-          } else {
-            document.getElementById('change-has_waitlist-info-{{.ID}}').classList.add("d-none");
-          }
-        });
+        {{if not $.manage}}
+          $(function() {
+            let switchWaitlist = document.getElementById("change-has_waitlist-switch-{{.ID}}");
+            if (switchWaitlist.checked) {
+              document.getElementById('change-has_waitlist-info-{{.ID}}').classList.remove("d-none");
+            } else {
+              document.getElementById('change-has_waitlist-info-{{.ID}}').classList.add("d-none");
+            }
+          });
+        {{end}}
 
         //react to has_waitlist switch events
         $('#change-has_waitlist-switch-{{.ID}}').change(function() {

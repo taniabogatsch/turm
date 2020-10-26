@@ -45,24 +45,21 @@ type sendEMails struct{}
 /*Run is a job that sends one e-mail from the queue. */
 func (e sendEMails) Run() {
 
-	email := <-EMailQueue
-	mailer(&email)
-	revel.AppLog.Debug("sending email", "recipient", email.Recipient,
-		"subject", email.Subject, "replyTo", email.ReplyTo)
+	select {
+	case email := <-EMailQueue:
+		mailer(&email)
+		revel.AppLog.Debug("sending email", "recipient", email.Recipient,
+			"subject", email.Subject, "replyTo", email.ReplyTo)
 
-	//wait before sending the next e-mail
-	time.Sleep(time.Second * 15) //necessary to not spam the e-mail server too much
+	case <-time.After(1 * time.Second):
+		//no e-mail in queue
+	}
 }
 
 //mailer sends an e-mail
 func mailer(email *EMail) {
 
-	//NOTE: receipts must look like this: []string{"some.mail@tu-ilmenau.de", "second.mail@web.de"}
-
-	//set up authentication information
-	auth := smtp.PlainAuth("", Mailer.User, Mailer.Password, Mailer.Server)
-
-	//connect to the server, authenticate, set the sender and recipient and send the e-mail
+	//set the subject and the body
 	subjectb64 := base64.StdEncoding.EncodeToString([]byte(email.Subject))
 	subjectutf8 := "=?utf-8?B?" + subjectb64 + "?=" //workaround for e-mail servers to not confuse uft-8 encoding in the subject
 	msg := "From: " + Mailer.EMail + "\n" +
@@ -72,12 +69,49 @@ func mailer(email *EMail) {
 		"MIME-version: 1.0;\nContent-Type: multipart/alternative; boundary=\"Nldui6qoTs4F=_?:\"\n\n" +
 		email.Body
 
-	err := smtp.SendMail(Mailer.URL, auth, Mailer.EMail, []string{email.Recipient}, []byte(msg))
+	//localhost -> local e-mail server (postfix)
+	c, err := smtp.Dial("127.0.0.1:25")
 	if err != nil {
-		revel.AppLog.Error("error sending e-mail", "recipient", email.Recipient,
-			"subject", email.Subject, "replyTo", email.ReplyTo, "err", err.Error())
+		revel.AppLog.Error("failed dialing localhost", "error", err.Error())
+		return
 	}
-	return
+	defer c.Close()
+
+	if err = c.Mail(Mailer.EMail); err != nil {
+		revel.AppLog.Error("failed setting the service e-mail as the sender",
+			"error", err.Error())
+		return
+	}
+
+	if err = c.Rcpt(email.Recipient); err != nil {
+		revel.AppLog.Error("failed setting the recipient of the e-mail",
+			"error", err.Error())
+		return
+	}
+
+	w, err := c.Data()
+	if err != nil {
+		revel.AppLog.Error("failed to issue data command to server",
+			"error", err.Error())
+		return
+	}
+
+	_, err = w.Write([]byte(msg))
+	if err != nil {
+		revel.AppLog.Error("failed to write e-mail body", "error", err.Error())
+		return
+	}
+
+	err = w.Close()
+	if err != nil {
+		revel.AppLog.Error("failed to close writer", "error", err.Error())
+		return
+	}
+	err = c.Quit()
+	if err != nil {
+		revel.AppLog.Error("failed to quit client", "error", err.Error())
+		return
+	}
 }
 
 /*SendErrorNote sends an error notification e-mail to the mailer. */

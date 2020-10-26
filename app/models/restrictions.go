@@ -61,6 +61,18 @@ func (rests *Restrictions) Get(tx *sqlx.Tx, courseID *int) (err error) {
 	return
 }
 
+/*Duplicate all restrictions of a course. */
+func (rests *Restrictions) Duplicate(tx *sqlx.Tx, courseID, courseIDOld *int) (err error) {
+
+	if _, err = tx.Exec(stmtDuplicateRestrictions, *courseID, *courseIDOld); err != nil {
+		log.Error("failed to duplicate restrictions", "courseID", *courseID, "courseIDOld",
+			*courseIDOld, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
 /*Validate Restriction fields. */
 func (rest *Restriction) Validate(v *revel.Validation) {
 
@@ -81,13 +93,26 @@ func (rest *Restriction) Validate(v *revel.Validation) {
 }
 
 /*Insert restriction. */
-func (rest *Restriction) Insert() (err error) {
+func (rest *Restriction) Insert(tx *sqlx.Tx, courseID int) (err error) {
 
-	err = app.Db.Get(rest, stmtInsertRestriction, rest.CourseID, rest.MinimumSemester,
-		rest.DegreeID, rest.CourseOfStudiesID)
+	if courseID != 0 {
+		rest.CourseID = courseID
+	}
+
+	if tx == nil {
+		err = app.Db.Get(rest, stmtInsertRestriction, rest.CourseID, rest.MinimumSemester,
+			rest.DegreeID, rest.CourseOfStudiesID)
+	} else {
+		err = tx.Get(rest, stmtInsertRestriction, rest.CourseID, rest.MinimumSemester,
+			rest.DegreeID, rest.CourseOfStudiesID)
+	}
+
 	if err != nil {
 		log.Error("failed to insert restriction", "restriction", *rest,
 			"error", err.Error())
+		if tx != nil {
+			tx.Rollback()
+		}
 	}
 	return
 }
@@ -176,5 +201,16 @@ const (
 		SELECT id, name
 		FROM degrees
 		ORDER BY name ASC
+	`
+
+	stmtDuplicateRestrictions = `
+		INSERT INTO enrollment_restrictions
+			(course_id, minimum_semester, degree_id, courses_of_studies_id)
+		(
+			SELECT $1 AS course_id, minimum_semester, degree_id,
+				courses_of_studies_id
+			FROM enrollment_restrictions
+			WHERE course_id = $2
+		)
 	`
 )

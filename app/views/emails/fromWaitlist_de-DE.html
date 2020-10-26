@@ -2,8 +2,8 @@
 
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
-Hier ist Ihr neues Passwort, mit dem Sie sich jetzt anmelden k&ouml;nnen.
-{{.data.User.Password.String}}
+Sie sind erfolgreich in die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' aus der Warteliste nachgerückt.
+Zum Kurs: {{.data.URL}}/course/open?ID={{.data.CourseID}}
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 
@@ -15,8 +15,10 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 <br>
 <br>
-Hier ist Ihr neues Passwort, mit dem Sie sich jetzt anmelden können. <br>
-<font color="red">{{.data.User.Password.String}}</font>
+Sie sind erfolgreich in die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' aus der Warteliste nachgerückt. <br>
+<a href="{{.data.URL}}/course/open?ID={{.data.CourseID}}">
+    Zum Kurs: {{.data.CourseTitle}}
+</a>
 <br>
 <br>
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>

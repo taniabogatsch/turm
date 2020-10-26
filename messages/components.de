@@ -49,6 +49,7 @@ button.show = Anzeigen
 button.enroll = Einschreiben
 button.unsubscribe = Austragen
 button.to.waitlist = Auf Warteliste
+button.from.waitlist = Aus Warteliste
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS
@@ -125,7 +126,12 @@ email.regards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwi
 
 email.subject.activation = Willkommen bei TurmII - Ihr Aktivierungscode
 email.subject.new.pw = Ihr neues TurmII Passwort
-email.subject.new.role = Information zu Ihrer neuen Nutzerrolle
+email.subject.new.role = TurmII - Information zu Ihrer neuen Nutzerrolle
+email.subject.enroll = TurmII - Einschreibung erfolgreich
+email.subject.wait.list = TurmII - Einschreibung auf Warteliste erfolgreich
+email.subject.unsub.wait.list = TurmII - Austragen aus Warteliste erfolgreich
+email.subject.unsubscribe = TurmII - Erfolgreich ausgetragen
+email.subject.from.wait.list = TurmII - Erfolgreich aus Warteliste nachgerückt
 
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH

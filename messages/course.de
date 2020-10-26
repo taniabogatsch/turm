@@ -36,7 +36,8 @@ course.url = URL zum Kurs
 course.creator.email = E-Mail-Adresse KurserstellerIn
 
 course.events = Veranstaltungen
-course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. Sie können sich in diese Veranstaltungen einschreiben.
+course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. NutzerInnen können sich in diese Veranstaltungen einschreiben.
+course.events.info2 = Es gibt zwei Arten von Veranstaltungen: Normale Veranstaltungen und Kalenderveranstaltungen. Sie können diese gemischt verwenden.
 
 course.events.normal.none = Dieser Kurs enthält keine normalen Veranstaltungen.
 course.events.calendar.none = Dieser Kurs enthält keine Kalenderveranstaltungen.

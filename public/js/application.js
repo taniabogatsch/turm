@@ -181,3 +181,13 @@ function openAdminGroupModal(ID, parentID, inheritsLimits, action, title,
 
   $('#admin-group-modal').modal('show');
 }
+
+function enterKeyModal(action, msg, ID) {
+
+  $('#enter-enroll-key-modal-form').attr("action", action);
+  $('#enter-enroll-key-modal-ID').val(ID);
+  $('#enter-enroll-key-modal-btn').html(msg);
+
+  //show the modal
+  $('#enter-enroll-key-modal').modal('show');
+}

@@ -1,10 +1,10 @@
 package models
 
 import (
+	"fmt"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/revel/revel"
 )
 
 /*EnrollmentStatus is a type for encoding the enrollment status. */
@@ -61,11 +61,6 @@ type Enrolled struct {
 	TimeOfEnrollment string           `db:"time_of_enrollment"`
 }
 
-/*Validate Enrolled fields. */
-func (enrolled *Enrolled) Validate(v *revel.Validation) {
-	//TODO
-}
-
 /*GetByCourse all enrollments of a user for a specific course. */
 func (enrollments *Enrollments) GetByCourse(tx *sqlx.Tx, userID, courseID *int) (err error) {
 
@@ -83,11 +78,6 @@ func (enrollments *Enrollments) GetByCourse(tx *sqlx.Tx, userID, courseID *int) 
 type Unsubscribed struct {
 	UserID  int `db:"user_id, primarykey"`
 	EventID int `db:"event_id, primarykey"`
-}
-
-/*Validate Unsubscribed fields. */
-func (unsubscribed *Unsubscribed) Validate(v *revel.Validation) {
-	//TODO
 }
 
 /*CourseStatus validates the enrollment status of an user for a course. */
@@ -112,15 +102,14 @@ type EventStatus struct {
 }
 
 /*EnrollOrUnsubscribe a user in/from an event. */
-func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string, err error) {
+func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
+	key string) (data EMailData, waitList bool, users Users, msg string, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
-
-	//TODO: enrollment key!
 
 	//get relevant event information
 	event := Event{ID: *eventID}
@@ -152,7 +141,7 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 	//enroll the user
 	if action == ENROLL {
 
-		if event.EnrollOption == UNSUBSCRIBE {
+		if event.EnrollOption == UNSUBSCRIBE || event.EnrollOption == UNSUBSCRIBEFROMWAITLIST {
 			//the user is already enrolled in this event
 			msg = "validation.enrollment.already.enrolled"
 			tx.Rollback()
@@ -166,6 +155,22 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 		}
 		if event.EnrollOption == ENROLLTOWAITLIST {
 			status = ONWAITLIST
+			waitList = true
+		}
+
+		//validate enrollment key (if required)
+		if event.EnrollmentKey.Valid {
+			var validKey bool
+			if err = tx.Get(&validKey, stmtValidateEnrollmentKey, *eventID, key); err != nil {
+				log.Error("failed to validate enrollment key", "eventID", *eventID, "key", key,
+					"error", err.Error())
+				tx.Rollback()
+				return
+			} else if !validKey {
+				msg = "validation.enrollment.invalid.key"
+				tx.Rollback()
+				return
+			}
 		}
 
 		//enroll
@@ -193,6 +198,10 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 			return
 		}
 
+		if event.EnrollOption == UNSUBSCRIBEFROMWAITLIST {
+			waitList = true
+		}
+
 		//unsubscribe
 		if _, err = tx.Exec(stmtUnsubscribeUser, *userID, *eventID); err != nil {
 			log.Error("failed to unsubscribe user", "userID", *userID, "eventID", *eventID,
@@ -211,8 +220,27 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption) (msg string,
 
 		//handle users who get enrolled from the wait list
 		if event.HasWaitlist {
-			//TODO
+
+			fmt.Println("test")
+
+			status := ENROLLED
+			if course.Fee.Valid {
+				status = AWAITINGPAYMENT
+			}
+
+			if err = users.AutoEnrollFromWaitList(tx, eventID, status); err != nil {
+				return
+			}
 		}
+	}
+
+	//set e-mail data
+	data.CourseTitle = course.Title
+	data.EventTitle = event.Title
+	data.CourseID = course.ID
+	data.User.ID = *userID
+	if err = data.User.Get(tx); err != nil {
+		return
 	}
 
 	tx.Commit()
@@ -302,5 +330,14 @@ const (
 		INSERT INTO unsubscribed
 			(user_id, event_id)
 		VALUES ($1, $2)
+	`
+
+	stmtValidateEnrollmentKey = `
+		SELECT EXISTS (
+			SELECT true
+			FROM events
+			WHERE id = $1
+				AND enrollment_key = CRYPT($2, enrollment_key)
+		) AS valid_key
 	`
 )

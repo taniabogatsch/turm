@@ -552,7 +552,7 @@ func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Re
 	}
 
 	if restriction.ID == 0 { //insert
-		if err := restriction.Insert(); err != nil {
+		if err := restriction.Insert(nil, 0); err != nil {
 			return flashError(
 				errDB, err, "/course/restrictions?ID="+strconv.Itoa(ID),
 				c.Controller, "")

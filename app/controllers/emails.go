@@ -8,24 +8,23 @@ import (
 )
 
 //sendEMail sends an e-mail to the specified user
-func sendEMail(c *revel.Controller, user *models.User, subjectKey string, filename string) (err error) {
+func sendEMail(c *revel.Controller, data *models.EMailData, subjectKey string,
+	filename string) (err error) {
 
-	c.Log.Debug("sending EMail", "user", user, "subjectKey", subjectKey,
+	c.Log.Debug("sending EMail", "data", *data, "subjectKey", subjectKey,
 		"filename", filename)
 
-	data := models.EMailData{User: *user}
-
-	if !user.Language.Valid {
-		user.Language.String = app.DefaultLanguage
+	if !data.User.Language.Valid {
+		data.User.Language.String = app.DefaultLanguage
 	}
 
 	email := app.EMail{
-		Recipient: user.EMail,
+		Recipient: data.User.EMail,
 	}
 
 	err = models.GetEMailSubjectBody(
-		&data,
-		&user.Language.String,
+		data,
+		&data.User.Language.String,
 		subjectKey,
 		filename,
 		&email,

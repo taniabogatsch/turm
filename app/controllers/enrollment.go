@@ -7,9 +7,9 @@ import (
 )
 
 /*Enroll a user in an event. */
-func (c Enrollment) Enroll(ID int) revel.Result {
+func (c Enrollment) Enroll(ID int, key string) revel.Result {
 
-	c.Log.Debug("enroll a user in an event", "ID", ID)
+	c.Log.Debug("enroll a user in an event", "ID", ID, "key", key)
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -17,13 +17,30 @@ func (c Enrollment) Enroll(ID int) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
-	if msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.ENROLL); err != nil {
+	//enroll user
+	data, waitList, _, msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.ENROLL, key)
+	if err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	} else if msg != "" {
 		c.Validation.ErrorKey(msg)
 		return flashError(
 			errValidation, nil, "", c.Controller, "")
+	}
+
+	//send e-mail to the user who enrolled
+	if waitList {
+		err = sendEMail(c.Controller, &data,
+			"email.subject.wait.list",
+			"waitlist")
+	} else {
+		err = sendEMail(c.Controller, &data,
+			"email.subject.enroll",
+			"enroll")
+	}
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("event.enroll.success"))
@@ -41,13 +58,49 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
-	if msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.UNSUBSCRIBE); err != nil {
+	//unsubscribe user
+	data, waitList, users, msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.UNSUBSCRIBE, "")
+	if err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	} else if msg != "" {
 		c.Validation.ErrorKey(msg)
 		return flashError(
 			errValidation, nil, "", c.Controller, "")
+	}
+
+	//send e-mail to the user who unsubscribed
+	if waitList {
+		err = sendEMail(c.Controller, &data,
+			"email.subject.unsub.wait.list",
+			"unsubWaitlist")
+	} else {
+		err = sendEMail(c.Controller, &data,
+			"email.subject.unsubscribe",
+			"unsubscribe")
+	}
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	//send e-mail to each auto enrolled user
+	if len(users) != 0 {
+		for _, user := range users {
+			mailData := models.EMailData{
+				User:        user,
+				CourseTitle: data.CourseTitle,
+				EventTitle:  data.EventTitle,
+				CourseID:    data.CourseID,
+			}
+			err = sendEMail(c.Controller, &mailData,
+				"email.subject.from.wait.list",
+				"fromWaitlist")
+			if err != nil {
+				return flashError(
+					errEMail, err, "", c.Controller, mailData.User.EMail)
+			}
+		}
 	}
 
 	c.Flash.Success(c.Message("event.unsubscribe.success"))

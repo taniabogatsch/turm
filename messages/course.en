@@ -36,7 +36,8 @@ course.url = Course URL
 course.creator.email = E-mail address of course creator
 
 course.events = Events
-course.events.info = A course can have a multitude of events. You can enroll in these events.
+course.events.info = A course can have a multitude of events. Users can enroll in these events.
+course.events.info2 = There are two types of events: normal events and calendar events. You can use both of them.
 
 course.events.normal.none = This course has no normal events.
 course.events.calendar.none = This course has no calendar events.

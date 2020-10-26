@@ -150,7 +150,8 @@ func (c User) Registration(user models.User) revel.Result {
 	c.setSession(&user)
 	c.Session["notActivated"] = "true"
 
-	err := sendEMail(c.Controller, &user,
+	data := models.EMailData{User: user}
+	err := sendEMail(c.Controller, &data,
 		"email.subject.activation",
 		"activation")
 	if err != nil {
@@ -225,7 +226,8 @@ func (c User) NewPassword(email string) revel.Result {
 	}
 	c.Log.Debug("set new password", "user", user)
 
-	err := sendEMail(c.Controller, &user,
+	mailData := models.EMailData{User: user}
+	err := sendEMail(c.Controller, &mailData,
 		"email.subject.new.pw",
 		"newPw")
 	if err != nil {
@@ -322,7 +324,8 @@ func (c User) NewActivationCode() revel.Result {
 			errDB, err, "", c.Controller, "")
 	}
 
-	err = sendEMail(c.Controller, &user,
+	data := models.EMailData{User: user}
+	err = sendEMail(c.Controller, &data,
 		"email.subject.activation",
 		"activation")
 	if err != nil {

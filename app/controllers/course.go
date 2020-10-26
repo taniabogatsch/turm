@@ -145,8 +145,9 @@ func (c Course) Events(ID int) revel.Result {
 		return c.Render()
 	}
 
+	manage := true
 	c.Log.Debug("loaded events", "events", events)
-	return c.Render(events)
+	return c.Render(events, manage)
 }
 
 /*Meetings of an event.

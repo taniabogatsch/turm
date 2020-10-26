@@ -492,7 +492,10 @@ func (course *Course) Duplicate() (err error) {
 		return
 	}
 
-	//TODO: duplicate restrictions
+	//duplicate restrictions
+	if err = course.Restrictions.Duplicate(tx, &course.ID, &courseIDOld); err != nil {
+		return
+	}
 
 	tx.Commit()
 	return
@@ -556,7 +559,11 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 		return
 	}
 
-	//TODO: insert restrictions
+	for _, restriction := range course.Restrictions {
+		if err = restriction.Insert(tx, course.ID); err != nil {
+			return
+		}
+	}
 
 	tx.Commit()
 	return

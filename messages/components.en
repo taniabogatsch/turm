@@ -49,6 +49,7 @@ button.show = Show
 button.enroll = Enroll
 button.unsubscribe = Unsubscribe
 button.to.waitlist = To wait list
+button.from.waitlist = From wait list
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS
@@ -125,7 +126,12 @@ email.regards = Sincerely <br> Your <a href="%s/">Turm2</a> Development Team <br
 
 email.subject.activation = Welcome at TurmII - Your activation code
 email.subject.new.pw = Your new password for TurmII
-email.subject.new.role = Information about your new user role
+email.subject.new.role = TurmII - Information about your new user role
+email.subject.enroll = TurmII - Enrollment successful
+email.subject.wait.list = TurmII - Successful enrollment to wait list
+email.subject.unsub.wait.list = TurmII - Successfully unsubscribed from wait list
+email.subject.unsubscribe = TurmII - Successfully unsubscribed
+email.subject.from.wait.list = TurmII - Successful enrollment from wait list
 
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH
