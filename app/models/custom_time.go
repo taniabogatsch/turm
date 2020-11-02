@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+/*Custom_time is used to compare times*/
 type Custom_time struct {
 	Value string
 	Hour  int
@@ -71,4 +72,19 @@ func (t1 *Custom_time) Sub(t2 Custom_time) (min int) {
 		min = (t2.Hour-t1.Hour)*60 + (t2.Min - t1.Min)
 	}
 	return
+}
+
+/*Equals checks if two Custom_times are the same*/
+func (t1 *Custom_time) Equals(t2 Custom_time) (equals bool) {
+	if t1.Hour == t2.Hour && t1.Min == t2.Min {
+		return true
+	}
+	return false
+}
+
+/*GernerateValueString uses the Hour and Min field to generate the Value String*/
+func (t1 *Custom_time) GernerateValueString() {
+	h := strconv.Itoa(t1.Hour)
+	m := strconv.Itoa(t1.Min)
+	t1.Value = h + ":" + m
 }

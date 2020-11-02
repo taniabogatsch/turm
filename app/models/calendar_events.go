@@ -24,6 +24,11 @@ type CalendarEvent struct {
 
 	//day templates for this week [0...6]
 	Days DayTmpls
+
+	//Exeptions of this week [0....6]
+	ExceptionsAtWeek ExceptionsAtWeek
+
+	ScheduleWeek []Schedule
 }
 
 /*NewBlank creates a new blank CalendarEvent. */
@@ -98,6 +103,91 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 	if err != nil {
 		return
 	}
+
+	event.ExceptionsAtWeek = append(event.ExceptionsAtWeek, Exceptions{}, Exceptions{}, Exceptions{},
+		Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{})
+	//get exceptions
+	for i := 0; i < 7; i++ {
+		err = event.ExceptionsAtWeek[i].Get(tx, monday, i)
+		if err != nil {
+			return
+		}
+	}
+
+	//Tfor ech day get scedule out of all dayTemps of that day and make a
+	//		scedule for whole day with exeptions
+	for dayIndex := 0; dayIndex < 7; dayIndex++ {
+		tmplsOfDay := event.Days[dayIndex]
+
+		daySchedule := Schedule{}
+		//generate blocked and free blocks depending on day_templates
+
+		//set blocked slot from 0 to start from first day-template
+		if tmplsOfDay[0].StartTime != "00:00" {
+			daySchedule = append(daySchedule, ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, BLOCKED})
+		}
+
+		/*insert all slots and free space of a dayTemplate and
+		the blocked space between the next day template*/
+		for i := range tmplsOfDay {
+
+			if i != 0 {
+				//check for blocked space to day tmpl upfront
+				if tmplsOfDay[i].StartTime != daySchedule[len(daySchedule)-1].EndTime {
+					daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
+						tmplsOfDay[i].StartTime, BLOCKED})
+				}
+			}
+
+			for j := range tmplsOfDay[i].Slots {
+
+				//get convert time's to string
+				slotStartTime := Custom_time{"", tmplsOfDay[i].Slots[j].StartTimestamp.Hour(),
+					tmplsOfDay[i].Slots[j].StartTimestamp.Minute()}
+				slotStartTime.GernerateValueString()
+
+				slotEndTime := Custom_time{"", tmplsOfDay[i].Slots[j].EndTimestamp.Hour(),
+					tmplsOfDay[i].Slots[j].EndTimestamp.Minute()}
+				slotEndTime.GernerateValueString()
+
+				//check if first slot needs free space upfront
+				if j == 0 {
+
+					//insert free ScheduleEntry at start if necessary
+					if tmplsOfDay[i].StartTime != slotStartTime.Value {
+						daySchedule = append(daySchedule, ScheduleEntry{tmplsOfDay[i].StartTime,
+							slotStartTime.Value, EMPTY})
+					}
+				} else { // check for free space to Schedule entry before current entry
+					if daySchedule[len(daySchedule)-1].EndTime != slotStartTime.Value {
+						daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
+							slotStartTime.Value, EMPTY})
+					}
+				}
+
+				//insert slot as ScheduleEntry
+				daySchedule = append(daySchedule, ScheduleEntry{slotStartTime.Value, slotEndTime.Value, SLOT})
+
+			} // END of for loop (slots of TmplsOfDay)
+
+			//check for free space from last slot to end of dayTemplate
+			if tmplsOfDay[i].EndTime != daySchedule[len(daySchedule)-1].EndTime {
+				daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
+					tmplsOfDay[i].EndTime, EMPTY})
+			}
+
+		} // END of for loop (TmplsOfDay)
+
+		//check for blocked space from end of last dayTemplate to 24:00
+		if daySchedule[len(daySchedule)-1].EndTime != "24:00" {
+			daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
+				"24:00", BLOCKED})
+		}
+
+		event.ScheduleWeek = append(event.ScheduleWeek, daySchedule)
+
+	}
+
 	//set the current week
 	_, event.Week = monday.ISOWeek()
 
@@ -106,6 +196,11 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 	}
 
 	return
+}
+
+//helper functions for Schedule
+func insertScheduleEntry(array []ScheduleEntry, element ScheduleEntry, i int) []ScheduleEntry {
+	return append(array[:i], append([]ScheduleEntry{element}, array[i:]...)...)
 }
 
 /*Update the specific column in the CalendarEvent. */

@@ -19,10 +19,12 @@ const (
 	SLOT
 	//EXCEPTION is for exceptions
 	EXCEPTION
+	//BLOCKED is for Timeslots between
+	BLOCKED
 )
 
 func (s ScheduleEntryType) String() string {
-	return [...]string{"empty", "slot", "exception"}[s]
+	return [...]string{"empty", "slot", "exception", "blocked"}[s]
 }
 
 /*DayTmpls of a week for each day. */
@@ -42,10 +44,7 @@ type DayTmpl struct {
 	Active           bool           `db:"active"`
 	DeactiavtionDate sql.NullString `db:"deactivation_date"`
 
-	Slots      Slots
-	Exceptions Exceptions
-
-	Schedule Schedule
+	Slots Slots
 }
 
 /*Schedule is a helper struct to display a day template at the front end. */
@@ -101,18 +100,22 @@ func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 	v.Check(startTime.Before(endTime)).
 		MessageKey("validation.calendarEvent.startInPast")
 
-	//chek if startTime and endTime is on same date
-	y1, m1, d1 := slot.StartTimestamp.Date()
-	y2, m2, d2 := slot.EndTimestamp.Date()
-	v.Check(y1 == y2 && m1 == m2 && d1 == d2).
-		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
-
 	//check step distance
 	intervalSteps := float64(startTime.Sub(endTime) / tmpl.Interval)
 	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
 
-	//TODO! check for, other tmpl on this day
+	//check if template collides with other template on that day
+	var timeOverlapTmpl bool
+
+	err := tx.Get(timeOverlapTmpl, stmtGetExistsOverlappingDayTmpl, startTime.Value, endTime.Value, tmpl.CalendarEventID)
+	if err != nil {
+		log.Error("failed to get DayTemolates",
+			"error", err.Error())
+	}
+
+	v.Check(!timeOverlapTmpl).
+		MessageKey("validation.calendarEvent.overlappingTimespanDayTmpl")
 }
 
 /*Update a day tmpl. */
@@ -129,7 +132,43 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 		return
 	}
 
+	//validate checks for time -> can collide with itselfe when changing time
+	//what happens to slots when changing Timespan of template
 	//TODO: update
+
+	tx.Commit()
+	return
+}
+
+/*Delete a day Template if it has no slots*/
+func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//check if DayTmpl has no slots
+	var notEmpty bool
+	err = tx.Get(notEmpty, stmtExistSlots, tmpl.ID)
+	if err != nil {
+		log.Error("failed to get DayTemolate", "templateID", tmpl.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if notEmpty {
+		v.ErrorKey("validation.calendarEvent.deleteDayTemplateNotEmpty")
+		tx.Commit()
+		return
+	}
+
+	//delete day_tmpl
+	if err = deleteByID("id", "calendar_events", tmpl.ID, tx); err != nil {
+		return
+	}
 
 	tx.Commit()
 	return
@@ -158,15 +197,11 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 			if err != nil {
 				return
 			}
-			//get exceptions
-			err = ((*dayTmpls)[i])[j].Exceptions.Get(tx, monday, i)
-			if err != nil {
-				return
-			}
+
+			//TODO: fill scedule for that day tmpl
+
 		}
 	}
-
-	//TODO: prepare for front end
 
 	return
 }
@@ -187,6 +222,7 @@ const (
     FROM day_templates
     WHERE day_of_week = $1
       AND active = true
+		ORDER BY start_time ASC
   `
 
 	stmtSelectDayTmpls = `
@@ -198,4 +234,26 @@ const (
       AND day_of_week = $2
     ORDER BY start_time ASC
   `
+
+	stmtGetExistsOverlappingDayTmpl = `
+		SELECT EXISTS(
+			SELECT true
+			FROM day_templates
+			WHERE $3 = calendar_event_id
+				AND active = true
+				AND (
+									($1 BETWEEN (start_time) AND (end_time))
+							OR 	($2 BETWEEN (start_time) AND (end_time))
+							OR  (($1 <= start_time) AND ($2 >= end_time))
+						)
+		) AS timeOverlapTmpl
+	`
+
+	stmtExistSlots = `
+		SELECT EXISTS (
+			SELECT true
+			FROM slots
+			WHERE day_tmpl_id = $1
+		) AS notEmpty
+	`
 )
