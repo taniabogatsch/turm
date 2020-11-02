@@ -16,7 +16,7 @@ import (
 
 //TODO: notify enrolled users if course is updated
 
-/*Open opens an already existing course for modification, etc.
+/*Open an already existing course for modification, etc.
 - Roles: creator and editors of this course. */
 func (c Edit) Open(ID int) revel.Result {
 
@@ -121,10 +121,10 @@ func (c Edit) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
+func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("create a new event", "ID", ID, "value", value,
-		"eventType", eventType)
+		"eventType", eventType, "conf", conf)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -147,17 +147,21 @@ func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 	//normal event
 	if eventType == "normal" {
 
+		conf.ID = ID
 		event := models.Event{CourseID: ID, Title: value}
-		if err := event.NewBlank(); err != nil {
+		if err := event.NewBlank(&conf); err != nil {
 			return flashError(
 				errDB, err, "/course/events?ID="+strconv.Itoa(ID),
 				c.Controller, "")
 		}
 
-		c.Flash.Success(c.Message("event.new.success",
-			event.Title,
-			event.ID,
-		))
+		//if the course is active, send notification e-mail
+		if err := sendEMailsEdit(c.Controller, &conf); err != nil {
+			return c.RenderJSON(
+				response{Status: ERROR, Msg: c.Message(errEMail.String())})
+		}
+
+		c.Flash.Success(c.Message("event.new.success", event.Title, event.ID))
 
 	} else { //calendar event
 
@@ -167,11 +171,10 @@ func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 				errDB, err, "", c.Controller, "")
 		}
 
-		c.Flash.Success(c.Message("event.new.calendar.success",
-			event.Title,
-			event.ID,
-		))
+		c.Flash.Success(c.Message("event.new.calendar.success", event.Title, event.ID))
 	}
+
+	//reload correct content
 	if eventType == "normal" {
 		return c.Redirect(Course.Events, ID)
 	}
@@ -180,10 +183,11 @@ func (c Edit) NewEvent(ID int, value, eventType string) revel.Result {
 
 /*ChangeTimestamp changes the specified timestamp.
 - Roles: creator and editors of the course */
-func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
+func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
+	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change timestamp", "ID", ID, "date", date,
-		"time", time, "fieldID", fieldID)
+	c.Log.Debug("change timestamp", "ID", ID, "date", date, "time", time,
+		"fieldID", fieldID, "conf", conf)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -199,7 +203,6 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 			models.IsTimestamp{},
 		).MessageKey("validation.invalid.timestamp")
 	}
-	//TODO: if edit, get course, set new timestamp value and validate
 
 	if c.Validation.HasErrors() {
 		return c.RenderJSON(
@@ -213,17 +216,24 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string) revel.Result {
 	}
 
 	course := models.Course{ID: ID}
+	conf.ID = ID
 	var err error
 
-	if fieldID == "unsubscribe_end" {
-		err = course.Update(nil, fieldID, sql.NullString{timestamp, valid})
-	} else {
-		err = course.Update(nil, fieldID, timestamp)
-	}
-
-	if err != nil {
+	if err = course.UpdateTimestamp(c.Validation, &conf, fieldID,
+		timestamp, valid); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	} else if c.Validation.HasErrors() {
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
+	}
+
+	//if the course is active, send notification e-mail
+	if fieldID != "expiration_date" {
+		if err = sendEMailsEdit(c.Controller, &conf); err != nil {
+			return c.RenderJSON(
+				response{Status: ERROR, Msg: c.Message(errEMail.String())})
+		}
 	}
 
 	msg := c.Message("course."+fieldID+".delete.success", course.ID)
@@ -251,7 +261,6 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
-	//TODO: if edit, get course, set new user and validate
 	if c.Validation.HasErrors() {
 		return flashError(
 			errValidation, nil, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
@@ -311,9 +320,7 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
 	//TODO: if the course is active, the user should get a notification e-mail
 
-	c.Flash.Success(c.Message("course."+listType+".delete.success",
-		ID,
-	))
+	c.Flash.Success(c.Message("course."+listType+".delete.success", ID))
 
 	if listType == "instructors" || listType == "editors" {
 		return c.Redirect(Course.EditorInstructorList, ID)
@@ -354,10 +361,7 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 
 	//TODO: if the course is active, the user should get a notification e-mail
 
-	c.Flash.Success(c.Message("course.matr.nr.change.success",
-		entry.EMail,
-		entry.CourseID,
-	))
+	c.Flash.Success(c.Message("course.matr.nr.change.success", entry.EMail, entry.CourseID))
 	return c.Redirect(Course.EditorInstructorList, ID)
 }
 
@@ -375,7 +379,7 @@ func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 	}
 
 	course := models.Course{ID: ID}
-	if err := course.Update(nil, listType, option); err != nil {
+	if err := course.Update(nil, listType, option, nil); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
@@ -387,9 +391,10 @@ func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course */
-func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
+func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value,
+		"conf", conf)
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -429,6 +434,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 	}
 
 	course := models.Course{ID: ID}
+	conf.ID = ID
 	var err error
 
 	if fieldID == "fee" && valid {
@@ -438,15 +444,21 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 			return c.RenderJSON(
 				response{Status: ERROR, Msg: c.Message("error.undefined")})
 		}
-		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid})
+		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid}, &conf)
 
 	} else {
-		err = course.Update(nil, fieldID, sql.NullString{value, valid})
+		err = course.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
 	}
 
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	}
+
+	//if the course is active, send notification e-mail
+	if err = sendEMailsEdit(c.Controller, &conf); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errEMail.String())})
 	}
 
 	msg := c.Message("course."+fieldID+".delete.success", course.ID)
@@ -464,7 +476,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string) revel.Result {
 
 /*ChangeGroup changes the group of a course.
 - Roles: creator and editors of the course. */
-func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
+func (c Edit) ChangeGroup(ID, parentID int, conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("change group", "ID", ID, "parentID", parentID)
 
@@ -483,15 +495,13 @@ func (c Edit) ChangeGroup(ID, parentID int) revel.Result {
 		ID:       ID,
 		ParentID: sql.NullInt32{Int32: int32(parentID), Valid: true},
 	}
-	if err := course.Update(nil, "parent_id", course.ParentID); err != nil {
+	if err := course.Update(nil, "parent_id", course.ParentID, &conf); err != nil {
 		return flashError(
 			errDB, err, "/course/path?ID="+strconv.Itoa(ID),
 			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("course.group.change.success",
-		course.ID,
-	))
+	c.Flash.Success(c.Message("course.group.change.success", course.ID))
 	return c.Redirect(Course.Path, ID)
 }
 
@@ -521,7 +531,7 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 	}
 
 	course := models.Course{ID: ID}
-	err := course.Update(nil, fieldID, sql.NullInt32{int32(value), valid})
+	err := course.Update(nil, fieldID, sql.NullInt32{int32(value), valid}, nil)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -578,7 +588,6 @@ func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	//delete
 	restriction := models.Restriction{ID: restrictionID}
 	if err := restriction.Delete(); err != nil {
 		return flashError(
@@ -586,9 +595,7 @@ func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("course.restriction.delete.success",
-		ID,
-	))
+	c.Flash.Success(c.Message("course.restriction.delete.success", ID))
 	return c.Redirect(Course.Restrictions, ID)
 }
 

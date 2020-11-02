@@ -31,19 +31,59 @@ type Event struct {
 }
 
 /*NewBlank creates a new blank event. */
-func (event *Event) NewBlank() (err error) {
+func (event *Event) NewBlank(conf *EditEMailConfig) (err error) {
 
-	err = app.Db.Get(event, stmtInsertBlankEvent, event.CourseID, event.Title)
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(event, stmtInsertBlankEvent, event.CourseID, event.Title)
 	if err != nil {
 		log.Error("failed to insert blank event", "event", event,
 			"error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	//get edit notification e-mail data
+	if err = conf.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
 	return
 }
 
 /*Update the specified column in the event table. */
-func (event *Event) Update(column string, value interface{}) (err error) {
-	return updateByID(nil, column, "events", value, event.ID, event)
+func (event *Event) Update(tx *sqlx.Tx, column string, value interface{},
+	conf *EditEMailConfig) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	if err = updateByID(tx, column, "events", value, event.ID, event); err != nil {
+		return
+	}
+
+	//get edit notification e-mail data
+	if conf != nil {
+		if err = conf.Get(tx); err != nil {
+			return
+		}
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
 }
 
 /*UpdateKey updates the enrollment key of an event. */
@@ -111,6 +151,31 @@ func (event *Event) Delete(v *revel.Validation) (err error) {
 		v.ErrorKey("validation.invalid.delete")
 		tx.Commit()
 		return
+	}
+
+	//don't allow courses to have no events and no calendar events
+	course := Course{}
+	if err = tx.Get(&course, stmtGetCourseIDOfEvent, event.ID); err != nil {
+		log.Error("failed to get course id of event", "event", *event,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get course data for validation
+	if err = course.GetForValidation(tx); err != nil {
+		return
+	}
+
+	//validate changes
+	if course.Active {
+		if len(course.Events) > 0 {
+			course.Events = course.Events[:len(course.Events)-1]
+		}
+		if course.Validate(v); v.HasErrors() {
+			tx.Commit()
+			return
+		}
 	}
 
 	//delete event
@@ -307,6 +372,28 @@ func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 	return
 }
 
+/*GetForValidation only returns event data required for course validation. */
+func (events *Events) GetForValidation(tx *sqlx.Tx, courseID *int) (err error) {
+
+	err = tx.Select(events, stmtSelectEvents, *courseID)
+	if err != nil {
+		log.Error("failed to get events of course for validation", "course ID", *courseID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	for key := range *events {
+		//get all meetings of this event
+		(*events)[key].Percentage = ((*events)[key].Fullness * 100) / (*events)[key].Capacity
+		if err = (*events)[key].Meetings.Get(tx, &(*events)[key].ID); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 /*Duplicate all events of a course. */
 func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err error) {
 
@@ -459,5 +546,11 @@ const (
 			WHERE event_id = $1
 				AND status = 1 /*on waitlist*/
 		)
+	`
+
+	stmtGetCourseIDOfEvent = `
+		SELECT course_id AS id
+		FROM events e
+		WHERE e.id = $1
 	`
 )

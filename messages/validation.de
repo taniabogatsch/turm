@@ -67,7 +67,7 @@ validation.invalid.parent = Der Kurs muss Teil einer Gruppe sein.
 validation.invalid.meeting.start = Termine dürfen nicht vor dem Anfang des Einschreibezeitraums liegen.
 validation.invalid.meeting.end = Das Ende von Terminen muss nach deren Anfang liegen.
 
-validation.invalid.len.events = Kurse müssen mindestens eine Veranstaltung besitzen.
+validation.invalid.len.events = Kurse müssen mindestens eine Veranstaltung oder eine Kalenderveranstaltung besitzen.
 
 validation.invalid.restriction = Bitte geben Sie mindestens einen angestrebten Abschluss, einen Studiengang oder ein Mindestsemester an.
 

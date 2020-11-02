@@ -15,6 +15,8 @@ func (c Creator) Activate(ID int) revel.Result {
 
 	//NOTE: the interceptor assures that the course ID is valid
 
+	//TODO: notify editors and instructors
+
 	course := models.Course{ID: ID}
 	if invalid, err := course.Activate(c.Validation); err != nil {
 		return flashError(
@@ -88,7 +90,7 @@ func (c Creator) Expire(ID int) revel.Result {
 	now := time.Now().Add(-time.Minute * 1).Format(revel.TimeFormats[0])
 
 	course := models.Course{ID: ID}
-	if err := course.Update(nil, "expiration_date", now); err != nil {
+	if err := course.Update(nil, "expiration_date", now, nil); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}

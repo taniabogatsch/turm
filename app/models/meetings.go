@@ -94,15 +94,29 @@ func (meeting *Meeting) Validate(v *revel.Validation) {
 }
 
 /*NewBlank creates a new blank meeting. */
-func (meeting *Meeting) NewBlank() (err error) {
+func (meeting *Meeting) NewBlank(conf *EditEMailConfig) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
 
 	now := time.Now().Format(revel.TimeFormats[0])
 
-	err = app.Db.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval, now)
+	err = tx.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval, now)
 	if err != nil {
 		log.Error("failed to insert blank meeting", "meeting", meeting,
 			"error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	if err = conf.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
 	return
 }
 

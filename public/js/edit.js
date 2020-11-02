@@ -53,7 +53,7 @@ function openChangeModal(title, field, valid, action, modal, max, info, ID, even
 
   if (field == "fee") {
     $('#change-text-modal-icon').html($('#change-text-icon-euro').html());
-    $('#change-text-modal-value').attr("pattern", "^([0-9]{1,6}([,|.][0-9]{0,2})?)?");
+    $('#change-text-modal-value').attr("pattern", "[0-9]{1,6}([,|.][0-9]{0,2})?");
     $('#change-text-modal-validation').html($('#change-text-validation-fee').html());
     $('#change-text-modal-value').attr("maxlength", 10);
   } else {

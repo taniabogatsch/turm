@@ -34,7 +34,8 @@ func (c EditEvent) Delete(ID, courseID int) revel.Result {
 
 /*NewMeeting creates a new blank meeting in an event.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval) revel.Result {
+func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,
+	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("create a new meeting", "ID", ID, "option", option)
 
@@ -50,11 +51,19 @@ func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval) revel.Resul
 			c.Controller, "")
 	}
 
+	conf.ID = ID
+	conf.IsEvent = true
+
 	meeting := models.Meeting{EventID: ID, MeetingInterval: option}
-	if err := meeting.NewBlank(); err != nil {
+	if err := meeting.NewBlank(&conf); err != nil {
 		return flashError(
 			errDB, err, "/course/meetings?ID="+strconv.Itoa(ID),
 			c.Controller, "")
+	}
+
+	//if the course is active, send notification e-mail
+	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
+		return flashError(errEMail, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("meeting.new.success", meeting.ID))
@@ -85,7 +94,7 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 	}
 
 	event := models.Event{ID: ID}
-	err := event.Update(fieldID, value)
+	err := event.Update(nil, fieldID, value, nil)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -98,7 +107,8 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course of the event */
-func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
+func (c EditEvent) ChangeText(ID int, fieldID, value string,
+	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
 
@@ -124,11 +134,20 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
+	conf.ID = ID
+	conf.IsEvent = true
+
 	event := models.Event{ID: ID}
-	err := event.Update(fieldID, sql.NullString{value, valid})
+	err := event.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	}
+
+	//if the course is active, send notification e-mail
+	if err = sendEMailsEdit(c.Controller, &conf); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errEMail.String())})
 	}
 
 	msg := c.Message("event." + fieldID + ".delete.success")
@@ -212,7 +231,7 @@ func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
 	//NOTE: the interceptor assures that the event ID is valid
 
 	event := models.Event{ID: ID}
-	err := event.Update("enrollment_key", sql.NullString{"", false})
+	err := event.Update(nil, "enrollment_key", sql.NullString{"", false}, nil)
 
 	if err != nil {
 		return c.RenderJSON(

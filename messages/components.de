@@ -124,14 +124,31 @@ email.dev.team = Ihr Turm2 Entwicklerteam
 email.no.reply = Antworten Sie nicht auf diese E-Mail. <%s>
 email.regards = Mit freundlichen Grüßen <br> Ihr <a href="%s/">Turm2</a> Entwicklerteam <br>
 
-email.subject.activation = Willkommen bei TurmII - Ihr Aktivierungscode
-email.subject.new.pw = Ihr neues TurmII Passwort
-email.subject.new.role = TurmII - Information zu Ihrer neuen Nutzerrolle
-email.subject.enroll = TurmII - Einschreibung erfolgreich
-email.subject.wait.list = TurmII - Einschreibung auf Warteliste erfolgreich
-email.subject.unsub.wait.list = TurmII - Austragen aus Warteliste erfolgreich
-email.subject.unsubscribe = TurmII - Erfolgreich ausgetragen
-email.subject.from.wait.list = TurmII - Erfolgreich aus Warteliste nachgerückt
+email.subject.activation = Willkommen bei Turm2 - Ihr Aktivierungscode
+email.subject.new.pw = Ihr neues Turm2 Passwort
+email.subject.new.role = Turm2 - Information zu Ihrer neuen Nutzerrolle
+email.subject.enroll = Turm2 - Einschreibung erfolgreich
+email.subject.wait.list = Turm2 - Einschreibung auf Warteliste erfolgreich
+email.subject.unsub.wait.list = Turm2 - Austragen aus Warteliste erfolgreich
+email.subject.unsubscribe = Turm2 - Erfolgreich ausgetragen
+email.subject.from.wait.list = Turm2 - Erfolgreich aus Warteliste nachgerückt
+email.subject.event.edit = Turm2 - Information zu einer Ihrer Veranstaltungen
+email.subject.course.edit = Turm2 - Information zu einem Ihrer Kurse
+email.subject.event.edit.manager = Turm2 - Kursverwaltung - Information zu einer Ihrer Veranstaltungen
+email.subject.course.edit.manager = Turm2 - Kursverwaltung - Information zu einem Ihrer Kurse
+
+email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
+email.edit.info = Bitte geben Sie die NutzerInnen an, die über die vorgenommene Änderung via E-Mail informiert werden sollen. Bitte geben Sie außerdem an, ob EditorInnen und OrganisatorInnen über die Änderung via E-Mail informiert werden sollen.
+email.edit.info.creator = <b>Achtung:</b> Solange Sie nicht 'Niemand' auswählen wird der Kursverantwortliche wird über alle Änderungen benachrichtigt.
+
+email.edit.option.choose = - bitte wählen -
+email.edit.option.all.users = Alle NutzerInnen
+email.edit.option.enrolled.users = Nur eingeschriebene NutzerInnen
+email.edit.option.wait.list.users = Nur NutzerInnen auf der Warteliste (insofern vorhanden)
+email.edit.option.all = EditorInnen und OrganisatorInnen
+email.edit.option.editors = Nur EditorInnen
+email.edit.option.instructors = Nur OrganisatorInnen
+email.edit.option.none = Niemand
 
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH

@@ -183,7 +183,7 @@ course.fee.change.success = Teilnahmegebühr zu %s€ geändert, Kurs ID = %d.
 course.fee.delete.success = Teilnahmegebühr gelöscht, Kurs ID = %d.
 course.fee.delete.confirm = Sind Sie sicher, dass Sie die Teilnahmegebühr löschen wollen?
 course.fee.delete.title = Teilnahmegebühr löschen
-course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15 oder 15,0 oder 15,00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
+course.fee.change.info = Beträge sind immer in Euro (€) anzugeben. Das gültige Format lautet 15.00 oder 15,00 (<strong>ohne Eurozeichen!</strong>) für einen Betrag von fünfzehn Euro.
 
 course.description.change.success = Kursbeschreibung geändert, Kurs ID = %d.
 course.description.delete.success = Kursbeschreibung gelöscht, Kurs ID = %d.

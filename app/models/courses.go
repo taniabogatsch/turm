@@ -65,9 +65,11 @@ func (course *Course) Validate(v *revel.Validation) {
 
 	now := time.Now().Format(revel.TimeFormats[0])
 
-	//now < EnrollmentStart
-	if now >= course.EnrollmentStart {
-		v.ErrorKey("validation.invalid.enrollment.start")
+	if !course.Active {
+		//now < EnrollmentStart
+		if now >= course.EnrollmentStart {
+			v.ErrorKey("validation.invalid.enrollment.start")
+		}
 	}
 
 	//EnrollmentStart < EnrollmentEnd
@@ -111,7 +113,7 @@ func (course *Course) Validate(v *revel.Validation) {
 		}
 	}
 
-	if len(course.Events) == 0 {
+	if len(course.Events) == 0 && len(course.CalendarEvents) == 0 {
 		v.ErrorKey("validation.invalid.len.events")
 	}
 }
@@ -136,8 +138,84 @@ func (course *Course) GetVisible(elem string) (err error) {
 }
 
 /*Update the specified column in the course table. */
-func (course *Course) Update(tx *sqlx.Tx, column string, value interface{}) (err error) {
-	return updateByID(tx, column, "courses", value, course.ID, course)
+func (course *Course) Update(tx *sqlx.Tx, column string, value interface{},
+	conf *EditEMailConfig) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	//update the course field
+	if err = updateByID(tx, column, "courses", value, course.ID, course); err != nil {
+		return
+	}
+
+	//get edit notification e-mail data
+	if conf != nil {
+		if err = conf.Get(tx); err != nil {
+			return
+		}
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
+/*UpdateTimestamp of a course. Also ensures validitiy, if the course is already active. */
+func (course *Course) UpdateTimestamp(v *revel.Validation, conf *EditEMailConfig,
+	fieldID string, timestamp string, valid bool) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//get course data for validation
+	if err = course.GetForValidation(tx); err != nil {
+		return
+	}
+
+	//validate changes
+	if course.Active {
+
+		switch fieldID {
+		case "enrollment_start":
+			course.EnrollmentStart = timestamp
+		case "enrollment_end":
+			course.EnrollmentEnd = timestamp
+		case "unsubscribe_end":
+			course.UnsubscribeEnd = sql.NullString{timestamp, valid}
+		case "expiration_date":
+			course.ExpirationDate = timestamp
+		}
+
+		if course.Validate(v); v.HasErrors() {
+			tx.Commit()
+			return
+		}
+	}
+
+	//no errors, update the course
+	if fieldID == "unsubscribe_end" {
+		if err = course.Update(tx, fieldID, sql.NullString{timestamp, valid}, conf); err != nil {
+			return
+		}
+	} else {
+		if err = course.Update(tx, fieldID, timestamp, conf); err != nil {
+			return
+		}
+	}
+
+	tx.Commit()
+	return
 }
 
 /*Get all course data. If manage is false, only get publicly available course
@@ -241,6 +319,28 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	if txWasNil {
 		tx.Commit()
 	}
+	return
+}
+
+/*GetForValidation only returns the course data required for validation. */
+func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
+
+	//get general course data
+	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get course for validation", "course ID", course.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get the events of the course
+	if err = course.Events.GetForValidation(tx, &course.ID); err != nil {
+		return
+	}
+
+	//TODO: get calendar events
+
 	return
 }
 
@@ -444,7 +544,9 @@ func (course *Course) Activate(v *revel.Validation) (invalid bool, err error) {
 		return
 	}
 
-	if err = course.Update(tx, "active", true); err != nil {
+	//TODO: get all instructors and editors
+	conf := EditEMailConfig{}
+	if err = course.Update(tx, "active", true, &conf); err != nil {
 		return
 	}
 

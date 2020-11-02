@@ -49,6 +49,37 @@
               {{msg $ "validation.invalid.text"}}
             </div>
           </div>
+
+          {{if .active}}
+            <hr>
+            <small class="form-text text-muted">
+              <b>{{msg $ "email.edit.info.bold"}}</b> <br>
+              {{msg $ "email.edit.info"}}
+              <br>
+              <br>
+            </small>
+            <div class="form-group">
+              <select class="custom-select" name="conf.OptionUsers" required>
+                <option value="">{{msg $ "email.edit.option.choose"}}</option>
+                <option value="1">{{msg $ "email.edit.option.all.users"}}</option>
+                <option value="2">{{msg $ "email.edit.option.enrolled.users"}}</option>
+                <option value="3">{{msg $ "email.edit.option.wait.list.users"}}</option>
+                <option value="4">{{msg $ "email.edit.option.none"}}</option>
+              </select>
+            </div>
+            <small class="form-text text-muted">
+              {{msg $ "email.edit.info.creator"}}
+            </small>
+            <div class="form-group">
+              <select class="custom-select" name="conf.OptionEditors" required>
+                <option value="">{{msg $ "email.edit.option.choose"}}</option>
+                <option value="1">{{msg $ "email.edit.option.all"}}</option>
+                <option value="2">{{msg $ "email.edit.option.editors"}}</option>
+                <option value="3">{{msg $ "email.edit.option.instructors"}}</option>
+                <option value="4">{{msg $ "email.edit.option.none"}}</option>
+              </select>
+            </div>
+          {{end}}
         </div>
 
         <!-- modal footer -->

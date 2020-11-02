@@ -124,14 +124,18 @@ email.dev.team = Your Turm2 Development Team
 email.no.reply = Please do not reply. <%s>
 email.regards = Sincerely <br> Your <a href="%s/">Turm2</a> Development Team <br>
 
-email.subject.activation = Welcome at TurmII - Your activation code
-email.subject.new.pw = Your new password for TurmII
-email.subject.new.role = TurmII - Information about your new user role
-email.subject.enroll = TurmII - Enrollment successful
-email.subject.wait.list = TurmII - Successful enrollment to wait list
-email.subject.unsub.wait.list = TurmII - Successfully unsubscribed from wait list
-email.subject.unsubscribe = TurmII - Successfully unsubscribed
-email.subject.from.wait.list = TurmII - Successful enrollment from wait list
+email.subject.activation = Welcome at Turm2 - Your activation code
+email.subject.new.pw = Your new password for Turm2
+email.subject.new.role = Turm2 - Information about your new user role
+email.subject.enroll = Turm2 - Enrollment successful
+email.subject.wait.list = Turm2 - Successful enrollment to wait list
+email.subject.unsub.wait.list = Turm2 - Successfully unsubscribed from wait list
+email.subject.unsubscribe = Turm2 - Successfully unsubscribed
+email.subject.from.wait.list = Turm2 - Successful enrollment from wait list
+email.subject.event.edit = Turm2 - Information about one of your events
+email.subject.course.edit = Turm2 - Information about one of your courses
+email.subject.event.edit.manager = Turm2 - Course management - Information about one of your events
+email.subject.course.edit.manager = Turm2 - Course management - Information about one of your courses
 
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH

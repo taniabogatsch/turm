@@ -67,7 +67,7 @@ validation.invalid.parent = The course must be part of a group.
 validation.invalid.meeting.start = Meetings must be after the start of the enrollment period.
 validation.invalid.meeting.end = Meetings must start before they end.
 
-validation.invalid.len.events = There must be at least one event.
+validation.invalid.len.events = There must be at least one event or one calendar event.
 
 validation.invalid.restriction = Please provide at least a pursued degree, a course of studies or a minimum semester.
 
