@@ -8,8 +8,8 @@ import (
 	"github.com/revel/revel"
 )
 
-/*ExceptionsAtWeek holds all exeptions of a week [0....6]*/
-type ExceptionsAtWeek []Exceptions
+/*ExceptionsOfWeek holds all exeptions of a week [0....6]. */
+type ExceptionsOfWeek []Exceptions
 
 /*Exceptions locked at a specific day within StartTime and EndTime of a day template. */
 type Exceptions []Exception
@@ -33,7 +33,8 @@ func (excepts *Exceptions) Get(tx *sqlx.Tx, monday time.Time, weekday int) (err 
 
 	err = tx.Select(excepts, stmtSelectExeptions, startTime, endTime)
 	if err != nil {
-		log.Error("failed to get slots of dayTemplate", "error", err.Error())
+		log.Error("failed to get exceptions of day template", "monday", monday,
+			"weekday", weekday, "error", err.Error())
 		tx.Rollback()
 	}
 	return

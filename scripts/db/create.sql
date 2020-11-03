@@ -248,8 +248,8 @@ CREATE TABLE calendar_events (
 CREATE TABLE day_templates (
   id                  serial                      PRIMARY KEY,
   calendar_event_id   integer                     NOT NULL,
-  start_time          time with time zone         NOT NULL,
-  end_time            time with time zone         NOT NULL,
+  start_time          time without time zone      NOT NULL,
+  end_time            time without time zone      NOT NULL,
   interval            integer                     NOT NULL DEFAULT 60,
   day_of_week         integer                     NOT NULL,
   active              boolean                     DEFAULT true,
@@ -277,7 +277,7 @@ CREATE TABLE calendar_exceptions (
   calendar_event_id   integer                     NOT NULL,
   start_time          timestamp with time zone,
   end_time            timestamp with time zone,
-  annotations         varchar(255),
+  annotation          varchar(255),
 
   FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
 );

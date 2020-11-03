@@ -79,23 +79,21 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 
 /*NewDayTemplate creates a repeatable blueprint of a day.
 - Roles: creator and editors of the course of the calendar event */
-func (c EditCalendarEvent) NewDayTemplate(ID int, tmpl models.DayTmpl) revel.Result {
+func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl) revel.Result {
 
-	c.Log.Debug("create a new day template", "ID", ID, "tmpl", tmpl)
+	c.Log.Debug("create a new day template", "ID", ID, "courseID", courseID, "tmpl", tmpl)
 
-	tmpl.ID = ID
+	tmpl.CalendarEventID = ID
 	if err := tmpl.Insert(c.Validation); err != nil {
 		return flashError(
-			errDB, err, "", c.Controller, "")
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
 	} else if c.Validation.HasErrors() {
 		return flashError(
-			errValidation, err, "", c.Controller, "")
+			errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("DayTemplate.new.success",
-		tmpl.StartTime,
-		tmpl.EndTime,
-		tmpl.ID,
-	))
-	return c.Redirect(c.Session["currPath"])
+	c.Flash.Success(c.Message("day.tmpl.new.success", tmpl.ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
 }

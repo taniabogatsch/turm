@@ -7,6 +7,8 @@ import (
 	"github.com/revel/revel"
 )
 
+//TODO: notify enrolled users if updated
+
 /*Edit meeting data.
 - Roles: creator and editors of the course of the meeting */
 func (c EditMeeting) Edit(ID int, meeting models.Meeting) revel.Result {

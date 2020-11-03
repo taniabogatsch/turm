@@ -464,3 +464,18 @@ function openNewEventModal(title, action, ID, info) {
   //show the modal
   $('#change-event-modal').modal('show');
 }
+
+function openChangeDayTmplModal(action, title, ID, dayOfWeek, start, end, interval) {
+
+  $('#change-day-tmpl-modal-ID').val(ID);
+  $('#change-day-tmpl-modal-title').html(title);
+  $('#change-day-tmpl-modal-form').attr('action', action);
+
+  $('#change-day-tmpl-modal-interval').val(interval);
+  $('#change-day-tmpl-modal-day-of-week').val(dayOfWeek);
+  $('#change-day-tmpl-modal-start').val(start);
+  $('#change-day-tmpl-modal-end').val(end);
+
+  //show the modal
+  $('#change-day-tmpl-modal').modal('show');
+}

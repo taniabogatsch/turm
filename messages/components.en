@@ -51,6 +51,8 @@ button.unsubscribe = Unsubscribe
 button.to.waitlist = To wait list
 button.from.waitlist = From wait list
 
+button.new.day.tmpl = New day template
+
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS
 # -------------------------------------------------------------------------------------------------- #

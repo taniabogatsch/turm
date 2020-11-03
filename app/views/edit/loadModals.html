@@ -16,6 +16,8 @@
 {{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
 {{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
 
+{{template "edit/modals/changeDayTmpl.html" dict_addLocale $.currentLocale "courseID" .course.ID}}
+
 {{template "edit/modals/deleteField.html" dict_addLocale $.currentLocale}}
 
 <script>
@@ -139,6 +141,20 @@
     }
 
     submitRenderForm("#change-event-modal-form", "#change-event-modal");
+    event.preventDefault();
+  });
+
+  $('#change-day-tmpl-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-day-tmpl-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#change-day-tmpl-modal-form", "#change-day-tmpl-modal");
     event.preventDefault();
   });
 

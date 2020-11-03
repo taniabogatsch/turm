@@ -57,7 +57,7 @@ type ScheduleEntry struct {
 	Type      ScheduleEntryType
 }
 
-/*Insert a DayTemplate. */
+/*Insert a day template. */
 func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 
 	tx, err := app.Db.Beginx()
@@ -77,45 +77,11 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 		log.Error("failed to insert day template", "tmpl", *tmpl,
 			"error", err.Error())
 		tx.Rollback()
+		return
 	}
 
 	tx.Commit()
 	return
-}
-
-//validate a day template.
-func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
-
-	//check for valid times
-	startTime := Custom_time{}
-	isValidTime1 := startTime.SetTime(tmpl.StartTime)
-
-	endTime := Custom_time{}
-	isValidTime2 := endTime.SetTime(tmpl.EndTime)
-
-	v.Check(isValidTime1 == false || isValidTime2 == false).
-		MessageKey("validation.invalid.timestamp")
-
-	//check startTime before endTime
-	v.Check(startTime.Before(endTime)).
-		MessageKey("validation.calendarEvent.startInPast")
-
-	//check step distance
-	intervalSteps := float64(startTime.Sub(endTime) / tmpl.Interval)
-	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
-	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
-
-	//check if template collides with other template on that day
-	var timeOverlapTmpl bool
-
-	err := tx.Get(timeOverlapTmpl, stmtGetExistsOverlappingDayTmpl, startTime.Value, endTime.Value, tmpl.CalendarEventID)
-	if err != nil {
-		log.Error("failed to get DayTemolates",
-			"error", err.Error())
-	}
-
-	v.Check(!timeOverlapTmpl).
-		MessageKey("validation.calendarEvent.overlappingTimespanDayTmpl")
 }
 
 /*Update a day tmpl. */
@@ -140,7 +106,7 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 	return
 }
 
-/*Delete a day Template if it has no slots*/
+/*Delete a day template if it has no slots. */
 func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
 
 	tx, err := app.Db.Beginx()
@@ -149,7 +115,9 @@ func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
-	//check if DayTmpl has no slots
+	//TODO: what if slots are waaaaay in the past
+
+	//check if day template has no slots
 	var notEmpty bool
 	err = tx.Get(notEmpty, stmtExistSlots, tmpl.ID)
 	if err != nil {
@@ -165,7 +133,7 @@ func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
-	//delete day_tmpl
+	//delete day template
 	if err = deleteByID("id", "calendar_events", tmpl.ID, tx); err != nil {
 		return
 	}
@@ -191,29 +159,69 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 			return
 		}
 
+		//get slots
 		for j := range (*dayTmpls)[i] {
-			//get slots
 			err = ((*dayTmpls)[i])[j].Slots.Get(tx, ((*dayTmpls)[i])[j].ID, monday, i)
 			if err != nil {
 				return
 			}
-
-			//TODO: fill scedule for that day tmpl
-
 		}
 	}
 
 	return
 }
 
+//validate a day template
+func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
+
+	//check for valid times
+	start := CustomTime{}
+	isValidTime1 := start.SetTime(tmpl.StartTime)
+
+	end := CustomTime{}
+	isValidTime2 := end.SetTime(tmpl.EndTime)
+
+	if !isValidTime1 || !isValidTime2 {
+		v.ErrorKey("validation.invalid.timestamp")
+	}
+
+	if !start.Before(&end) {
+		v.ErrorKey("validation.calendar.event.start.after.end")
+	}
+
+	//check step distance
+	distance := float64(start.Sub(&end))
+	multiplier := distance / float64(tmpl.Interval)
+	if multiplier-float64(int(multiplier)) != 0.0 {
+		v.ErrorKey("validation.calendar.event.wrong.interval")
+	}
+
+	if !v.HasErrors() {
+
+		//check if template collides with other templates on that day
+		var overlaps bool
+
+		err := tx.Get(&overlaps, stmtGetOverlappingTmpls, start.Value,
+			end.Value, tmpl.DayOfWeek, tmpl.CalendarEventID)
+		if err != nil {
+			log.Error("failed to validate if day templates overlap each other", "day tmpl",
+				*tmpl, "error", err.Error())
+			v.ErrorKey("error.db")
+			return
+		}
+
+		if overlaps {
+			v.ErrorKey("validation.calendar.event.tmpls.overlap")
+		}
+	}
+}
+
 const (
 	stmtInsertDayTemplate = `
     INSERT INTO day_templates (
-        calendar_event_id, start_time, end_time, intervall, day_of_week
-      )
-    VALUES (
-        $1, $2, $3, $4, $5
-    )
+        calendar_event_id, start_time, end_time, interval, day_of_week
+			)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING id
   `
 
@@ -226,8 +234,10 @@ const (
   `
 
 	stmtSelectDayTmpls = `
-    SELECT id, calendar_event_id, start_time, end_time, interval,
-      day_of_week, active, deactivation_date
+    SELECT id, calendar_event_id,
+			TO_CHAR (date '2001-09-28' + start_time, 'HH24:MI') AS start_time,
+			TO_CHAR (date '2001-09-28' + end_time, 'HH24:MI') AS end_time,
+			interval, day_of_week, active, deactivation_date
     FROM day_templates
     WHERE calendar_event_id = $1
       AND active = true
@@ -235,17 +245,18 @@ const (
     ORDER BY start_time ASC
   `
 
-	stmtGetExistsOverlappingDayTmpl = `
+	stmtGetOverlappingTmpls = `
 		SELECT EXISTS(
 			SELECT true
 			FROM day_templates
-			WHERE $3 = calendar_event_id
+			WHERE $4 = calendar_event_id
 				AND active = true
+				AND day_of_week = $3
 				AND (
-									($1 BETWEEN (start_time) AND (end_time))
-							OR 	($2 BETWEEN (start_time) AND (end_time))
-							OR  (($1 <= start_time) AND ($2 >= end_time))
-						)
+							($1 < end_time AND $1 >= start_time)
+					OR 	($2 <= end_time AND $2 > start_time)
+					OR 	(($1 <= start_time) AND ($2 >= end_time))
+				)
 		) AS timeOverlapTmpl
 	`
 

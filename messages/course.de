@@ -64,6 +64,17 @@ event.unsubscribe.success = Sie haben sich erfolgreich ausgetragen.
 # -------------------------------------------------------------------------------------------------- #
 
 event.calendar.title = Kalenderveranstaltungstitel
+event.calendar.week = Woche
+event.calendar.week.day = Wochentag
+event.calendar.interval.info = Intervall in Minuten (min)
+event.calendar.min = min
+event.calendar.mo = Mo
+event.calendar.tu = Di
+event.calendar.we = Mi
+event.calendar.th = Do
+event.calendar.fr = Fr
+event.calendar.sa = Sa
+event.calendar.so = So
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -169,6 +180,9 @@ event.calendar.title.change.success = Kalenderveranstaltungstitel zu '%s' geänd
 
 event.calendar.annotation.change.success = Anmerkung zu '%s' geändert.
 event.calendar.annotation.delete.success = Anmerkung gelöscht.
+
+day.tmpl.new.success = Neue Schablone hinzugefügt, ID = %d.
+day.tmpl.new.title = Neue Schablone hinzufügen
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

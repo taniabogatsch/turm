@@ -29,11 +29,6 @@
 
 <ul class="list-group">
 
-  <script>
-    var fromMsg = '{{msg $ "meeting.from"}}';
-    var clockMsg = '{{msg $ "course.clock"}}';
-  </script>
-
   {{range .events}}
     <li class="list-group-item mb-2 border rounded">
 
@@ -89,47 +84,67 @@
         </button>
       </div>
 
-      <div class="row border rounded mt-2">
+      <div class="row border rounded mt-3 m-0">
         <div class="col-sm-12">
           <div class="row text-center">
             <div class="col-sm-12 rounded-top">
-              <strong>Woche {{.Week}}</strong>
+              <strong>{{msg $ "event.calendar.week"}} {{.Week}}</strong>
             </div>
           </div>
           <!-- week days header -->
           <div class="row border-top">
             <div class="col-sm-2">
-              Mo
+              {{msg $ "event.calendar.mo"}}
             </div>
             <div class="col-sm-2">
-              Di
+              {{msg $ "event.calendar.tu"}}
             </div>
             <div class="col-sm-2">
-              Mi
+              {{msg $ "event.calendar.we"}}
             </div>
             <div class="col-sm-2">
-              Do
+              {{msg $ "event.calendar.th"}}
             </div>
             <div class="col-sm-2">
-              Fr
+              {{msg $ "event.calendar.fr"}}
             </div>
             <div class="col-sm-1">
-              Sa
+              {{msg $ "event.calendar.sa"}}
             </div>
             <div class="col-sm-1">
-              So
+              {{msg $ "event.calendar.so"}}
             </div>
           </div>
 
           <!-- content -->
           <div class="row">
             <!-- range templates -->
+            {{range $k, $v := .Days}}
+              <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}}">
+                {{range .}}
+                <div class="card mb-1">
+                  <div class="card-body p-1">
+                    {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                    {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                  </div>
+                </div>
+                {{end}}
+              </div>
+            {{end}}
           </div>
         </div>
       </div>
-      <button type="button" class="btn btn-outline-darkblue edit-show d-none">
-        + &nbsp; Template
-      </button>
+      <br>
+      <div class="d-inline">
+        <button type="button" class="btn btn-outline-darkblue edit-show d-none"
+          onclick='openChangeDayTmplModal({{url "EditCalendarEvent.NewDayTemplate"}},
+            {{msg $ "day.tmpl.new.title"}}, {{.ID}}, 0, "", "", 60);'>
+          + &nbsp; {{msg $ "button.new.day.tmpl"}}
+        </button>
+        <button type="button" class="btn btn-outline-darkblue edit-show d-none">
+          + &nbsp; Zeitraum sperren
+        </button>
+      </div>
 
     </li>
   {{else}}

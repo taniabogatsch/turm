@@ -14,8 +14,6 @@ import (
 	"github.com/revel/revel"
 )
 
-//TODO: notify enrolled users if course is updated
-
 /*Open an already existing course for modification, etc.
 - Roles: creator and editors of this course. */
 func (c Edit) Open(ID int) revel.Result {
@@ -168,7 +166,8 @@ func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailCon
 		event := models.CalendarEvent{CourseID: ID, Title: value}
 		if err := event.NewBlank(); err != nil {
 			return flashError(
-				errDB, err, "", c.Controller, "")
+				errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(ID),
+				c.Controller, "")
 		}
 
 		c.Flash.Success(c.Message("event.new.calendar.success", event.Title, event.ID))

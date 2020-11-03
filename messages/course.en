@@ -64,6 +64,17 @@ event.unsubscribe.success = You unsubscribed successfully.
 # -------------------------------------------------------------------------------------------------- #
 
 event.calendar.title = Calendar event title
+event.calendar.week = Week
+event.calendar.week.day = Day of the week
+event.calendar.interval.info = Interval in minutes (min)
+event.calendar.min = min
+event.calendar.mo = Mo
+event.calendar.tu = Tu
+event.calendar.we = We
+event.calendar.th = Th
+event.calendar.fr = Fr
+event.calendar.sa = Sa
+event.calendar.so = So
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -169,6 +180,9 @@ event.calendar.title.change.success = Changed calendar event title to '%s'.
 
 event.calendar.annotation.change.success = Changed annotation to '%s'.
 event.calendar.annotation.delete.success = Deleted annotation.
+
+day.tmpl.new.success = Added new day template, ID = %d.
+day.tmpl.new.title = New day template
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

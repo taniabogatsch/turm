@@ -5,67 +5,63 @@ import (
 	"strings"
 )
 
-/*Custom_time is used to compare times*/
-type Custom_time struct {
+/*CustomTime is used to compare times. */
+type CustomTime struct {
 	Value string
 	Hour  int
 	Min   int
 }
 
-/*SetTime uses a Timestring of "12:50". if it is a valid time it sets hour and min*/
-func (t1 *Custom_time) SetTime(value string) (succsess bool) {
+/*SetTime uses a time string of format '12:50'. If value is a valid time it sets hour and min. */
+func (t1 *CustomTime) SetTime(value string) (success bool) {
 
 	s := strings.Split(value, ":")
 
-	h, error1 := strconv.Atoi(s[0])
-	m, error2 := strconv.Atoi(s[1])
+	h, err := strconv.Atoi(s[0])
+	if err != nil {
+		log.Error("cannot convert value to hour", "value", value,
+			"error", err.Error())
+		return
+	}
 
-	if error1 != nil || error2 != nil {
-		log.Error("on SetTime: not convertable to int",
-			"error_hour", error1, "error_min", error2)
-	} else {
-		if 0 <= h && h < 24 && 0 <= m && m < 60 {
-			succsess = true
-			t1.Value = value
-			t1.Hour = h
-			t1.Min = m
-		}
+	m, err := strconv.Atoi(s[1])
+	if err != nil {
+		log.Error("cannot convert value to minute", "value", value,
+			"error", err.Error())
+		return
+	}
+
+	if 0 <= h && h <= 24 && 0 <= m && m < 60 {
+		success = true
+		t1.Value = value
+		t1.Hour = h
+		t1.Min = m
 	}
 	return
 }
 
-/*Before checks if a time(t1) is before a secound time(t2)*/
-func (t1 *Custom_time) Before(t2 Custom_time) (isBefore bool) {
+/*Before checks if t1 is before t2. */
+func (t1 *CustomTime) Before(t2 *CustomTime) (before bool) {
+
 	if t1.Hour < t2.Hour {
-		isBefore = true
+		before = true
 		return
-	} else if t1.Hour == t2.Hour {
-		if t1.Min < t2.Min {
-			isBefore = true
-			return
-		}
 	}
-	isBefore = false
+
+	if t1.Hour == t2.Hour && t1.Min <= t2.Min {
+		before = true
+	}
 	return
 }
 
-/*After checks if a time(t1) is after a secound time(t2)*/
-func (t1 *Custom_time) After(t2 Custom_time) (isBefore bool) {
-	if t1.Hour > t2.Hour {
-		isBefore = true
-		return
-	} else if t1.Hour == t2.Hour {
-		if t1.Min > t2.Min {
-			isBefore = true
-			return
-		}
-	}
-	isBefore = false
-	return
+/*After checks if t1 is after t2. */
+func (t1 *CustomTime) After(t2 *CustomTime) (after bool) {
+	return !t1.Before(t2)
 }
 
-/*Sub gives the difference from two times within a day*/
-func (t1 *Custom_time) Sub(t2 Custom_time) (min int) {
+/*Sub returns the time interval between two times. */
+func (t1 *CustomTime) Sub(t2 *CustomTime) (min int) {
+
 	if t1.After(t2) {
 		min = (t1.Hour-t2.Hour)*60 + (t1.Min - t2.Min)
 	} else {
@@ -74,16 +70,18 @@ func (t1 *Custom_time) Sub(t2 Custom_time) (min int) {
 	return
 }
 
-/*Equals checks if two Custom_times are the same*/
-func (t1 *Custom_time) Equals(t2 Custom_time) (equals bool) {
+/*Equals checks if t1 equals t2. */
+func (t1 *CustomTime) Equals(t2 *CustomTime) (equals bool) {
+
 	if t1.Hour == t2.Hour && t1.Min == t2.Min {
 		return true
 	}
-	return false
+	return
 }
 
-/*GernerateValueString uses the Hour and Min field to generate the Value String*/
-func (t1 *Custom_time) GernerateValueString() {
+/*String sets the value field of the CustomTime struct. */
+func (t1 *CustomTime) String() {
+
 	h := strconv.Itoa(t1.Hour)
 	m := strconv.Itoa(t1.Min)
 	t1.Value = h + ":" + m

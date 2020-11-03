@@ -273,7 +273,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	//get the last (current) monday
 	now := time.Now()
 	weekday := time.Now().Weekday()
-	monday := now.AddDate(0, 0, -1*int(weekday))
+	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
 	//get the calander events of a course
 	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
 		return

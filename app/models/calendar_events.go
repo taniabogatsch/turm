@@ -25,8 +25,8 @@ type CalendarEvent struct {
 	//day templates for this week [0...6]
 	Days DayTmpls
 
-	//Exeptions of this week [0....6]
-	ExceptionsAtWeek ExceptionsAtWeek
+	//exeptions of this week [0....6]
+	ExceptionsOfWeek ExceptionsOfWeek
 
 	ScheduleWeek []Schedule
 }
@@ -42,8 +42,8 @@ func (event *CalendarEvent) NewBlank() (err error) {
 	return
 }
 
-/*Get all CalendarEvents. */
-func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, day time.Time) (err error) {
+/*Get all CalendarEvents by the provided monday. */
+func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
@@ -56,20 +56,26 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, day time.Time) (er
 
 	err = tx.Select(events, stmtSelectCalendarEvents, *courseID)
 	if err != nil {
-		log.Error("failed to get CalendarEvents of course", "course ID", *courseID,
+		log.Error("failed to get calendar events of course", "course ID", *courseID,
 			"error", err.Error())
 		tx.Rollback()
 		return
 	}
 
 	for i := range *events {
-		//get all day_templates of this event
-		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, day)
+		//get all day templates of this event
+		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, monday)
 		if err != nil {
 			return
 		}
+
+		//get the slot schedule
+		if err = (*events)[i].getSchedule(tx, monday); err != nil {
+			return
+		}
+
 		//set the current week
-		_, (*events)[i].Week = day.ISOWeek()
+		_, (*events)[i].Week = monday.ISOWeek()
 	}
 
 	if txWasNil {
@@ -90,102 +96,23 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 		}
 	}
 
-	err = tx.Get(event, stmtSelectCalendarEvent, *courseID, event.ID)
+	//get general event information
+	err = tx.Get(event, stmtGetCalendarEvent, *courseID, event.ID)
 	if err != nil {
-		log.Error("failed to get CalendarEvents of course", "monday", monday, "course ID", *courseID,
+		log.Error("failed to get calendar event of course", "monday", monday, "course ID", *courseID,
 			"error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	//get all day_templates of this event
-	err = event.Days.Get(tx, &event.ID, monday)
-	if err != nil {
+	//get all day templates of this event
+	if err = event.Days.Get(tx, &event.ID, monday); err != nil {
 		return
 	}
 
-	event.ExceptionsAtWeek = append(event.ExceptionsAtWeek, Exceptions{}, Exceptions{}, Exceptions{},
-		Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{})
-	//get exceptions
-	for i := 0; i < 7; i++ {
-		err = event.ExceptionsAtWeek[i].Get(tx, monday, i)
-		if err != nil {
-			return
-		}
-	}
-
-	//Tfor ech day get scedule out of all dayTemps of that day and make a
-	//		scedule for whole day with exeptions
-	for dayIndex := 0; dayIndex < 7; dayIndex++ {
-		tmplsOfDay := event.Days[dayIndex]
-
-		daySchedule := Schedule{}
-		//generate blocked and free blocks depending on day_templates
-
-		//set blocked slot from 0 to start from first day-template
-		if tmplsOfDay[0].StartTime != "00:00" {
-			daySchedule = append(daySchedule, ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, BLOCKED})
-		}
-
-		/*insert all slots and free space of a dayTemplate and
-		the blocked space between the next day template*/
-		for i := range tmplsOfDay {
-
-			if i != 0 {
-				//check for blocked space to day tmpl upfront
-				if tmplsOfDay[i].StartTime != daySchedule[len(daySchedule)-1].EndTime {
-					daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
-						tmplsOfDay[i].StartTime, BLOCKED})
-				}
-			}
-
-			for j := range tmplsOfDay[i].Slots {
-
-				//get convert time's to string
-				slotStartTime := Custom_time{"", tmplsOfDay[i].Slots[j].StartTimestamp.Hour(),
-					tmplsOfDay[i].Slots[j].StartTimestamp.Minute()}
-				slotStartTime.GernerateValueString()
-
-				slotEndTime := Custom_time{"", tmplsOfDay[i].Slots[j].EndTimestamp.Hour(),
-					tmplsOfDay[i].Slots[j].EndTimestamp.Minute()}
-				slotEndTime.GernerateValueString()
-
-				//check if first slot needs free space upfront
-				if j == 0 {
-
-					//insert free ScheduleEntry at start if necessary
-					if tmplsOfDay[i].StartTime != slotStartTime.Value {
-						daySchedule = append(daySchedule, ScheduleEntry{tmplsOfDay[i].StartTime,
-							slotStartTime.Value, EMPTY})
-					}
-				} else { // check for free space to Schedule entry before current entry
-					if daySchedule[len(daySchedule)-1].EndTime != slotStartTime.Value {
-						daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
-							slotStartTime.Value, EMPTY})
-					}
-				}
-
-				//insert slot as ScheduleEntry
-				daySchedule = append(daySchedule, ScheduleEntry{slotStartTime.Value, slotEndTime.Value, SLOT})
-
-			} // END of for loop (slots of TmplsOfDay)
-
-			//check for free space from last slot to end of dayTemplate
-			if tmplsOfDay[i].EndTime != daySchedule[len(daySchedule)-1].EndTime {
-				daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
-					tmplsOfDay[i].EndTime, EMPTY})
-			}
-
-		} // END of for loop (TmplsOfDay)
-
-		//check for blocked space from end of last dayTemplate to 24:00
-		if daySchedule[len(daySchedule)-1].EndTime != "24:00" {
-			daySchedule = append(daySchedule, ScheduleEntry{daySchedule[len(daySchedule)-1].EndTime,
-				"24:00", BLOCKED})
-		}
-
-		event.ScheduleWeek = append(event.ScheduleWeek, daySchedule)
-
+	//get the slot schedule
+	if err = event.getSchedule(tx, monday); err != nil {
+		return
 	}
 
 	//set the current week
@@ -193,6 +120,102 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 
 	if txWasNil {
 		tx.Commit()
+	}
+	return
+}
+
+func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
+
+	//get the exceptions of each day of that week (as defined by monday)
+	event.ExceptionsOfWeek = append(event.ExceptionsOfWeek, Exceptions{}, Exceptions{},
+		Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{})
+	for i := 0; i < 7; i++ {
+		if err = event.ExceptionsOfWeek[i].Get(tx, monday, i); err != nil {
+			return
+		}
+	}
+
+	//prepare a schedule for the whole week by looping all day templates and
+	//their slots for each day respectively
+	for _, tmplsOfDay := range event.Days {
+
+		if len(tmplsOfDay) != 0 {
+
+			//generate blocked and free blocks of this schedule
+			schedule := Schedule{}
+
+			//set blocked slot from 0 to start of the first day template
+			if tmplsOfDay[0].StartTime != "00:00" {
+				schedule = append(schedule,
+					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, BLOCKED})
+			}
+
+			//insert all slots and free spaces of a day template and
+			//the blocked space between this day template and the next day template
+			for i := range tmplsOfDay {
+
+				//if two day templates are not exactly subsequent to each other,
+				//then insert a BLOCKED schedule entry
+				if i != 0 {
+					if tmplsOfDay[i].StartTime != schedule[len(schedule)-1].EndTime {
+						schedule = append(schedule,
+							ScheduleEntry{
+								schedule[len(schedule)-1].EndTime,
+								tmplsOfDay[i].StartTime,
+								BLOCKED},
+						)
+					}
+				}
+
+				//insert all BOOKED and FREE schedule entries for the current day template
+				for j := range tmplsOfDay[i].Slots {
+
+					//get start time as string
+					slotStart := CustomTime{"", tmplsOfDay[i].Slots[j].Start.Hour(),
+						tmplsOfDay[i].Slots[j].Start.Minute()}
+					slotStart.String()
+
+					//get end time as string
+					slotEnd := CustomTime{"", tmplsOfDay[i].Slots[j].End.Hour(),
+						tmplsOfDay[i].Slots[j].End.Minute()}
+					slotEnd.String()
+
+					//check if there is free space before the first BOOKED slot
+					if j == 0 {
+						//insert FREE schedule entry
+						if tmplsOfDay[i].StartTime != slotStart.Value {
+							schedule = append(schedule, ScheduleEntry{tmplsOfDay[i].StartTime,
+								slotStart.Value, EMPTY})
+						}
+					} else {
+						//check for FREE space between two slots
+						if schedule[len(schedule)-1].EndTime != slotStart.Value {
+							schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
+								slotStart.Value, EMPTY})
+						}
+					}
+
+					//insert slot as schedule entry
+					schedule = append(schedule, ScheduleEntry{slotStart.Value, slotEnd.Value, SLOT})
+
+				} //end of for loop of slots
+
+				//check for FREE space from the last slot to the end of the day template
+				if tmplsOfDay[i].EndTime != schedule[len(schedule)-1].EndTime {
+					schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
+						tmplsOfDay[i].EndTime, EMPTY})
+				}
+
+			} //end of for loop of day templates
+
+			//check for BLOCKED space from the end of the last day template to 24:00
+			if schedule[len(schedule)-1].EndTime != "24:00" {
+				schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
+					"24:00", BLOCKED})
+			}
+
+			event.ScheduleWeek = append(event.ScheduleWeek, schedule)
+		}
 	}
 
 	return
@@ -217,9 +240,11 @@ func (event *CalendarEvent) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
+	//TODO: think about this: can we delete calendar events if the slots are e.g. older than 1 year?
+
 	var notEmpty bool
 	//don't allow the deletion of calendar events if users are enrolled in them
-	tx.Get(notEmpty, stmtUsersExist, event.ID)
+	tx.Get(notEmpty, stmtSlotsExist, event.ID)
 	if err != nil {
 		log.Error("failed to get CalendarEvents of course", "event ID", event.ID,
 			"error", err.Error())
@@ -245,11 +270,9 @@ func (event *CalendarEvent) Delete(v *revel.Validation) (err error) {
 const (
 	stmtInsertCalendarEvent = `
 		INSERT INTO calendar_events (
-				course_id, title
-			)
-		VALUES (
-				$1, $2
+			course_id, title
 		)
+		VALUES ($1, $2)
 		RETURNING id
 	`
 
@@ -260,7 +283,7 @@ const (
 		ORDER BY id ASC
 	`
 
-	stmtSelectCalendarEvent = `
+	stmtGetCalendarEvent = `
 		SELECT id, course_id, title, annotation
 		FROM calendar_events
 		WHERE course_id = $1
@@ -274,7 +297,7 @@ const (
 		WHERE id = $1
 	`
 
-	stmtUsersExist = `
+	stmtSlotsExist = `
 		SELECT EXISTS (
 			SELECT true
 			FROM day_templates t JOIN slots s ON t.id = s.day_tmpl_id

@@ -110,6 +110,7 @@ POST    /edit/meeting/delete                        EditMeeting.Delete
 
 POST    /edit/calendar/changeText                   EditCalendarEvent.ChangeText
 POST    /edit/calendar/delete                       EditCalendarEvent.Delete
+POST    /edit/calendar/newDayTemplate               EditCalendarEvent.NewDayTemplate
 
 
 # ---------------------------------------------------------------------------- #

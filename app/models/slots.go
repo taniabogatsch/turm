@@ -19,8 +19,8 @@ type Slot struct {
 	Created   string `db:"created"`
 
 	//date + time
-	StartTimestamp time.Time `db:"start_time"`
-	EndTimestamp   time.Time `db:"end_time"`
+	Start time.Time `db:"start_time"`
+	End   time.Time `db:"end_time"`
 }
 
 /*Insert a new slot. */
@@ -40,7 +40,7 @@ func (slot *Slot) Insert(v *revel.Validation) (err error) {
 
 	//insert Slot
 	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
-		slot.StartTimestamp, slot.EndTimestamp)
+		slot.Start, slot.End)
 	if err != nil {
 		log.Error("failed to get Slot", "slotID", slot.ID,
 			"error", err.Error())
@@ -72,23 +72,24 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 //validate the slot struct
 func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 
-	startInPast := slot.StartTimestamp.After(time.Now())
+	startInPast := slot.Start.After(time.Now())
 	v.Check(startInPast).
 		MessageKey("validation.calendarEvent.startInPast")
 
-	startAfterEndTime := slot.StartTimestamp.Before(slot.EndTimestamp)
+	startAfterEndTime := slot.Start.Before(slot.End)
 	v.Check(startAfterEndTime).
 		MessageKey("validation.calendarEvent.startAfterEndTime")
 
 	//chek if startTime and endTime is on same date
-	y1, m1, d1 := slot.StartTimestamp.Date()
-	y2, m2, d2 := slot.EndTimestamp.Date()
-	v.Check(y1 == y2 && m1 == m2 && d1 == d2).
+	y1, m1, d1 := slot.Start.Date()
+	y2, m2, d2 := slot.End.Date()
+	valid := y1 == y2 && m1 == m2 && d1 == d2
+	v.Check(valid).
 		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
 
 	dayTmpls := []DayTmpl{}
 
-	weekday := int(slot.StartTimestamp.Weekday())
+	weekday := int(slot.Start.Weekday())
 
 	err := tx.Select(dayTmpls, stmtGetDayTemplateFromWeekDay, weekday)
 	if err != nil {
@@ -98,14 +99,14 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 		return
 	}
 
-	slotStartTime := Custom_time{}
-	slotStartTime.Hour, slotStartTime.Min, _ = slot.StartTimestamp.Clock()
+	slotStartTime := CustomTime{}
+	slotStartTime.Hour, slotStartTime.Min, _ = slot.Start.Clock()
 
-	slotEndTime := Custom_time{}
-	slotEndTime.Hour, slotEndTime.Min, _ = slot.EndTimestamp.Clock()
+	slotEndTime := CustomTime{}
+	slotEndTime.Hour, slotEndTime.Min, _ = slot.End.Clock()
 
-	tmplStartTime := Custom_time{}
-	tmplEndTime := Custom_time{}
+	tmplStartTime := CustomTime{}
+	tmplEndTime := CustomTime{}
 
 	isInTemplate := false
 	indexDayTmpl := 0
@@ -115,7 +116,7 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 		tmplStartTime.SetTime(dayTmpls[i].StartTime)
 		tmplEndTime.SetTime(dayTmpls[i].EndTime)
 
-		if tmplStartTime.Before(slotStartTime) && tmplEndTime.After(slotEndTime) {
+		if tmplStartTime.Before(&slotStartTime) && tmplEndTime.After(&slotEndTime) {
 			isInTemplate = true
 			indexDayTmpl = i
 			break
@@ -125,11 +126,11 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	v.Check(isInTemplate).MessageKey("validation.calendarEvent.noTemplateFitting")
 
 	//schrittweite prüfen
-	intervalSteps := float64(slotStartTime.Sub(tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
+	intervalSteps := float64(slotStartTime.Sub(&tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
 	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.startTimeWrongStepDistance")
 
-	intervalSteps = float64(slotEndTime.Sub(tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
+	intervalSteps = float64(slotEndTime.Sub(&tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
 	endWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(endWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
 

@@ -103,3 +103,12 @@ validation.enrollment.full = This event is full.
 validation.enrollment.already.enrolled = You already enrolled in this event.
 validation.enrollment.already.unsubscribed = You already unsubscribed from this event.
 validation.enrollment.invalid.key = Invalid enrollment key.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EVENTS
+# -------------------------------------------------------------------------------------------------- #
+
+validation.calendar.event.invalid.interval = The interval value must be between 1 and 1440.
+validation.calendar.event.start.after.end = Day templates must start before they end.
+validation.calendar.event.wrong.interval = The time interval between the start and end time must be an even multiple of the interval.
+validation.calendar.event.tmpls.overlap = This day template intersects with another day template at that day.
