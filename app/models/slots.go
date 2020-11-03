@@ -32,12 +32,21 @@ func (slot *Slot) Insert(v *revel.Validation) (err error) {
 		return
 	}
 
+	//check if all values are correct and the selected timespann is free
 	if slot.validate(v, tx); v.HasErrors() {
 		tx.Rollback()
 		return
 	}
 
-	//TODO @Marco
+	//insert Slot
+	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
+		slot.StartTimestamp, slot.EndTimestamp)
+	if err != nil {
+		log.Error("failed to get Slot", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
 
 	tx.Commit()
 	return
@@ -71,6 +80,12 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	v.Check(startAfterEndTime).
 		MessageKey("validation.calendarEvent.startAfterEndTime")
 
+	//chek if startTime and endTime is on same date
+	y1, m1, d1 := slot.StartTimestamp.Date()
+	y2, m2, d2 := slot.EndTimestamp.Date()
+	v.Check(y1 == y2 && m1 == m2 && d1 == d2).
+		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
+
 	dayTmpls := []DayTmpl{}
 
 	weekday := int(slot.StartTimestamp.Weekday())
@@ -79,16 +94,18 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	if err != nil {
 		log.Error("failed to get DayTemolate", "weekday", weekday,
 			"error", err.Error())
+		tx.Rollback()
+		return
 	}
 
-	slotStartTime := CustomTime{}
+	slotStartTime := Custom_time{}
 	slotStartTime.Hour, slotStartTime.Min, _ = slot.StartTimestamp.Clock()
 
-	slotEndTime := CustomTime{}
+	slotEndTime := Custom_time{}
 	slotEndTime.Hour, slotEndTime.Min, _ = slot.EndTimestamp.Clock()
 
-	tmplStartTime := CustomTime{}
-	tmplEndTime := CustomTime{}
+	tmplStartTime := Custom_time{}
+	tmplEndTime := Custom_time{}
 
 	isInTemplate := false
 	indexDayTmpl := 0
@@ -108,7 +125,6 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	v.Check(isInTemplate).MessageKey("validation.calendarEvent.noTemplateFitting")
 
 	//schrittweite prüfen
-	//types ok?
 	intervalSteps := float64(slotStartTime.Sub(tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
 	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.startTimeWrongStepDistance")
@@ -117,16 +133,117 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	endWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
 	v.Check(endWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
 
-	//schon besetzt?
+	//check if slot timespan is already occupied
+	var slotUsed bool
+
+	err = tx.Get(slotUsed, stmtExistsOverlappingSlot, slotStartTime.Value, slotEndTime.Value, slot.DayTmplID)
+	if err != nil {
+		log.Error("failed to get exist of Slots", "DayTmplID", slot.DayTmplID,
+			"error", err.Error())
+	}
+	v.Check(!slotUsed).
+		MessageKey("validation.calendarEvent.overlappingTimespanSlot")
+
+	//check for exeption in that timespan
+	slotUsed = false
+	err = tx.Get(slotUsed, stmtExistsOverlappingExeption, slot.DayTmplID, slotStartTime.Value, slotEndTime.Value)
+	if err != nil {
+		log.Error("failed to get exist of Exeption",
+			"error", err.Error())
+	}
+
+	v.Check(!slotUsed).
+		MessageKey("validation.calendarEvent.overlappingTimespanExeption")
 }
 
-//TODO: delete (unsubscribe)
+/*Delete a Slot if it it is more than an hour away*/
+func (slot *Slot) Delete(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//get slot startTime by ID
+	var startTime time.Time
+
+	err = tx.Get(startTime, stmtGetSlotStartTime, slot.ID)
+	if err != nil {
+		log.Error("failed to get Slot", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//check if slot is more than an hour away
+	var duration time.Duration = 1000000000 * 60 * 60
+
+	if startTime.Sub(time.Now()) < duration {
+		v.ErrorKey("validation.calendarEvent.deleteSlotToCloseToStart")
+		tx.Commit()
+		return
+	}
+
+	//delete day_tmpl
+	if err = deleteByID("id", "slots", slot.ID, tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
 
 const (
+	stmtInsertSlot = `
+		INSERT INTO slots (
+				user_id, day_tmpl_id, start_time, end_time, created
+			)
+		VALUES (
+				$1, $2, $3, $4, $5
+		)
+		RETURNING id
+	`
+
 	stmtSelectSlots = `
     SELECT id, user_id, day_tmpl_id, start_time, end_time, created
     FROM slots
     WHERE day_tmpl_id = $1
-      AND start_time BETWEEN ($2) AND ($3);
+      AND start_time BETWEEN ($2) AND ($3)
+		ORDER BY start_time ASC
   `
+
+	stmtExistsOverlappingSlot = `
+		SELECT EXISTS(
+			SELECT true
+			FROM slots
+			WHERE $3 = day_tmpl_id
+				AND(
+					 	 ($1 BETWEEN (start_time) AND (end_time))
+					OR ($2 BETWEEN (start_time) AND (end_time))
+					OR (($1 <= start_time) AND ($2 >= end_time))
+				)
+		) AS slotUsed
+	`
+
+	stmtExistsOverlappingExeption = `
+		SELECT EXISTS(
+			SELECT true
+			FROM day_tmpls d JOIN calendar_events e ON d.calendar_event_id = e.id
+				JOIN calendar_exceptions ex ON e.id = ex.calendar_event_id
+			WHERE d.id = $1
+				AND (
+								 ($2 BETWEEN (start_time) AND (end_time))
+							OR ($3 BETWEEN (start_time) AND (end_time))
+							OR (($2 <= start_time) AND ($3 >= end_time))
+						)
+		) AS slotUsed
+	`
+
+	stmtGetSlotStartTime = `
+		SELECT start_time
+		FROM slots
+		WHERE id = $1
+		AS startTime
+	`
 )

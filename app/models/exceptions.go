@@ -8,6 +8,9 @@ import (
 	"github.com/revel/revel"
 )
 
+/*ExceptionsAtWeek holds all exeptions of a week [0....6]*/
+type ExceptionsAtWeek []Exceptions
+
 /*Exceptions locked at a specific day within StartTime and EndTime of a day template. */
 type Exceptions []Exception
 
@@ -36,6 +39,8 @@ func (excepts *Exceptions) Get(tx *sqlx.Tx, monday time.Time, weekday int) (err 
 	return
 }
 
+//TODO: INSERT function (delete slots who collide or keep them?)
+
 /*Validate an exception. */
 func (except *Exception) Validate() {
 	//TODO
@@ -51,6 +56,7 @@ const (
 	stmtSelectExeptions = `
     SELECT id, calendar_event_id, start_time, end_time, annotation
     FROM calendar_exceptions
-    WHERE start_time BETWEEN ($1) AND ($2);
+    WHERE start_time BETWEEN ($1) AND ($2)
+		ORDER BY start_time ASC
   `
 )
