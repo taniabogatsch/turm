@@ -111,6 +111,8 @@ POST    /edit/meeting/delete                        EditMeeting.Delete
 POST    /edit/calendar/changeText                   EditCalendarEvent.ChangeText
 POST    /edit/calendar/delete                       EditCalendarEvent.Delete
 POST    /edit/calendar/newDayTemplate               EditCalendarEvent.NewDayTemplate
+POST    /edit/calendar/deleteDayTemplate            EditCalendarEvent.DeleteDayTemplate
+POST    /edit/calendar/editDayTemplate              EditCalendarEvent.EditDayTemplate
 
 
 # ---------------------------------------------------------------------------- #
@@ -119,6 +121,7 @@ POST    /edit/calendar/newDayTemplate               EditCalendarEvent.NewDayTemp
 
 GET     /enrollment/enroll                          Enrollment.Enroll
 GET     /enrollment/unsubscribe                     Enrollment.Unsubscribe
+GET     /enrollment/enrollInSlot                    Enrollment.EnrollInSlot
 
 
 # ---------------------------------------------------------------------------- #

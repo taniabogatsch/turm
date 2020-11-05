@@ -52,6 +52,8 @@ button.to.waitlist = To wait list
 button.from.waitlist = From wait list
 
 button.new.day.tmpl = New day template
+button.book.slot = Book slot
+button.book = Book
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS

@@ -112,3 +112,5 @@ validation.calendar.event.invalid.interval = The interval value must be between 
 validation.calendar.event.start.after.end = Day templates must start before they end.
 validation.calendar.event.wrong.interval = The time interval between the start and end time must be an even multiple of the interval.
 validation.calendar.event.tmpls.overlap = This day template intersects with another day template at that day.
+validation.calendar.event.slot.start.in.past = The slot starts in the past.
+validation.calendar.event.slot.start.after.end = Slots must start before they end.

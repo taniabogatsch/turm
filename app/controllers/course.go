@@ -175,7 +175,7 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 	//get the last (current) monday
 	now := time.Now()
 	weekday := time.Now().Weekday()
-	monday := now.AddDate(0, 0, -1*int(weekday))
+	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
 
 	events := models.CalendarEvents{}
 	if err := events.Get(nil, &ID, monday); err != nil {

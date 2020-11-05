@@ -13,8 +13,8 @@ import (
 type ScheduleEntryType int
 
 const (
-	//EMPTY is for no entry
-	EMPTY ScheduleEntryType = iota
+	//FREE is for no entry
+	FREE ScheduleEntryType = iota
 	//SLOT is for slots
 	SLOT
 	//EXCEPTION is for exceptions
@@ -24,7 +24,7 @@ const (
 )
 
 func (s ScheduleEntryType) String() string {
-	return [...]string{"empty", "slot", "exception", "blocked"}[s]
+	return [...]string{"free", "slot", "exception", "blocked"}[s]
 }
 
 /*DayTmpls of a week for each day. */
@@ -48,7 +48,10 @@ type DayTmpl struct {
 }
 
 /*Schedule is a helper struct to display a day template at the front end. */
-type Schedule []ScheduleEntry
+type Schedule struct {
+	Date    string
+	Entries []ScheduleEntry
+}
 
 /*ScheduleEntry containing all information to print a section of a day template. */
 type ScheduleEntry struct {
@@ -93,13 +96,16 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 		return
 	}
 
-	if tmpl.validate(v, tx); v.HasErrors() {
-		tx.Rollback()
-		return
-	}
+	//TODO: ensure that the updated day template does not overlap with itself
 
-	//validate checks for time -> can collide with itselfe when changing time
-	//what happens to slots when changing Timespan of template
+	/*
+		if tmpl.validate(v, tx); v.HasErrors() {
+			tx.Rollback()
+			return
+		}
+	*/
+
+	//TODO: delete users that are no longer in valid slots and send an e-mail
 	//TODO: update
 
 	tx.Commit()
@@ -107,7 +113,7 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 }
 
 /*Delete a day template if it has no slots. */
-func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
+func (tmpl *DayTmpl) Delete() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -115,26 +121,11 @@ func (tmpl *DayTmpl) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
-	//TODO: what if slots are waaaaay in the past
-
-	//check if day template has no slots
-	var notEmpty bool
-	err = tx.Get(notEmpty, stmtExistSlots, tmpl.ID)
-	if err != nil {
-		log.Error("failed to get DayTemolate", "templateID", tmpl.ID,
-			"error", err.Error())
-		tx.Rollback()
-		return
-	}
-
-	if notEmpty {
-		v.ErrorKey("validation.calendarEvent.deleteDayTemplateNotEmpty")
-		tx.Commit()
-		return
-	}
+	//TODO: get all users that have booked slots for this day template (in the future)
+	//TODO: return these and write them an e-mail
 
 	//delete day template
-	if err = deleteByID("id", "calendar_events", tmpl.ID, tx); err != nil {
+	if err = deleteByID("id", "day_templates", tmpl.ID, tx); err != nil {
 		return
 	}
 
@@ -226,7 +217,7 @@ const (
   `
 
 	stmtGetDayTemplateFromWeekDay = `
-    SELECT id, start_time, end_time, intevall
+    SELECT id, start_time, end_time, inteval
     FROM day_templates
     WHERE day_of_week = $1
       AND active = true
@@ -258,13 +249,5 @@ const (
 					OR 	(($1 <= start_time) AND ($2 >= end_time))
 				)
 		) AS timeOverlapTmpl
-	`
-
-	stmtExistSlots = `
-		SELECT EXISTS (
-			SELECT true
-			FROM slots
-			WHERE day_tmpl_id = $1
-		) AS notEmpty
 	`
 )

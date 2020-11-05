@@ -112,13 +112,15 @@ validation.calendar.event.invalid.interval = Der Wert des Intervalls muss zwisch
 validation.calendar.event.start.after.end = Das Ende von Schablonen muss nach deren Anfang liegen.
 validation.calendar.event.wrong.interval = Start- und Endzeit müssen ein Vielfaches des Intervals voneinander entfernt sein.
 validation.calendar.event.tmpls.overlap = Diese Schablone überschneidet sich mit einer anderen Schablone an diesem Tag.
+validation.calendar.event.slot.start.in.past =  Die Startzeit befindet sich in der Vergangenheit.
+validation.calendar.event.slot.start.after.end = Das Ende von Buchungen muss nach deren Anfang liegen.
 
 validation.calendarEvent.startInPast = Die Startzeit befindet sich in der Vergangenheit.
 validation.calendarEvent.startAfterEndTime = Der Startzeitpunkt darf nicht nach dem Endzeitpunkt sein.
 validation.calendarEvent.noTemplateFitting = Der ausgewählte Zeitraum ist nicht innerhalb der in dem Tag zur verfügung stehenden Zeit.
 validation.calendarEvent.startTimeWrongStepDistance = Die Startzeit muss ein vielfaches der Schrittweite entsprechen.
 validation.calendarEvent.endTimeWrongStepDistance = Die Endzeit muss ein vielfaches der Schrittweite entsprechen.
-validation.calendarEvent.startOtherDayThanEnd = Start- und Endzeit müssen am selben Tag sein
+validation.calendarEvent.startOtherDayThanEnd =
 validation.calendarEvent.overlappingTimespanDayTmpl = Die angegebene Zeit überschneidet sich mit einer vorhandenen an diesem Tag.
 validation.calendarEvent.overlappingTimespanSlot = Die angegebene Zeit überschneidet sich mit einem bereits belegtem Slot.
 validation.calendarEvent.overlappingTimespanExeption = Innerhalb der angegebenen Zeit befindet sich eine Ausnahme welche den Slot blockiert.

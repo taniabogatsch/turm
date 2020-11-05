@@ -52,6 +52,8 @@ button.to.waitlist = Auf Warteliste
 button.from.waitlist = Aus Warteliste
 
 button.new.day.tmpl = Neue Schablone
+button.book.slot = Zeitraum buchen
+button.book = Buchen
 
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS

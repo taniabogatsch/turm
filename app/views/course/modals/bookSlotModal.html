@@ -1,0 +1,85 @@
+<!-- modal for booking a slot -->
+
+<div class="modal fade" id="book-slot-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form accept-charset="UTF-8" method="GET" class="needs-validation"
+        action='{{url "Enrollment.EnrollInSlot"}}' novalidate>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "event.calendar.slot.book"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- calendar event ID -->
+          <input type="hidden" name="ID" id="book-slot-modal-ID">
+
+          <div class="d-inline"> {{msg $ "event.calendar.slot.date"}}: </div>
+          <div class="d-inline" id="book-slot-modal-date-div"></div>
+          <input type="hidden" name="date" id="book-slot-modal-date">
+          <br>
+          <br>
+
+          <!-- start time -->
+          <div class="row">
+            <div class="col-sm-6">
+              <small class="text-muted form-text">
+                {{msg $ "meeting.from.time"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="startTime" class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+
+            <!-- end time -->
+            <div class="col-sm-6">
+              <small class="text-muted form-text">
+                {{msg $ "meeting.to.time"}}
+              </small>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="endTime" class="form-control rounded-right" required>
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.book"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

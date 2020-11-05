@@ -465,9 +465,10 @@ function openNewEventModal(title, action, ID, info) {
   $('#change-event-modal').modal('show');
 }
 
-function openChangeDayTmplModal(action, title, ID, dayOfWeek, start, end, interval) {
+function openChangeDayTmplModal(action, title, ID, dayOfWeek, start, end, interval, tmplID) {
 
   $('#change-day-tmpl-modal-ID').val(ID);
+  $('#change-day-tmpl-modal-tmpl-ID').val(tmplID);
   $('#change-day-tmpl-modal-title').html(title);
   $('#change-day-tmpl-modal-form').attr('action', action);
 

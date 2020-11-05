@@ -6,7 +6,6 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/revel/revel"
 )
 
 /*CalendarEvents holds all calendar events of a course. */
@@ -27,7 +26,7 @@ type CalendarEvent struct {
 
 	//exeptions of this week [0....6]
 	ExceptionsOfWeek ExceptionsOfWeek
-
+	//transformed schedule for easy front end usage
 	ScheduleWeek []Schedule
 }
 
@@ -139,14 +138,14 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 	//their slots for each day respectively
 	for _, tmplsOfDay := range event.Days {
 
-		if len(tmplsOfDay) != 0 {
+		//generate blocked and free blocks of this schedule
+		schedule := Schedule{Date: "28.09."} //TODO: set the date
 
-			//generate blocked and free blocks of this schedule
-			schedule := Schedule{}
+		if len(tmplsOfDay) != 0 {
 
 			//set blocked slot from 0 to start of the first day template
 			if tmplsOfDay[0].StartTime != "00:00" {
-				schedule = append(schedule,
+				schedule.Entries = append(schedule.Entries,
 					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, BLOCKED})
 			}
 
@@ -157,10 +156,10 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 				//if two day templates are not exactly subsequent to each other,
 				//then insert a BLOCKED schedule entry
 				if i != 0 {
-					if tmplsOfDay[i].StartTime != schedule[len(schedule)-1].EndTime {
-						schedule = append(schedule,
+					if tmplsOfDay[i].StartTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+						schedule.Entries = append(schedule.Entries,
 							ScheduleEntry{
-								schedule[len(schedule)-1].EndTime,
+								schedule.Entries[len(schedule.Entries)-1].EndTime,
 								tmplsOfDay[i].StartTime,
 								BLOCKED},
 						)
@@ -184,38 +183,44 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 					if j == 0 {
 						//insert FREE schedule entry
 						if tmplsOfDay[i].StartTime != slotStart.Value {
-							schedule = append(schedule, ScheduleEntry{tmplsOfDay[i].StartTime,
-								slotStart.Value, EMPTY})
+							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
+								slotStart.Value, FREE})
 						}
 					} else {
 						//check for FREE space between two slots
-						if schedule[len(schedule)-1].EndTime != slotStart.Value {
-							schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
-								slotStart.Value, EMPTY})
+						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
+							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
+								slotStart.Value, FREE})
 						}
 					}
 
 					//insert slot as schedule entry
-					schedule = append(schedule, ScheduleEntry{slotStart.Value, slotEnd.Value, SLOT})
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
+						SLOT})
 
 				} //end of for loop of slots
 
 				//check for FREE space from the last slot to the end of the day template
-				if tmplsOfDay[i].EndTime != schedule[len(schedule)-1].EndTime {
-					schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
-						tmplsOfDay[i].EndTime, EMPTY})
+				if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
+						tmplsOfDay[i].EndTime, FREE})
 				}
 
 			} //end of for loop of day templates
 
 			//check for BLOCKED space from the end of the last day template to 24:00
-			if schedule[len(schedule)-1].EndTime != "24:00" {
-				schedule = append(schedule, ScheduleEntry{schedule[len(schedule)-1].EndTime,
+			if schedule.Entries[len(schedule.Entries)-1].EndTime != "24:00" {
+				schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
 					"24:00", BLOCKED})
 			}
 
-			event.ScheduleWeek = append(event.ScheduleWeek, schedule)
+		} else {
+			//no day templates for this day
+			schedule.Entries = append(schedule.Entries,
+				ScheduleEntry{"00:00", "24:00", BLOCKED})
 		}
+
+		event.ScheduleWeek = append(event.ScheduleWeek, schedule)
 	}
 
 	return
@@ -232,7 +237,7 @@ func (event *CalendarEvent) Update(column string, value interface{}) (err error)
 }
 
 /*Delete a calendar event. */
-func (event *CalendarEvent) Delete(v *revel.Validation) (err error) {
+func (event *CalendarEvent) Delete() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -240,23 +245,8 @@ func (event *CalendarEvent) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
-	//TODO: think about this: can we delete calendar events if the slots are e.g. older than 1 year?
-
-	var notEmpty bool
-	//don't allow the deletion of calendar events if users are enrolled in them
-	tx.Get(notEmpty, stmtSlotsExist, event.ID)
-	if err != nil {
-		log.Error("failed to get CalendarEvents of course", "event ID", event.ID,
-			"error", err.Error())
-		tx.Rollback()
-		return
-	}
-
-	if notEmpty {
-		v.ErrorKey("validation.invalid.delete")
-		tx.Commit()
-		return
-	}
+	//TODO: get all users that have booked slots for this event (in the future)
+	//TODO: return these and write them an e-mail
 
 	//delete event
 	if err = deleteByID("id", "calendar_events", event.ID, tx); err != nil {
@@ -295,13 +285,5 @@ const (
 		SELECT course_id
 		FROM calendar_events
 		WHERE id = $1
-	`
-
-	stmtSlotsExist = `
-		SELECT EXISTS (
-			SELECT true
-			FROM day_templates t JOIN slots s ON t.id = s.day_tmpl_id
-			WHERE calendar_event_id = $1
-		) AS not_empty
 	`
 )

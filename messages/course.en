@@ -53,6 +53,7 @@ event.waitlist.no = There is no waiting list
 event.key.set = Set enrollment key
 event.key = Enrollment key
 event.key.repeat = Repeat enrollment key
+event.key.modal.title = Enter enrollment key
 
 event.number.meetings = Number of meetings
 
@@ -75,6 +76,13 @@ event.calendar.th = Th
 event.calendar.fr = Fr
 event.calendar.sa = Sa
 event.calendar.so = So
+event.calendar.legend = Legend
+event.calendar.slot.free = Free
+event.calendar.slot.booked = Booked
+event.calendar.slot.blocked = Blocked
+event.calendar.slot.not.available = Not available
+event.calendar.slot.book = Book slot
+event.calendar.slot.date = Datum
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -172,7 +180,7 @@ event.type.calendar = Calendar event
 event.new.calendar.success = Added calendar event '%s', course ID = %d.
 
 event.calendar.delete.success = Deleted calendar event, ID = %d.
-event.calendar.delete.confirm = Please confirm the deletion of the calendar event '%s'.
+event.calendar.delete.confirm = Please confirm the deletion of the calendar event '%s'. <br><br> CAREFUL: All users who booked slots for this calendar event will be removed and notified by e-mail.
 event.calendar.delete.title = Delete calendar event
 
 event.calendar.title.change.info = The calendar event title comprises the purpose of the event, e.g. 'Machine 1', 'Room 3', ...
@@ -183,6 +191,12 @@ event.calendar.annotation.delete.success = Deleted annotation.
 
 day.tmpl.new.success = Added new day template, ID = %d.
 day.tmpl.new.title = New day template
+day.tmpl.edit.title = Edit day template
+day.tmpl.edit.success = Edited day template, ID = %d.
+
+day.tmpl.delete.success = Deleted day template, ID = %d.
+day.tmpl.delete.confirm = Please confirm the deletion of this day template. <br><br> CAREFUL: All users who booked slots for this day template will be removed and notified by e-mail.
+day.tmpl.delete.title = Delete day template
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

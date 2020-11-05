@@ -29,7 +29,7 @@
 
 <ul class="list-group">
 
-  {{range .events}}
+  {{range $ek, $ev := .events}}
     <li class="list-group-item mb-2 border rounded">
 
       <!-- delete event -->
@@ -91,6 +91,7 @@
               <strong>{{msg $ "event.calendar.week"}} {{.Week}}</strong>
             </div>
           </div>
+
           <!-- week days header -->
           <div class="row border-top">
             <div class="col-sm-2">
@@ -116,31 +117,135 @@
             </div>
           </div>
 
+          <div class="row edit-hide">
+            {{range $k, $v := .ScheduleWeek}}
+              <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-hide">
+                {{.Date}}
+              </div>
+            {{end}}
+          </div>
+
           <!-- content -->
+          <br>
           <div class="row">
-            <!-- range templates -->
+
+            <!-- range each week day -->
             {{range $k, $v := .Days}}
-              <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}}">
+              <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-show d-none">
+
+                <!-- range day templates of a day -->
                 {{range .}}
-                <div class="card mb-1">
-                  <div class="card-body p-1">
-                    {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
-                    {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                  <div class="card mb-1">
+                    <div class="card-body pl-1 pr-1 pt-1 pb-0">
+                      {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                      {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                    </div>
+
+                    <div class="d-inline text-center">
+                      <a href="#no-scroll" class="badge btn-outline-darkblue"
+                        onclick='openChangeDayTmplModal({{url "EditCalendarEvent.EditDayTemplate"}},
+                          {{msg $ "day.tmpl.edit.title"}}, {{.CalendarEventID}}, {{.DayOfWeek}},
+                          {{.StartTime}}, {{.EndTime}}, {{.Interval}}, {{.ID}});'>
+                        {{template "icons/pencil.html" . }}
+                      </a>
+                      <a href="#no-scroll" class="badge btn-outline-darkblue"
+                        onclick='confirmDeleteRenderModal({{msg $ "day.tmpl.delete.title"}},
+                          {{msg $ "day.tmpl.delete.confirm"}},
+                          "{{url "EditCalendarEvent.DeleteDayTemplate" .ID $ev.CourseID}}", "calendar_events");'>
+                        {{template "icons/trash.html" . }}
+                      </a>
+                    </div>
+
                   </div>
-                </div>
+                {{end}}
+
+              </div>
+            {{end}}
+
+            {{range $k, $v := .ScheduleWeek}}
+              <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-hide">
+
+                {{$freeSlot := false}}
+
+                {{range .Entries}}
+
+                  {{if eq .Type 0}} <!-- FREE -->
+
+                    <div class="card mb-1 alert-success">
+                      <div class="card-body p-1 text-center">
+                        {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}}
+                      </div>
+                    </div>
+                    {{$freeSlot = true}}
+
+                  {{else if eq .Type 1}} <!-- SLOT -->
+
+                    <div class="card mb-1 alert-primary">
+                      <div class="card-body p-1 text-center">
+                        {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                      </div>
+                    </div>
+
+                  {{else if eq .Type 2}} <!-- EXCEPTION -->
+                    <!-- TODO -->
+
+                  {{else if eq .Type 3}} <!-- BLOCKED -->
+
+                    <!-- TODO: do we want to show blocked entries? -->
+                    <div class="card mb-1 alert-dark">
+                      <div class="card-body p-1 text-center">
+                        {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                      </div>
+                    </div>
+
+                  {{end}}
+                {{end}}
+
+                {{if $freeSlot}}
+                  <br>
+                  <div class="text-center">
+                    <button type="button" class="btn btn-success w-100"
+                      onclick='bookSlotModal({{$ev.ID}}, {{.Date}});'>
+                      {{msg $ "button.book.slot"}}
+                    </button>
+                  </div>
+                  <br>
                 {{end}}
               </div>
             {{end}}
+
           </div>
         </div>
       </div>
       <br>
+      <div class="edit-hide">
+        <div class="card-body p-1 d-inline mr-2">
+          {{msg $ "event.calendar.legend"}}:
+        </div>
+        <div class="card-body p-1 alert-success d-inline mr-2 border rounded">
+          {{msg $ "event.calendar.slot.free"}}
+        </div>
+        <div class="card-body p-1 alert-primary d-inline mr-2 border rounded">
+          {{msg $ "event.calendar.slot.booked"}}
+        </div>
+        <div class="card-body p-1 alert-danger d-inline mr-2 border rounded">
+          {{msg $ "event.calendar.slot.blocked"}}
+        </div>
+        <div class="card-body p-1 alert-dark d-inline border rounded">
+          {{msg $ "event.calendar.slot.not.available"}}
+        </div>
+      </div>
+
       <div class="d-inline">
+
+        <!-- button for adding new day templates -->
         <button type="button" class="btn btn-outline-darkblue edit-show d-none"
           onclick='openChangeDayTmplModal({{url "EditCalendarEvent.NewDayTemplate"}},
-            {{msg $ "day.tmpl.new.title"}}, {{.ID}}, 0, "", "", 60);'>
+            {{msg $ "day.tmpl.new.title"}}, {{.ID}}, 0, "", "", 60, 0);'>
           + &nbsp; {{msg $ "button.new.day.tmpl"}}
         </button>
+
+        <!-- button for adding exceptions -->
         <button type="button" class="btn btn-outline-darkblue edit-show d-none">
           + &nbsp; Zeitraum sperren
         </button>

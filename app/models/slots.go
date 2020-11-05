@@ -24,29 +24,30 @@ type Slot struct {
 }
 
 /*Insert a new slot. */
-func (slot *Slot) Insert(v *revel.Validation) (err error) {
+func (slot *Slot) Insert(v *revel.Validation) (data EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
+	/*
+		//check if all values are correct and the selected timespan is free
+		if slot.validate(v, tx); v.HasErrors() {
+			tx.Rollback()
+			return
+		}
 
-	//check if all values are correct and the selected timespann is free
-	if slot.validate(v, tx); v.HasErrors() {
-		tx.Rollback()
-		return
-	}
-
-	//insert Slot
-	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
-		slot.Start, slot.End)
-	if err != nil {
-		log.Error("failed to get Slot", "slotID", slot.ID,
-			"error", err.Error())
-		tx.Rollback()
-		return
-	}
+		//insert Slot
+		err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
+			slot.Start, slot.End)
+		if err != nil {
+			log.Error("failed to get Slot", "slotID", slot.ID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+	*/
 
 	tx.Commit()
 	return
@@ -72,28 +73,20 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 //validate the slot struct
 func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 
-	startInPast := slot.Start.After(time.Now())
-	v.Check(startInPast).
-		MessageKey("validation.calendarEvent.startInPast")
+	if !slot.Start.After(time.Now()) {
+		v.ErrorKey("validation.calendar.event.slot.start.in.past")
+	}
+	if !slot.Start.Before(slot.End) {
+		v.ErrorKey("validation.calendar.event.slot.start.after.end")
+	}
 
-	startAfterEndTime := slot.Start.Before(slot.End)
-	v.Check(startAfterEndTime).
-		MessageKey("validation.calendarEvent.startAfterEndTime")
-
-	//chek if startTime and endTime is on same date
-	y1, m1, d1 := slot.Start.Date()
-	y2, m2, d2 := slot.End.Date()
-	valid := y1 == y2 && m1 == m2 && d1 == d2
-	v.Check(valid).
-		MessageKey("validation.calendarEvent.startOtherDayThanEnd")
-
+	//ensure that the slot is in a valid day template
 	dayTmpls := []DayTmpl{}
-
 	weekday := int(slot.Start.Weekday())
 
 	err := tx.Select(dayTmpls, stmtGetDayTemplateFromWeekDay, weekday)
 	if err != nil {
-		log.Error("failed to get DayTemolate", "weekday", weekday,
+		log.Error("failed to get day template", "weekday", weekday,
 			"error", err.Error())
 		tx.Rollback()
 		return

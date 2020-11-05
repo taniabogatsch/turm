@@ -53,6 +53,7 @@ event.waitlist.no = Keine Warteliste vorhanden
 event.key.set = Einschreibeschlüssel gesetzt
 event.key = Einschreibeschlüssel
 event.key.repeat = Einschreibeschlüssel wiederholen
+event.key.modal.title = Einschreibeschlüssel eingeben
 
 event.number.meetings = Anzahl der Termine
 
@@ -75,6 +76,13 @@ event.calendar.th = Do
 event.calendar.fr = Fr
 event.calendar.sa = Sa
 event.calendar.so = So
+event.calendar.legend = Legende
+event.calendar.slot.free = Frei
+event.calendar.slot.booked = Gebucht
+event.calendar.slot.blocked = Gesperrt
+event.calendar.slot.not.available = Nicht verfügbar
+event.calendar.slot.book = Zeitraum buchen
+event.calendar.slot.date = Datum
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -172,7 +180,7 @@ event.type.calendar = Kalenderveranstaltung
 event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
 
 event.calendar.delete.success = Kalenderveranstaltung gelöscht, ID = %d.
-event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen?
+event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen? <br><br> ACHTUNG: Alle NutzerInnen, die bereits Buchungen für diese Kalenderveranstaltung vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.
 event.calendar.delete.title = Kalenderveranstaltung löschen
 
 event.calendar.title.change.info = Der Kalenderveranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Maschine 1', 'Raum 1', ...
@@ -183,6 +191,12 @@ event.calendar.annotation.delete.success = Anmerkung gelöscht.
 
 day.tmpl.new.success = Neue Schablone hinzugefügt, ID = %d.
 day.tmpl.new.title = Neue Schablone hinzufügen
+day.tmpl.edit.title = Schablone bearbeiten
+day.tmpl.edit.success = Schablone bearbeitet, ID = %d.
+
+day.tmpl.delete.success = Schablone gelöscht, ID = %d.
+day.tmpl.delete.confirm = Schablone wirklich löschen? <br><br> ACHTUNG: Alle NutzerInnen, die bereits Buchungen für diese Schablone vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.
+day.tmpl.delete.title = Schablone löschen
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

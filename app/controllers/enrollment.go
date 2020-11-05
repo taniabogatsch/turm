@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"time"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -107,40 +109,54 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*EnrollInCalendarSlot to enroll into a time slot of a day*/
-func (c Enrollment) EnrollInCalendarSlot(ID int, startTime, endTime, date string) revel.Result {
+/*EnrollInSlot to enroll into a time slot of a day in a calendar event. */
+func (c Enrollment) EnrollInSlot(ID int, startTime, endTime, date string) revel.Result {
 
+	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "startTime",
+		startTime, "endTime", endTime, "date", date)
+
+	//get user
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	//set start and end time
+	startT := date + "T" + startTime + "Z"
+	start, err := time.Parse("2006-01-02T15:04:05Z", startT)
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+	endT := date + "T" + endTime + "Z"
+	end, err := time.Parse("2006-01-02T15:04:05Z", endT)
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	slot := models.Slot{
+		UserID: userID,
+		Start:  start,
+		End:    end,
+	}
+
+	//enroll user
+	data, err := slot.Insert(c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(errValidation, nil, "", c.Controller, "")
+	}
+
+	fmt.Println(data)
+	//TODO: send e-mail to the user who enrolled
 	/*
-		userID, err := getIntFromSession(c.Controller, "userID")
+		err = sendEMail(c.Controller, &data,
+			"email.subject.enroll.slot",
+			"enrollToSlot")
 		if err != nil {
 			return flashError(
-				errTypeConv, err, "", c.Controller, "")
+				errEMail, err, "", c.Controller, data.User.EMail)
 		}
-
-		fmt.Println(userID)
-
-		sT := date + "T" + startTime + "Z"
-		sTime, err := time.Parse("2006-01-02T15:04:05Z", sT)
-		if err != nil {
-			return flashError(errTypeConv, err, "", c.Controller, "")
-		}
-
-		eT := date + "T" + endTime + "Z"
-		eTime, err := time.Parse("2006-01-02T15:04:05Z", eT)
-		if err != nil {
-			return flashError(errTypeConv, err, "", c.Controller, "")
-		}
-
-		slot := models.Slot{
-			StartTimestamp: sTime,
-			EndTimestamp:   eTime,
-		}
-
-		slot.Validate(c.Validation)
-
-		//check if start time/date is in future and end time/date is afterwards (and valid)
-
-		//models.calendar_events.newSlot
 	*/
 
 	c.Flash.Success(c.Message("event.enroll.success"))
