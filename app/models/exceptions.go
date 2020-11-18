@@ -16,14 +16,14 @@ type Exceptions []Exception
 
 /*Exception can lock a timespan on a specific date. */
 type Exception struct {
-	ID             int            `db:"id"`
-	DayTmplID      int            `db:"day_tmpl_id"`
-	StartTimestamp string         `db:"start_time"`
-	EndTimestamp   string         `db:"end_time"`
-	Annotation     sql.NullString `db:"annotation"`
+	ID                int            `db:"id"`
+	Calendar_event_id int            `db:"calendar_event_id"`
+	StartTimestamp    string         `db:"start_time"`
+	EndTimestamp      string         `db:"end_time"`
+	Annotation        sql.NullString `db:"annotation"`
 }
 
-/*Get all exceptions of a day template. Monday specifies the week for which all exceptions
+/*Get all exceptions of a day . Monday specifies the week for which all exceptions
 must be loaded and weekday specifies the day. */
 func (excepts *Exceptions) Get(tx *sqlx.Tx, monday time.Time, weekday int) (err error) {
 

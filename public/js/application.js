@@ -192,11 +192,12 @@ function enterKeyModal(action, msg, ID) {
   $('#enter-enroll-key-modal').modal('show');
 }
 
-function bookSlotModal(calendarEventID, date) {
+function bookSlotModal(calendarEventID, date, year) {
 
   $('#book-slot-modal-ID').val(calendarEventID);
   $('#book-slot-modal-date').val(date)
   $('#book-slot-modal-date-div').html(date);
+  $('#book-slot-modal-year').val(year);
 
   //show the modal
   $('#book-slot-modal').modal('show');

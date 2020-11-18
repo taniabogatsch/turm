@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 	"turm/app"
 
@@ -24,30 +25,31 @@ type Slot struct {
 }
 
 /*Insert a new slot. */
-func (slot *Slot) Insert(v *revel.Validation) (data EMailData, err error) {
+func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
-	/*
-		//check if all values are correct and the selected timespan is free
-		if slot.validate(v, tx); v.HasErrors() {
-			tx.Rollback()
-			return
-		}
 
-		//insert Slot
-		err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
-			slot.Start, slot.End)
-		if err != nil {
-			log.Error("failed to get Slot", "slotID", slot.ID,
-				"error", err.Error())
-			tx.Rollback()
-			return
-		}
-	*/
+	//check if all values are correct and the selected timespan is free
+	if err = slot.validate(v, tx, calendarEventID); err != nil {
+		return
+	} else if v.HasErrors() {
+		tx.Rollback()
+		return
+	}
+
+	//insert Slot
+	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
+		slot.Start, slot.End, time.Now())
+	if err != nil {
+		log.Error("failed to get Slot", "slot", *slot,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
 
 	tx.Commit()
 	return
@@ -71,23 +73,26 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 }
 
 //validate the slot struct
-func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
+func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx, calendarEventID int) (err error) {
 
 	if !slot.Start.After(time.Now()) {
 		v.ErrorKey("validation.calendar.event.slot.start.in.past")
+		return
 	}
+
 	if !slot.Start.Before(slot.End) {
 		v.ErrorKey("validation.calendar.event.slot.start.after.end")
+		return
 	}
 
-	//ensure that the slot is in a valid day template
+	//ensure that the slot is in a valid day template of that calendar event
 	dayTmpls := []DayTmpl{}
-	weekday := int(slot.Start.Weekday())
+	weekday := int(slot.Start.Weekday()) - 1
 
-	err := tx.Select(dayTmpls, stmtGetDayTemplateFromWeekDay, weekday)
+	err = tx.Select(&dayTmpls, stmtGetDayTemplateFromWeekDay, weekday, calendarEventID)
 	if err != nil {
-		log.Error("failed to get day template", "weekday", weekday,
-			"error", err.Error())
+		log.Error("failed to get day template", "calendarEventID", calendarEventID,
+			"weekday", weekday, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -104,50 +109,74 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx) {
 	isInTemplate := false
 	indexDayTmpl := 0
 
-	//look for a DayTemplate where the slot is within its time intervall
+	//find the day template in which the slot must occur
 	for i := range dayTmpls {
 		tmplStartTime.SetTime(dayTmpls[i].StartTime)
 		tmplEndTime.SetTime(dayTmpls[i].EndTime)
 
-		if tmplStartTime.Before(&slotStartTime) && tmplEndTime.After(&slotEndTime) {
+		if tmplStartTime.Before(&slotStartTime) && (tmplEndTime.After(&slotEndTime) || tmplEndTime.Equals(&slotEndTime)) {
 			isInTemplate = true
 			indexDayTmpl = i
+			slot.DayTmplID = dayTmpls[i].ID
 			break
 		}
 	}
 
-	v.Check(isInTemplate).MessageKey("validation.calendarEvent.noTemplateFitting")
+	if !isInTemplate {
+		v.ErrorKey("validation.calendarEvent.noTemplateFitting")
+		return
+	}
 
-	//schrittweite prüfen
-	intervalSteps := float64(slotStartTime.Sub(&tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
-	startWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
-	v.Check(startWrongStepDistance).MessageKey("validation.calendarEvent.startTimeWrongStepDistance")
+	//slot starts at a valid interval section
+	rem := slotStartTime.Sub(&tmplStartTime) % dayTmpls[indexDayTmpl].Interval
+	if rem != 0 {
+		v.ErrorKey("validation.calendarEvent.startTimeWrongStepDistance")
+		return
+	}
 
-	intervalSteps = float64(slotEndTime.Sub(&tmplStartTime) / dayTmpls[indexDayTmpl].Interval)
-	endWrongStepDistance := (intervalSteps - float64(int(intervalSteps))) == 0
-	v.Check(endWrongStepDistance).MessageKey("validation.calendarEvent.endTimeWrongStepDistance")
+	//the slot length is a valid interval
+	rem = slotEndTime.Sub(&tmplStartTime) % dayTmpls[indexDayTmpl].Interval
+	if rem != 0 {
+		v.ErrorKey("validation.calendarEvent.endTimeWrongStepDistance")
+		return
+	}
 
 	//check if slot timespan is already occupied
 	var slotUsed bool
-
-	err = tx.Get(slotUsed, stmtExistsOverlappingSlot, slotStartTime.Value, slotEndTime.Value, slot.DayTmplID)
+	err = tx.Get(&slotUsed, stmtExistsOverlappingSlot, slot.Start,
+		slot.End, slot.DayTmplID)
 	if err != nil {
-		log.Error("failed to get exist of Slots", "DayTmplID", slot.DayTmplID,
-			"error", err.Error())
+		log.Error("failed to get whether slot is already booked", "slotStartTimeValue",
+			slotStartTime.Value, "slotEndTimeValue", slotEndTime.Value, "slotDayTmplID",
+			slot.DayTmplID, "error", err.Error())
+		tx.Rollback()
+		return
 	}
-	v.Check(!slotUsed).
-		MessageKey("validation.calendarEvent.overlappingTimespanSlot")
+
+	fmt.Println(slotUsed)
+	if slotUsed {
+		v.ErrorKey("validation.calendarEvent.overlappingTimespanSlot")
+		return
+	}
 
 	//check for exeption in that timespan
-	slotUsed = false
-	err = tx.Get(slotUsed, stmtExistsOverlappingExeption, slot.DayTmplID, slotStartTime.Value, slotEndTime.Value)
-	if err != nil {
-		log.Error("failed to get exist of Exeption",
-			"error", err.Error())
-	}
+	//TODO: validate once we have exceptions
+	/*
+		slotUsed = false
+		err = tx.Get(slotUsed, stmtExistsOverlappingExeption, slot.DayTmplID,
+			slotStartTime.Value, slotEndTime.Value)
+		if err != nil {
+			log.Error("failed to get exist of Exeption",
+				"error", err.Error())
+		}
 
-	v.Check(!slotUsed).
-		MessageKey("validation.calendarEvent.overlappingTimespanExeption")
+		if slotUsed {
+			v.ErrorKey("validation.calendarEvent.overlappingTimespanExeption")
+			return
+		}
+	*/
+
+	return
 }
 
 /*Delete a Slot if it it is more than an hour away*/
@@ -208,14 +237,14 @@ const (
   `
 
 	stmtExistsOverlappingSlot = `
-		SELECT EXISTS(
+		SELECT EXISTS (
 			SELECT true
 			FROM slots
-			WHERE $3 = day_tmpl_id
+			WHERE day_tmpl_id = $3
 				AND(
-					 	 ($1 BETWEEN (start_time) AND (end_time))
-					OR ($2 BETWEEN (start_time) AND (end_time))
-					OR (($1 <= start_time) AND ($2 >= end_time))
+								($1 >= start_time AND $1 < end_time)
+						OR 	($2 <= end_time AND $2 > start_time)
+						OR 	(($1 <= start_time) AND ($2 >= end_time))
 				)
 		) AS slotUsed
 	`

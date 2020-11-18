@@ -217,9 +217,10 @@ const (
   `
 
 	stmtGetDayTemplateFromWeekDay = `
-    SELECT id, start_time, end_time, inteval
+    SELECT id, start_time, end_time, interval
     FROM day_templates
     WHERE day_of_week = $1
+			AND calendar_event_id = $2
       AND active = true
 		ORDER BY start_time ASC
   `
@@ -244,9 +245,9 @@ const (
 				AND active = true
 				AND day_of_week = $3
 				AND (
-							($1 < end_time AND $1 >= start_time)
-					OR 	($2 <= end_time AND $2 > start_time)
-					OR 	(($1 <= start_time) AND ($2 >= end_time))
+								($1 >= start_time AND $1 < end_time)
+						OR 	($2 <= end_time AND $2 > start_time)
+						OR 	(($1 <= start_time) AND ($2 >= end_time))
 				)
 		) AS timeOverlapTmpl
 	`

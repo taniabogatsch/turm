@@ -20,6 +20,7 @@ type CalendarEvent struct {
 
 	//loaded week
 	Week int
+	Year int
 
 	//day templates for this week [0...6]
 	Days DayTmpls
@@ -75,6 +76,7 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 
 		//set the current week
 		_, (*events)[i].Week = monday.ISOWeek()
+		(*events)[i].Year = monday.Year()
 	}
 
 	if txWasNil {
@@ -116,6 +118,7 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 
 	//set the current week
 	_, event.Week = monday.ISOWeek()
+	event.Year = monday.Year()
 
 	if txWasNil {
 		tx.Commit()
@@ -134,12 +137,15 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 		}
 	}
 
+	day := monday
+
 	//prepare a schedule for the whole week by looping all day templates and
 	//their slots for each day respectively
 	for _, tmplsOfDay := range event.Days {
 
 		//generate blocked and free blocks of this schedule
-		schedule := Schedule{Date: "28.09."} //TODO: set the date
+		schedule := Schedule{Date: day.Format("02.01.")}
+		day = day.AddDate(0, 0, 1)
 
 		if len(tmplsOfDay) != 0 {
 

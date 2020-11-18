@@ -40,7 +40,7 @@ func (t1 *CustomTime) SetTime(value string) (success bool) {
 	return
 }
 
-/*Before checks if t1 is before t2. */
+/*Before checks if t1 is before or equal (<=) t2. */
 func (t1 *CustomTime) Before(t2 *CustomTime) (before bool) {
 
 	if t1.Hour < t2.Hour {
@@ -54,7 +54,7 @@ func (t1 *CustomTime) Before(t2 *CustomTime) (before bool) {
 	return
 }
 
-/*After checks if t1 is after t2. */
+/*After checks if t1 is after (>) t2. */
 func (t1 *CustomTime) After(t2 *CustomTime) (after bool) {
 	return !t1.Before(t2)
 }
@@ -84,5 +84,17 @@ func (t1 *CustomTime) String() {
 
 	h := strconv.Itoa(t1.Hour)
 	m := strconv.Itoa(t1.Min)
-	t1.Value = h + ":" + m
+
+	if t1.Hour < 10 {
+		t1.Value = "0" + h
+	} else {
+		t1.Value = h
+	}
+
+	if t1.Min < 10 {
+		t1.Value = t1.Value + ":0" + m
+	} else {
+		t1.Value = t1.Value + ":" + m
+	}
+
 }

@@ -1,8 +1,10 @@
 package controllers
 
 import (
-	"fmt"
+	"strconv"
+	"strings"
 	"time"
+	"turm/app"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -110,9 +112,9 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 }
 
 /*EnrollInSlot to enroll into a time slot of a day in a calendar event. */
-func (c Enrollment) EnrollInSlot(ID int, startTime, endTime, date string) revel.Result {
+func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) revel.Result {
 
-	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "startTime",
+	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "year", year, "startTime",
 		startTime, "endTime", endTime, "date", date)
 
 	//get user
@@ -121,17 +123,45 @@ func (c Enrollment) EnrollInSlot(ID int, startTime, endTime, date string) revel.
 		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
+	location, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	splitDate := strings.Split(date, ".")
+	month, err := strconv.Atoi(splitDate[1])
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+	day, err := strconv.Atoi(splitDate[0])
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
 	//set start and end time
-	startT := date + "T" + startTime + "Z"
-	start, err := time.Parse("2006-01-02T15:04:05Z", startT)
+	splitTime := strings.Split(startTime, ":")
+	hour, err := strconv.Atoi(splitTime[0])
 	if err != nil {
 		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
-	endT := date + "T" + endTime + "Z"
-	end, err := time.Parse("2006-01-02T15:04:05Z", endT)
+	min, err := strconv.Atoi(splitTime[1])
 	if err != nil {
 		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
+
+	start := time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
+
+	splitTime = strings.Split(endTime, ":")
+	hour, err = strconv.Atoi(splitTime[0])
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+	min, err = strconv.Atoi(splitTime[1])
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	end := time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
 
 	slot := models.Slot{
 		UserID: userID,
@@ -140,14 +170,13 @@ func (c Enrollment) EnrollInSlot(ID int, startTime, endTime, date string) revel.
 	}
 
 	//enroll user
-	data, err := slot.Insert(c.Validation)
+	_, err = slot.Insert(c.Validation, ID)
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	} else if c.Validation.HasErrors() {
 		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
-	fmt.Println(data)
 	//TODO: send e-mail to the user who enrolled
 	/*
 		err = sendEMail(c.Controller, &data,
