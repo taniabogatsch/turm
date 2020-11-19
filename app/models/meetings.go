@@ -121,20 +121,34 @@ func (meeting *Meeting) NewBlank(conf *EditEMailConfig) (err error) {
 }
 
 /*Update a meeting. */
-func (meeting *Meeting) Update() (err error) {
+func (meeting *Meeting) Update(conf *EditEMailConfig) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
 
 	if meeting.MeetingInterval == SINGLE {
-		err = app.Db.Get(meeting, stmtUpdateSingleMeeting, meeting.Place,
+		err = tx.Get(meeting, stmtUpdateSingleMeeting, meeting.Place,
 			meeting.Annotation, meeting.MeetingStart, meeting.MeetingEnd, meeting.ID)
 	} else {
-		err = app.Db.Get(meeting, stmtUpdateWeeklyMeeting, meeting.Place,
+		err = tx.Get(meeting, stmtUpdateWeeklyMeeting, meeting.Place,
 			meeting.Annotation, meeting.MeetingStart, meeting.MeetingEnd,
 			meeting.ID, meeting.WeekDay, meeting.MeetingInterval)
 	}
 	if err != nil {
 		log.Error("failed to update meeting", "meeting", *meeting,
 			"error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	if err = conf.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
 	return
 }
 

@@ -480,3 +480,32 @@ function openChangeDayTmplModal(action, title, ID, dayOfWeek, start, end, interv
   //show the modal
   $('#change-day-tmpl-modal').modal('show');
 }
+
+function openChangeExceptionModal(title, ID, start, end, annotation, exceptionID) {
+
+  $('#change-exception-modal-ID').val(ID);
+  $('#change-exception-modal-exception-ID').val(exceptionID);
+  $('#change-exception-modal-title').html(title);
+
+  if (start != "") {
+    const startParts = start.split(" ");
+    $('#exception-start-date').val(startParts[0]);
+    $('#exception-start-time').val(startParts[1]);
+  } else {
+    $('#exception-start-date').val("");
+    $('#exception-start-time').val("");
+  }
+  if (end != "") {
+    const endParts = end.split(" ");
+    $('#exception-end-date').val(endParts[0]);
+    $('#exception-end-time').val(endParts[1]);
+  } else {
+    $('#exception-end-date').val("");
+    $('#exception-end-time').val("");
+  }
+
+  $('#change-exception-modal-annotation').val(annotation);
+
+  //show the modal
+  $('#change-exception-modal').modal('show');
+}

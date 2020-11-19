@@ -198,6 +198,9 @@ day.tmpl.delete.success = Schablone gelöscht, ID = %d.
 day.tmpl.delete.confirm = Schablone wirklich löschen? <br><br> ACHTUNG: Alle NutzerInnen, die bereits Buchungen für diese Schablone vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.
 day.tmpl.delete.title = Schablone löschen
 
+exception.change.success = Änderungen an Ausnahme erfolgreich, ID = %d.
+exception.new.title = Neue Ausnahme hinzufügen
+
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS
 # -------------------------------------------------------------------------------------------------- #

@@ -25,6 +25,9 @@ type CalendarEvent struct {
 	//day templates for this week [0...6]
 	Days DayTmpls
 
+	//all upcoming exceptions
+	Exceptions Exceptions
+
 	//exeptions of this week [0....6]
 	ExceptionsOfWeek ExceptionsOfWeek
 	//transformed schedule for easy front end usage

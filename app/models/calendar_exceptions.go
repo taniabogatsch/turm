@@ -16,11 +16,15 @@ type Exceptions []Exception
 
 /*Exception can lock a timespan on a specific date. */
 type Exception struct {
-	ID                int            `db:"id"`
-	Calendar_event_id int            `db:"calendar_event_id"`
-	StartTimestamp    string         `db:"start_time"`
-	EndTimestamp      string         `db:"end_time"`
-	Annotation        sql.NullString `db:"annotation"`
+	ID              int            `db:"id"`
+	CalendarEventID int            `db:"calendar_event_id"`
+	ExceptionStart  string         `db:"exception_start"`
+	ExceptionEnd    string         `db:"exception_end"`
+	Annotation      sql.NullString `db:"annotation"`
+
+	//used to get the front end values
+	ExceptionStartTime string ``
+	ExceptionEndTime   string ``
 }
 
 /*Get all exceptions of a day . Monday specifies the week for which all exceptions
@@ -40,11 +44,16 @@ func (excepts *Exceptions) Get(tx *sqlx.Tx, monday time.Time, weekday int) (err 
 	return
 }
 
-//TODO: INSERT function (delete slots who collide or keep them?)
-
-/*Validate an exception. */
-func (except *Exception) Validate() {
+//validate an exception.
+func (except *Exception) validate() {
 	//TODO
+}
+
+/*Insert an exception. */
+func (except *Exception) Insert(v *revel.Validation) (err error) {
+	//TODO: INSERT function (delete slots who collide or keep them?)
+	//TODO
+	return
 }
 
 /*Update an exception. */
@@ -55,9 +64,9 @@ func (except *Exception) Update(v *revel.Validation) (err error) {
 
 const (
 	stmtSelectExeptions = `
-    SELECT id, calendar_event_id, start_time, end_time, annotation
+    SELECT id, calendar_event_id, exception_start, exception_end, annotation
     FROM calendar_exceptions
-    WHERE start_time BETWEEN ($1) AND ($2)
-		ORDER BY start_time ASC
+    WHERE exception_start BETWEEN ($1) AND ($2)
+		ORDER BY exception_start ASC
   `
 )

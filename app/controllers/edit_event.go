@@ -37,7 +37,8 @@ func (c EditEvent) Delete(ID, courseID int) revel.Result {
 func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,
 	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("create a new meeting", "ID", ID, "option", option)
+	c.Log.Debug("create a new meeting", "ID", ID, "option", option,
+		"conf", conf)
 
 	//NOTE: the interceptor assures that the event ID is valid
 

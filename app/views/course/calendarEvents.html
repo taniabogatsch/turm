@@ -187,7 +187,11 @@
                     </div>
 
                   {{else if eq .Type 2}} <!-- EXCEPTION -->
-                    <!-- TODO -->
+                    <div class="card mb-1 alert-danger">
+                      <div class="card-body p-1 text-center">
+                        {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                      </div>
+                    </div>
 
                   {{else if eq .Type 3}} <!-- BLOCKED -->
 
@@ -246,10 +250,23 @@
         </button>
 
         <!-- button for adding exceptions -->
-        <button type="button" class="btn btn-outline-darkblue edit-show d-none">
+        <button type="button" class="btn btn-outline-darkblue edit-show d-none"
+          onclick='openChangeExceptionModal({{msg $ "exception.new.title"}},
+            {{.ID}}, "", "", "", 0);'>
           + &nbsp; Zeitraum sperren
         </button>
       </div>
+
+      {{if .Exceptions}}
+        <div class="edit-show d-none">
+          Hinzugefügte Ausnahmen:
+          <hr>
+          {{range .Exceptions}}
+            {{.ExceptionStart}}, {{.ExceptionEnd}}, {{.Annotation}}
+            <br>
+          {{end}}
+        </div>
+      {{end}}
 
     </li>
   {{else}}

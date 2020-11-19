@@ -116,7 +116,7 @@
 <script>
   $(function() {
     //adjust the nav pills
-    {{if .participants.Active}}
+    {{if not .participants.Expired}}
       $('#pills-opened-draft').addClass("d-none");
       $('#pills-opened-active').removeClass("d-none");
       $('#pills-opened-expired').addClass("d-none");

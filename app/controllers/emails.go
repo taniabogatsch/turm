@@ -34,7 +34,6 @@ func sendEMail(c *revel.Controller, data *models.EMailData, subjectKey string,
 		return
 	}
 
-	c.Log.Debug("assembled e-mail")
 	app.EMailQueue <- email
 	return
 }

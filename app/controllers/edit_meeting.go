@@ -11,9 +11,11 @@ import (
 
 /*Edit meeting data.
 - Roles: creator and editors of the course of the meeting */
-func (c EditMeeting) Edit(ID int, meeting models.Meeting) revel.Result {
+func (c EditMeeting) Edit(ID int, meeting models.Meeting,
+	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change meeting", "ID", ID, "meeting", meeting)
+	c.Log.Debug("change meeting", "ID", ID, "meeting", meeting,
+		"conf", conf)
 
 	//NOTE: the interceptor assures that the meeting ID is valid
 
@@ -24,11 +26,19 @@ func (c EditMeeting) Edit(ID int, meeting models.Meeting) revel.Result {
 			c.Controller, "")
 	}
 
+	conf.ID = meeting.EventID
+	conf.IsEvent = true
+
 	meeting.ID = ID
-	if err := meeting.Update(); err != nil {
+	if err := meeting.Update(&conf); err != nil {
 		return flashError(
 			errDB, err, "/course/meetings?ID="+strconv.Itoa(meeting.EventID),
 			c.Controller, "")
+	}
+
+	//if the course is active, send notification e-mail
+	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
+		return flashError(errEMail, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("meeting.update.success", meeting.ID))

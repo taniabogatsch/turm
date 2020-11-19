@@ -137,3 +137,32 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 	c.Flash.Success(c.Message("day.tmpl.edit.success", tmpl.ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
+
+/*ChangeException edits or adds an exception.
+- Roles: creator and editors of the course of the calendar event */
+func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Exception) revel.Result {
+
+	c.Log.Debug("change an exception", "ID", ID, "courseID", courseID, "exception", exception)
+
+	//NOTE: the interceptor assures that the calendar event ID is valid
+
+	exception.CalendarEventID = ID
+	var err error
+	if exception.ID == 0 {
+		err = exception.Insert(c.Validation)
+	} else {
+		err = exception.Update(c.Validation)
+	}
+	if err != nil {
+		return flashError(
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("exception.change.success", exception.ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
+}

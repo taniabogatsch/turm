@@ -13,10 +13,11 @@
 {{template "edit/modals/newEvent.html" dict_addLocale $.currentLocale "active" .course.Active}}
 
 {{template "edit/modals/newMeeting.html" dict_addLocale $.currentLocale "active" .course.Active}}
-{{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale}}
-{{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale}}
+{{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale "active" .course.Active}}
+{{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale "active" .course.Active}}
 
 {{template "edit/modals/changeDayTmpl.html" dict_addLocale $.currentLocale "courseID" .course.ID}}
+{{template "edit/modals/changeException.html" dict_addLocale $.currentLocale "courseID" .course.ID}}
 
 {{template "edit/modals/deleteField.html" dict_addLocale $.currentLocale}}
 
@@ -155,6 +156,20 @@
     }
 
     submitRenderForm("#change-day-tmpl-modal-form", "#change-day-tmpl-modal");
+    event.preventDefault();
+  });
+
+  $('#change-exception-modal-form').submit(function (event) {
+
+    let form = document.getElementById("change-exception-modal-form");
+    form.classList.add('was-validated');
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    submitRenderForm("#change-exception-modal-form", "#change-exception-modal");
     event.preventDefault();
   });
 
