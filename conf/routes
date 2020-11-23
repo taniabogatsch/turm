@@ -139,6 +139,8 @@ GET     /manageCourses/expired                      Manage.Expired
 # ---------------------------------------------------------------------------- #
 
 GET     /participants/open                          Participants.Open
+GET     /participants/download                      Participants.Download
+GET     /participants/email                         Participants.EMail
 
 
 # ---------------------------------------------------------------------------- #

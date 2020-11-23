@@ -617,8 +617,16 @@ func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err erro
 
 	} else {
 		//unmarshal the struct into the old layout
+		oldCourse := OldCourse{}
+		err = json.Unmarshal(*data, &oldCourse)
+		if err != nil {
+			log.Error("failed to unmarshal into old struct", "data",
+				*data, "error", err.Error())
+			return
+		}
+
 		//then transfer the data to the new course struct
-		//TODO
+		err = oldCourse.Transform(course)
 	}
 
 	return

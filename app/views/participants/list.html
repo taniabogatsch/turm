@@ -1,1 +1,77 @@
 <!-- template for loading a selected participants list -->
+
+{{if .list}}
+  <div class="row font-weight-bold">
+    <div class="col-sm-3">
+      TeilnehmerIn
+    </div>
+    <div class="col-sm-3">
+      Zugehörigkeit, Matrikelnummer
+    </div>
+    <div class="col-sm-2">
+      Studiengang
+    </div>
+    <div class="col-sm-2">
+      Einschreibezeitpunkt
+    </div>
+    <div class="col-sm-1">
+      Status
+    </div>
+    <div class="col-sm-1">
+      Austragen
+    </div>
+  </div>
+{{end}}
+
+{{range .list}}
+  <hr>
+  <div class="row mb-1">
+    <div class="col-sm-3 break-text">
+      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
+      <br>
+      {{.EMail}}
+    </div>
+    <div class="col-sm-3 break-text">
+      {{if .Affiliations.Valid}}
+        {{range $k, $v := .Affiliations.Affiliations}}
+          {{if ne $k 0}}, {{end}}{{$v}}
+        {{end}}
+      {{else}}
+        Keine Zugehörigkeit
+      {{end}}
+      <br>
+      {{if .MatrNr.Valid}}
+        {{if eq .MatrNr.Int32 12345}}
+          {{msg $ "user.matr.nr.not.visible"}}
+        {{else}}
+          {{.MatrNr.Int32}}
+        {{end}}
+      {{else}}
+        {{msg $ "user.no.matr.nr"}}
+      {{end}}
+    </div>
+    <div class="col-sm-2 break-text">
+      {{range .Studies}}
+        {{.Degree}}
+        <br>
+        {{.CourseOfStudies}}
+        <br>
+        {{.Semester}}. Semester
+      {{else}}
+        Kein Studiengang
+      {{end}}
+    </div>
+    <div class="col-sm-2 break-text">
+      {{.TimeOfEnrollment}}
+    </div>
+    <div class="col-sm-1 break-text">
+      {{.Status}}
+    </div>
+    <div class="col-sm-1 break-text">
+    </div>
+  </div>
+{{else}}
+  <small class="text-muted">
+    Keine NutzerInnen auf dieser Liste.
+  </small>
+{{end}}

@@ -86,10 +86,13 @@ user.creators = Creators
 user.ldap = University account
 user.external = External account
 user.matr.nr = Matriculation number
+user.no.matr.nr = No matriculation number
+user.matr.nr.not.visible = Not visible
 user.matr.nrs = Matriculation numbers
 user.affiliation = Affiliation
 user.course.of.studies = Course of studies
 user.degree = Pursued degree
+user.semester = Semester
 
 user.name = Name
 user.firstname = First name
@@ -141,6 +144,8 @@ email.subject.course.edit = Turm2 - Information about one of your courses
 email.subject.event.edit.manager = Turm2 - Course management - Information about one of your events
 email.subject.course.edit.manager = Turm2 - Course management - Information about one of your courses
 
+email.send.success = E-mail was send to %d participants.
+
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH
 # -------------------------------------------------------------------------------------------------- #
@@ -156,3 +161,17 @@ search.limit = Search results are limited to a <strong>maximum of %d results</st
 search.criteria = Search criteria are: last name, first name, e-mail address, matriculation number (only entire numbers).
 search.inactive.users = Show not activated accounts
 search.already.added = Already added
+
+# -------------------------------------------------------------------------------------------------- #
+# ENROLLMENT
+# -------------------------------------------------------------------------------------------------- #
+
+enroll.status = Status
+enroll.status.enrolled = Enrolled
+enroll.status.on.wait.list = On wait list
+enroll.status.awaiting.payment = Awaiting payment
+enroll.status.paid = Paid
+enroll.status.freed = Freed
+enroll.status.unsubscribed = Unsubscribed
+
+enroll.time = Time of enrollment

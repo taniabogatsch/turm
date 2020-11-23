@@ -60,42 +60,69 @@
 
       <div class="row">
         <div class="col-sm-6">
-          <select class="custom-select" id="parts-select-event">
-            <option value="all" selected>Alle Veranstaltungen</option>
-            {{range .participants.Lists}}
-              <option value="{{.ID}}">{{.Title}}</option>
-            {{end}}
-          </select>
-        </div>
-        <div class="col-sm-3">
-          <button type="button" class="btn btn-outline-darkblue w-100">
+          <button type="button" class="btn btn-outline-darkblue w-100"
+            data-toggle="modal" data-target="#download-participants-modal">
             {{template "icons/download.html" . }}
-            &nbsp; Teilnehmerliste
+            &nbsp; Listen herunterladen
           </button>
         </div>
-        <div class="col-sm-3">
-          <button type="button" class="btn btn-outline-darkblue w-100">
+        <div class="col-sm-6">
+          <button type="button" class="btn btn-outline-darkblue w-100"
+            data-toggle="modal" data-target="#email-participants-modal">
             {{template "icons/envelope.html" . }}
             &nbsp; E-Mail senden
           </button>
         </div>
       </div>
       <hr>
+      <br>
 
-      <div class="collapse show select-option select-option-all">
-        - manuell einschreiben
-        <br>
-        Alle Veranstaltungen
-      </div>
-      {{range .participants.Lists}}
+      <h5>
+        <div class="d-inline">
+          Veranstaltung: &nbsp;
+        </div>
+        <div class="d-inline">
+          <select class="custom-select w-auto" id="parts-select-event">
+            {{range $k, $v := .participants.Lists}}
+              <option value="{{.ID}}" {{if eq $k 0}}selected{{end}}>{{.Title}}</option>
+            {{end}}
+          </select>
+        </div>
+      </h5>
+
+      <!-- range events and their participants -->
+      {{range $k, $v := .participants.Lists}}
         <div class="collapse select-option select-option-{{.ID}}">
-          - manuell einschreiben
+          <!-- TODO: field for manual enrollment of users -->
+          TeilnehmerInnen: {{.Fullness}}/{{.Capacity}}
+          {{if .Annotation.Valid}}
+            <br>
+            Anmerkung: {{.Annotation.String}}
+          {{end}}
+          <hr>
           <br>
-          {{.Title}}
+          <h5>
+            {{template "icons/people.html" . }}
+            &nbsp; Teilnehmerliste
+          </h5>
           <hr>
-          {{.Participants}}
+          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants}}
           <hr>
-          {{.Waitlist}}
+          <br>
+          <h5>
+            {{template "icons/clock.html" . }}
+            &nbsp; Wartelist
+          </h5>
+          <hr>
+          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist}}
+          <hr>
+          <br>
+          <h5>
+            {{template "icons/arrowRightIn.html" . }}
+            &nbsp; Ausgetragene TeilnehmerInnen
+          </h5>
+          <hr>
+          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed}}
         </div>
       {{end}}
 
@@ -106,10 +133,13 @@
 <div class="page page-side">
   <div class="page-right-layout">
     <small class="text-muted">
-      Hier können Sie spezifizieren für welche Veranstaltung Sie die Teilnehmerlisten anzeigen möchten. Außerdem können Sie für die gewählte Option die Teilnehmerliste herunterladen oder E-Mails versenden.
+      TODO
     </small>
   </div>
 </div>
+
+{{template "participants/modals/download.html" .}}
+{{template "participants/modals/email.html" .}}
 
 <script src="/public/js/participants.js"></script>
 
@@ -135,6 +165,15 @@
       //show element connected to selected option
       $(selector).collapse('show');
     });
+
+    //
+    let selector = '.select-option-' + $('#parts-select-event').val();
+    $('.select-option').collapse('hide');
+    $(selector).collapse('show');
+
+    //download and e-mail modal
+    toggleEventSelection('selector-events-email');
+    toggleEventSelection('selector-events-download');
   });
 </script>
 

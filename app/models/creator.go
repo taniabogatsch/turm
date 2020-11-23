@@ -76,9 +76,10 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 					//assert that enrolllimitevents is an integer
 					switch jsonIntf["enrolllimitevents"].(type) {
 					case bool:
-						jsonIntf["enrolllimitevents"] = 0
 						if jsonIntf["enrolllimitevents"] == true {
 							jsonIntf["enrolllimitevents"] = 1
+						} else {
+							jsonIntf["enrolllimitevents"] = 0
 						}
 						//create an updated json to be unmarshalled into the course struct
 						json, err := json.Marshal(jsonIntf)

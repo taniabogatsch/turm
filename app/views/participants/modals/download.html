@@ -1,0 +1,112 @@
+<!-- template rendering the modal for downloading lists of participants -->
+
+<div class="modal fade" id="download-participants-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          Teilnehmerlisten herunterladen
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form action='{{url "Participants.Download"}}' method="GET"
+        class="needs-validation" novalidate id="download-participants-form">
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <input type="hidden" name="ID" value="{{.participants.ID}}">
+
+          <!-- title -->
+          <small class="form-text text-muted">
+            Hier können Sie der Teilnehmerliste einen individuellen Dateinamen geben. Wenn Sie das Feld leer lassen wird ein Dateiname generiert.
+          </small>
+          <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input type="text" class="form-control rounded-right" name="conf.Filename"
+              placeholder='Dateiname' minlength="3" maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+
+          <small class="form-text text-muted">
+            Wählen Sie aus, ob Sie die Teilnehmerliste für alle Veranstaltungen oder nur für ausgewählte Veranstaltungen herunterladen wollen.
+          </small>
+          <div class="form-group">
+            <select class="custom-select" name="conf.AllEvents" required
+              onchange="toggleEventSelection('selector-events-download');"
+              id="selector-events-download">
+              <option value="true" selected>Alle Veranstaltungen</option>
+              <option value="false">Ausgewählte Veranstaltungen</option>
+            </select>
+          </div>
+          <!-- events -->
+          <div class="d-none" id="selector-events-download-options">
+            <small class="form-text text-muted">
+              Wählen Sie alle Veranstaltungen aus, deren TeilnehmerInnen auf der heruntergeladenen Liste vorkommen sollen. Halten Sie dazu beim Auswählen <b>STRG</b> gedrückt.
+            </small>
+            <div class="form-row">
+              <div class="col">
+                <select name="conf.EventIDs[]" class="form-control" multiple>
+                  {{range .participants.Lists}}
+                    <option value="{{.ID}}">{{.Title}}</option>
+                  {{end}}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- select lists -->
+          <small class="form-text text-muted mt-4">
+            Wählen Sie die Listen an, die Sie herunterladen möchten.
+          </small>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.Participants">
+            <label class="form-check-label">Eingeschriebene TeilnehmerInnen</label>
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.WaitList">
+            <label class="form-check-label">TeilnehmerInnen auf der Warteliste (insofern vorhanden)</label>
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.Unsubscribed">
+            <label class="form-check-label">Ausgetragene TeilnehmerInnen</label>
+          </div>
+
+          <!-- use comma -->
+          <small class="form-text text-muted mt-4">
+            Wählen Sie diese Option, falls Sie NICHT Excel zum Öffnen der Teilnehmerliste verwenden.
+          </small>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.UseComma">
+            <label class="form-check-label">Einträge kommasepariert speichern</label>
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="button" class="btn btn-darkblue"
+            onclick="submitParticipantsModal('download-participants');">
+            {{msg $ "button.download"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

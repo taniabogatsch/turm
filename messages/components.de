@@ -86,10 +86,13 @@ user.creators = Kursverantwortliche
 user.ldap = Uni Account
 user.external = Externer Account
 user.matr.nr = Matrikelnummer
+user.no.matr.nr = Keine Matrikelnummer
+user.matr.nr.not.visible = Nicht sichtbar
 user.matr.nrs = Matrikelnummern
 user.affiliation = Zugehörigkeit
 user.course.of.studies = Studiengang
 user.degree = Angestrebter Abschluss
+user.semester = Semester
 
 user.name = Name
 user.firstname = Vorname
@@ -154,6 +157,8 @@ email.edit.option.editors = Nur EditorInnen
 email.edit.option.instructors = Nur OrganisatorInnen
 email.edit.option.none = Niemand
 
+email.send.success = E-Mail an %d TeilnehmerInnen versendet.
+
 # -------------------------------------------------------------------------------------------------- #
 # SEARCH
 # -------------------------------------------------------------------------------------------------- #
@@ -169,3 +174,17 @@ search.limit = Suchergebnisse sind auf <strong>maximal %d Ergebnisse</strong> be
 search.criteria = Suchkriterien sind: Name, Vorname, E-Mail-Adresse, Matrikelnummer (nur ganze Nummer).
 search.inactive.users = Nicht aktivierte Accounts anzeigen
 search.already.added = Bereits hinzugefügt
+
+# -------------------------------------------------------------------------------------------------- #
+# ENROLLMENT
+# -------------------------------------------------------------------------------------------------- #
+
+enroll.status = Status
+enroll.status.enrolled = Eingeschrieben
+enroll.status.on.wait.list = Auf Warteliste
+enroll.status.awaiting.payment = Zahlung ausstehend
+enroll.status.paid = Bezahlt
+enroll.status.freed = Befreit
+enroll.status.unsubscribed = Ausgetragen
+
+enroll.time = Einschreibezeitpunkt

@@ -21,10 +21,13 @@ const (
 	PAID
 	//FREED users enrolled in an event and do not have to pay the fee of the course
 	FREED
+	//UNSUBSCRIBED users unsubscribed from an event
+	UNSUBSCRIBED
 )
 
 func (status EnrollmentStatus) String() string {
-	return [...]string{"enrolled", "on waitlist", "awaiting payment", "paid", "freed"}[status]
+	return [...]string{"enrolled", "on waitlist", "awaiting payment",
+		"paid", "freed", "unsubscribed"}[status]
 }
 
 /*EnrollOption is a type for encoding different enrollment options. */

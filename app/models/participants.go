@@ -7,6 +7,20 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+/*ListConf determines to whom an e-mail is send or which users are at the
+downloaded participants list. */
+type ListConf struct {
+	AllEvents    bool
+	EventIDs     []int
+	Participants bool
+	WaitList     bool
+	Unsubscribed bool
+	UseComma     bool
+	Filename     string
+	Subject      string
+	Content      string
+}
+
 /*Participants of a course. */
 type Participants struct {
 	ID              int            `db:"id, primarykey, autoincrement"`
@@ -16,13 +30,15 @@ type Participants struct {
 	EnrollmentEnd   string         `db:"enrollment_end"`
 	UnsubscribeEnd  sql.NullString `db:"unsubscribe_end"`
 	ExpirationDate  string         `db:"expiration_date"`
+	ViewMatrNr      bool           `db:"view_matr_nr"`
+	UserEMail       string         `db:"user_email"`
 
 	Expired bool
 	Lists   ParticipantLists
 }
 
 /*Get all participants of a course. */
-func (parts *Participants) Get() (err error) {
+func (parts *Participants) Get(userID int) (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -31,16 +47,26 @@ func (parts *Participants) Get() (err error) {
 	}
 
 	//get course data
-	err = tx.Get(parts, stmtSelectParticipantsCourseData, parts.ID, app.TimeZone)
+	err = tx.Get(parts, stmtSelectParticipantsCourseData, parts.ID,
+		app.TimeZone, userID)
 	if err != nil {
 		log.Error("failed to get participants course data", "parts ID", parts.ID,
-			"error", err.Error())
+			"userID", userID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get whether the user is allowed to see matriculation numbers
+	err = tx.Get(parts, stmtGetViewMatrNr, parts.ID, userID)
+	if err != nil {
+		log.Error("failed to get whether user is allowed to see matr nr or not",
+			"partsID", parts.ID, "userID", userID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
 	//get all participant lists of this course
-	if err = parts.Lists.Get(tx, &parts.ID); err != nil {
+	if err = parts.Lists.Get(tx, &parts.ID, parts.ViewMatrNr); err != nil {
 		return
 	}
 
@@ -72,7 +98,7 @@ type ParticipantList struct {
 }
 
 /*Get all participant lists of a course. */
-func (lists *ParticipantLists) Get(tx *sqlx.Tx, partsID *int) (err error) {
+func (lists *ParticipantLists) Get(tx *sqlx.Tx, partsID *int, viewMatrNr bool) (err error) {
 
 	//get event data for lists
 	err = tx.Select(lists, stmtSelectEventListsData, *partsID)
@@ -90,19 +116,19 @@ func (lists *ParticipantLists) Get(tx *sqlx.Tx, partsID *int) (err error) {
 		(*lists)[key].Percentage = (list.Fullness * 100) / list.Capacity
 
 		//participants list
-		if err = (*lists)[key].Participants.Get(tx, "participants", &list.ID); err != nil {
+		if err = (*lists)[key].Participants.Get(tx, "participants", &list.ID, viewMatrNr); err != nil {
 			return
 		}
 
 		//wait list (if exists)
 		if (*lists)[key].HasWaitlist {
-			if err = (*lists)[key].Waitlist.Get(tx, "waitlist", &list.ID); err != nil {
+			if err = (*lists)[key].Waitlist.Get(tx, "waitlist", &list.ID, viewMatrNr); err != nil {
 				return
 			}
 		}
 
 		//get unsubscribed list
-		if err = (*lists)[key].Unsubscribed.Get(tx, "unsubscribed", &list.ID); err != nil {
+		if err = (*lists)[key].Unsubscribed.Get(tx, "unsubscribed", &list.ID, viewMatrNr); err != nil {
 			return
 		}
 	}
@@ -121,7 +147,7 @@ type Entry struct {
 }
 
 /*Get all entries on a specific list. */
-func (entries *Entries) Get(tx *sqlx.Tx, listType string, eventID *int) (err error) {
+func (entries *Entries) Get(tx *sqlx.Tx, listType string, eventID *int, viewMatrNr bool) (err error) {
 
 	switch listType {
 	case "participants":
@@ -136,6 +162,23 @@ func (entries *Entries) Get(tx *sqlx.Tx, listType string, eventID *int) (err err
 		log.Error("failed to get entries", "listType", listType, "eventID", *eventID,
 			"error", err.Error())
 		tx.Rollback()
+		return
+	}
+
+	for key := range *entries {
+
+		//get the courses of studies
+		if (*entries)[key].IsLDAP {
+			err = (*entries)[key].Studies.Select(tx, &(*entries)[key].ID)
+			if err != nil {
+				return
+			}
+		}
+
+		//create dummy matriculation numbers, if the user is not allowed to see them
+		if (*entries)[key].MatrNr.Valid && !viewMatrNr {
+			(*entries)[key].MatrNr.Int32 = 12345
+		}
 	}
 
 	return
@@ -149,7 +192,12 @@ const (
       TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end,
       TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribe_end,
       TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date,
-      (current_timestamp >= expiration_date) AS expired
+      (current_timestamp >= expiration_date) AS expired,
+			(
+				SELECT email
+				FROM users
+				WHERE id = $3
+			) AS user_email
     FROM courses
     WHERE id = $1
   `
@@ -166,35 +214,72 @@ const (
       ) AS fullness
     FROM events e
     WHERE e.course_id = $1
+		ORDER BY e.id ASC
   `
 
 	stmtSelectParticipants = `
     SELECT
-      u.id, u.last_name, u.first_name, u.email, u.salutation,
+      u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
       e.user_id, e.event_id, e.status, e.email_traffic,
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
       AND e.status != 1 /*on waitlist */
+		ORDER BY u.last_name ASC
   `
 
 	stmtSelectParticipantsWaitlist = `
     SELECT
-      u.id, u.last_name, u.first_name, u.email, u.salutation,
+      u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
       e.user_id, e.event_id, e.status, e.email_traffic,
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
       AND e.status = 1 /*on waitlist */
+		ORDER BY u.last_name ASC
   `
 
 	stmtSelectUnsubscribed = `
     SELECT
-      u.id, u.last_name, u.first_name, u.email, u.salutation,
-      u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations
+      u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
+      u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
+			un.event_id, 5 AS status
     FROM users u JOIN unsubscribed un ON u.id = un.user_id
     WHERE un.event_id = $1
+		ORDER BY u.last_name ASC
   `
+
+	stmtGetViewMatrNr = `
+		SELECT EXISTS (
+			(
+				SELECT id
+				FROM courses
+				WHERE id = $1
+					AND creator = $2
+			)
+
+			UNION ALL
+
+			(
+				SELECT user_id AS id
+				FROM editors
+				WHERE course_id = $1
+					AND user_id = $2
+					AND view_matr_nr
+			)
+
+			UNION ALL
+
+			(
+				SELECT user_id AS id
+				FROM instructors
+				WHERE course_id = $1
+					AND user_id = $2
+					AND view_matr_nr
+			)
+
+		) AS view_matr_nr
+	`
 )

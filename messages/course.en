@@ -4,6 +4,7 @@
 
 course = Course
 
+course.ID = Course ID
 course.path = Course path
 course.title = Course title
 course.subtitle = Subtitle
@@ -46,6 +47,7 @@ course.events.calendar.none = This course has no calendar events.
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
 
+event.ID = Event ID
 event.title = Event title
 event.annotation = Annotation
 event.waitlist.yes = A waiting list exists

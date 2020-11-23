@@ -88,6 +88,7 @@ creator.course.upload = Upload course data
 creator.upload.file = Choose file...
 creator.uploaded.file = Uploaded file
 creator.upload.info = Please upload a course file with JSON formatting.
+creator.upload.info2 = <b>ATTENTION:</b> You can upload courses of the previous Turm2 version. However, some data might be lost during that upload. So please double check all uploaded data before activating the course.
 
 
 # --- edit course

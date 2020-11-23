@@ -104,7 +104,8 @@ func (meeting *Meeting) NewBlank(conf *EditEMailConfig) (err error) {
 
 	now := time.Now().Format(revel.TimeFormats[0])
 
-	err = tx.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval, now)
+	err = tx.Get(meeting, stmtInsertBlankMeeting, meeting.EventID,
+		meeting.MeetingInterval, now)
 	if err != nil {
 		log.Error("failed to insert blank meeting", "meeting", meeting,
 			"error", err.Error())

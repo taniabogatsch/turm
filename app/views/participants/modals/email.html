@@ -1,0 +1,135 @@
+<!-- template rendering the modal for sending e-mails to lists of participants -->
+
+<div class="modal fade" id="email-participants-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          E-Mail an TeilnehmerInnen versenden
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form action='{{url "Participants.EMail"}}' method="GET"
+        class="needs-validation" novalidate id="email-participants-form">
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <input type="hidden" name="ID" value="{{.participants.ID}}">
+
+          <!-- subject -->
+          <small class="form-text text-muted">
+            Betreff der E-Mail
+          </small>
+          <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input type="text" class="form-control rounded-right" name="conf.Subject"
+              placeholder='Betreff' minlength="3" maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text.short"}}
+            </div>
+          </div>
+
+          <small class="form-text text-muted">
+            Wählen Sie aus, ob die E-Mail an alle Veranstaltungen oder nur an ausgewählte Veranstaltungen gesendet werden soll.
+          </small>
+          <div class="form-group">
+            <select class="custom-select" name="conf.AllEvents" required
+              onchange="toggleEventSelection('selector-events-email');"
+              id="selector-events-email">
+              <option value="true" selected>Alle Veranstaltungen</option>
+              <option value="false">Ausgewählte Veranstaltungen</option>
+            </select>
+          </div>
+          <!-- events -->
+          <div class="d-none" id="selector-events-email-options">
+            <small class="form-text text-muted">
+              Wählen Sie alle Veranstaltungen aus, deren TeilnehmerInnen die E-Mail erhalten sollen. Halten Sie dazu beim Auswählen <b>STRG</b> gedrückt.
+            </small>
+            <div class="form-row">
+              <div class="col">
+                <select name="conf.EventIDs[]" class="form-control" multiple>
+                  {{range .participants.Lists}}
+                    <option value="{{.ID}}">{{.Title}}</option>
+                  {{end}}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- select lists -->
+          <small class="form-text text-muted mt-4">
+            Wählen Sie die Listen an, an die Sie die E-Mail senden möchten.
+          </small>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.Participants">
+            <label class="form-check-label">Eingeschriebene TeilnehmerInnen</label>
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.WaitList">
+            <label class="form-check-label">TeilnehmerInnen auf der Warteliste (insofern vorhanden)</label>
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" name="conf.Unsubscribed">
+            <label class="form-check-label">Ausgetragene TeilnehmerInnen</label>
+          </div>
+
+          <small class="form-text text-muted">
+            Hier können Sie die gewünschte E-Mail verfassen.
+          </small>
+          <!-- editor -->
+          <div id="editor-e-mail-participants">
+          </div>
+
+          <!-- hidden text area -->
+          <textarea class="d-none" id="e-mail-participants-value" name="conf.Content" required>
+          </textarea>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.text.area"}}
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="button" class="btn btn-darkblue"
+            onclick="submitParticipantsModal('email-participants');">
+            {{msg $ "button.send"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  //initialize the Quill editor
+  var quill;
+
+  $(function() {
+    //set the Quill editor
+    quill = new Quill('#editor-e-mail-participants', {
+      theme: 'snow'
+    });
+
+    //ensure that the form validation behaves correctly
+    quill.on('text-change', function(delta, oldDelta, source) {
+      const text = quill.root.innerHTML;
+      detectTextFieldChange(source, "e-mail-participants-value", text);
+    });
+  });
+</script>

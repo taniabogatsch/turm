@@ -87,6 +87,7 @@ creator.course.upload = Kursvorlage hochladen
 creator.upload.file = Datei hochladen...
 creator.uploaded.file = Datei hochgeladen
 creator.upload.info = Laden Sie bitte eine Kursdatei im JSON-Format hoch.
+creator.upload.info2 = <b>ACHTUNG:</b> Sie können Kursdateien aus der vorangegangenen Version von Turm2 hochladen. Allerdings werden einige Felder dabei nicht länger richtig eingelesen. Prüfen Sie also alle Eingaben sorgfältig, bevor Sie den hochgeladenen Kurs aktivieren.
 
 
 # --- edit course
