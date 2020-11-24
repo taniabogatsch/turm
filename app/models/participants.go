@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -184,6 +186,54 @@ func (entries *Entries) Get(tx *sqlx.Tx, listType string, eventID *int, viewMatr
 	return
 }
 
+/*Search all entries. */
+func (entries *Entries) Search(ID, eventID, userID *int, value *string) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//get whether the user is allowed to see matriculation numbers
+	var viewMatrNr bool
+	err = tx.Get(&viewMatrNr, stmtGetViewMatrNr, *ID, userID)
+	if err != nil {
+		log.Error("failed to get whether user is allowed to see matr nr or not",
+			"ID", *ID, "userID", *userID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//prepare the search value for pattern matching
+	values := "%"
+	for _, val := range strings.Split(*value, " ") {
+		values += val + "%"
+	}
+	//the value can be the matriculation number
+	matrNr, _ := strconv.Atoi(*value) //matrNr is 0 if there is an error
+
+	err = tx.Select(entries, stmtSearchEntries, values, matrNr, *eventID)
+	if err != nil {
+		log.Error("failed to search entries", "values", values,
+			"matrNr", matrNr, "eventID", *eventID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//create dummy matriculation numbers, if the user is not allowed to see them
+	if !viewMatrNr {
+		for key := range *entries {
+			if (*entries)[key].MatrNr.Valid {
+				(*entries)[key].MatrNr.Int32 = 12345
+			}
+		}
+	}
+
+	tx.Commit()
+	return
+}
+
 const (
 	stmtSelectParticipantsCourseData = `
     SELECT
@@ -281,5 +331,36 @@ const (
 			)
 
 		) AS view_matr_nr
+	`
+
+	stmtSearchEntries = `
+		SELECT u.id, u.last_name, u.first_name, u.email, u.salutation, u.title,
+			u.academic_title, u.name_affix, u.matr_nr, u.affiliations, (u.password IS NULL) AS is_ldap,
+
+			CASE WHEN en.status IS NOT NULL THEN en.status
+            ELSE 5
+      END AS status
+
+		FROM users u LEFT OUTER JOIN enrolled en ON (u.id = en.user_id AND en.event_id = $3)
+		WHERE u.activation_code IS NULL
+			AND (
+				/* all combinations having a name_affix */
+				u.title || u.academic_title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.academic_title || u.first_name || u.name_affix || u.last_name ILIKE $1
+				OR u.first_name || u.name_affix || u.last_name ILIKE $1
+
+				/* all combinations without a name_affix */
+				OR u.title || u.academic_title || u.first_name || u.last_name ILIKE $1
+				OR u.title || u.first_name || u.last_name ILIKE $1
+				OR u.academic_title || u.first_name || u.last_name ILIKE $1
+				OR u.first_name || u.last_name ILIKE $1
+
+				/* others */
+				OR u.email ILIKE $1
+				OR u.matr_nr = $2
+			)
+		ORDER BY u.last_name, u.first_name, u.id
+		LIMIT 5
 	`
 )

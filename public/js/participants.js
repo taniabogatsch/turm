@@ -16,3 +16,20 @@ function submitParticipantsModal(elemID) {
   $('#' + elemID + '-form').submit();
   $('#' + elemID + '-modal').modal('hide');
 }
+
+function reactToEntryInput(eventIdx, courseID, eventID) {
+
+  document.getElementById("search-form-" + eventIdx).classList.add('was-validated');
+  const value = $('#user-search-input-' + eventIdx).val();
+
+  if (value.length > 2) { //search matching users
+    searchEntries(eventIdx, courseID, eventID, value);
+
+  } else if (value.length == 0) {
+    $('#user-search-results-' + eventIdx).html("");
+    document.getElementById("search-form-" + eventIdx).classList.remove('was-validated');
+
+  } else {
+    $('#user-search-results-' + eventIdx).html("");
+  }
+}

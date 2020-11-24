@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"turm/app"
 	"turm/app/models"
@@ -36,7 +37,7 @@ func (c Participants) Open(ID int) revel.Result {
 	//only set these after the course is loaded
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
+	c.ViewArgs["tabName"] = c.Message("pcpts.tab")
 
 	return c.Render(participants)
 }
@@ -143,6 +144,38 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 
 	c.Flash.Success(c.Message("email.send.success", len(emails)))
 	return c.Redirect(Participants.Open, ID)
+}
+
+/*SearchUser renders search results for a search value. */
+func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
+
+	c.Log.Debug("search users", "ID", ID, "eventID", eventID, "value", value)
+
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
+		revel.MinSize{3},
+		revel.MaxSize{127},
+	).MessageKey("validation.invalid.searchValue")
+
+	if c.Validation.HasErrors() {
+		c.Validation.Keep()
+		return c.Render()
+	}
+
+	//get the user ID, because not all editors/instructors are allowed to
+	//see matriculation numbers
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+	}
+
+	var entries models.Entries
+	if err := entries.Search(&ID, &eventID, &userID, &value); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(entries)
 }
 
 func createCSV(c *revel.Controller, participants *models.Participants,

@@ -47,6 +47,7 @@ course.events.calendar.none = Dieser Kurs enthält keine Kalenderveranstaltungen
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
 
+event = Veranstaltung
 event.ID = VeranstaltungsID
 event.title = Veranstaltungstitel
 event.annotation = Anmerkung

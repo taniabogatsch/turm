@@ -47,6 +47,7 @@ course.events.calendar.none = This course has no calendar events.
 # EVENT FIELDS
 # -------------------------------------------------------------------------------------------------- #
 
+event = Event
 event.ID = Event ID
 event.title = Event title
 event.annotation = Annotation

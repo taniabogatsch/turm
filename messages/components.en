@@ -86,7 +86,7 @@ user.creators = Creators
 user.ldap = University account
 user.external = External account
 user.matr.nr = Matriculation number
-user.no.matr.nr = No matriculation number
+user.no.matr.nr = -
 user.matr.nr.not.visible = Not visible
 user.matr.nrs = Matriculation numbers
 user.affiliation = Affiliation
@@ -117,9 +117,14 @@ user.language = Language
 user.data = User data
 user.details = User details
 
+user.participant = Participant
+user.participants = Participants
+
 # -------------------------------------------------------------------------------------------------- #
 # EMAIL
 # -------------------------------------------------------------------------------------------------- #
+
+email.subject = Subject
 
 email.dear.ms = Dear Ms
 email.dear.mr = Dear Mr

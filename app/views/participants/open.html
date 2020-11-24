@@ -10,7 +10,7 @@
     <h4>
       <!-- show either an open draft or an open course -->
       {{template "icons/people.html" . }}
-      &nbsp; Teilnehmerverwaltung
+      &nbsp; {{msg $ "pcpts.tab"}}
     </h4>
     <hr>
 
@@ -32,17 +32,17 @@
 
       <div class="row">
         <div class="col-sm-3">
-          Einschreibestart:
+          {{msg $ "course.enrollment.start"}}:
           <br>
           {{.participants.EnrollmentStart}}
         </div>
         <div class="col-sm-3">
-          Einschreibeende:
+          {{msg $ "course.enrollment.end"}}:
           <br>
           {{.participants.EnrollmentEnd}}
         </div>
         <div class="col-sm-3">
-          Austragen bis:
+          {{msg $ "course.unsubscribe.end"}}:
           <br>
           {{if .participants.UnsubscribeEnd.Valid}}
             {{.participants.UnsubscribeEnd.String}}
@@ -51,7 +51,7 @@
           {{end}}
         </div>
         <div class="col-sm-3">
-          Ablaufdatum:
+          {{msg $ "course.expiration.date"}}:
           <br>
           {{.participants.ExpirationDate}}
         </div>
@@ -63,14 +63,14 @@
           <button type="button" class="btn btn-outline-darkblue w-100"
             data-toggle="modal" data-target="#download-participants-modal">
             {{template "icons/download.html" . }}
-            &nbsp; Listen herunterladen
+            &nbsp; {{msg $ "pcpts.download.lists"}}
           </button>
         </div>
         <div class="col-sm-6">
           <button type="button" class="btn btn-outline-darkblue w-100"
             data-toggle="modal" data-target="#email-participants-modal">
             {{template "icons/envelope.html" . }}
-            &nbsp; E-Mail senden
+            &nbsp; {{msg $ "pcpts.email.send"}}
           </button>
         </div>
       </div>
@@ -79,7 +79,7 @@
 
       <h5>
         <div class="d-inline">
-          Veranstaltung: &nbsp;
+          {{msg $ "event"}}: &nbsp;
         </div>
         <div class="d-inline">
           <select class="custom-select w-auto" id="parts-select-event">
@@ -93,36 +93,78 @@
       <!-- range events and their participants -->
       {{range $k, $v := .participants.Lists}}
         <div class="collapse select-option select-option-{{.ID}}">
-          <!-- TODO: field for manual enrollment of users -->
-          TeilnehmerInnen: {{.Fullness}}/{{.Capacity}}
+
+          <!-- event information -->
+          {{msg $ "user.participants"}}: {{.Fullness}}/{{.Capacity}}
           {{if .Annotation.Valid}}
             <br>
-            Anmerkung: {{.Annotation.String}}
+            {{msg $ "event.annotation"}}: {{.Annotation.String}}
           {{end}}
           <hr>
           <br>
-          <h5>
-            {{template "icons/people.html" . }}
-            &nbsp; Teilnehmerliste
-          </h5>
-          <hr>
-          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants}}
-          <hr>
+
+          <!-- field for manual enrollment of users -->
+          <small class="form-text text-muted">
+            {{msg $ "search.criteria"}}
+          </small>
+          <form id="search-form-{{$k}}" accept-charset="UTF-8" class="needs-validation"
+            novalidate onkeydown="return event.key != 'Enter';">
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text border-right-0">
+                    {{template "icons/search.html" .}}
+                  </span>
+                </div>
+                <input id="user-search-input-{{$k}}" type="text" class="form-control rounded-right"
+                  placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3"
+                  onkeyup="reactToEntryInput({{$k}}, {{$.participants.ID}}, {{.ID}});"
+                  onpaste="reactToEntryInput({{$k}}, {{$.participants.ID}}, {{.ID}});">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.searchValue"}}
+                </div>
+              </div>
+            </div>
+          </form>
           <br>
-          <h5>
-            {{template "icons/clock.html" . }}
-            &nbsp; Wartelist
-          </h5>
-          <hr>
-          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist}}
-          <hr>
-          <br>
-          <h5>
-            {{template "icons/arrowRightIn.html" . }}
-            &nbsp; Ausgetragene TeilnehmerInnen
-          </h5>
-          <hr>
-          {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed}}
+          <div id="user-search-results-{{$k}}"></div>
+
+          <!-- participants -->
+          {{if .Participants}}
+            <h5>
+              {{template "icons/people.html" . }}
+              &nbsp; {{msg $ "pcpts.participants.list"}}
+            </h5>
+            <hr>
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants}}
+            <hr>
+            <br>
+          {{end}}
+
+          <!-- wait list -->
+          {{if .Waitlist}}
+            {{if .HasWaitlist}}
+              <h5>
+                {{template "icons/clock.html" . }}
+                &nbsp; {{msg $ "pcpts.wait.list"}}
+              </h5>
+              <hr>
+              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist}}
+              <hr>
+              <br>
+            {{end}}
+          {{end}}
+
+          <!-- unsubscribed users -->
+          {{if .Unsubscribed}}
+            <h5>
+              {{template "icons/arrowRightIn.html" . }}
+              &nbsp; {{msg $ "pcpts.unsubscribed"}}
+            </h5>
+            <hr>
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed}}
+          {{end}}
+
         </div>
       {{end}}
 
@@ -133,7 +175,7 @@
 <div class="page page-side">
   <div class="page-right-layout">
     <small class="text-muted">
-      TODO
+      TODO, z.Bsp. Aktionen erklären, manuelles Verwalten erklären
     </small>
   </div>
 </div>
@@ -144,6 +186,8 @@
 <script src="/public/js/participants.js"></script>
 
 <script>
+  {{template "js/participants.js" .}}
+
   $(function() {
     //adjust the nav pills
     {{if not .participants.Expired}}

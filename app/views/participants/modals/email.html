@@ -8,7 +8,7 @@
       <!-- modal header -->
       <div class="modal-header bg-darkblue border-radius-2">
         <h5 class="modal-title text-white">
-          E-Mail an TeilnehmerInnen versenden
+          {{msg $ "pcpts.email.send"}}
         </h5>
         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -25,7 +25,7 @@
 
           <!-- subject -->
           <small class="form-text text-muted">
-            Betreff der E-Mail
+            {{msg $ "pcpts.email.subject"}}
           </small>
           <div class="input-group mb-4">
             <div class="input-group-prepend">
@@ -34,27 +34,27 @@
               </span>
             </div>
             <input type="text" class="form-control rounded-right" name="conf.Subject"
-              placeholder='Betreff' minlength="3" maxlength="255">
+              placeholder='{{msg $ "email.subject"}}' minlength="3" maxlength="255">
             <div class="invalid-feedback">
               {{msg $ "validation.invalid.text.short"}}
             </div>
           </div>
 
           <small class="form-text text-muted">
-            Wählen Sie aus, ob die E-Mail an alle Veranstaltungen oder nur an ausgewählte Veranstaltungen gesendet werden soll.
+            {{msg $ "pcpts.email.select.events.info1"}}
           </small>
           <div class="form-group">
             <select class="custom-select" name="conf.AllEvents" required
               onchange="toggleEventSelection('selector-events-email');"
               id="selector-events-email">
-              <option value="true" selected>Alle Veranstaltungen</option>
-              <option value="false">Ausgewählte Veranstaltungen</option>
+              <option value="true" selected>{{msg $ "pcpts.all.events"}}</option>
+              <option value="false">{{msg $ "pcpts.selected.events"}}</option>
             </select>
           </div>
           <!-- events -->
           <div class="d-none" id="selector-events-email-options">
             <small class="form-text text-muted">
-              Wählen Sie alle Veranstaltungen aus, deren TeilnehmerInnen die E-Mail erhalten sollen. Halten Sie dazu beim Auswählen <b>STRG</b> gedrückt.
+              {{msg $ "pcpts.email.select.events.info2"}}
             </small>
             <div class="form-row">
               <div class="col">
@@ -69,23 +69,23 @@
 
           <!-- select lists -->
           <small class="form-text text-muted mt-4">
-            Wählen Sie die Listen an, an die Sie die E-Mail senden möchten.
+            {{msg $ "pcpts.email.lists.info"}}
           </small>
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" name="conf.Participants">
-            <label class="form-check-label">Eingeschriebene TeilnehmerInnen</label>
+            <label class="form-check-label">{{msg $ "pcpts.participants.list"}}</label>
           </div>
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" name="conf.WaitList">
-            <label class="form-check-label">TeilnehmerInnen auf der Warteliste (insofern vorhanden)</label>
+            <label class="form-check-label">{{msg $ "pcpts.wait.list.if.exists"}}</label>
           </div>
           <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" name="conf.Unsubscribed">
-            <label class="form-check-label">Ausgetragene TeilnehmerInnen</label>
+            <label class="form-check-label">{{msg $ "pcpts.unsubscribed"}}</label>
           </div>
 
           <small class="form-text text-muted">
-            Hier können Sie die gewünschte E-Mail verfassen.
+            {{msg $ "pcpts.email.content.info"}}
           </small>
           <!-- editor -->
           <div id="editor-e-mail-participants">

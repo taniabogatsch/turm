@@ -86,7 +86,7 @@ user.creators = Kursverantwortliche
 user.ldap = Uni Account
 user.external = Externer Account
 user.matr.nr = Matrikelnummer
-user.no.matr.nr = Keine Matrikelnummer
+user.no.matr.nr = -
 user.matr.nr.not.visible = Nicht sichtbar
 user.matr.nrs = Matrikelnummern
 user.affiliation = Zugehörigkeit
@@ -117,9 +117,14 @@ user.language = Sprache
 user.data = Nutzerdaten
 user.details = Nutzerdetails
 
+user.participant = TeilnehmerIn
+user.participants = TeilnehmerInnen
+
 # -------------------------------------------------------------------------------------------------- #
 # EMAIL
 # -------------------------------------------------------------------------------------------------- #
+
+email.subject = Betreff
 
 email.dear.ms = Sehr geehrte Frau
 email.dear.mr = Sehr geehrter Herr

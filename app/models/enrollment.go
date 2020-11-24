@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -223,8 +222,6 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 
 		//handle users who get enrolled from the wait list
 		if event.HasWaitlist {
-
-			fmt.Println("test")
 
 			status := ENROLLED
 			if course.Fee.Valid {

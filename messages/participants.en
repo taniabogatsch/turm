@@ -2,4 +2,30 @@
 # MANAGING PARTICIPANTS
 # -------------------------------------------------------------------------------------------------- #
 
+pcpts.tab = Manage participants
+
 pcpts.download.extraction.time = Extraction time
+pcpts.download.lists = Download lists
+pcpts.download.filename.info = Here you can provide a custom file name. If you do not enter a custom file name, it will be generated.
+pcpts.download.filename = Filename
+pcpts.download.select.events.info1 = Please select if you want to download a list containing the participants of all events or if you want to select specific events.
+pcpts.download.select.events.info2 = Please select all events whose participants are to be present at the list of participants. Please press <b>STRG</b> when selecting events.
+pcpts.download.lists.info = Please select all lists that you want to download.
+pcpts.download.comma.info = Please check this option if you do NOT use Excel for opening the user list.
+pcpts.download.comma = Separate entries by comma.
+
+pcpts.all.events = All events
+pcpts.selected.events = Select specific events
+
+pcpts.email.send = Send e-mail
+pcpts.email.subject = E-mail subject
+pcpts.email.select.events.info1 = Please select if you want to send an e-mail to the participants of all events or if you want to select specific events.
+pcpts.email.select.events.info2 = Please select all events to whose participants you want to send this e-mail. Please press <b>STRG</b> when selecting events.
+pcpts.email.lists.info = Please select all lists to which you want to send this e-mail.
+pcpts.email.content.info = Here you can enter the e-mail content.
+
+pcpts.actions = Actions
+pcpts.participants.list = List of participants
+pcpts.wait.list = Wait list
+pcpts.wait.list.if.exists = Wait list (if exists)
+pcpts.unsubscribed = List of unsubscribed participants

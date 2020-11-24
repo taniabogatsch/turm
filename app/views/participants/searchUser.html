@@ -1,0 +1,79 @@
+<!-- template containing user search results -->
+
+<!-- title -->
+<h5>
+  {{msg $ "search.results"}}
+</h5>
+<small class="form-text text-muted">
+  {{msg $ "search.limit" 5}}
+</small>
+<br>
+
+<!-- search results -->
+{{range $key, $value := .entries}}
+  {{if ne $key 0}}
+    <hr>
+  {{end}}
+  <div class="row mb-2">
+
+      <!-- salutation, e-mail -->
+      <div class="col-sm-3 break-text">
+        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
+        <br>
+        {{.EMail}}
+      </div>
+
+      <!-- affiliations, matriculation number -->
+      <div class="col-sm-3 break-text">
+        {{if .Affiliations.Valid}}
+          {{range $k, $v := .Affiliations.Affiliations}}
+            {{if ne $k 0}}, {{end}}{{$v}}
+          {{end}}
+        {{else}}
+          -
+        {{end}}
+        <br>
+        {{if .MatrNr.Valid}}
+          {{if eq .MatrNr.Int32 12345}}
+            {{msg $ "user.matr.nr.not.visible"}}
+          {{else}}
+            {{.MatrNr.Int32}}
+          {{end}}
+        {{else}}
+          {{msg $ "user.no.matr.nr"}}
+        {{end}}
+      </div>
+
+      <!-- status -->
+      <div class="col-sm-3 break-text">
+        {{if eq .Status 0}}
+          {{msg $ "enroll.status.enrolled"}}
+        {{else if eq .Status 1}}
+          {{msg $ "enroll.status.on.wait.list"}}
+        {{else if eq .Status 2}}
+          {{msg $ "enroll.status.awaiting.payment"}}
+        {{else if eq .Status 3}}
+          {{msg $ "enroll.status.paid"}}
+        {{else if eq .Status 4}}
+          {{msg $ "enroll.status.freed"}}
+        {{else}}
+          -
+        {{end}}
+      </div>
+
+      <!-- actions -->
+      <div class="col-sm-3 break-text">
+      </div>
+  </div>
+{{else}}
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    {{msg $ "search.no.results"}}
+  {{end}}
+{{end}}
+
+<hr>
+<br>
