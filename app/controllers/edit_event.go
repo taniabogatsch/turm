@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 )
 
+//TODO: interceptor: make sure that ID is part of this course (courseID)
+
 /*Delete event data.
 - Roles: creator and editors of the course of the event */
 func (c EditEvent) Delete(ID, courseID int) revel.Result {

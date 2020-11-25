@@ -202,6 +202,12 @@ func (event *Event) Get(tx *sqlx.Tx) (err error) {
 	return
 }
 
+/*GetColumnValue returns the value of a specific column. */
+func (event *Event) GetColumnValue(tx *sqlx.Tx, column string) (err error) {
+
+	return getColumnValue(tx, column, "events", event.ID, event)
+}
+
 //validateEnrollStatus sets the fields of the enroll status of an event
 func (event *Event) validateEnrollStatus(tx *sqlx.Tx, userID *int,
 	limit *sql.NullInt32) (err error) {

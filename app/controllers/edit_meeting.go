@@ -7,7 +7,7 @@ import (
 	"github.com/revel/revel"
 )
 
-//TODO: notify enrolled users if updated
+//TODO: interceptor: make sure that ID is part of this event (eventID)
 
 /*Edit meeting data.
 - Roles: creator and editors of the course of the meeting */
@@ -59,6 +59,8 @@ func (c EditMeeting) Delete(ID, eventID int) revel.Result {
 			errDB, err, "/course/meetings?ID="+strconv.Itoa(eventID),
 			c.Controller, "")
 	}
+
+	//TODO: notify enrolled users if deleted
 
 	c.Flash.Success(c.Message("meeting.delete.success", ID))
 	return c.Redirect(Course.Meetings, eventID)

@@ -13,6 +13,8 @@ import (
 	"github.com/revel/revel"
 )
 
+//TODO: use GetColumnValue for other functions?
+
 /*Course is a model of the course table. */
 type Course struct {
 	ID                int             `db:"id, primarykey, autoincrement"`
@@ -367,6 +369,12 @@ func (course *Course) GetForEnrollment(tx *sqlx.Tx, userID, eventID *int) (err e
 
 	err = course.validateEnrollment(tx, *userID)
 	return
+}
+
+/*GetColumnValue returns the value of a specific column. */
+func (course *Course) GetColumnValue(tx *sqlx.Tx, column string) (err error) {
+
+	return getColumnValue(tx, column, "courses", course.ID, course)
 }
 
 //validateEnrollment validates whether a user can enroll in a course

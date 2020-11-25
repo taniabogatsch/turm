@@ -1,23 +1,23 @@
 <!-- template for loading a selected participants list -->
 
 {{if .list}}
-  <div class="row font-weight-bold">
-    <div class="col-sm-3">
+  <div class="row">
+    <div class="col-sm-2 break-text">
       {{msg $ "user.participant"}}
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2 break-text">
       {{msg $ "user.affiliation"}}, {{msg $ "user.matr.nr"}}
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2 break-text">
       {{msg $ "user.course.of.studies"}}
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2 break-text">
       {{msg $ "enroll.time"}}
     </div>
-    <div class="col-sm-2">
+    <div class="col-sm-2 break-text">
       {{msg $ "enroll.status"}}
     </div>
-    <div class="col-sm-1">
+    <div class="col-sm-2 break-text">
       {{msg $ "pcpts.actions"}}
     </div>
   </div>
@@ -28,71 +28,87 @@
   <div class="row mb-1">
 
     <!-- salutation, e-mail -->
-    <div class="col-sm-3 break-text">
-      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
-      <br>
-      {{.EMail}}
+    <div class="col-sm-2 break-text">
+      <small class="text-muted">
+        {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .}}
+        <br>
+        {{.EMail}}
+      </small>
     </div>
 
     <!-- affiliations, matriculation number -->
     <div class="col-sm-2 break-text">
-      {{if .Affiliations.Valid}}
-        {{range $k, $v := .Affiliations.Affiliations}}
-          {{if ne $k 0}}, {{end}}{{$v}}
-        {{end}}
-      {{else}}
-        -
-      {{end}}
-      <br>
-      {{if .MatrNr.Valid}}
-        {{if eq .MatrNr.Int32 12345}}
-          {{msg $ "user.matr.nr.not.visible"}}
+      <small class="text-muted">
+        {{if .Affiliations.Valid}}
+          {{range $k, $v := .Affiliations.Affiliations}}
+            {{if ne $k 0}}, {{end}}{{$v}}
+          {{end}}
         {{else}}
-          {{.MatrNr.Int32}}
+          -
         {{end}}
-      {{else}}
-        {{msg $ "user.no.matr.nr"}}
-      {{end}}
+        <br>
+        {{if .MatrNr.Valid}}
+          {{if eq .MatrNr.Int32 12345}}
+            {{msg $ "user.matr.nr.not.visible"}}
+          {{else}}
+            {{.MatrNr.Int32}}
+          {{end}}
+        {{else}}
+          {{msg $ "user.no.matr.nr"}}
+        {{end}}
+      </small>
     </div>
 
     <!-- course of studies -->
     <div class="col-sm-2 break-text">
-      {{range .Studies}}
-        {{.Degree}}
-        <br>
-        {{.CourseOfStudies}}
-        <br>
-        {{.Semester}}. {{msg $ "user.semester"}}
-      {{else}}
-        -
-      {{end}}
+      <small class="text-muted">
+        {{range .Studies}}
+          {{.Degree}}
+          <br>
+          {{.CourseOfStudies}}
+          <br>
+          {{.Semester}}. {{msg $ "user.semester"}}
+        {{else}}
+          -
+        {{end}}
+      </small>
     </div>
 
     <!-- time of enrollment -->
     <div class="col-sm-2 break-text">
-      {{.TimeOfEnrollment}}
+      <small class="text-muted">
+        {{if ne .TimeOfEnrollment ""}}
+          {{.TimeOfEnrollment}}
+        {{else}}
+        {{end}}
+      </small>
     </div>
 
     <!-- status -->
     <div class="col-sm-2 break-text">
-      <!-- TODO: manage payment status -->
-      {{if eq .Status 0}}
-        {{msg $ "enroll.status.enrolled"}}
-      {{else if eq .Status 1}}
-        {{msg $ "enroll.status.on.wait.list"}}
-      {{else if eq .Status 2}}
-        {{msg $ "enroll.status.awaiting.payment"}}
-      {{else if eq .Status 3}}
-        {{msg $ "enroll.status.paid"}}
-      {{else if eq .Status 4}}
-        {{msg $ "enroll.status.freed"}}
-      {{else}}
-        {{msg $ "enroll.status.unsubscribed"}}
-      {{end}}
+      <small class="text-muted">
+        <!-- TODO: manage payment status -->
+        {{if eq .Status 0}}
+          {{msg $ "enroll.status.enrolled"}}
+        {{else if eq .Status 1}}
+          {{msg $ "enroll.status.on.wait.list"}}
+        {{else if eq .Status 2}}
+          {{msg $ "enroll.status.awaiting.payment"}}
+        {{else if eq .Status 3}}
+          {{msg $ "enroll.status.paid"}}
+        {{else if eq .Status 4}}
+          {{msg $ "enroll.status.freed"}}
+        {{else}}
+          {{msg $ "enroll.status.unsubscribed"}}
+        {{end}}
+      </small>
     </div>
 
     <!-- actions -->
-    <div class="col-sm-1 break-text">
+    <div class="col-sm-2 break-text">
+      <small class="text-muted">
+        {{template "participants/manualOptions.html" dict_addLocale $.currentLocale "status" .Status "ID" $.ID "eventID" $.eventID "userID" .ID}}
+      </small>
     </div>
   </div>
 {{end}}

@@ -12,8 +12,11 @@ import (
 	"github.com/revel/revel"
 )
 
+//TODO: interceptor and roles!
+//TODO: interceptor: event must be part of course
+
 /*Open a course for user management. */
-func (c Participants) Open(ID int) revel.Result {
+func (c Participants) Open(ID, eventID int) revel.Result {
 
 	c.Log.Debug("open course for user management", "ID", ID)
 
@@ -39,7 +42,13 @@ func (c Participants) Open(ID int) revel.Result {
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("pcpts.tab")
 
-	return c.Render(participants)
+	if eventID == 0 {
+		if len(participants.Lists) > 0 {
+			eventID = participants.Lists[0].ID
+		}
+	}
+
+	return c.Render(participants, eventID)
 }
 
 /*Download a list of participants. */
@@ -175,7 +184,56 @@ func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 		return c.Render()
 	}
 
-	return c.Render(entries)
+	return c.Render(entries, ID, eventID)
+}
+
+/*Enroll a user without validating enrollment constraints. */
+func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
+
+	c.Log.Debug("enroll user without constraints", "ID", ID,
+		"eventID", eventID, "userID", userID)
+
+	//enroll user
+	data, err := models.Enroll(&ID, &eventID, &userID)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	}
+
+	//send e-mail to the user
+	err = sendEMail(c.Controller, &data,
+		"email.subject.manual.enroll",
+		"manualEnroll")
+
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	c.Flash.Success(c.Message("enroll.manual.success"))
+	return c.Redirect(Participants.Open, ID, eventID)
+}
+
+/*Unsubscribe a user from an event. */
+func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
+
+	c.Log.Debug("unsubscribe user from an event", "ID", ID,
+		"eventID", eventID, "userID", userID)
+
+	//TODO
+
+	return c.Redirect(Participants.Open, ID, eventID)
+}
+
+/*Waitlist puts a user at the wait list of an event without validating
+enrollment constraints. */
+func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
+
+	c.Log.Debug("put user at wait list without validating constraints", "ID", ID,
+		"eventID", eventID, "userID", userID)
+
+	//TODO
+
+	return c.Redirect(Participants.Open, ID, eventID)
 }
 
 func createCSV(c *revel.Controller, participants *models.Participants,

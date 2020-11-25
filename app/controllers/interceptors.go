@@ -327,6 +327,8 @@ func (c Enrollment) auth() revel.Result {
 		return nil
 	}
 
+	//TODO: only activated accounts
+
 	c.Flash.Error(c.Message("intercept.invalid.action"))
 	return c.Redirect(App.Index)
 }

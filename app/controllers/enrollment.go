@@ -10,7 +10,8 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Enroll a user in an event. */
+/*Enroll a user in an event.
+- Roles: logged in and activated users */
 func (c Enrollment) Enroll(ID int, key string) revel.Result {
 
 	c.Log.Debug("enroll a user in an event", "ID", ID, "key", key)
@@ -32,7 +33,7 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
-	//send e-mail to the user who enrolled
+	//send e-mail to the user
 	if waitList {
 		err = sendEMail(c.Controller, &data,
 			"email.subject.wait.list",
@@ -51,7 +52,8 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*Unsubscribe a user from an event. */
+/*Unsubscribe a user from an event.
+- Roles: logged in and activated users */
 func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 	c.Log.Debug("unsubscribe a user from an event", "ID", ID)
@@ -111,7 +113,8 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*EnrollInSlot to enroll into a time slot of a day in a calendar event. */
+/*EnrollInSlot to enroll into a time slot of a day in a calendar event.
+- Roles: logged in and activated users */
 func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) revel.Result {
 
 	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "year", year, "startTime",

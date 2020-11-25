@@ -84,7 +84,7 @@
         <div class="d-inline">
           <select class="custom-select w-auto" id="parts-select-event">
             {{range $k, $v := .participants.Lists}}
-              <option value="{{.ID}}" {{if eq $k 0}}selected{{end}}>{{.Title}}</option>
+              <option value="{{.ID}}" {{if eq .ID $.eventID}}selected{{end}}>{{.Title}}</option>
             {{end}}
           </select>
         </div>
@@ -136,7 +136,7 @@
               &nbsp; {{msg $ "pcpts.participants.list"}}
             </h5>
             <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants}}
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants "ID" .CourseID "eventID" .ID}}
             <hr>
             <br>
           {{end}}
@@ -149,7 +149,7 @@
                 &nbsp; {{msg $ "pcpts.wait.list"}}
               </h5>
               <hr>
-              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist}}
+              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist "ID" .CourseID "eventID" .ID}}
               <hr>
               <br>
             {{end}}
@@ -162,7 +162,7 @@
               &nbsp; {{msg $ "pcpts.unsubscribed"}}
             </h5>
             <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed}}
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed "ID" .CourseID "eventID" .ID}}
           {{end}}
 
         </div>
@@ -210,7 +210,6 @@
       $(selector).collapse('show');
     });
 
-    //
     let selector = '.select-option-' + $('#parts-select-event').val();
     $('.select-option').collapse('hide');
     $(selector).collapse('show');

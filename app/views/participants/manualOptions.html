@@ -1,0 +1,74 @@
+<!-- template containing all manual user management options -->
+
+{{if eq .status 0}} <!-- enrolled -->
+  <!-- waitlist -->
+  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+    {{template "icons/clock.html" .}}
+  </a>
+  <!-- unsubscribe -->
+  <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
+    href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
+    {{template "icons/arrowRightIn.html" .}}
+  </a>
+
+{{else if eq .status 1}} <!-- wait list -->
+  <!-- enroll -->
+  <a class="btn btn-outline-darkblue d-inline mr-2" title='{{msg $ "title.enroll"}}'
+    href='{{url "Participants.Enroll" .ID .eventID .userID}}'>
+    {{template "icons/personPlus.html" .}}
+  </a>
+  <!-- unsubscribe -->
+  <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
+    href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
+    {{template "icons/arrowRightIn.html" .}}
+  </a>
+
+{{else if eq .status 2}} <!-- awaiting payment -->
+  <!-- waitlist -->
+  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+    {{template "icons/clock.html" .}}
+  </a>
+  <!-- unsubscribe -->
+  <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
+    href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
+    {{template "icons/arrowRightIn.html" .}}
+  </a>
+
+{{else if eq .status 3}} <!-- paid -->
+  <!-- waitlist (disabled) -->
+  <button class="btn btn-outline-secondary d-inline mr-2" disabled
+    title='{{msg $ "title.already.paid"}}'>
+    {{template "icons/clock.html" .}}
+  </button>
+  <!-- unsubscribe (disabled) -->
+  <button class="btn btn-outline-danger d-inline" disabled
+    title='{{msg $ "title.already.paid"}}'>
+    {{template "icons/arrowRightIn.html" .}}
+  </button>
+
+{{else if eq .status 4}} <!-- freed -->
+  <!-- waitlist -->
+  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+    {{template "icons/clock.html" .}}
+  </a>
+  <!-- unsubscribe -->
+  <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
+    href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
+    {{template "icons/arrowRightIn.html" .}}
+  </a>
+
+{{else}} <!-- not enrolled -->
+  <!-- enroll -->
+  <a class="btn btn-outline-darkblue d-inline mr-2" title='{{msg $ "title.enroll"}}'
+    href='{{url "Participants.Enroll" .ID .eventID .userID}}'>
+    {{template "icons/personPlus.html" .}}
+  </a>
+  <!-- waitlist -->
+  <a class="btn btn-outline-secondary d-inline" title='{{msg $ "title.wait.list"}}'
+    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+    {{template "icons/clock.html" .}}
+  </a>
+{{end}}

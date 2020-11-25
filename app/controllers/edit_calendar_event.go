@@ -9,6 +9,8 @@ import (
 	"github.com/revel/revel"
 )
 
+//TODO: interceptor: make sure that ID is part of this course (courseID)
+
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Result {
@@ -97,7 +99,8 @@ func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl)
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*DeleteDayTemplate deletes a day template. */
+/*DeleteDayTemplate deletes a day template.
+- Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) DeleteDayTemplate(ID, courseID int) revel.Result {
 
 	c.Log.Debug("delete a day template", "ID", ID, "courseID", courseID)

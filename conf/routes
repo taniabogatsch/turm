@@ -143,6 +143,10 @@ GET     /participants/download                      Participants.Download
 GET     /participants/email                         Participants.EMail
 GET     /participants/searchUser                    Participants.SearchUser
 
+GET     /participants/enroll                        Participants.Enroll
+GET     /participants/unsubscribe                   Participants.Unsubscribe
+GET     /participants/waitlist                      Participants.Waitlist
+
 
 # ---------------------------------------------------------------------------- #
 # User

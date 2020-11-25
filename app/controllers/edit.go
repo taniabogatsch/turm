@@ -580,7 +580,8 @@ func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Re
 	return c.Redirect(Course.Restrictions, ID)
 }
 
-/*DeleteRestriction deletes a restriction. */
+/*DeleteRestriction deletes a restriction.
+- Roles: creator and editors of this course. */
 func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 
 	c.Log.Debug("delete enrollment restriction", "ID", ID, "restrictionID", restrictionID)
@@ -627,6 +628,8 @@ func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) re
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
+	//TODO: do not load matriculation numbers if the user is not allowed to see them
 
 	return c.Render(users, listType)
 }

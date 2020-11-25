@@ -148,6 +148,22 @@ email.subject.event.edit = Turm2 - Information about one of your events
 email.subject.course.edit = Turm2 - Information about one of your courses
 email.subject.event.edit.manager = Turm2 - Course management - Information about one of your events
 email.subject.course.edit.manager = Turm2 - Course management - Information about one of your courses
+email.subject.manual.enroll = Turm2 - Information about manual enrollment
+email.subject.manual.wait.list = Turm2 - Information about manual enrollment to wait list
+email.subject.manual.unsubscribed = Turm2 - Information about manual unsubscribe
+
+email.edit.info.bold = The course/the event is already active!
+email.edit.info = Please select all users which you want to notify about your changes. Please also select whether you want to notify editors and/or instructors about your changes or not.
+email.edit.info.creator = <b>Please note:</b> Creators will always be notified as long as you do not choose the option 'nobody'.
+
+email.edit.option.choose = - please select -
+email.edit.option.all.users = All users
+email.edit.option.enrolled.users = Only enrolled users
+email.edit.option.wait.list.users = Only users at the wait list (if exists)
+email.edit.option.all = Editors and instructors
+email.edit.option.editors = Only editors
+email.edit.option.instructors = Only instructors
+email.edit.option.none = Nobody
 
 email.send.success = E-mail was send to %d participants.
 
@@ -180,3 +196,16 @@ enroll.status.freed = Freed
 enroll.status.unsubscribed = Unsubscribed
 
 enroll.time = Time of enrollment
+
+enroll.manual.success = Manually enrolled user.
+enroll.manual.unsubscribe.success = User was unsubscribed.
+enroll.manual.to.wait.list.success = Manually enrolled user to wait list.
+
+# -------------------------------------------------------------------------------------------------- #
+# TITLES
+# -------------------------------------------------------------------------------------------------- #
+
+title.enroll = Enroll user
+title.unsubscribe = Unsubscribe user
+title.wait.list = Enroll user to wait list
+title.already.paid = User already paid for this event!

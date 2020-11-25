@@ -247,6 +247,88 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 	return
 }
 
+/*Enroll a user via participants management. */
+func Enroll(courseID, eventID, userID *int) (data EMailData, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	course := Course{ID: *courseID}
+	if err = course.GetColumnValue(tx, "fee"); err != nil {
+		return
+	}
+	if err = course.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+	event := Event{ID: *eventID}
+	if err = event.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+
+	//set enroll status
+	status := ENROLLED
+	if course.Fee.Valid {
+		status = AWAITINGPAYMENT
+	}
+
+	waitlist := false
+	//get if already enrolled or on wait list
+	err = tx.Get(&waitlist, stmtGetUserAtWaitList, *eventID, *userID)
+	if err != nil {
+		log.Error("failed to get whether the user is already at the wait list		or not",
+			"eventID", *eventID, "userID", *userID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if waitlist {
+
+		//update status
+		_, err = tx.Exec(stmtEnrollUserFromWaitlist, *userID, *eventID, status)
+		if err != nil {
+			log.Error("failed to manually enroll user from wait list", "userID", *userID,
+				"eventID", *eventID, "status", status, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+	} else {
+
+		//enroll
+		_, err = tx.Exec(stmtEnrollUser, *userID, *eventID, status)
+		if err != nil {
+			log.Error("failed to manually enroll user", "userID", *userID, "eventID", *eventID,
+				"status", status, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+		//try to remove the user from the unsubscribed table
+		_, err = tx.Exec(stmtDeleteUserFromUnsubscribed, *userID, *eventID)
+		if err != nil {
+			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
+	//set e-mail data
+	data.CourseTitle = course.Title
+	data.EventTitle = event.Title
+	data.CourseID = course.ID
+	data.User.ID = *userID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 const (
 	stmtSelectCourseEnrollments = `
 		SELECT en.user_id, en.event_id, en.status
@@ -339,5 +421,22 @@ const (
 			WHERE id = $1
 				AND enrollment_key = CRYPT($2, enrollment_key)
 		) AS valid_key
+	`
+
+	stmtGetUserAtWaitList = `
+		SELECT EXISTS (
+			SELECT user_id
+			FROM enrolled
+			WHERE event_id = $1
+				AND user_id = $2
+				AND status = 1 /*on waitlist */
+		) AS waitlist
+	`
+
+	stmtEnrollUserFromWaitlist = `
+		UPDATE enrolled
+		SET status = $3
+		WHERE user_id = $1
+			AND event_id = $2
 	`
 )

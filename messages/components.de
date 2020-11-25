@@ -148,10 +148,13 @@ email.subject.event.edit = Turm2 - Information zu einer Ihrer Veranstaltungen
 email.subject.course.edit = Turm2 - Information zu einem Ihrer Kurse
 email.subject.event.edit.manager = Turm2 - Kursverwaltung - Information zu einer Ihrer Veranstaltungen
 email.subject.course.edit.manager = Turm2 - Kursverwaltung - Information zu einem Ihrer Kurse
+email.subject.manual.enroll = Turm2 - Information zum manuellen Einschreiben
+email.subject.manual.wait.list = Turm2 - Information zum manuellen Einschreiben auf die Warteliste
+email.subject.manual.unsubscribed = Turm2 - Information zum manuellen Austragen
 
 email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
 email.edit.info = Bitte geben Sie die NutzerInnen an, die über die vorgenommene Änderung via E-Mail informiert werden sollen. Bitte geben Sie außerdem an, ob EditorInnen und OrganisatorInnen über die Änderung via E-Mail informiert werden sollen.
-email.edit.info.creator = <b>Achtung:</b> Solange Sie nicht 'Niemand' auswählen wird der Kursverantwortliche wird über alle Änderungen benachrichtigt.
+email.edit.info.creator = <b>Achtung:</b> Solange Sie nicht 'Niemand' auswählen wird der Kursverantwortliche über alle Änderungen benachrichtigt.
 
 email.edit.option.choose = - bitte wählen -
 email.edit.option.all.users = Alle NutzerInnen
@@ -193,3 +196,16 @@ enroll.status.freed = Befreit
 enroll.status.unsubscribed = Ausgetragen
 
 enroll.time = Einschreibezeitpunkt
+
+enroll.manual.success = Manuelle Einschreibung erfolgreich.
+enroll.manual.unsubscribe.success = Manuelles austragen erfolgreich.
+enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste erfolgreich.
+
+# -------------------------------------------------------------------------------------------------- #
+# TITLES
+# -------------------------------------------------------------------------------------------------- #
+
+title.enroll = NutzerIn einschreiben
+title.unsubscribe = NutzerIn austragen
+title.wait.list = NutzerIn auf Warteliste
+title.already.paid = NuzterIn hat bereits bezahlt!

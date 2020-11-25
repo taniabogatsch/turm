@@ -39,7 +39,7 @@ func deleteByID(column, table string, value interface{}, tx *sqlx.Tx) (err error
 func updateByID(tx *sqlx.Tx, column, table string, value, selection, model interface{}) (err error) {
 
 	update := `UPDATE ` + table + ` SET ` + column +
-	 					` = $2 WHERE id = $1 RETURNING id, ` + column
+		` = $2 WHERE id = $1 RETURNING id, ` + column
 
 	if tx == nil {
 		err = app.Db.Get(model, update, selection, value)
@@ -49,10 +49,26 @@ func updateByID(tx *sqlx.Tx, column, table string, value, selection, model inter
 
 	if err != nil {
 		log.Error("failed to update value", "selection", selection,
-			"value", value, "error", err.Error())
+			"value", value, "update", update, "error", err.Error())
 		if tx != nil {
 			tx.Rollback()
 		}
+	}
+	return
+}
+
+//getColumnValue returns the column value of the specified table
+func getColumnValue(tx *sqlx.Tx, column, table string, selection, model interface{}) (err error) {
+
+	stmt := `SELECT ` + column + `
+	FROM ` + table + `
+	WHERE id = $1`
+
+	err = tx.Get(model, stmt, selection)
+	if err != nil {
+		log.Error("failed to get column value", "stmt", stmt,
+			"selection", selection, "error", err.Error())
+		tx.Rollback()
 	}
 	return
 }
