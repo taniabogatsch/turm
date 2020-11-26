@@ -104,6 +104,12 @@ validation.enrollment.already.enrolled = Sie sind bereits in diese Veranstaltung
 validation.enrollment.already.unsubscribed = Sie haben sich bereits aus dieser Veranstaltung ausgetragen.
 validation.enrollment.invalid.key = Ungültiger Einschreibeschlüssel.
 
+validation.enrollment.manual.already.enrolled = NutzerIn ist bereits eingeschrieben.
+validation.enrollment.manual.already.at.wait.list = NutzerIn ist bereits auf der Warteliste.
+validation.enrollment.manual.already.unsubscribed = NuzterIn ist bereits ausgetragen.
+validation.enrollment.manual.no.wait.list = Diese Veranstaltung besitzt keine Warteliste.
+validation.enrollment.manual.auto.enrolled = NutzerIn würde direkt aus der Warteliste in den Kurs nachrücken.
+
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EVENTS
 # -------------------------------------------------------------------------------------------------- #

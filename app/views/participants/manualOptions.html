@@ -2,10 +2,12 @@
 
 {{if eq .status 0}} <!-- enrolled -->
   <!-- waitlist -->
-  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
-    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
-    {{template "icons/clock.html" .}}
-  </a>
+  {{if .hasWaitlist}}
+    <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+      href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+      {{template "icons/clock.html" .}}
+    </a>
+  {{end}}
   <!-- unsubscribe -->
   <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
     href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
@@ -26,10 +28,12 @@
 
 {{else if eq .status 2}} <!-- awaiting payment -->
   <!-- waitlist -->
-  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
-    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
-    {{template "icons/clock.html" .}}
-  </a>
+  {{if .hasWaitlist}}
+    <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+      href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+      {{template "icons/clock.html" .}}
+    </a>
+  {{end}}
   <!-- unsubscribe -->
   <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
     href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
@@ -38,10 +42,12 @@
 
 {{else if eq .status 3}} <!-- paid -->
   <!-- waitlist (disabled) -->
-  <button class="btn btn-outline-secondary d-inline mr-2" disabled
-    title='{{msg $ "title.already.paid"}}'>
-    {{template "icons/clock.html" .}}
-  </button>
+  {{if .hasWaitlist}}
+    <button class="btn btn-outline-secondary d-inline mr-2" disabled
+      title='{{msg $ "title.already.paid"}}'>
+      {{template "icons/clock.html" .}}
+    </button>
+  {{end}}
   <!-- unsubscribe (disabled) -->
   <button class="btn btn-outline-danger d-inline" disabled
     title='{{msg $ "title.already.paid"}}'>
@@ -50,10 +56,12 @@
 
 {{else if eq .status 4}} <!-- freed -->
   <!-- waitlist -->
-  <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
-    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
-    {{template "icons/clock.html" .}}
-  </a>
+  {{if .hasWaitlist}}
+    <a class="btn btn-outline-secondary d-inline mr-2" title='{{msg $ "title.wait.list"}}'
+      href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+      {{template "icons/clock.html" .}}
+    </a>
+  {{end}}
   <!-- unsubscribe -->
   <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.unsubscribe"}}'
     href='{{url "Participants.Unsubscribe" .ID .eventID .userID}}'>
@@ -67,8 +75,10 @@
     {{template "icons/personPlus.html" .}}
   </a>
   <!-- waitlist -->
-  <a class="btn btn-outline-secondary d-inline" title='{{msg $ "title.wait.list"}}'
-    href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
-    {{template "icons/clock.html" .}}
-  </a>
+  {{if .hasWaitlist}}
+    <a class="btn btn-outline-secondary d-inline" title='{{msg $ "title.wait.list"}}'
+      href='{{url "Participants.WaitList" .ID .eventID .userID}}'>
+      {{template "icons/clock.html" .}}
+    </a>
+  {{end}}
 {{end}}

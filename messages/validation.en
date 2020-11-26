@@ -104,6 +104,12 @@ validation.enrollment.already.enrolled = You already enrolled in this event.
 validation.enrollment.already.unsubscribed = You already unsubscribed from this event.
 validation.enrollment.invalid.key = Invalid enrollment key.
 
+validation.enrollment.manual.already.enrolled = The user is already enrolled in this event.
+validation.enrollment.manual.already.at.wait.list = The user is already at the wait list of this event.
+validation.enrollment.manual.already.unsubscribed = The user already unsubscribed from this event.
+validation.enrollment.manual.no.wait.list = Diese Veranstaltung besitzt keine Warteliste.
+validation.enrollment.manual.auto.enrolled = User will get enrolled from the wait list directly.
+
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EVENTS
 # -------------------------------------------------------------------------------------------------- #

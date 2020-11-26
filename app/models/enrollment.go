@@ -4,6 +4,7 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/revel/revel"
 )
 
 /*EnrollmentStatus is a type for encoding the enrollment status. */
@@ -104,8 +105,8 @@ type EventStatus struct {
 }
 
 /*EnrollOrUnsubscribe a user in/from an event. */
-func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
-	key string) (data EMailData, waitList bool, users Users, msg string, err error) {
+func (enrolled *Enrolled) EnrollOrUnsubscribe(action EnrollOption, key string) (data EMailData,
+	waitList bool, users Users, msg string, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -114,19 +115,21 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 	}
 
 	//get relevant event information
-	event := Event{ID: *eventID}
+	event := Event{ID: enrolled.EventID}
 	if err = event.Get(tx); err != nil {
 		return
 	}
 
 	//get relevant course information
 	course := Course{ID: event.CourseID}
-	if err = course.GetForEnrollment(tx, userID, eventID); err != nil {
+	err = course.GetForEnrollment(tx, &enrolled.UserID, &enrolled.EventID)
+	if err != nil {
 		return
 	}
 
 	//get the event enroll status
-	if err = event.validateEnrollStatus(tx, userID, &course.EnrollLimitEvents); err != nil {
+	err = event.validateEnrollStatus(tx, &enrolled.UserID, &course.EnrollLimitEvents)
+	if err != nil {
 		return
 	}
 
@@ -151,21 +154,22 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 		}
 
 		//set enroll status
-		status := ENROLLED
+		enrolled.Status = ENROLLED
 		if course.Fee.Valid {
-			status = AWAITINGPAYMENT
+			enrolled.Status = AWAITINGPAYMENT
 		}
 		if event.EnrollOption == ENROLLTOWAITLIST {
-			status = ONWAITLIST
+			enrolled.Status = ONWAITLIST
 			waitList = true
 		}
 
 		//validate enrollment key (if required)
 		if event.EnrollmentKey.Valid {
 			var validKey bool
-			if err = tx.Get(&validKey, stmtValidateEnrollmentKey, *eventID, key); err != nil {
-				log.Error("failed to validate enrollment key", "eventID", *eventID, "key", key,
-					"error", err.Error())
+			err = tx.Get(&validKey, stmtValidateEnrollmentKey, enrolled.EventID, key)
+			if err != nil {
+				log.Error("failed to validate enrollment key", "eventID", enrolled.EventID,
+					"key", key, "error", err.Error())
 				tx.Rollback()
 				return
 			} else if !validKey {
@@ -176,18 +180,10 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 		}
 
 		//enroll
-		if _, err = tx.Exec(stmtEnrollUser, *userID, *eventID, status); err != nil {
-			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
-				"status", status, "error", err.Error())
-			tx.Rollback()
+		if err = enrolled.enroll(tx); err != nil {
 			return
 		}
-
-		//try to remove the user from the unsubscribed table
-		if _, err = tx.Exec(stmtDeleteUserFromUnsubscribed, *userID, *eventID); err != nil {
-			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
-				"error", err.Error())
-			tx.Rollback()
+		if err = enrolled.removeFromUnsubscribed(tx); err != nil {
 			return
 		}
 
@@ -204,19 +200,7 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 			waitList = true
 		}
 
-		//unsubscribe
-		if _, err = tx.Exec(stmtUnsubscribeUser, *userID, *eventID); err != nil {
-			log.Error("failed to unsubscribe user", "userID", *userID, "eventID", *eventID,
-				"error", err.Error())
-			tx.Rollback()
-			return
-		}
-
-		//insert into unsubscribed table
-		if _, err = tx.Exec(stmtInsertUserIntoUnsubscribed, *userID, *eventID); err != nil {
-			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
-				"error", err.Error())
-			tx.Rollback()
+		if err = enrolled.unsubscribe(tx); err != nil {
 			return
 		}
 
@@ -228,7 +212,8 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 				status = AWAITINGPAYMENT
 			}
 
-			if err = users.AutoEnrollFromWaitList(tx, eventID, status); err != nil {
+			err = users.AutoEnrollFromWaitList(tx, &enrolled.EventID, status)
+			if err != nil {
 				return
 			}
 		}
@@ -238,7 +223,7 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 	data.CourseTitle = course.Title
 	data.EventTitle = event.Title
 	data.CourseID = course.ID
-	data.User.ID = *userID
+	data.User.ID = enrolled.UserID
 	if err = data.User.Get(tx); err != nil {
 		return
 	}
@@ -248,7 +233,7 @@ func EnrollOrUnsubscribe(userID, eventID *int, action EnrollOption,
 }
 
 /*Enroll a user via participants management. */
-func Enroll(courseID, eventID, userID *int) (data EMailData, err error) {
+func (enrolled *Enrolled) Enroll(courseID *int, v *revel.Validation) (data EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -256,62 +241,55 @@ func Enroll(courseID, eventID, userID *int) (data EMailData, err error) {
 		return
 	}
 
-	course := Course{ID: *courseID}
-	if err = course.GetColumnValue(tx, "fee"); err != nil {
-		return
+	//get if already enrolled
+	enrolled.Status = ENROLLED
+	if isEnrolled, err := enrolled.hasEventStatus(tx); err != nil {
+		return data, err
+	} else if isEnrolled {
+		v.ErrorKey("validation.enrollment.manual.already.enrolled")
+		tx.Rollback()
+		return data, err
 	}
+
+	course := Course{ID: *courseID}
 	if err = course.GetColumnValue(tx, "title"); err != nil {
 		return
 	}
-	event := Event{ID: *eventID}
+	if err = course.GetColumnValue(tx, "fee"); err != nil {
+		return
+	}
+	event := Event{ID: enrolled.EventID}
 	if err = event.GetColumnValue(tx, "title"); err != nil {
 		return
 	}
 
-	//set enroll status
-	status := ENROLLED
-	if course.Fee.Valid {
-		status = AWAITINGPAYMENT
+	//get if on wait list
+	enrolled.Status = ONWAITLIST
+	waitlist, err := enrolled.hasEventStatus(tx)
+	if err != nil {
+		return
 	}
 
-	waitlist := false
-	//get if already enrolled or on wait list
-	err = tx.Get(&waitlist, stmtGetUserAtWaitList, *eventID, *userID)
-	if err != nil {
-		log.Error("failed to get whether the user is already at the wait list		or not",
-			"eventID", *eventID, "userID", *userID, "error", err.Error())
-		tx.Rollback()
-		return
+	//set enroll status
+	enrolled.Status = ENROLLED
+	if course.Fee.Valid {
+		enrolled.Status = AWAITINGPAYMENT
 	}
 
 	if waitlist {
 
 		//update status
-		_, err = tx.Exec(stmtEnrollUserFromWaitlist, *userID, *eventID, status)
-		if err != nil {
-			log.Error("failed to manually enroll user from wait list", "userID", *userID,
-				"eventID", *eventID, "status", status, "error", err.Error())
-			tx.Rollback()
+		if err = enrolled.updateStatus(tx); err != nil {
 			return
 		}
 
 	} else {
 
 		//enroll
-		_, err = tx.Exec(stmtEnrollUser, *userID, *eventID, status)
-		if err != nil {
-			log.Error("failed to manually enroll user", "userID", *userID, "eventID", *eventID,
-				"status", status, "error", err.Error())
-			tx.Rollback()
+		if err = enrolled.enroll(tx); err != nil {
 			return
 		}
-
-		//try to remove the user from the unsubscribed table
-		_, err = tx.Exec(stmtDeleteUserFromUnsubscribed, *userID, *eventID)
-		if err != nil {
-			log.Error("failed to enroll user", "userID", *userID, "eventID", *eventID,
-				"error", err.Error())
-			tx.Rollback()
+		if err = enrolled.removeFromUnsubscribed(tx); err != nil {
 			return
 		}
 	}
@@ -320,12 +298,286 @@ func Enroll(courseID, eventID, userID *int) (data EMailData, err error) {
 	data.CourseTitle = course.Title
 	data.EventTitle = event.Title
 	data.CourseID = course.ID
-	data.User.ID = *userID
+	data.User.ID = enrolled.UserID
 	if err = data.User.Get(tx); err != nil {
 		return
 	}
 
 	tx.Commit()
+	return
+}
+
+/*Waitlist enrolls a user to a wait list via participants management. */
+func (enrolled *Enrolled) Waitlist(courseID *int, v *revel.Validation) (data EMailData,
+	users Users, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	course := Course{ID: *courseID}
+	if err = course.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+	if err = course.GetColumnValue(tx, "fee"); err != nil {
+		return
+	}
+
+	//get relevant event information
+	event := Event{ID: enrolled.EventID}
+	if err = event.Get(tx); err != nil {
+		return
+	}
+
+	if !event.HasWaitlist {
+		v.ErrorKey("validation.enrollment.manual.no.wait.list")
+		tx.Rollback()
+		return
+	}
+	if event.Fullness < event.Capacity {
+		v.ErrorKey("validation.enrollment.manual.wait.list.invalid")
+		tx.Rollback()
+		return
+	}
+
+	//get if on wait list
+	enrolled.Status = ONWAITLIST
+	if waitlist, err := enrolled.hasEventStatus(tx); err != nil {
+		return data, users, err
+	} else if waitlist {
+		v.ErrorKey("validation.enrollment.manual.already.at.wait.list")
+		tx.Rollback()
+		return data, users, err
+	}
+
+	//get if already enrolled
+	enrolled.Status = ENROLLED
+	isEnrolled, err := enrolled.hasEventStatus(tx)
+	if err != nil {
+		return
+	}
+
+	if isEnrolled && event.Fullness == event.Capacity {
+
+		//validate whether the user would be auto enrolled directly after
+		//being put at the wait list
+
+		autoEnroll := false
+		err = tx.Get(&autoEnroll, stmtUserWillGetAutoEnrolled,
+			enrolled.EventID, enrolled.UserID)
+		if err != nil {
+			log.Error("failed to get if user will get auto enrolled", "enrolled", *enrolled,
+				"isEnrolled", isEnrolled, "error", err.Error())
+			tx.Rollback()
+			return
+		} else if autoEnroll {
+			v.ErrorKey("validation.enrollment.manual.auto.enrolled")
+			tx.Rollback()
+			return
+		}
+	}
+
+	enrolled.Status = ONWAITLIST
+
+	if isEnrolled {
+
+		//update status
+		if err = enrolled.updateStatus(tx); err != nil {
+			return
+		}
+
+	} else {
+
+		//enroll to wait list
+		if err = enrolled.enroll(tx); err != nil {
+			return
+		}
+		if err = enrolled.removeFromUnsubscribed(tx); err != nil {
+			return
+		}
+	}
+
+	//handle users who get enrolled from the wait list
+	if event.HasWaitlist && isEnrolled {
+
+		status := ENROLLED
+		if course.Fee.Valid {
+			status = AWAITINGPAYMENT
+		}
+
+		err = users.AutoEnrollFromWaitList(tx, &enrolled.EventID, status)
+		if err != nil {
+			return
+		}
+	}
+
+	//set e-mail data
+	data.CourseTitle = course.Title
+	data.EventTitle = event.Title
+	data.CourseID = course.ID
+	data.User.ID = enrolled.UserID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+/*Unsubscribe a user via participants management. */
+func (enrolled *Enrolled) Unsubscribe(courseID *int, v *revel.Validation) (data EMailData,
+	users Users, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	course := Course{ID: *courseID}
+	if err = course.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+	if err = course.GetColumnValue(tx, "fee"); err != nil {
+		return
+	}
+
+	//get relevant event information
+	event := Event{ID: enrolled.EventID}
+	if err = event.Get(tx); err != nil {
+		return
+	}
+
+	//get if on wait list
+	enrolled.Status = ONWAITLIST
+	waitList, err := enrolled.hasEventStatus(tx)
+	if err != nil {
+		return
+	}
+
+	if !waitList {
+		//get if already enrolled
+		enrolled.Status = ENROLLED
+		isEnrolled, err := enrolled.hasEventStatus(tx)
+		if err != nil {
+			return data, users, err
+		} else if !isEnrolled {
+			v.ErrorKey("validation.enrollment.manual.already.unsubscribed")
+			tx.Rollback()
+			return data, users, err
+		}
+	}
+
+	if err = enrolled.unsubscribe(tx); err != nil {
+		return
+	}
+
+	//handle users who get enrolled from the wait list
+	if event.HasWaitlist && !waitList {
+
+		status := ENROLLED
+		if course.Fee.Valid {
+			status = AWAITINGPAYMENT
+		}
+
+		err = users.AutoEnrollFromWaitList(tx, &enrolled.EventID, status)
+		if err != nil {
+			return
+		}
+	}
+
+	//set e-mail data
+	data.CourseTitle = course.Title
+	data.EventTitle = event.Title
+	data.CourseID = course.ID
+	data.User.ID = enrolled.UserID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+func (enrolled *Enrolled) removeFromUnsubscribed(tx *sqlx.Tx) (err error) {
+
+	//try to remove the user from the unsubscribed table
+	_, err = tx.Exec(stmtDeleteUserFromUnsubscribed, enrolled.UserID, enrolled.EventID)
+	if err != nil {
+		log.Error("failed to remove user from unsubscribed table", "enrolled",
+			*enrolled, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+func (enrolled *Enrolled) hasEventStatus(tx *sqlx.Tx) (exists bool, err error) {
+
+	stmt := stmtGetUserEnrolled
+	if enrolled.Status == ONWAITLIST {
+		stmt = stmtGetUserAtWaitList
+	} else if enrolled.Status == UNSUBSCRIBED {
+		stmt = stmtGetUserUnsubscribed
+	}
+
+	err = tx.Get(&exists, stmt, enrolled.EventID, enrolled.UserID)
+	if err != nil {
+		log.Error("failed to get if the user has the specified event status",
+			"enrolled", *enrolled, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+func (enrolled *Enrolled) updateStatus(tx *sqlx.Tx) (err error) {
+
+	_, err = tx.Exec(stmtUpdateEnrollmentStatus, enrolled.UserID,
+		enrolled.EventID, enrolled.Status)
+	if err != nil {
+		log.Error("failed to update user status", "enrolled",
+			*enrolled, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+func (enrolled *Enrolled) enroll(tx *sqlx.Tx) (err error) {
+
+	_, err = tx.Exec(stmtEnrollUser, enrolled.UserID, enrolled.EventID,
+		enrolled.Status)
+	if err != nil {
+		log.Error("failed to enroll user", "enrolled", *enrolled,
+			"error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+func (enrolled *Enrolled) unsubscribe(tx *sqlx.Tx) (err error) {
+
+	//unsubscribe
+	_, err = tx.Exec(stmtUnsubscribeUser, enrolled.UserID, enrolled.EventID)
+	if err != nil {
+		log.Error("failed to unsubscribe user", "enrolled", *enrolled,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//insert into unsubscribed table
+	_, err = tx.Exec(stmtInsertUserIntoUnsubscribed, enrolled.UserID, enrolled.EventID)
+	if err != nil {
+		log.Error("failed to remove user from unsubscribed table", "enrolled",
+			*enrolled, "error", err.Error())
+		tx.Rollback()
+	}
+
 	return
 }
 
@@ -423,6 +675,16 @@ const (
 		) AS valid_key
 	`
 
+	stmtGetUserEnrolled = `
+		SELECT EXISTS (
+			SELECT user_id
+			FROM enrolled
+			WHERE event_id = $1
+				AND user_id = $2
+				AND status != 1 /*on waitlist */
+		) AS exists
+	`
+
 	stmtGetUserAtWaitList = `
 		SELECT EXISTS (
 			SELECT user_id
@@ -430,13 +692,37 @@ const (
 			WHERE event_id = $1
 				AND user_id = $2
 				AND status = 1 /*on waitlist */
-		) AS waitlist
+		) AS exists
 	`
 
-	stmtEnrollUserFromWaitlist = `
+	stmtGetUserUnsubscribed = `
+		SELECT EXISTS (
+			SELECT user_id
+			FROM unsubscribed
+			WHERE event_id = $1
+				AND user_id = $2
+		) AS exists
+	`
+
+	stmtUpdateEnrollmentStatus = `
 		UPDATE enrolled
 		SET status = $3
 		WHERE user_id = $1
 			AND event_id = $2
+	`
+
+	stmtUserWillGetAutoEnrolled = `
+		SELECT NOT EXISTS (
+			SELECT en.user_id
+			FROM enrolled en
+			WHERE en.event_id = $1
+				AND en.status = 1 /* on wait list */
+				AND en.time_of_enrollment < (
+					SELECT e.time_of_enrollment
+					FROM enrolled e
+					WHERE e.event_id = $1
+						AND e.user_id = $2
+				)
+		) AS auto_enrolled
 	`
 )

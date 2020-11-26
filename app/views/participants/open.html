@@ -136,7 +136,7 @@
               &nbsp; {{msg $ "pcpts.participants.list"}}
             </h5>
             <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants "ID" .CourseID "eventID" .ID}}
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
             <hr>
             <br>
           {{end}}
@@ -149,7 +149,7 @@
                 &nbsp; {{msg $ "pcpts.wait.list"}}
               </h5>
               <hr>
-              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist "ID" .CourseID "eventID" .ID}}
+              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
               <hr>
               <br>
             {{end}}
@@ -162,7 +162,7 @@
               &nbsp; {{msg $ "pcpts.unsubscribed"}}
             </h5>
             <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed "ID" .CourseID "eventID" .ID}}
+            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
           {{end}}
 
         </div>

@@ -179,12 +179,13 @@ func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 	}
 
 	var entries models.Entries
-	if err := entries.Search(&ID, &eventID, &userID, &value); err != nil {
+	hasWaitlist, err := entries.Search(&ID, &eventID, &userID, &value)
+	if err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
 
-	return c.Render(entries, ID, eventID)
+	return c.Render(entries, ID, eventID, hasWaitlist)
 }
 
 /*Enroll a user without validating enrollment constraints. */
@@ -194,9 +195,13 @@ func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 		"eventID", eventID, "userID", userID)
 
 	//enroll user
-	data, err := models.Enroll(&ID, &eventID, &userID)
+	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
+	data, err := enrolled.Enroll(&ID, c.Validation)
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
 	}
 
 	//send e-mail to the user
@@ -219,8 +224,44 @@ func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 	c.Log.Debug("unsubscribe user from an event", "ID", ID,
 		"eventID", eventID, "userID", userID)
 
-	//TODO
+	//unsubscribe user
+	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
+	data, users, err := enrolled.Unsubscribe(&ID, c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
 
+	//send e-mail to the user
+	err = sendEMail(c.Controller, &data,
+		"email.subject.manual.unsubscribed",
+		"manualUnsub")
+
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	//send e-mail to each auto enrolled user
+	for _, user := range users {
+		mailData := models.EMailData{
+			User:        user,
+			CourseTitle: data.CourseTitle,
+			EventTitle:  data.EventTitle,
+			CourseID:    data.CourseID,
+		}
+		err = sendEMail(c.Controller, &mailData,
+			"email.subject.from.wait.list",
+			"fromWaitlist")
+		if err != nil {
+			return flashError(
+				errEMail, err, "", c.Controller, mailData.User.EMail)
+		}
+	}
+
+	c.Flash.Success(c.Message("enroll.manual.unsubscribe.success"))
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
@@ -231,8 +272,44 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 	c.Log.Debug("put user at wait list without validating constraints", "ID", ID,
 		"eventID", eventID, "userID", userID)
 
-	//TODO
+	//enroll user to wait list
+	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
+	data, users, err := enrolled.Waitlist(&ID, c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
 
+	//send e-mail to the user
+	err = sendEMail(c.Controller, &data,
+		"email.subject.manual.wait.list",
+		"manualWaitlist")
+
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	//send e-mail to each auto enrolled user
+	for _, user := range users {
+		mailData := models.EMailData{
+			User:        user,
+			CourseTitle: data.CourseTitle,
+			EventTitle:  data.EventTitle,
+			CourseID:    data.CourseID,
+		}
+		err = sendEMail(c.Controller, &mailData,
+			"email.subject.from.wait.list",
+			"fromWaitlist")
+		if err != nil {
+			return flashError(
+				errEMail, err, "", c.Controller, mailData.User.EMail)
+		}
+	}
+
+	c.Flash.Success(c.Message("enroll.manual.to.wait.list.success"))
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 

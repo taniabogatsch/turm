@@ -58,7 +58,8 @@ func (users *Users) Search(value *string, searchInactive *bool) (err error) {
 func (users *Users) AutoEnrollFromWaitList(tx *sqlx.Tx, eventID *int,
 	status EnrollmentStatus) (err error) {
 
-	if tx.Select(users, stmtAutoEnrollFromWaitlist, *eventID, status); err != nil {
+	err = tx.Select(users, stmtAutoEnrollFromWaitlist, *eventID, status)
+	if err != nil {
 		log.Error("failed to auto enroll users from wait list", "eventID", *eventID,
 			"status", status, "error", err.Error())
 		tx.Rollback()
@@ -130,10 +131,17 @@ const (
 
 					/* get the number of free slots in the event */
 					SELECT (ev.capacity - (
-							SELECT COUNT(e.user_id)
+
+							SELECT
+								CASE
+									WHEN COUNT(e.user_id) <= ev.capacity
+									THEN COUNT(e.user_id)
+					        ELSE ev.capacity
+					      END
 							FROM enrolled e
 							WHERE e.event_id = $1
 								AND e.status != 1 /*on waitlist*/
+
 						))
 					FROM events ev
 					WHERE ev.id = $1

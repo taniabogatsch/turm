@@ -187,7 +187,7 @@ func (entries *Entries) Get(tx *sqlx.Tx, listType string, eventID *int, viewMatr
 }
 
 /*Search all entries. */
-func (entries *Entries) Search(ID, eventID, userID *int, value *string) (err error) {
+func (entries *Entries) Search(ID, eventID, userID *int, value *string) (hasWaitlist bool, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -229,6 +229,12 @@ func (entries *Entries) Search(ID, eventID, userID *int, value *string) (err err
 			}
 		}
 	}
+
+	event := Event{ID: *eventID}
+	if err = event.GetColumnValue(tx, "has_waitlist"); err != nil {
+		return
+	}
+	hasWaitlist = event.HasWaitlist
 
 	tx.Commit()
 	return

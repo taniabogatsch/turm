@@ -81,6 +81,8 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 	//NOTE: the interceptor assures that the event ID is valid
 
+	//TODO: auto enroll users from wait list
+
 	c.Validation.Check(value,
 		revel.Min{1},
 		revel.Max{1000000},

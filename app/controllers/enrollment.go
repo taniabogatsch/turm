@@ -23,7 +23,8 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 	}
 
 	//enroll user
-	data, waitList, _, msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.ENROLL, key)
+	enrolled := models.Enrolled{EventID: ID, UserID: userID}
+	data, waitList, _, msg, err := enrolled.EnrollOrUnsubscribe(models.ENROLL, key)
 	if err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -65,7 +66,8 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	}
 
 	//unsubscribe user
-	data, waitList, users, msg, err := models.EnrollOrUnsubscribe(&userID, &ID, models.UNSUBSCRIBE, "")
+	enrolled := models.Enrolled{EventID: ID, UserID: userID}
+	data, waitList, users, msg, err := enrolled.EnrollOrUnsubscribe(models.UNSUBSCRIBE, "")
 	if err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
@@ -91,21 +93,19 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	}
 
 	//send e-mail to each auto enrolled user
-	if len(users) != 0 {
-		for _, user := range users {
-			mailData := models.EMailData{
-				User:        user,
-				CourseTitle: data.CourseTitle,
-				EventTitle:  data.EventTitle,
-				CourseID:    data.CourseID,
-			}
-			err = sendEMail(c.Controller, &mailData,
-				"email.subject.from.wait.list",
-				"fromWaitlist")
-			if err != nil {
-				return flashError(
-					errEMail, err, "", c.Controller, mailData.User.EMail)
-			}
+	for _, user := range users {
+		mailData := models.EMailData{
+			User:        user,
+			CourseTitle: data.CourseTitle,
+			EventTitle:  data.EventTitle,
+			CourseID:    data.CourseID,
+		}
+		err = sendEMail(c.Controller, &mailData,
+			"email.subject.from.wait.list",
+			"fromWaitlist")
+		if err != nil {
+			return flashError(
+				errEMail, err, "", c.Controller, mailData.User.EMail)
 		}
 	}
 
