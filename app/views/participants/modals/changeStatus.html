@@ -1,0 +1,58 @@
+<!-- template rendering the modal for changing the status of an enrolled user -->
+
+<div class="modal fade" id="change-status-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "pcpts.change.status.title"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form action='{{url "Participants.ChangeStatus"}}' method="GET"
+        class="needs-validation" novalidate id="change-status-form">
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" value="{{.participants.ID}}">
+          <!-- event ID -->
+          <input type="hidden" name="eventID" id="change-status-event-ID">
+          <!-- user ID -->
+          <input type="hidden" name="enrolled.UserID" id="change-status-user-ID">
+
+          <small class="form-text text-muted">
+            {{msg $ "pcpts.new.status.info"}}
+          </small>
+          <div class="form-group">
+            <select class="custom-select" name="enrolled.Status" required
+              id="change-status-select">
+              <option value="2">{{msg $ "enroll.status.awaiting.payment"}}</option>
+              <option value="3">{{msg $ "enroll.status.paid"}}</option>
+              <option value="4">{{msg $ "enroll.status.freed"}}</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

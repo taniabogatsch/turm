@@ -33,3 +33,19 @@ function reactToEntryInput(eventIdx, courseID, eventID) {
     $('#user-search-results-' + eventIdx).html("");
   }
 }
+
+function openChangeStatusModal(eventID, userID, status) {
+
+  $('#change-status-event-ID').val(eventID);
+  $('#change-status-user-ID').val(userID);
+
+  if (status == "awaiting payment") {
+    $('#change-status-select').val("2");
+  } else if (status == "paid") {
+    $('#change-status-select').val("3");
+  } else {
+    $('#change-status-select').val("4");
+  }
+
+  $('#change-status-modal').modal('show');
+}

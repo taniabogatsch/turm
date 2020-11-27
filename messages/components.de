@@ -151,6 +151,7 @@ email.subject.course.edit.manager = Turm2 - Kursverwaltung - Information zu eine
 email.subject.manual.enroll = Turm2 - Information zum manuellen Einschreiben
 email.subject.manual.wait.list = Turm2 - Information zum manuellen Einschreiben auf die Warteliste
 email.subject.manual.unsubscribed = Turm2 - Information zum manuellen Austragen
+email.subject.change.status = Turm2 - Ihr Bezahlstatus wurde geändert
 
 email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
 email.edit.info = Bitte geben Sie die NutzerInnen an, die über die vorgenommene Änderung via E-Mail informiert werden sollen. Bitte geben Sie außerdem an, ob EditorInnen und OrganisatorInnen über die Änderung via E-Mail informiert werden sollen.

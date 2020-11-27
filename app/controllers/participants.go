@@ -313,6 +313,36 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
+/*ChangeStatus changes the payment status of a user in an event. */
+func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) revel.Result {
+
+	c.Log.Debug("change status of user", "ID", ID, "eventID", eventID,
+		"enrolled", enrolled)
+
+	//enroll user
+	enrolled.EventID = eventID
+	data, err := enrolled.ChangeStatus(&ID, c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
+	//send e-mail to the user
+	err = sendEMail(c.Controller, &data,
+		"email.subject.change.status",
+		"changeStatus")
+
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	c.Flash.Success(c.Message("pcpts.change.status.success"))
+	return c.Redirect(Participants.Open, ID, eventID)
+}
+
 func createCSV(c *revel.Controller, participants *models.Participants,
 	conf *models.ListConf) (filepath string, err error) {
 

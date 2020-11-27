@@ -501,6 +501,59 @@ func (enrolled *Enrolled) Unsubscribe(courseID *int, v *revel.Validation) (data 
 	return
 }
 
+/*ChangeStatus updates the enrollment status of a user. */
+func (enrolled *Enrolled) ChangeStatus(courseID *int, v *revel.Validation) (data EMailData,
+	err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	course := Course{ID: *courseID}
+	if err = course.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+	if err = course.GetColumnValue(tx, "fee"); err != nil {
+		return
+	}
+
+	if !course.Fee.Valid {
+		v.ErrorKey("validation.enrollment.change.status.invalid")
+		tx.Rollback()
+		return
+	}
+
+	event := Event{ID: enrolled.EventID}
+	if err = event.GetColumnValue(tx, "title"); err != nil {
+		return
+	}
+
+	//change status
+	err = tx.Get(enrolled, stmtUpdateStatus, enrolled.EventID, enrolled.UserID,
+		enrolled.Status)
+	if err != nil {
+		log.Error("failed to update payment status", "enrolled", *enrolled,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//set e-mail data
+	data.CourseTitle = course.Title
+	data.EventTitle = event.Title
+	data.CourseID = course.ID
+	data.User.ID = enrolled.UserID
+	data.Status = enrolled.Status
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 func (enrolled *Enrolled) removeFromUnsubscribed(tx *sqlx.Tx) (err error) {
 
 	//try to remove the user from the unsubscribed table
@@ -724,5 +777,15 @@ const (
 						AND e.user_id = $2
 				)
 		) AS auto_enrolled
+	`
+
+	stmtUpdateStatus = `
+		UPDATE enrolled
+		SET status = $3
+		WHERE event_id = $1
+			AND user_id = $2
+			AND status != 0
+			AND status != 1
+		RETURNING user_id
 	`
 )

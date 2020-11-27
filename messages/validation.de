@@ -110,6 +110,8 @@ validation.enrollment.manual.already.unsubscribed = NuzterIn ist bereits ausgetr
 validation.enrollment.manual.no.wait.list = Diese Veranstaltung besitzt keine Warteliste.
 validation.enrollment.manual.auto.enrolled = NutzerIn würde direkt aus der Warteliste in den Kurs nachrücken.
 
+validation.enrollment.change.status.invalid = Dieser Kurs ist nicht bezahlpflichtig.
+
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EVENTS
 # -------------------------------------------------------------------------------------------------- #

@@ -333,6 +333,36 @@ func (c Enrollment) auth() revel.Result {
 	return c.Redirect(App.Index)
 }
 
+//auth prevents unauthorized access to controllers of type Participants.
+func (c Participants) auth() revel.Result {
+
+	c.Log.Debug("executing auth participants interceptor")
+
+	if authorized, _, err := evalHasElevatedRights(c.Controller); err != nil {
+		return flashError(
+			errTypeConv, err, "/", c.Controller, "")
+	} else if !authorized {
+		c.Flash.Error(c.Message("intercept.invalid.action"))
+		return c.Redirect(App.Index)
+	}
+
+	if c.MethodName == "SearchUser" || c.MethodName == "Enroll" ||
+		c.MethodName == "Unsubscribe" || c.MethodName == "Waitlist" ||
+		c.MethodName == "ChangeStatus" {
+
+		fittingEventID, err := evalEventIDFitsCourseID(c.Controller)
+		if err != nil {
+			return flashError(
+				errTypeConv, err, "/", c.Controller, "")
+		} else if !fittingEventID {
+			c.Flash.Error(c.Message("intercept.invalid.action"))
+			return c.Redirect(App.Index)
+		}
+	}
+
+	return nil
+}
+
 //evalEditAuth evaluates if a user is authorized to edit a course/event/meeting.
 func evalEditAuth(c *revel.Controller, table string) (authorized, expired bool, err error) {
 
@@ -402,6 +432,40 @@ func evalHasElevatedRights(c *revel.Controller) (authorized, expired bool, err e
 		return false, false, err
 	}
 
-	authorized, expired, err = user.HasElevatedRights(&ID)
-	return
+	return user.HasElevatedRights(&ID)
+}
+
+//evalEventIDFitsCourseID evaluates whether the provided event is part of the course or not
+func evalEventIDFitsCourseID(c *revel.Controller) (fittingEventID bool, err error) {
+
+	//get the course ID
+	IDStr := c.Params.Query.Get("ID") //GET request
+	if IDStr == "" {
+		IDStr = c.Params.Form.Get("ID") //POST request
+	}
+
+	//get the course ID
+	ID, err := strconv.Atoi(IDStr)
+	if err != nil {
+		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr,
+			"error", err.Error())
+		return false, err
+	}
+
+	//get the event ID
+	eventIDStr := c.Params.Query.Get("eventID") //GET request
+	if eventIDStr == "" {
+		eventIDStr = c.Params.Form.Get("eventID") //POST request
+	}
+
+	//get the event ID
+	eventID, err := strconv.Atoi(eventIDStr)
+	if err != nil {
+		c.Log.Error("failed to parse event ID from parameter", "eventIDStr",
+			eventIDStr, "error", err.Error())
+		return false, err
+	}
+
+	event := models.Event{ID: eventID}
+	return event.BelongsToCourse(&ID)
 }

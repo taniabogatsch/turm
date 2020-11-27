@@ -87,17 +87,31 @@
     <!-- status -->
     <div class="col-sm-2 break-text">
       <small class="text-muted">
-        <!-- TODO: manage payment status -->
         {{if eq .Status 0}}
           {{msg $ "enroll.status.enrolled"}}
         {{else if eq .Status 1}}
           {{msg $ "enroll.status.on.wait.list"}}
         {{else if eq .Status 2}}
           {{msg $ "enroll.status.awaiting.payment"}}
+          <!-- manage payment status -->
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openChangeStatusModal({{$.eventID}}, {{.ID}}, {{.Status}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
         {{else if eq .Status 3}}
           {{msg $ "enroll.status.paid"}}
+          <!-- manage payment status -->
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openChangeStatusModal({{$.eventID}}, {{.ID}}, {{.Status}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
         {{else if eq .Status 4}}
           {{msg $ "enroll.status.freed"}}
+          <!-- manage payment status -->
+          <a href="#no-scroll" class="badge btn-outline-darkblue"
+            onclick='openChangeStatusModal({{$.eventID}}, {{.ID}}, {{.Status}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
         {{else}}
           {{msg $ "enroll.status.unsubscribed"}}
         {{end}}

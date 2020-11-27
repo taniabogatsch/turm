@@ -208,6 +208,18 @@ func (event *Event) GetColumnValue(tx *sqlx.Tx, column string) (err error) {
 	return getColumnValue(tx, column, "events", event.ID, event)
 }
 
+/*BelongsToCourse validates if an event is part of a course. */
+func (event *Event) BelongsToCourse(courseID *int) (belongsToCourse bool, err error) {
+
+	err = app.Db.Get(&belongsToCourse, stmtEventBelongsToCourse, event.ID, *courseID)
+	if err != nil {
+		log.Error("failed to validate if an event belongs to a course", "eventID",
+			event.ID, "courseID", *courseID, "error", err.Error())
+	}
+
+	return
+}
+
 //validateEnrollStatus sets the fields of the enroll status of an event
 func (event *Event) validateEnrollStatus(tx *sqlx.Tx, userID *int,
 	limit *sql.NullInt32) (err error) {
@@ -558,5 +570,14 @@ const (
 		SELECT course_id AS id
 		FROM events e
 		WHERE e.id = $1
+	`
+
+	stmtEventBelongsToCourse = `
+		SELECT EXISTS (
+			SELECT id
+			FROM events
+			WHERE id = $1
+				AND course_id = $2
+		) AS belongs_to_course
 	`
 )

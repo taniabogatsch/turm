@@ -29,3 +29,7 @@ pcpts.participants.list = List of participants
 pcpts.wait.list = Wait list
 pcpts.wait.list.if.exists = Wait list (if exists)
 pcpts.unsubscribed = List of unsubscribed participants
+
+pcpts.change.status.title = Change payment status
+pcpts.new.status.info = Here you can select the new payment status.
+pcpts.change.status.success = Changed enrollment status.

@@ -21,6 +21,9 @@ type EMailData struct {
 	CourseTitle string
 	EventTitle  string
 	CourseID    int
+
+	//used for changing the enrollment status
+	Status EnrollmentStatus
 }
 
 /*EditEMailConfig provides all information for sending edit notification e-mails. */
