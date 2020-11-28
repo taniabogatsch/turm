@@ -225,7 +225,7 @@ func (event *Event) validateEnrollStatus(tx *sqlx.Tx, userID *int,
 	limit *sql.NullInt32) (err error) {
 
 	enrollments := Enrollments{}
-	if err = enrollments.GetByCourse(tx, userID, &event.CourseID); err != nil {
+	if err = enrollments.SelectByCourse(tx, userID, &event.CourseID); err != nil {
 		return
 	}
 

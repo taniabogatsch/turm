@@ -56,6 +56,8 @@ new.pw.success = Ein neues Passwort wurde an %s gesendet, falls diese E-Mail-Adr
 new.pw.question = Passwort vergessen?
 new.pw.info = Bitte geben Sie Ihre E-Mail-Adresse an. Wir werden ein neues Passwort an diese E-Mail-Adresse senden. Neue Passwörter können <strong>nur</strong> für <strong>externe Accounts</strong> generiert werden (kein Universitätslogin).
 
+change.pw.success = Passwort geändert.
+
 activation.tab = Account Aktivieren
 activation.page = Account Aktivieren
 

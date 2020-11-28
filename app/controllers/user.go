@@ -203,6 +203,8 @@ func (c User) NewPassword(email string) revel.Result {
 			errValidation, nil, "", c.Controller, "")
 	}
 
+	//TODO: use transaction and revel validation in models function
+
 	//we do not want to provide any information on whether an e-mail exists
 	data := models.ValidateUniqueData{
 		Column: "email",
@@ -220,7 +222,7 @@ func (c User) NewPassword(email string) revel.Result {
 	}
 
 	user := models.User{EMail: strings.ToLower(email)}
-	if err := user.NewPassword(); err != nil {
+	if err := user.GenerateNewPassword(); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -363,22 +365,72 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	)
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	//update the language
 	userID := c.Session["userID"].(string)
 	user := models.User{Language: sql.NullString{prefLanguage, true}}
 	if err := user.SetPrefLanguage(&userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("pref.lang.success",
-		user.Language.String,
-	))
+	c.Flash.Success(c.Message("pref.lang.success", user.Language.String))
 	return c.Redirect(c.Session["callPath"])
+}
+
+/*Profile page of the user.
+Roles: logged in and activated users. */
+func (c User) Profile() revel.Result {
+
+	c.Log.Debug("render profile page")
+
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	user := models.User{ID: userID}
+	if err = user.GetProfileData(); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(user)
+}
+
+/*ChangePassword of an user. */
+func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
+
+	c.Log.Debug("change password of user", "oldPw", oldPw, "newPw1", newPw1,
+		"newPw2", newPw2)
+
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	user := models.User{ID: userID,
+		Password: sql.NullString{Valid: true, String: oldPw}}
+	err = user.NewPassword(newPw1, newPw2, c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(errValidation, nil, "", c.Controller, "")
+	}
+
+	mailData := models.EMailData{User: user}
+	err = sendEMail(c.Controller, &mailData,
+		"email.subject.change.pw",
+		"changePw")
+	if err != nil {
+		return flashError(errEMail, err, "", c.Controller, user.EMail)
+	}
+
+	c.Flash.Success(c.Message("change.pw.success"))
+	return c.Redirect(User.Profile)
 }
 
 //setSession sets all user related session values.

@@ -17,6 +17,7 @@ validation.invalid.email = Bitte geben Sie eine gültige E-Mail-Adresse an.
 validation.invalid.password = Das Passwort muss aus 6 bis 127 Zeichen bestehen.
 validation.invalid.passwords = Die Passwörter müssen übereinstimmen und dürfen nur aus 6 bis 127 Zeichen bestehen.
 validation.invalid.salutation = Bitte geben Sie eine gültige Anrede an.
+validation.invalid.password.match = Das angegebene Passwort entspricht nicht Ihrem momentanen Passwort.
 
 validation.email.notUnique = Die eingegebene E-Mail-Adresse ist bereits in Verwendung. Bitte lassen Sie sich ein neues Passwort zusenden oder verwenden Sie eine andere E-Mail-Adresse.
 validation.email.ldap = Bei der angegebenen E-Mail-Adresse handelt es sich um eine Universitäts-E-Mail-Adresse. Bitte verwenden Sie den Universitätslogin.

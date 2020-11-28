@@ -46,6 +46,7 @@ func general(c *revel.Controller) revel.Result {
 	}
 
 	//TODO: is a user is logged in, render all courses of that user for the navigation bar
+	//TODO: but do so via an ajax call!
 
 	return nil
 }
@@ -298,6 +299,10 @@ func (c User) auth() revel.Result {
 
 	} else { //logged in users
 		if c.MethodName == "SetPrefLanguage" || c.MethodName == "PrefLanguagePage" {
+			return nil
+		}
+
+		if c.MethodName == "Profile" && c.Session["notActivated"] == nil {
 			return nil
 		}
 

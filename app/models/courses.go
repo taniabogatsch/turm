@@ -237,7 +237,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	course.Manage = manage
 
 	//get general course data
-	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
+	err = tx.Get(course, stmtGetCourse, course.ID, app.TimeZone)
 	if err != nil {
 		log.Error("failed to get course", "course ID", course.ID, "error", err.Error())
 		tx.Rollback()
@@ -328,7 +328,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 
 	//get general course data
-	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
+	err = tx.Get(course, stmtGetCourse, course.ID, app.TimeZone)
 	if err != nil {
 		log.Error("failed to get course for validation", "course ID", course.ID,
 			"error", err.Error())
@@ -350,7 +350,7 @@ func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 func (course *Course) GetForEnrollment(tx *sqlx.Tx, userID, eventID *int) (err error) {
 
 	//get general course data
-	err = tx.Get(course, stmtSelectCourse, course.ID, app.TimeZone)
+	err = tx.Get(course, stmtGetCourse, course.ID, app.TimeZone)
 	if err != nil {
 		log.Error("failed to get course", "course ID", course.ID, "error", err.Error())
 		tx.Rollback()
@@ -691,7 +691,7 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 var FeePattern = regexp.MustCompile("^([0-9]{1,6}([,|.][0-9]{0,2})?)?")
 
 const (
-	stmtSelectCourse = `
+	stmtGetCourse = `
 		SELECT
 			id, title, creator, subtitle, visible, active, only_ldap, parent_id,
 			description, fee, custom_email, enroll_limit_events, speaker,

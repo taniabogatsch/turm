@@ -77,6 +77,10 @@ type User struct {
 
 	//used for event enrollment
 	IsLDAP bool `db:"is_ldap"`
+
+	//used for profile page
+	ActiveEnrollments  Enrollments
+	ExpiredEnrollments Enrollments
 }
 
 /*Validate User fields of newly registered users. */
@@ -243,6 +247,37 @@ func (user *User) GetBasicData(tx *sqlx.Tx) (err error) {
 	return
 }
 
+/*GetProfileData returns all profile information of the user. */
+func (user *User) GetProfileData() (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return err
+	}
+
+	//get user data
+	if err = user.Get(tx); err != nil {
+		return
+	}
+
+	//get all active enrollments
+	err = user.ActiveEnrollments.SelectByUser(tx, &user.ID, false)
+	if err != nil {
+		return
+	}
+	//get all expired enrollments
+	err = user.ExpiredEnrollments.SelectByUser(tx, &user.ID, true)
+	if err != nil {
+		return
+	}
+
+	//TODO: get all calendar slots
+
+	tx.Commit()
+	return
+}
+
 /*Login inserts or updates a user. It provides all session values of that user. */
 func (user *User) Login() (err error) {
 
@@ -320,17 +355,58 @@ func (user *User) Register() (err error) {
 	return
 }
 
-/*NewPassword generates a new password for an user. */
-func (user *User) NewPassword() (err error) {
+/*GenerateNewPassword for an user. */
+func (user *User) GenerateNewPassword() (err error) {
 
 	password := generateCode()
 
-	err = app.Db.Get(user, stmtUpdatePassword, password, user.EMail)
+	err = app.Db.Get(user, stmtUpdatePasswordByEMail, password, user.EMail)
 	if err != nil {
 		log.Error("failed to update password", "user", user,
 			"password", password, "error", err.Error())
 	}
 	user.Password.String = password
+	return
+}
+
+/*NewPassword sets a new password for an user. */
+func (user *User) NewPassword(newPw1, newPw2 string, v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return err
+	}
+
+	if newPw1 != newPw2 {
+		v.ErrorKey("validation.invalid.passwords")
+		tx.Rollback()
+		return
+	}
+
+	//ensure that the old password is valid
+	match := false
+	err = tx.Get(&match, stmtPasswordsMatch, user.ID, user.Password)
+	if err != nil {
+		log.Error("failed to validate if passwords match", "userID",
+			user.ID, "password", user.Password, "error", err.Error())
+		tx.Rollback()
+		return
+	} else if !match {
+		v.ErrorKey("validation.invalid.password.match")
+		tx.Rollback()
+		return
+	}
+
+	err = tx.Get(user, stmtUpdatePassword, newPw1, user.ID)
+	if err != nil {
+		log.Error("failed to update password", "user", user,
+			"newPw1", newPw1, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	return
 }
 
@@ -631,12 +707,21 @@ const (
 		FROM users WHERE id = $1
 	`
 
-	stmtUpdatePassword = `
+	stmtUpdatePasswordByEMail = `
 		UPDATE users
 		SET password = CRYPT($1, gen_salt('bf'))
 		WHERE email = $2
 		RETURNING
 			/* data to send notification e-mail containing the new password */
+			id, last_name, first_name, email, language, salutation
+	`
+
+	stmtUpdatePassword = `
+		UPDATE users
+		SET password = CRYPT($1, gen_salt('bf'))
+		WHERE id = $2
+		RETURNING
+			/* data to send notification e-mail containing */
 			id, last_name, first_name, email, language, salutation
 	`
 
@@ -755,5 +840,14 @@ const (
 				AND course_id = $2
 
 		) AS authorized
+	`
+
+	stmtPasswordsMatch = `
+		SELECT EXISTS (
+			SELECT id
+			FROM users
+			WHERE id = $1
+				AND password = CRYPT($2, password)
+		) AS match
 	`
 )

@@ -60,12 +60,16 @@ type Enrolled struct {
 	UserID           int              `db:"user_id, primarykey"`
 	EventID          int              `db:"event_id, primarykey"`
 	Status           EnrollmentStatus `db:"status"`
-	EMailTraffic     bool             `db:"email_traffic"`
 	TimeOfEnrollment string           `db:"time_of_enrollment"`
+
+	//used for profile page
+	CourseID    int    `db:"course_id"`
+	CourseTitle string `db:"course_title"`
+	EventTitle  string `db:"event_title"`
 }
 
-/*GetByCourse all enrollments of a user for a specific course. */
-func (enrollments *Enrollments) GetByCourse(tx *sqlx.Tx, userID, courseID *int) (err error) {
+/*SelectByCourse selects all enrollments of a user for a specific course. */
+func (enrollments *Enrollments) SelectByCourse(tx *sqlx.Tx, userID, courseID *int) (err error) {
 
 	err = tx.Select(enrollments, stmtSelectCourseEnrollments,
 		*userID, *courseID)
@@ -74,6 +78,24 @@ func (enrollments *Enrollments) GetByCourse(tx *sqlx.Tx, userID, courseID *int) 
 			"courseID", *courseID, "error", err.Error())
 		tx.Rollback()
 	}
+	return
+}
+
+/*SelectByUser returns all enrollments of a user. */
+func (enrollments *Enrollments) SelectByUser(tx *sqlx.Tx, userID *int, expired bool) (err error) {
+
+	if expired {
+		err = tx.Select(enrollments, stmtSelectUserEnrollmentsExpired, *userID)
+	} else {
+		err = tx.Select(enrollments, stmtSelectUserEnrollments, *userID)
+	}
+
+	if err != nil {
+		log.Error("failed to select user enrollments", "userID", *userID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+
 	return
 }
 
@@ -787,5 +809,24 @@ const (
 			AND status != 0
 			AND status != 1
 		RETURNING user_id
+	`
+
+	stmtSelectUserEnrollmentsExpired = `
+		SELECT en.user_id, en.event_id, en.time_of_enrollment,
+			en.status, c.title AS course_title, e.title AS event_title
+		FROM enrolled en JOIN events e ON en.event_id = e.id
+			JOIN courses c ON e.course_id = c.id
+		WHERE en.user_id = $1
+			AND current_timestamp >= expiration_date
+	`
+
+	stmtSelectUserEnrollments = `
+		SELECT en.user_id, en.event_id, en.time_of_enrollment,
+			en.status, c.title AS course_title, e.title AS event_title,
+			c.id AS course_id
+		FROM enrolled en JOIN events e ON en.event_id = e.id
+			JOIN courses c ON e.course_id = c.id
+		WHERE en.user_id = $1
+			AND current_timestamp < expiration_date
 	`
 )

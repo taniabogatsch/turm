@@ -17,6 +17,7 @@ validation.invalid.email = Please provide a valid e-mail address.
 validation.invalid.password = The password must be between 6 - 255 characters long.
 validation.invalid.passwords = The passwords do not match and must be between 6 - 127 characters long.
 validation.invalid.salutation = Please provide a valid salutation.
+validation.invalid.password.match = The provided password does not match your current password.
 
 validation.email.notUnique = This e-mail address is already in use. Please use the 'new password' option or use a different e-mail address.
 validation.email.ldap = University e-mail address detected. Please use the university login.

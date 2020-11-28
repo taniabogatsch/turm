@@ -171,6 +171,9 @@ GET     /user/newActivationCode                     User.NewActivationCode
 GET     /user/prefLanguagePage                      User.PrefLanguagePage
 POST    /user/setPrefLanguage                       User.SetPrefLanguage
 
+GET     /user/profile                               User.Profile
+GET     /user/changePassword                        User.ChangePassword
+
 
 # ---------------------------------------------------------------------------- #
 # Else
