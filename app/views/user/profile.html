@@ -1,0 +1,131 @@
+<!-- profile -->
+
+{{template "header.html" .}}
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+<div class="page page-middle">
+
+  <h4 class="mb-3">
+    {{template "icons/person.html" .}}
+    &nbsp; {{msg $ "profile.page"}}
+  </h4>
+  <hr>
+
+  <h5>
+    {{template "icons/infoSquare.html" .}}
+    &nbsp; {{msg $ "profile.user.info"}}:
+  </h5>
+  <hr>
+  <div class="row">
+
+    <!-- salutation, e-mail, user role -->
+    <div class="col-sm-4">
+      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .user}}
+      <br>
+      {{.user.EMail}}
+      <br>
+      {{if eq .user.Role 2}}
+        {{msg $ "user.role.admin"}}
+      {{else if eq .user.Role 1}}
+        {{msg $ "user.role.creator"}}
+      {{else}}
+        {{msg $ "user.role.user"}}
+      {{end}}
+    </div>
+
+    <!-- last/first login, language -->
+    <div class="col-sm-4">
+      {{msg $ "user.first.login"}}: {{.user.FirstLogin}}
+      <br>
+      {{msg $ "user.last.login"}}: {{.user.LastLogin}}
+      <br>
+      {{msg $ "user.language.email"}}: {{.user.Language.String}}
+      <!-- manage payment status -->
+      <a href='{{url "User.PrefLanguagePage"}}' class="badge btn-outline-darkblue">
+        {{template "icons/pencil.html" . }}
+      </a>
+    </div>
+
+    <div class="col-sm-4">
+
+      <!-- ldap user -->
+      {{if .user.IsLDAP}}
+
+        <!-- affiliations -->
+        {{range $i, $t := .user.Affiliations.Affiliations}}
+          {{if ne $i 0}}<br>{{end}}
+          {{if eq $t "Student"}}
+            {{msg $ "user.affiliation.student"}}
+          {{else if eq $t "Mitarbeiter"}}
+            {{msg $ "user.affiliation.staff"}}
+          {{else if eq $t "Funktion"}}
+            {{msg $ "user.affiliation.function"}}
+          {{else}}
+            {{$t}}
+          {{end}}
+        {{end}}
+
+        {{if .MatrNr.Valid}}
+          {{if .user.Affiliations.Valid}}<br>{{end}}
+          {{.MatrNr.Int32}}
+        {{end}}
+
+        {{if or $.userAffiliations.Valid $.MatrNr.Valid}}
+          {{if .Studies}}
+            <br>
+          {{end}}
+        {{end}}
+        {{range $i, $v := .Studies}}
+          {{if ne $i 0}}<br>{{end}}
+          {{.Degree}}, {{.CourseOfStudies}}, {{.Semester}}. {{msg $ "user.semester"}}
+        {{end}}
+
+      {{else}} <!-- external user -->
+
+        <!-- change pw -->
+        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal"
+          data-target="#change-password-modal">
+          {{msg $ "profile.change.pw"}}
+        </button>
+
+      {{end}}
+
+    </div>
+  </div>
+
+  {{if .user.ActiveEnrollments}}
+    <br>
+    <br>
+    <h5>
+      {{template "icons/layoutTextSidebarReversed.html" . }}
+      &nbsp; {{msg $ "profile.active.events"}}:
+    </h5>
+    <hr>
+
+    {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ActiveEnrollments}}
+  {{end}}
+
+  {{if .user.ExpiredEnrollments}}
+    <br>
+    <br>
+    <h5>
+      {{template "icons/archive.html" . }}
+      &nbsp; {{msg $ "profile.expired.events"}}:
+    </h5>
+    <hr>
+
+    {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ExpiredEnrollments}}
+  {{end}}
+
+</div>
+
+{{template "user/changePassword.html" dict_addLocale $.currentLocale}}
+
+<div class="page page-side">
+  <br class="medium-hidden">
+</div>
+
+{{template "footer.html" .}}

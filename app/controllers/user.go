@@ -368,10 +368,17 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
+	//get the user ID
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	user := models.User{ID: userID,
+		Language: sql.NullString{prefLanguage, true}}
+
 	//update the language
-	userID := c.Session["userID"].(string)
-	user := models.User{Language: sql.NullString{prefLanguage, true}}
-	if err := user.SetPrefLanguage(&userID); err != nil {
+	if err := user.SetPrefLanguage(); err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	}
 
@@ -396,6 +403,10 @@ func (c User) Profile() revel.Result {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
+
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.ViewArgs["tabName"] = c.Message("profile.tab")
 
 	return c.Render(user)
 }
@@ -429,7 +440,7 @@ func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 		return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
 
-	c.Flash.Success(c.Message("change.pw.success"))
+	c.Flash.Success(c.Message("profile.change.pw.success"))
 	return c.Redirect(User.Profile)
 }
 

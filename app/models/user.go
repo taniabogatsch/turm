@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 	"turm/app"
@@ -459,19 +458,12 @@ func (user *User) NewActivationCode() (err error) {
 }
 
 /*SetPrefLanguage sets the preferred language of an user. */
-func (user *User) SetPrefLanguage(userIDSession *string) (err error) {
+func (user *User) SetPrefLanguage() (err error) {
 
-	user.ID, err = strconv.Atoi(*userIDSession)
+	err = app.Db.Get(user, stmtUpdateLanguage, user.Language, user.ID)
 	if err != nil {
-		log.Error("failed to parse userID from session",
-			"userIDSession", *userIDSession, "error", err.Error())
-		return
-	}
-
-	err = app.Db.Get(user, stmtUpdateLanguage, user.Language.String, user.ID)
-	if err != nil {
-		log.Error("failed to update language", "userID", user.ID,
-			"language", user.Language, "error", err.Error())
+		log.Error("failed to update language", "user", *user,
+			"error", err.Error())
 	}
 	return
 }

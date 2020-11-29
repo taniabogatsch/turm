@@ -302,15 +302,18 @@ func (c User) auth() revel.Result {
 			return nil
 		}
 
-		if c.MethodName == "Profile" && c.Session["notActivated"] == nil {
+		//activated users
+		if (c.MethodName == "Profile" || c.MethodName == "ChangePassword") &&
+			c.Session["notActivated"] == nil {
 			return nil
 		}
 
-		//logged in and not activated users
+		//not activated users
 		if c.Session["notActivated"] != nil {
 			if c.MethodName == "NewActivationCode" {
 				return nil
 			}
+
 		}
 		loggedIn = true
 	}

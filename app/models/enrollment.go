@@ -85,9 +85,11 @@ func (enrollments *Enrollments) SelectByCourse(tx *sqlx.Tx, userID, courseID *in
 func (enrollments *Enrollments) SelectByUser(tx *sqlx.Tx, userID *int, expired bool) (err error) {
 
 	if expired {
-		err = tx.Select(enrollments, stmtSelectUserEnrollmentsExpired, *userID)
+		err = tx.Select(enrollments, stmtSelectUserEnrollmentsExpired, *userID,
+			app.TimeZone)
 	} else {
-		err = tx.Select(enrollments, stmtSelectUserEnrollments, *userID)
+		err = tx.Select(enrollments, stmtSelectUserEnrollments, *userID,
+			app.TimeZone)
 	}
 
 	if err != nil {
@@ -812,21 +814,24 @@ const (
 	`
 
 	stmtSelectUserEnrollmentsExpired = `
-		SELECT en.user_id, en.event_id, en.time_of_enrollment,
-			en.status, c.title AS course_title, e.title AS event_title
+		SELECT en.user_id, en.event_id, en.status, c.title AS course_title,
+			e.title AS event_title,
+		TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id
 		WHERE en.user_id = $1
 			AND current_timestamp >= expiration_date
+		ORDER BY time_of_enrollment DESC
 	`
 
 	stmtSelectUserEnrollments = `
-		SELECT en.user_id, en.event_id, en.time_of_enrollment,
-			en.status, c.title AS course_title, e.title AS event_title,
-			c.id AS course_id
+		SELECT en.user_id, en.event_id,	en.status, c.title AS course_title,
+			e.title AS event_title, c.id AS course_id,
+			TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id
 		WHERE en.user_id = $1
 			AND current_timestamp < expiration_date
+		ORDER BY time_of_enrollment DESC
 	`
 )

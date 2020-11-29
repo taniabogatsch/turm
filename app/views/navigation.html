@@ -70,12 +70,21 @@
         </div>
       </li>
 
+      <!-- profile -->
+      <li class="nav-item active">
+        <a class="nav-link" href='{{url "User.Profile"}}'>
+          {{msg $ "profile.tab"}}
+        </a>
+      </li>
+
+      <!-- course management -->
       <li class="nav-item active d-none admin creator editor instructor">
         <a class="nav-link" href='{{url "Manage.Active"}}'>
           {{msg $ "creator.tab"}}
         </a>
       </li>
 
+      <!-- admin page -->
       <li class="nav-item active d-none admin">
         <a class="nav-link" href='{{url "Admin.Users"}}'>
           {{msg $ "admin.page"}}

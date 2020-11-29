@@ -1,0 +1,53 @@
+<!-- template rendering all enrollments of a user -->
+
+<div class="row">
+  <div class="col-sm-6">
+    {{msg $ "profile.list.events"}}
+  </div>
+  <div class="col-sm-3">
+    {{msg $ "enroll.status"}}
+  </div>
+  <div class="col-sm-3">
+    {{msg $ "enroll.time"}}
+  </div>
+</div>
+
+{{range .enrollments}}
+  <hr>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <small class="text-muted">
+        {{if ne .CourseID 0}}
+          <a href='{{url "Course.Open" .CourseID}}'>
+            {{.CourseTitle}}, {{.EventTitle}}
+          </a>
+        {{else}}
+          {{.CourseTitle}}, {{.EventTitle}}
+        {{end}}
+      </small>
+    </div>
+
+    <div class="col-sm-3">
+      <small class="text-muted">
+        {{if eq .Status 0}}
+          {{msg $ "enroll.status.enrolled"}}
+        {{else if eq .Status 1}}
+          {{msg $ "enroll.status.on.wait.list"}}
+        {{else if eq .Status 2}}
+          {{msg $ "enroll.status.awaiting.payment"}}
+        {{else if eq .Status 3}}
+          {{msg $ "enroll.status.paid"}}
+        {{else if eq .Status 4}}
+          {{msg $ "enroll.status.freed"}}
+        {{end}}
+      </small>
+    </div>
+
+    <div class="col-sm-3">
+      <small class="text-muted">
+        {{.TimeOfEnrollment}}
+      </small>
+    </div>
+  </div>
+{{end}}

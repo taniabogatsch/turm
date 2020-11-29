@@ -56,8 +56,6 @@ new.pw.success = A new password was send to %s, if that e-mail address exists. P
 new.pw.question = Forgot your password?
 new.pw.info = Please enter your e-mail address. We will send a new password to that e-mail-address. New passwords can <strong>only</strong> be generated for <strong>external accounts</strong> (non-university accounts).
 
-change.pw.success = Changed password
-
 activation.tab = Activate account
 activation.page = Activate account
 
@@ -141,3 +139,20 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
+
+# -------------------------------------------------------------------------------------------------- #
+# PROFILE
+# -------------------------------------------------------------------------------------------------- #
+
+profile.tab = Profile
+profile.page = User profile
+
+profile.user.info = User information
+profile.active.events = Active events
+profile.expired.events = Expired events
+
+profile.change.pw = Change password
+profile.change.pw.success = Changed password
+profile.old.password = Old password
+
+profile.list.events = Course and event name

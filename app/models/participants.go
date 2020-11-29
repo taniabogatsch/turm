@@ -277,7 +277,7 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status, e.email_traffic,
+      e.user_id, e.event_id, e.status,
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
@@ -289,7 +289,7 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status, e.email_traffic,
+      e.user_id, e.event_id, e.status, 
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1

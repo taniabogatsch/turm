@@ -62,7 +62,8 @@
     <!-- course of studies -->
     <div class="col-sm-2 break-text">
       <small class="text-muted">
-        {{range .Studies}}
+        {{range $i, $v := .Studies}}
+          {{if ne $i 0}}<br>{{end}}
           {{.Degree}}
           <br>
           {{.CourseOfStudies}}

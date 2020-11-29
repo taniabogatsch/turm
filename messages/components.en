@@ -90,6 +90,9 @@ user.no.matr.nr = -
 user.matr.nr.not.visible = Not visible
 user.matr.nrs = Matriculation numbers
 user.affiliation = Affiliation
+user.affiliation.student = Student
+user.affiliation.staff = Staff
+user.affiliation.function = Function
 user.course.of.studies = Course of studies
 user.degree = Pursued degree
 user.semester = Semester
@@ -113,6 +116,7 @@ user.id = User ID
 user.last.login = Last login
 user.first.login = First login
 user.language = Language
+user.language.email = E-Mail language
 
 user.data = User data
 user.details = User details
