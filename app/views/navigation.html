@@ -71,11 +71,13 @@
       </li>
 
       <!-- profile -->
-      <li class="nav-item active">
-        <a class="nav-link" href='{{url "User.Profile"}}'>
-          {{msg $ "profile.tab"}}
-        </a>
-      </li>
+      {{if .session.userID}}
+        <li class="nav-item active">
+          <a class="nav-link" href='{{url "User.Profile"}}'>
+            {{msg $ "profile.tab"}}
+          </a>
+        </li>
+      {{end}}
 
       <!-- course management -->
       <li class="nav-item active d-none admin creator editor instructor">

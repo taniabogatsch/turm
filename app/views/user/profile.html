@@ -3,126 +3,250 @@
 {{template "header.html" .}}
 
 <div class="page page-side">
-  <br class="medium-hidden">
+  <div class="page-left-layout">
+    <h4>
+      {{msg $ "profile.page"}}
+    </h4>
+    <hr>
+
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+      <!-- user information -->
+      <a class="nav-link active btn-outline-darkblue m-1" id="v-pills-info-tab" data-toggle="pill"
+        href="#v-pills-info" role="tab" aria-controls="v-pills-info" aria-selected="true">
+        {{template "icons/infoSquare.html" .}}
+        &nbsp; {{msg $ "profile.user.info"}}
+      </a>
+
+      <!-- active events -->
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-active-tab" data-toggle="pill"
+        href="#v-pills-active" role="tab" aria-controls="v-pills-active" aria-selected="false">
+        {{template "icons/layoutTextSidebarReversed.html" . }}
+        &nbsp; {{msg $ "profile.active.events"}}
+      </a>
+
+      <a class="nav-link btn-outline-darkblue m-1" id="v-pills-expired-tab" data-toggle="pill"
+        href="#v-pills-expired" role="tab" aria-controls="v-pills-expired" aria-selected="false">
+        {{template "icons/archive.html" . }}
+        &nbsp; {{msg $ "profile.expired.events"}}
+      </a>
+    </div>
+  </div>
 </div>
 
 <div class="page page-middle">
 
-  <h4 class="mb-3">
-    {{template "icons/person.html" .}}
-    &nbsp; {{msg $ "profile.page"}}
-  </h4>
-  <hr>
+  <div class="tab-content" id="v-pills-tabContent">
 
-  <h5>
-    {{template "icons/infoSquare.html" .}}
-    &nbsp; {{msg $ "profile.user.info"}}:
-  </h5>
-  <hr>
-  <div class="row">
+    <!-- user information -->
+    <div class="tab-pane fade show active" id="v-pills-info" role="tabpanel"
+      aria-labelledby="v-pills-info-tab">
 
-    <!-- salutation, e-mail, user role -->
-    <div class="col-sm-4">
-      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .user}}
+      <h4>
+        {{template "icons/infoSquare.html" .}}
+        &nbsp; {{msg $ "profile.user.info"}}
+      </h4>
+      <hr>
       <br>
-      {{.user.EMail}}
+
+      <!-- name -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.name"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .user}}
+        </div>
+      </div>
+
+      <!-- e-mail -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.email"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{.user.EMail}}
+        </div>
+      </div>
       <br>
-      {{if eq .user.Role 2}}
-        {{msg $ "user.role.admin"}}
-      {{else if eq .user.Role 1}}
-        {{msg $ "user.role.creator"}}
-      {{else}}
-        {{msg $ "user.role.user"}}
-      {{end}}
-    </div>
 
-    <!-- last/first login, language -->
-    <div class="col-sm-4">
-      {{msg $ "user.first.login"}}: {{.user.FirstLogin}}
-      <br>
-      {{msg $ "user.last.login"}}: {{.user.LastLogin}}
-      <br>
-      {{msg $ "user.language.email"}}: {{.user.Language.String}}
-      <!-- manage payment status -->
-      <a href='{{url "User.PrefLanguagePage"}}' class="badge btn-outline-darkblue">
-        {{template "icons/pencil.html" . }}
-      </a>
-    </div>
-
-    <div class="col-sm-4">
-
-      <!-- ldap user -->
-      {{if .user.IsLDAP}}
-
-        <!-- affiliations -->
-        {{range $i, $t := .user.Affiliations.Affiliations}}
-          {{if ne $i 0}}<br>{{end}}
-          {{if eq $t "Student"}}
-            {{msg $ "user.affiliation.student"}}
-          {{else if eq $t "Mitarbeiter"}}
-            {{msg $ "user.affiliation.staff"}}
-          {{else if eq $t "Funktion"}}
-            {{msg $ "user.affiliation.function"}}
+      <!-- role -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.role"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{if eq .user.Role 2}}
+            {{msg $ "user.role.admin"}}
+          {{else if eq .user.Role 1}}
+            {{msg $ "user.role.creator"}}
           {{else}}
-            {{$t}}
+            {{msg $ "user.role.user"}}
           {{end}}
-        {{end}}
+        </div>
+      </div>
+      <br>
 
-        {{if .MatrNr.Valid}}
-          {{if .user.Affiliations.Valid}}<br>{{end}}
-          {{.MatrNr.Int32}}
-        {{end}}
+      <!-- language -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.language.email"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{.user.Language.String}}
+        </div>
+      </div>
+      <br>
 
-        {{if or $.userAffiliations.Valid $.MatrNr.Valid}}
-          {{if .Studies}}
-            <br>
-          {{end}}
-        {{end}}
-        {{range $i, $v := .Studies}}
-          {{if ne $i 0}}<br>{{end}}
-          {{.Degree}}, {{.CourseOfStudies}}, {{.Semester}}. {{msg $ "user.semester"}}
-        {{end}}
+      <!-- first login -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.first.login"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{.user.FirstLogin}}
+        </div>
+      </div>
 
-      {{else}} <!-- external user -->
+      <!-- last login -->
+      <div class="row">
+        <div class="col-sm-3">
+          <small class="text-muted">
+            {{msg $ "user.last.login"}}:
+          </small>
+        </div>
+        <div class="col-sm-9">
+          {{.user.LastLogin}}
+        </div>
+      </div>
+      <br>
 
-        <!-- change pw -->
-        <button type="button" class="btn btn-outline-darkblue" data-toggle="modal"
+      <!-- affiliation -->
+      {{if .user.IsLDAP}}
+        <div class="row">
+          <div class="col-sm-3">
+            <small class="text-muted">
+              {{msg $ "user.affiliation"}}:
+            </small>
+          </div>
+          <div class="col-sm-9">
+            {{range $i, $t := .user.Affiliations.Affiliations}}
+              {{if ne $i 0}}<br>{{end}}
+              {{if eq $t "Student"}}
+                {{msg $ "user.affiliation.student"}}
+              {{else if eq $t "Mitarbeiter"}}
+                {{msg $ "user.affiliation.staff"}}
+              {{else if eq $t "Funktion"}}
+                {{msg $ "user.affiliation.function"}}
+              {{else}}
+                {{$t}}
+              {{end}}
+            {{end}}
+          </div>
+        </div>
+        <br>
+      {{end}}
+
+      <!-- matriculation number -->
+      {{if .user.MatrNr.Valid}}
+        <div class="row">
+          <div class="col-sm-3">
+            <small class="text-muted">
+              {{msg $ "user.matr.nr"}}:
+            </small>
+          </div>
+          <div class="col-sm-9">
+            {{if .user.MatrNr.Valid}}
+              {{.user.MatrNr.Int32}}
+            {{end}}
+          </div>
+        </div>
+        <br>
+      {{end}}
+
+      <!-- courses of studies -->
+      {{if .user.Studies}}
+        <div class="row">
+          <div class="col-sm-3">
+            <small class="text-muted">
+              {{msg $ "user.course.of.studies"}}:
+            </small>
+          </div>
+          <div class="col-sm-9">
+            {{range $i, $v := .user.Studies}}
+              {{if ne $i 0}}<hr>{{end}}
+              {{.Degree}}
+              <br>
+              {{.CourseOfStudies}}
+              <br>
+              {{.Semester}}. {{msg $ "user.semester"}}
+            {{end}}
+          </div>
+        </div>
+        <br>
+      {{end}}
+
+      <!-- change pw -->
+      <hr>
+      {{if not .user.IsLDAP}}
+        <button type="button" class="btn btn-outline-darkblue d-inline" data-toggle="modal"
           data-target="#change-password-modal">
           {{msg $ "profile.change.pw"}}
         </button>
-
       {{end}}
+      <button type="button" class="btn btn-outline-darkblue d-inline" data-toggle="modal"
+        data-target="#change-language-modal">
+        {{msg $ "profile.change.language"}}
+      </button>
+    </div>
 
+    <!-- active events -->
+    <div class="tab-pane fade" id="v-pills-active" role="tabpanel"
+      aria-labelledby="v-pills-active-tab">
+
+      {{if .user.ActiveEnrollments}}
+        <h4>
+          {{template "icons/layoutTextSidebarReversed.html" . }}
+          &nbsp; {{msg $ "profile.active.events"}}
+        </h4>
+        <hr>
+        <br>
+
+        {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ActiveEnrollments}}
+      {{end}}
+    </div>
+
+    <!-- expired events -->
+    <div class="tab-pane fade" id="v-pills-expired" role="tabpanel"
+      aria-labelledby="v-pills-expired-tab">
+
+      {{if .user.ExpiredEnrollments}}
+        <h4>
+          {{template "icons/archive.html" . }}
+          &nbsp; {{msg $ "profile.expired.events"}}
+        </h4>
+        <hr>
+        <br>
+
+        {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ExpiredEnrollments}}
+      {{end}}
     </div>
   </div>
 
-  {{if .user.ActiveEnrollments}}
-    <br>
-    <br>
-    <h5>
-      {{template "icons/layoutTextSidebarReversed.html" . }}
-      &nbsp; {{msg $ "profile.active.events"}}:
-    </h5>
-    <hr>
-
-    {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ActiveEnrollments}}
-  {{end}}
-
-  {{if .user.ExpiredEnrollments}}
-    <br>
-    <br>
-    <h5>
-      {{template "icons/archive.html" . }}
-      &nbsp; {{msg $ "profile.expired.events"}}:
-    </h5>
-    <hr>
-
-    {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ExpiredEnrollments}}
-  {{end}}
-
 </div>
 
-{{template "user/changePassword.html" dict_addLocale $.currentLocale}}
+{{template "user/modals/changePassword.html" .}}
+{{template "user/modals/changeLanguage.html" .}}
 
 <div class="page page-side">
   <br class="medium-hidden">

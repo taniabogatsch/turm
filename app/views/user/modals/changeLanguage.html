@@ -1,0 +1,51 @@
+<!-- template rendering the modal for changing the password of an user -->
+
+<div class="modal fade" id="change-language-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "profile.change.language"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form action='{{url "User.SetPrefLanguage"}}' method="POST"
+        class="needs-validation" novalidate>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <small class="form-text text-muted">
+            {{msg $ "pref.lang.info.long"}}
+          </small>
+          <!-- language selection -->
+          <select name="prefLanguage" class="custom-select">
+            {{range .languages}}
+              <option value="{{.}}" {{if eq $.currentLocale .}}selected="selected"{{end}}>
+                {{.}}
+              </option>
+            {{end}}
+          </select>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -78,17 +78,18 @@
       <br>
 
       <h5>
-        <div class="d-inline">
+        <div>
           {{msg $ "event"}}: &nbsp;
         </div>
-        <div class="d-inline">
-          <select class="custom-select w-auto" id="parts-select-event">
-            {{range $k, $v := .participants.Lists}}
-              <option value="{{.ID}}" {{if eq .ID $.eventID}}selected{{end}}>{{.Title}}</option>
-            {{end}}
-          </select>
-        </div>
       </h5>
+      <div class="w-100">
+        <select class="custom-select" id="parts-select-event">
+          {{range $k, $v := .participants.Lists}}
+            <option value="{{.ID}}" {{if eq .ID $.eventID}}selected{{end}}>{{.Title}}</option>
+          {{end}}
+        </select>
+      </div>
+      <br>
 
       <!-- range events and their participants -->
       {{range $k, $v := .participants.Lists}}

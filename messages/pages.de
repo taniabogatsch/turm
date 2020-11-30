@@ -155,4 +155,6 @@ profile.change.pw = Passwort ändern
 profile.change.pw.success = Passwort geändert.
 profile.old.password = Altes Passwort
 
+profile.change.language = E-Mail Sprache ändern
+
 profile.list.events = Kurs- und Veranstaltungsname

@@ -155,4 +155,6 @@ profile.change.pw = Change password
 profile.change.pw.success = Changed password
 profile.old.password = Old password
 
+profile.change.language = Change e-mail language
+
 profile.list.events = Course and event name
