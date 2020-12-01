@@ -275,8 +275,8 @@ CREATE TABLE slots (
 CREATE TABLE calendar_exceptions (
   id                  serial                    PRIMARY KEY,
   calendar_event_id   integer                     NOT NULL,
-  start_time          timestamp with time zone,
-  end_time            timestamp with time zone,
+  exception_start         timestamp with time zone NOT NULL,
+  exception_end           timestamp with time zone NOT NULL,
   annotation          varchar(255),
 
   FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE

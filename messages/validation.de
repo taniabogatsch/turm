@@ -126,3 +126,13 @@ validation.calendarEvent.overlappingTimespanSlot = Die angegebene Zeit überschn
 validation.calendarEvent.overlappingTimespanExeption = Innerhalb der angegebenen Zeit befindet sich eine Ausnahme welche den Slot blockiert.
 validation.calendarEvent.deleteDayTemplateNotEmpty = Es gibt noch Slots welche sich auf diesem DayTemplate befinden.
 validation.calendarEvent.deleteSlotToCloseToStart = Kurzfristiges austragen (< 1h) nicht möglich. Bitte wenden sie sich an den Kursverantworlichen bei dringenden Fällen.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EXCEPTIONS
+# -------------------------------------------------------------------------------------------------- #
+
+validation.calendar.exceptions.invalid.time = Die angegebene Zeit ist nicht im gültigen 24h format
+validation.calendarEvent.conversion.string.to.int = Die umwandlung der Datentypen ist fehlgeschlagen, bitte wenden sie sich an den Support.
+validation.calendarEvent.overlapping.exception = Eine andere Ausnahme belegt bereits einen Teil der angegebenen Zeitspanne.
+calendar.event.exception.start.in.past =  Die Startzeit der Ausnahme befindet sich in der Vergangenheit.
+validation.calendar.event.exception.start.after.end = Das Ende von Ausnahmen muss nach deren Anfang liegen.
