@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 	"turm/app/models"
@@ -151,36 +150,42 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	exception.CalendarEventID = ID
+	data := models.EMailData{}
+	users := models.Users{}
+	var err error
 
 	//if for Insert, else for Update
 	if exception.ID == 0 {
-		data, users, err := exception.Insert(c.Validation)
-
-		if err != nil {
-			return flashError(
-				errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
-				c.Controller, "")
-		} else if c.Validation.HasErrors() {
-			return flashError(
-				errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
-				c.Controller, "")
-		}
-
-		//TODO
-		fmt.Println(data)
-		fmt.Println(users)
+		data, users, err = exception.Insert(c.Validation)
 
 	} else {
-		err := exception.Update(c.Validation)
+		data, users, err = exception.Update(c.Validation)
+	}
 
+	if err != nil {
+		return flashError(
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	//send e-mail to each user that got removed from its slot
+	for _, user := range users {
+		mailData := models.EMailData{
+			User:        user,
+			CourseTitle: data.CourseTitle,
+			EventTitle:  data.EventTitle,
+			CourseID:    data.CourseID,
+		}
+		err = sendEMail(c.Controller, &mailData,
+			"email.subject.from.slot",
+			"manualRemove")
 		if err != nil {
 			return flashError(
-				errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
-				c.Controller, "")
-		} else if c.Validation.HasErrors() {
-			return flashError(
-				errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
-				c.Controller, "")
+				errEMail, err, "", c.Controller, mailData.User.EMail)
 		}
 	}
 

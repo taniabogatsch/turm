@@ -157,6 +157,7 @@ email.subject.manual.wait.list = Turm2 - Information about manual enrollment to 
 email.subject.manual.unsubscribed = Turm2 - Information about manual unsubscribe
 email.subject.change.status = Turm2 - Your payment status was updated
 email.subject.change.pw = Turm2 - Your password has been changed
+email.subject.from.slot = Turm2 - Your slot was removed manually
 
 email.edit.info.bold = The course/the event is already active!
 email.edit.info = Please select all users which you want to notify about your changes. Please also select whether you want to notify editors and/or instructors about your changes or not.

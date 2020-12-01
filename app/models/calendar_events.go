@@ -26,7 +26,7 @@ type CalendarEvent struct {
 	Days DayTmpls
 
 	//all upcoming exceptions
-	Exceptions []Exception
+	Exceptions Exceptions
 
 	//exeptions of this week
 	ExceptionsOfWeek ExceptionsOfWeek
@@ -66,6 +66,7 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 	}
 
 	for i := range *events {
+
 		//get all day templates of this event
 		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, monday)
 		if err != nil {
@@ -80,6 +81,11 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 		//set the current week
 		_, (*events)[i].Week = monday.ISOWeek()
 		(*events)[i].Year = monday.Year()
+
+		//get all calendar exceptions
+		if err = (*events)[i].Exceptions.Get(tx, &(*events)[i].ID); err != nil {
+			return
+		}
 	}
 
 	if txWasNil {

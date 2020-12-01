@@ -23,11 +23,14 @@ type Exception struct {
 	Annotation       sql.NullString `db:"annotation"`
 
 	//used to get the front end values
-	ExceptionStart     string ``
-	ExceptionEnd       string ``
+	ExceptionStart     string `db:"exception_start_str"`
+	ExceptionEnd       string `db:"exception_end_str"`
 	ExceptionStartTime string ``
 	ExceptionEndTime   string ``
 }
+
+/*Exceptions is a slice of exceptions. */
+type Exceptions []Exception
 
 /*Get all exceptions of a day . Monday specifies the week for which all exceptions
 must be loaded and weekday specifies the day. */
@@ -36,7 +39,7 @@ func (excepts *ExceptionsOfWeek) Get(tx *sqlx.Tx, monday time.Time) (err error) 
 	//end time is
 	endTime := monday.AddDate(0, 0, 7)
 
-	err = tx.Select(excepts, stmtSelectExeptions, monday, endTime)
+	err = tx.Select(excepts, stmtSelectExceptionsOfWeek, monday, endTime)
 	if err != nil {
 		log.Error("failed to get exceptions of day template", "monday", monday,
 			"error", err.Error())
@@ -235,13 +238,26 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 }
 
 /*Update an exception. */
-func (except *Exception) Update(v *revel.Validation) (err error) {
+func (except *Exception) Update(v *revel.Validation) (data EMailData, users Users, err error) {
 	//TODO
 	return
 }
 
+/*Get all exceptions that are still running. */
+func (excepts *Exceptions) Get(tx *sqlx.Tx, eventID *int) (err error) {
+
+	err = tx.Select(excepts, stmtSelectExceptions, *eventID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get exceptions", "eventID", *eventID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
 const (
-	stmtSelectExeptions = `
+	stmtSelectExceptionsOfWeek = `
     SELECT id, calendar_event_id, exception_start, exception_end, annotation
     FROM calendar_exceptions
     WHERE (
@@ -306,4 +322,14 @@ const (
 				)
 		)
 	`
+
+	stmtSelectExceptions = `
+    SELECT id, calendar_event_id, annotation,
+			TO_CHAR (exception_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS exception_start_str,
+			TO_CHAR (exception_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS exception_end_str
+    FROM calendar_exceptions
+    WHERE calendar_event_id = $1
+			AND exception_end > now()
+		ORDER BY exception_start ASC
+  `
 )

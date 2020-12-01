@@ -259,12 +259,17 @@
 
       {{if .Exceptions}}
         <div class="edit-show d-none">
-          Hinzugefügte Ausnahmen:
           <hr>
+          Hinzugefügte Ausnahmen:
+          <small class="text-muted">
+          <ul>
           {{range .Exceptions}}
-            {{.ExceptionStart}}, {{.ExceptionEnd}}, {{.Annotation}}
-            <br>
+            <li>
+              {{if .Annotation.Valid}}{{.Annotation.String}}: {{end}}{{.ExceptionStart}} bis {{.ExceptionEnd}}
+            </li>
           {{end}}
+        </ul>
+      </small>
         </div>
       {{end}}
 
