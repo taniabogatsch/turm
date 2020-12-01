@@ -52,6 +52,17 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 	startTime := CustomTime{}
 	endTime := CustomTime{}
 
+	if except.Annotation.String != "" {
+
+		except.Annotation.String = strings.TrimSpace(except.Annotation.String)
+		v.Check(except.Annotation.String,
+			revel.MinSize{3},
+			revel.MaxSize{255},
+		).MessageKey("validation.invalid.text.short")
+
+		except.Annotation.Valid = true
+	}
+
 	if !startTime.SetTime(except.ExceptionStartTime) {
 		v.ErrorKey("validation.calendar.exceptions.invalid.time")
 		return
@@ -146,7 +157,8 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 }
 
 /*Insert an exception. */
-func (except *Exception) Insert(v *revel.Validation) (err error) {
+func (except *Exception) Insert(v *revel.Validation) (data EMailData, users Users,
+	err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -162,11 +174,57 @@ func (except *Exception) Insert(v *revel.Validation) (err error) {
 		return
 	}
 
-	//insert Exception TODO: annotation to true if not empty
+	//insert Exception
 	err = tx.Get(except, stmtInsertException, except.CalendarEventID,
 		except.ExceptionStartDB, except.ExceptionEndDB, except.Annotation)
 	if err != nil {
 		log.Error("failed to insert Exception", "exception", *except,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	var userIDs []int
+
+	//delete all enrolled users in the time span
+
+	//get all the users ID in Timespan
+	err = tx.Select(&userIDs, stmtSelectUserIDInExeptionTime, except.CalendarEventID,
+		except.ExceptionStartDB, except.ExceptionEndDB)
+	if err != nil {
+		log.Error("failed to get User IDs within Exception Timespan", "exception", *except,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	for _, userID := range userIDs {
+
+		user := User{ID: userID}
+
+		err = user.Get(tx)
+		if err != nil {
+			return
+		}
+
+		users = append(users, user)
+
+	}
+
+	//get CourseID, CourseTitle and EventTitle
+	err = tx.Get(&data, stmtGetCourseInfo, except.CalendarEventID)
+	if err != nil {
+		log.Error("failed to get CourseID, CourseTitle and EventTitle", "exception", *except,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//delete user
+	_, err = tx.Exec(stmtDeleteUserInExeptionTime, except.CalendarEventID,
+		except.ExceptionStartDB, except.ExceptionEndDB)
+	if err != nil {
+		log.Error("failed to delete User within Exception Timespan", "exception", *except,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -215,5 +273,37 @@ const (
 						OR 	(($1 <= exception_start) AND ($2 >= exception_end))
 				)
 		) AS exceptionOverlapping
+	`
+
+	stmtSelectUserIDInExeptionTime = `
+		SELECT s.user_id
+		FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
+		WHERE t.calendar_event_id = $1
+		AND(
+						($2 >= s.start_time AND $2 < s.end_time)
+				OR 	($3 <= s.end_time AND $3 > s.start_time)
+				OR 	(($2 <= s.start_time) AND ($3 >= s.end_time))
+		)
+	`
+
+	stmtGetCourseInfo = `
+		SELECT c.id AS course_id, c.title AS course_title, ce.title AS event_title
+		FROM calendar_events ce JOIN courses c ON ce.course_id = c.id
+		WHERE ce.id = $1
+	`
+
+	stmtDeleteUserInExeptionTime = `
+		DELETE
+		FROM slots
+		WHERE id IN (
+			SELECT s.id
+			FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
+			WHERE t.calendar_event_id = $1
+			AND(
+							($2 >= s.start_time AND $2 < s.end_time)
+					OR 	($3 <= s.end_time AND $3 > s.start_time)
+					OR 	(($2 <= s.start_time) AND ($3 >= s.end_time))
+				)
+		)
 	`
 )
