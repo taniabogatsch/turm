@@ -26,9 +26,9 @@ type CalendarEvent struct {
 	Days DayTmpls
 
 	//all upcoming exceptions
-	Exceptions Exceptions
+	Exceptions []Exception
 
-	//exeptions of this week [0....6]
+	//exeptions of this week
 	ExceptionsOfWeek ExceptionsOfWeek
 	//transformed schedule for easy front end usage
 	ScheduleWeek []Schedule
@@ -132,12 +132,8 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
 
 	//get the exceptions of each day of that week (as defined by monday)
-	event.ExceptionsOfWeek = append(event.ExceptionsOfWeek, Exceptions{}, Exceptions{},
-		Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{}, Exceptions{})
-	for i := 0; i < 7; i++ {
-		if err = event.ExceptionsOfWeek[i].Get(tx, monday, i); err != nil {
-			return
-		}
+	if err = event.ExceptionsOfWeek.Get(tx, monday); err != nil {
+		return
 	}
 
 	day := monday

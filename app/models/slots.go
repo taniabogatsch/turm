@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 	"turm/app"
 
@@ -45,7 +44,7 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailDa
 	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
 		slot.Start, slot.End, time.Now())
 	if err != nil {
-		log.Error("failed to get Slot", "slot", *slot,
+		log.Error("failed to insert Slot", "slot", *slot,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -153,28 +152,25 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx, calendarEventID int
 		return
 	}
 
-	fmt.Println(slotUsed)
 	if slotUsed {
 		v.ErrorKey("validation.calendarEvent.overlappingTimespanSlot")
 		return
 	}
 
 	//check for exeption in that timespan
-	//TODO: validate once we have exceptions
-	/*
-		slotUsed = false
-		err = tx.Get(slotUsed, stmtExistsOverlappingExeption, slot.DayTmplID,
-			slotStartTime.Value, slotEndTime.Value)
-		if err != nil {
-			log.Error("failed to get exist of Exeption",
-				"error", err.Error())
-		}
 
-		if slotUsed {
-			v.ErrorKey("validation.calendarEvent.overlappingTimespanExeption")
-			return
-		}
-	*/
+	slotUsed = false
+	err = tx.Get(&slotUsed, stmtExistsOverlappingExeption, calendarEventID,
+		slot.Start, slot.End)
+	if err != nil {
+		log.Error("failed to get exist of Exeption",
+			"error", err.Error())
+	}
+
+	if slotUsed {
+		v.ErrorKey("validation.calendarEvent.overlappingTimespanExeption")
+		return
+	}
 
 	return
 }
@@ -252,13 +248,12 @@ const (
 	stmtExistsOverlappingExeption = `
 		SELECT EXISTS(
 			SELECT true
-			FROM day_tmpls d JOIN calendar_events e ON d.calendar_event_id = e.id
-				JOIN calendar_exceptions ex ON e.id = ex.calendar_event_id
-			WHERE d.id = $1
+			FROM calendar_exceptions
+			WHERE calendar_event_id = $1
 				AND (
-								 ($2 BETWEEN (start_time) AND (end_time))
-							OR ($3 BETWEEN (start_time) AND (end_time))
-							OR (($2 <= start_time) AND ($3 >= end_time))
+									($2 >= exception_start AND $2 < exception_end)
+							 OR ($3 <= exception_end 	AND $3 > exception_start)
+							OR (($2 <= exception_start) AND ($3 >= exception_end))
 						)
 		) AS slotUsed
 	`
