@@ -18,9 +18,9 @@ type EMailData struct {
 	URL string
 
 	//used for enrollment
-	CourseTitle string
-	EventTitle  string
-	CourseID    int
+	CourseTitle string `db:"course_title"`
+	EventTitle  string `db:"event_title"`
+	CourseID    int    `db:"course_id"`
 
 	//used for changing the enrollment status
 	Status EnrollmentStatus
