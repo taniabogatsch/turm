@@ -9,6 +9,32 @@ function getGroups(prefix, div) {
   })
 }
 
+function searchCourse(valDiv, resultDiv, dropdownID) {
+
+  let dropdown = document.getElementById(resultDiv);
+  let contains = dropdown.classList.contains("show");
+
+  let value = $('#' + valDiv).val();
+  if (value != "") {
+    $.get('{{url "Course.Search"}}', {
+      "value": value
+    }, function(data) {
+      $('#' + resultDiv).html(data);
+    })
+
+    if (!contains) {
+      $('#' + dropdownID).dropdown('toggle');
+    }
+    dropdown.classList.remove("d-none");
+  } else {
+
+    if (contains) {
+      $('#' + dropdownID).dropdown('toggle');
+    }
+    dropdown.classList.add("d-none");
+  }
+}
+
 //on-load function to hide all elements that are not to be seen by users without the respective authority
 $(function() {
 

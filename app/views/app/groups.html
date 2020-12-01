@@ -15,20 +15,23 @@
               {{if not .Groups}}
                 <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
                   onclick='confirmPOSTModal({{msg $ "group.delete.title"}},
-                  {{msg $ "group.delete.question" .Name}}, "{{url "Admin.DeleteGroup" .ID}}#");'>
+                  {{msg $ "group.delete.question" .Name}}, "{{url "Admin.DeleteGroup" .ID}}#");'
+                  title='{{msg $ "title.delete.group"}}'>
                   {{template "icons/trash.html" . }}
                 </a>
               {{end}}
               <!-- update -->
               <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
                 onclick='openAdminGroupModal({{.ID}}, {{.ParentID}}, {{.InheritsLimits}}, {{url "Admin.UpdateGroup"}},
-                {{msg $ "group.update"}}, {{.Name}}, {{.ChildHasLimits}}, {{.CourseLimit.Int32}});'>
+                {{msg $ "group.update"}}, {{.Name}}, {{.ChildHasLimits}}, {{.CourseLimit.Int32}});'
+                title='{{msg $ "title.edit.group"}}'>
                 {{template "icons/pencil.html" . }}
               </a>
               <!-- insert -->
               <a href="#no-scroll" class="btn btn-outline-darkblue float-right ml-3"
                 onclick='openAdminGroupModal("", {{.ID}}, {{.InheritsLimits}},
-                {{url "Admin.InsertGroup"}}, {{msg $ "group.insert"}}, "", false, "");'>
+                {{url "Admin.InsertGroup"}}, {{msg $ "group.insert"}}, "", false, "");'
+                title='{{msg $ "title.add.group"}}'>
                 {{template "icons/plus.html" . }}
               </a>
             {{end}}
@@ -69,7 +72,8 @@
     <!-- open course -->
     <form action='{{url "Course.Open" .CourseID}}' method="POST">
       <button class="btn btn-block btn-light text-justify list-group-item"
-        type="submit" {{if eq .IDPrefix "creator"}}disabled{{end}}>
+        type="submit" {{if eq .IDPrefix "creator"}}disabled{{end}}
+        title='{{msg $ "title.course.open"}}'>
         <span class="badge badge-secondary btn-darkblue"> {{msg $ "course"}} </span>
         &nbsp; {{.Name}}
       </button>

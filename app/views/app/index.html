@@ -12,20 +12,25 @@
   <h4>
     {{msg $ "search.course.title"}}
   </h4>
-  <form accept-charset="UTF-8" class="needs-validation" novalidate>
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text border-right-0">
-          {{template "icons/search.html" . }}
-        </span>
-      </div>
-      <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}'
-        required maxlength="127" minlength="3">
-      <div class="invalid-feedback">
-        {{msg $ "validation.invalid.searchValue"}}
-      </div>
+
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text border-right-0">
+        {{template "icons/search.html" . }}
+      </span>
     </div>
-  </form>
+
+    <!-- input -->
+    <input class="form-control dropdown-toggle rounded-right" type="search"
+      placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
+      onkeyup="searchCourse('dropdown-index-search', 'content-index-search', 'dropdown-index-search');"
+      aria-expanded="false" id="dropdown-index-search">
+
+      <!-- results -->
+      <div class="dropdown-menu d-none" id="content-index-search">
+      </div>
+  </div>
+
   <br>
   <br>
 

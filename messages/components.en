@@ -215,3 +215,14 @@ title.enroll = Enroll user
 title.unsubscribe = Unsubscribe user
 title.wait.list = Enroll user to wait list
 title.already.paid = User already paid for this event!
+
+title.add.group = Add group inside this group
+title.edit.group = Edit group
+title.delete.group = Delete group
+
+title.course.open = Open course
+
+title.manage.course.view = Open course view
+title.manage.edit = Edit course
+title.manage.download = Download course
+title.manage.participants = Open participants management

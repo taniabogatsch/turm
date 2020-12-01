@@ -214,15 +214,20 @@
     <div class="tab-pane fade" id="v-pills-active" role="tabpanel"
       aria-labelledby="v-pills-active-tab">
 
-      {{if .user.ActiveEnrollments}}
-        <h4>
-          {{template "icons/layoutTextSidebarReversed.html" . }}
-          &nbsp; {{msg $ "profile.active.events"}}
-        </h4>
-        <hr>
-        <br>
 
+      <h4>
+        {{template "icons/layoutTextSidebarReversed.html" . }}
+        &nbsp; {{msg $ "profile.active.events"}}
+      </h4>
+      <hr>
+      <br>
+
+      {{if .user.ActiveEnrollments}}
         {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ActiveEnrollments}}
+      {{else}}
+        <small class="text-muted">
+          {{msg $ "profile.active.events.none"}}
+        </small>
       {{end}}
     </div>
 
@@ -230,15 +235,19 @@
     <div class="tab-pane fade" id="v-pills-expired" role="tabpanel"
       aria-labelledby="v-pills-expired-tab">
 
-      {{if .user.ExpiredEnrollments}}
-        <h4>
-          {{template "icons/archive.html" . }}
-          &nbsp; {{msg $ "profile.expired.events"}}
-        </h4>
-        <hr>
-        <br>
+      <h4>
+        {{template "icons/archive.html" . }}
+        &nbsp; {{msg $ "profile.expired.events"}}
+      </h4>
+      <hr>
+      <br>
 
+      {{if .user.ExpiredEnrollments}}
         {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ExpiredEnrollments}}
+      {{else}}
+        <small class="text-muted">
+          {{msg $ "profile.expired.events.none"}}
+        </small>
       {{end}}
     </div>
   </div>

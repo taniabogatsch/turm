@@ -52,6 +52,8 @@ GET     /app/news                                   App.News
 POST    /course/open                                Course.Open
 GET     /course/open                                Course.Open
 
+GET     /course/search                              Course.Search
+
 GET     /course/editorInstructorList                Course.EditorInstructorList
 GET     /course/whitelist                           Course.Whitelist
 GET     /course/blacklist                           Course.Blacklist

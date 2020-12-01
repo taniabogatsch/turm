@@ -149,7 +149,9 @@ profile.page = Nutzerprofil
 
 profile.user.info = Nuzterinformationen
 profile.active.events = Aktive Veranstaltungen
+profile.active.events.none = Keine aktiven Veranstaltungen
 profile.expired.events = Abgelaufene Veranstaltungen
+profile.expired.events.none = Keine abgelaufenen Veranstaltungen
 
 profile.change.pw = Passwort ändern
 profile.change.pw.success = Passwort geändert.

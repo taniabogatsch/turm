@@ -1,0 +1,22 @@
+<!-- template rendering all course search results -->
+
+<h6 class="dropdown-header">
+  {{msg $ "search.limit" 5}}
+</h6>
+{{range .courses}}
+  <div class="dropdown-divider"></div>
+  <a class="dropdown-item" href='{{url "Course.Open" .ID}}'>
+    {{.Title}}
+  </a>
+
+{{else}}
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    <h6 class="dropdown-header">
+      {{msg $ "search.no.results"}}
+    </h6>
+  {{end}}
+{{end}}

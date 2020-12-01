@@ -215,3 +215,14 @@ title.enroll = NutzerIn einschreiben
 title.unsubscribe = NutzerIn austragen
 title.wait.list = NutzerIn auf Warteliste
 title.already.paid = NuzterIn hat bereits bezahlt!
+
+title.add.group = Untergruppe hinzufügen
+title.edit.group = Gruppe bearbeiten
+title.delete.group = Gruppe löschen
+
+title.course.open = Kurs anzeigen
+
+title.manage.course.view = Zur Kursansicht
+title.manage.edit = Kurs bearbeiten
+title.manage.download = Kurs herunterladen
+title.manage.participants = Zur Teilnehmerverwaltung

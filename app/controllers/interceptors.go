@@ -117,6 +117,14 @@ func (c Course) auth() revel.Result {
 
 	c.Log.Debug("executing auth course interceptor")
 
+	//only allow a course search if the user is not logged in or
+	//if the user account is activated
+	if c.MethodName == "Search" {
+		if c.Session["notActivated"] == nil {
+			return nil
+		}
+	}
+
 	if authorized, expired, err := evalHasElevatedRights(c.Controller); err != nil {
 		return flashError(
 			errTypeConv, err, "/", c.Controller, "")

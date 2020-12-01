@@ -96,15 +96,25 @@
 
     {{if .session.userID}}
       <span class="navbar-text mt-2 mt-lg-0 mr-0 mr-lg-3 large-hidden">
-        <a class="text-white" href="#">
+        <a class="text-white" href='{{url "User.Profile"}}'>
           {{$.session.firstName}} {{$.session.lastName}}
         </a>
       </span>
     {{end}}
 
+    <!-- course search -->
     <form class="form-inline mt-2 mt-lg-0 mr-0 mr-lg-3">
       <div class="input-group">
-        <input class="form-control" type="search" placeholder='{{msg $ "search.course"}}'>
+
+        <!-- input -->
+        <input class="form-control dropdown-toggle rounded-right" type="search"
+          placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
+          onkeyup="searchCourse('dropdown-search', 'content-search', 'dropdown-search');"
+          aria-expanded="false" id="dropdown-search">
+
+        <!-- menu -->
+        <div class="dropdown-menu dropdown-menu-right d-none" id="content-search">
+        </div>
       </div>
     </form>
 

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strings"
 	"time"
 	"turm/app/models"
 
@@ -42,6 +43,32 @@ func (c Course) Open(ID int) revel.Result {
 
 	c.Log.Debug("loaded course", "course", course)
 	return c.Render(course)
+}
+
+/*Search for a specific course.
+Roles: all (except not activated users). */
+func (c Course) Search(value string) revel.Result {
+
+	c.Log.Debug("search courses", "value", value)
+
+	value = strings.TrimSpace(value)
+	c.Validation.Check(value,
+		revel.MinSize{1},
+		revel.MaxSize{127},
+	).MessageKey("validation.invalid.searchValue")
+
+	if c.Validation.HasErrors() {
+		c.Validation.Keep()
+		return c.Render()
+	}
+
+	var courses models.Courses
+	if err := courses.Search(value); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(courses)
 }
 
 /*EditorInstructorList of a course.
