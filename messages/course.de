@@ -40,6 +40,8 @@ course.events = Veranstaltungen
 course.events.info = Ein Kurs kann beliebig viele Veranstaltungen haben. NutzerInnen können sich in diese Veranstaltungen einschreiben.
 course.events.info2 = Es gibt zwei Arten von Veranstaltungen: Normale Veranstaltungen und Kalenderveranstaltungen. Sie können diese gemischt verwenden.
 
+course.events.normal = Normale Veranstaltungen
+course.events.calendar = Kalenderveranstaltungen
 course.events.normal.none = Dieser Kurs enthält keine normalen Veranstaltungen.
 course.events.calendar.none = Dieser Kurs enthält keine Kalenderveranstaltungen.
 
@@ -72,6 +74,7 @@ event.calendar.week = Woche
 event.calendar.week.day = Wochentag
 event.calendar.interval.info = Intervall in Minuten (min)
 event.calendar.min = min
+
 event.calendar.mo = Mo
 event.calendar.tu = Di
 event.calendar.we = Mi
@@ -79,13 +82,18 @@ event.calendar.th = Do
 event.calendar.fr = Fr
 event.calendar.sa = Sa
 event.calendar.so = So
+
 event.calendar.legend = Legende
+
 event.calendar.slot.free = Frei
 event.calendar.slot.booked = Gebucht
 event.calendar.slot.blocked = Gesperrt
 event.calendar.slot.not.available = Nicht verfügbar
 event.calendar.slot.book = Zeitraum buchen
 event.calendar.slot.date = Datum
+
+event.calendar.add.exception = Ausnahme hinzufügen
+event.calendar.list.exceptions = Aktuelle und anstehende Ausnahmen
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -203,6 +211,9 @@ day.tmpl.delete.title = Schablone löschen
 
 exception.change.success = Änderungen an Ausnahme erfolgreich, ID = %d.
 exception.new.title = Neue Ausnahme hinzufügen
+exception.delete.title = Ausnahme löschen 
+exception.delete.confirm = Möchten Sie diese Ausnahme wirklich löschen?
+exception.delete.success = Ausnahme gelöscht, ID = %d.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

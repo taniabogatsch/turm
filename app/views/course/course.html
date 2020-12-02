@@ -350,21 +350,11 @@
 </div>
 
 <hr>
-{{template "icons/easel.html" .}}
-&nbsp; Normale Veranstaltungen
-<br>
-<br>
 
 <!-- event list -->
 <div id="div-events">
   {{template "course/events.html" dict_addLocale $.currentLocale "events" .course.Events "manage" .course.Manage}}
 </div>
-
-<br>
-{{template "icons/calendarDate.html" .}}
-&nbsp; Kalenderveranstaltungen
-<br>
-<br>
 
 <!-- calendar event list -->
 <div id="div-calendar_events">

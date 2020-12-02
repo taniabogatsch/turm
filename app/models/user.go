@@ -552,12 +552,21 @@ func (user *User) AuthorizedToEdit(table *string, ID *int) (authorized, expired 
 
 /*HasElevatedRights returns whether a user is an instructor, editor, creator or
 admin (of a course). */
-func (user *User) HasElevatedRights(ID *int) (authorized, expired bool, err error) {
+func (user *User) HasElevatedRights(ID *int, table string) (authorized, expired bool, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
+	}
+
+	if table == "events" {
+		err = tx.Get(ID, stmtGetCourseIDByEvent, *ID)
+		if err != nil {
+			log.Error("failed to get course ID by event ID", "ID", *ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
 	}
 
 	err = tx.Get(&expired, stmtCourseExpired, *ID)

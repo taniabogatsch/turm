@@ -227,3 +227,9 @@ title.manage.course.view = Zur Kursansicht
 title.manage.edit = Kurs bearbeiten
 title.manage.download = Kurs herunterladen
 title.manage.participants = Zur Teilnehmerverwaltung
+
+title.edit.preview = Kursvorschau
+title.edit.validate = Kursfelder validieren
+title.edit.activate = Kurs aktivieren
+title.edit.expire = Kurs auf abgelaufen setzen
+title.edit.course = Kurs bearbeiten

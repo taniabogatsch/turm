@@ -293,7 +293,7 @@ const (
 	`
 
 	stmtGetCourseIDByCalendarEvent = `
-		SELECT course_id
+		SELECT course_id AS id
 		FROM calendar_events
 		WHERE id = $1
 	`

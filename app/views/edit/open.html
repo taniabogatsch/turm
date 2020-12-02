@@ -18,38 +18,46 @@
 
       {{if eq .session.role "admin"}}
         {{if not .course.Active}}
+
           <!-- activate the course -->
           <button type="button" class="btn btn-outline-darkblue float-lg-right"
             onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
               {{msg $ "creator.course.activate.confirm" .course.Title}},
-              {{url "Creator.Activate" .course.ID}});'>
+              {{url "Creator.Activate" .course.ID}});'
+            title='{{msg $ "title.edit.activate"}}'>
             {{template "icons/unlock.html" . }}
           </button>
         {{else}}
+
           <!-- expire the course -->
           <button type="button" class="btn btn-outline-darkblue float-lg-right"
             onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
               {{msg $ "creator.course.expire.confirm" .course.Title}},
-              {{url "Creator.Expire" .course.ID}});'>
+              {{url "Creator.Expire" .course.ID}});'
+            title='{{msg $ "title.edit.expire"}}'>
             {{template "icons/archive.html" . }}
           </button>
         {{end}}
       {{else}}
         {{if eq .course.CreatorID .session.userID}}
           {{if not .course.Active}}
+
             <!-- activate the course -->
             <button type="button" class="btn btn-outline-darkblue float-left float-lg-right"
               onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
                 {{msg $ "creator.course.activate.confirm" .course.Title}},
-                {{url "Creator.Activate" .course.ID}});'>
+                {{url "Creator.Activate" .course.ID}});'
+              title='{{msg $ "title.edit.activate"}}'>
               {{template "icons/unlock.html" . }}
             </button>
           {{else}}
+
             <!-- expire the course -->
             <button type="button" class="btn btn-outline-darkblue float-left float-lg-right"
               onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
                 {{msg $ "creator.course.expire.confirm" .course.Title}},
-                {{url "Creator.Expire" .course.ID}});'>
+                {{url "Creator.Expire" .course.ID}});'
+              title='{{msg $ "title.edit.activate"}}'>
               {{template "icons/archive.html" . }}
             </button>
           {{end}}
@@ -57,18 +65,21 @@
       {{end}}
 
       {{if not .course.Active}}
+
         <!-- validate course -->
         <form class="float-left float-lg-right mr-3" action='{{url "Edit.Validate" .course.ID}}' method="POST">
-          <button type="submit" class="btn btn-outline-darkblue">
+          <button type="submit" class="btn btn-outline-darkblue" title='{{msg $ "title.edit.validate"}}'>
             {{template "icons/checkAll.html" . }}
           </button>
         </form>
       {{end}}
 
-      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3" onclick="plainCourse();">
+      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3"
+        onclick="plainCourse();" title='{{msg $ "title.edit.course"}}'>
         {{template "icons/aspectRatio.html" . }}
       </button>
-      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3 d-none" onclick="editCourse();">
+      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3 d-none"
+        onclick="editCourse();" title='{{msg $ "title.edit.preview"}}'>
         {{template "icons/pencil.html" . }}
       </button>
     </h4>

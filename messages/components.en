@@ -227,3 +227,9 @@ title.manage.course.view = Open course view
 title.manage.edit = Edit course
 title.manage.download = Download course
 title.manage.participants = Open participants management
+
+title.edit.preview = Course preview
+title.edit.validate = Validate course fields
+title.edit.activate = Activate course
+title.edit.expire = Change course status to expired
+title.edit.course = Edit course

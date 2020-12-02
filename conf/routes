@@ -116,6 +116,7 @@ POST    /edit/calendar/newDayTemplate               EditCalendarEvent.NewDayTemp
 POST    /edit/calendar/deleteDayTemplate            EditCalendarEvent.DeleteDayTemplate
 POST    /edit/calendar/editDayTemplate              EditCalendarEvent.EditDayTemplate
 POST    /edit/calendar/changeException              EditCalendarEvent.ChangeException
+POST    /edit/calendar/deleteException              EditCalendarEvent.DeleteException
 
 
 # ---------------------------------------------------------------------------- #

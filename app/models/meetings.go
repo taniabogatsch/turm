@@ -158,6 +158,18 @@ func (meeting *Meeting) Delete() (err error) {
 	return deleteByID("id", "meetings", meeting.ID, nil)
 }
 
+/*BelongsToEvent validates if a meeting is part of an event. */
+func (meeting *Meeting) BelongsToEvent(eventID *int) (belongsToEvent bool, err error) {
+
+	err = app.Db.Get(&belongsToEvent, stmtMeetingBelongsToEvent, meeting.ID, *eventID)
+	if err != nil {
+		log.Error("failed to validate if a meeting belongs to an event", "meetingID",
+			meeting.ID, "eventID", *eventID, "error", err.Error())
+	}
+
+	return
+}
+
 /*Meetings holds all meetings of an event. */
 type Meetings []Meeting
 
@@ -262,8 +274,17 @@ const (
 	`
 
 	stmtGetCourseIDByMeeting = `
-		SELECT e.course_id
+		SELECT e.course_id AS id
 		FROM meetings m JOIN events e ON m.event_id = e.id
 		WHERE m.id = $1
+	`
+
+	stmtMeetingBelongsToEvent = `
+		SELECT EXISTS (
+			SELECT id
+			FROM meetings
+			WHERE event_id = $2
+				AND id = $1
+		) AS belongs_to_event
 	`
 )

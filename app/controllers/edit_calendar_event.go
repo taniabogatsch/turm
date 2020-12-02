@@ -52,6 +52,8 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 		msg = c.Message("event.calendar."+fieldID+".change.success", value)
 	}
 
+	//TODO: notify people (according to conf) about changes
+
 	return c.RenderJSON(
 		response{Status: SUCCESS, Msg: msg, FieldID: "calendar_" + fieldID,
 			Value: value, ID: ID})
@@ -71,6 +73,8 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
+
+	//TODO: send e-mail to all slots if the course is active
 
 	c.Flash.Success(c.Message("event.calendar.delete.success", ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
@@ -99,25 +103,6 @@ func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl)
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*DeleteDayTemplate deletes a day template.
-- Roles: creator and editors of the course of the calendar event */
-func (c EditCalendarEvent) DeleteDayTemplate(ID, courseID int) revel.Result {
-
-	c.Log.Debug("delete a day template", "ID", ID, "courseID", courseID)
-
-	//NOTE: the interceptor assures that the day template ID is valid
-
-	tmpl := models.DayTmpl{ID: ID}
-	if err := tmpl.Delete(); err != nil {
-		return flashError(
-			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
-			c.Controller, "")
-	}
-
-	c.Flash.Success(c.Message("event.calendar.delete.success", ID))
-	return c.Redirect(Course.CalendarEvents, courseID)
-}
-
 /*EditDayTemplate edits a repeatable blueprint of a day.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl) revel.Result {
@@ -136,6 +121,9 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 			errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
+
+	//TODO: when updating, validate that the tmpl ID fits the calendar event ID
+	//TODO: notify users
 
 	c.Flash.Success(c.Message("day.tmpl.edit.success", tmpl.ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
@@ -159,7 +147,8 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 		data, users, err = exception.Insert(c.Validation)
 
 	} else { //update
-		data, users, err = exception.Update(c.Validation)
+		data, users, err = exception.Update(c.Validation) //TODO
+		//TODO: when updating, validate that the exception ID fits the calendar event ID
 	}
 
 	if err != nil {
@@ -190,5 +179,47 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 	}
 
 	c.Flash.Success(c.Message("exception.change.success", exception.ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
+}
+
+/*DeleteException deletes an exception.
+- Roles: creator and editors of the course of the calendar event */
+func (c EditCalendarEvent) DeleteException(ID, courseID int) revel.Result {
+
+	c.Log.Debug("delete an exception", "ID", ID, "courseID", courseID)
+
+	//NOTE: the interceptor assures that the day template ID is valid
+
+	//TODO: we don't need validation in function call
+
+	exception := models.Exception{ID: ID}
+	if err := exception.Delete(c.Validation); err != nil {
+		return flashError(
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("exception.delete.success", ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
+}
+
+/*DeleteDayTemplate deletes a day template.
+- Roles: creator and editors of the course of the calendar event */
+func (c EditCalendarEvent) DeleteDayTemplate(ID, courseID int) revel.Result {
+
+	c.Log.Debug("delete a day template", "ID", ID, "courseID", courseID)
+
+	//NOTE: the interceptor assures that the day template ID is valid
+
+	tmpl := models.DayTmpl{ID: ID}
+	if err := tmpl.Delete(); err != nil {
+		return flashError(
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	//TODO: return users and write e-mail
+
+	c.Flash.Success(c.Message("day.tmpl.delete.success", ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
 }

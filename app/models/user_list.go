@@ -236,6 +236,26 @@ func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err err
 	return
 }
 
+/*GetEditorsInstructors returns editors and instructors. */
+func (users *UserList) GetEditorsInstructors(courseID *int) (instructors UserList, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	if err = users.Get(tx, courseID, "editors"); err != nil {
+		return
+	}
+	if err = instructors.Get(tx, courseID, "instructors"); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 const (
 	stmtUsersWhere = `
 		FROM users u

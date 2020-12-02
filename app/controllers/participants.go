@@ -12,15 +12,16 @@ import (
 	"github.com/revel/revel"
 )
 
-//TODO: interceptor and roles!
-//TODO: interceptor: event must be part of course
-
-/*Open a course for user management. */
+/*Open a course for user management.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) Open(ID, eventID int) revel.Result {
 
 	c.Log.Debug("open course for user management", "ID", ID)
 
-	//TODO: the interceptor assures that the course ID is valid
+	//NOTE: the interceptor assures that the course ID is valid
+	//NOTE: we do not have to validate if the eventID fits the course
+	//ID because we do not use the event ID for anything else but
+	//rendering
 
 	//get the user ID, because not all editors/instructors are allowed to
 	//see matriculation numbers
@@ -51,7 +52,8 @@ func (c Participants) Open(ID, eventID int) revel.Result {
 	return c.Render(participants, eventID)
 }
 
-/*Download a list of participants. */
+/*Download a list of participants.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 
 	c.Log.Debug("download list of participants", "ID", ID, "conf", conf)
@@ -81,7 +83,8 @@ func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 	return c.RenderFileName(filepath, revel.Attachment)
 }
 
-/*EMail a list of participants. */
+/*EMail a list of participants.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 
 	c.Log.Debug("send an e-mail to a list of participants", "ID", ID, "conf", conf)
@@ -155,7 +158,8 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 	return c.Redirect(Participants.Open, ID)
 }
 
-/*SearchUser renders search results for a search value. */
+/*SearchUser renders search results for a search value.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 
 	c.Log.Debug("search users", "ID", ID, "eventID", eventID, "value", value)
@@ -188,7 +192,8 @@ func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 	return c.Render(entries, ID, eventID, hasWaitlist)
 }
 
-/*Enroll a user without validating enrollment constraints. */
+/*Enroll a user without validating enrollment constraints.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("enroll user without constraints", "ID", ID,
@@ -218,7 +223,8 @@ func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
-/*Unsubscribe a user from an event. */
+/*Unsubscribe a user from an event.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("unsubscribe user from an event", "ID", ID,
@@ -266,7 +272,8 @@ func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 }
 
 /*Waitlist puts a user at the wait list of an event without validating
-enrollment constraints. */
+enrollment constraints.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("put user at wait list without validating constraints", "ID", ID,
@@ -313,7 +320,8 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
-/*ChangeStatus changes the payment status of a user in an event. */
+/*ChangeStatus changes the payment status of a user in an event.
+- Roles: creator, editors and instructors of this course. */
 func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) revel.Result {
 
 	c.Log.Debug("change status of user", "ID", ID, "eventID", eventID,

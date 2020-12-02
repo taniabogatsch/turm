@@ -77,21 +77,13 @@ func (c Course) EditorInstructorList(ID int) revel.Result {
 
 	c.Log.Debug("load editors and instructors of course", "ID", ID)
 
-	//TODO: maybe transaction?
-
 	editors := models.UserList{}
-	if err := editors.Get(nil, &ID, "editors"); err != nil {
+	instructors, err := editors.GetEditorsInstructors(&ID)
+	if err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
 
-	instructors := models.UserList{}
-	if err := instructors.Get(nil, &ID, "instructors"); err != nil {
-		renderQuietError(errDB, err, c.Controller)
-		return c.Render()
-	}
-
-	c.Log.Debug("loaded editors and instructors", "editors", editors, "instructors", instructors)
 	return c.Render(editors, instructors)
 }
 
@@ -107,7 +99,6 @@ func (c Course) Whitelist(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded whitelist", "whitelist", whitelist)
 	return c.Render(whitelist)
 }
 
@@ -123,7 +114,6 @@ func (c Course) Blacklist(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded blacklist", "blacklist", blacklist)
 	return c.Render(blacklist)
 }
 
@@ -139,7 +129,6 @@ func (c Course) Path(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded path", "path", path)
 	return c.Render(path)
 }
 
@@ -155,7 +144,6 @@ func (c Course) Restrictions(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded restrictions", "restrictions", restrictions)
 	return c.Render(restrictions)
 }
 
@@ -173,7 +161,6 @@ func (c Course) Events(ID int) revel.Result {
 	}
 
 	manage := true
-	c.Log.Debug("loaded events", "events", events)
 	return c.Render(events, manage)
 }
 
@@ -189,7 +176,6 @@ func (c Course) Meetings(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded meetings", "meetings", meetings)
 	return c.Render(meetings, ID)
 }
 
@@ -210,6 +196,5 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 		return c.Render()
 	}
 
-	c.Log.Debug("loaded calendar events", "calendar events", events)
 	return c.Render(events)
 }

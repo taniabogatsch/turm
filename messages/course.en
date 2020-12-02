@@ -72,6 +72,7 @@ event.calendar.week = Week
 event.calendar.week.day = Day of the week
 event.calendar.interval.info = Interval in minutes (min)
 event.calendar.min = min
+
 event.calendar.mo = Mo
 event.calendar.tu = Tu
 event.calendar.we = We
@@ -79,13 +80,18 @@ event.calendar.th = Th
 event.calendar.fr = Fr
 event.calendar.sa = Sa
 event.calendar.so = So
+
 event.calendar.legend = Legend
+
 event.calendar.slot.free = Free
 event.calendar.slot.booked = Booked
 event.calendar.slot.blocked = Blocked
 event.calendar.slot.not.available = Not available
 event.calendar.slot.book = Book slot
 event.calendar.slot.date = Datum
+
+event.calendar.add.exception = Add exception
+event.calendar.list.exceptions = Current and upcoming exceptions
 
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
@@ -203,6 +209,9 @@ day.tmpl.delete.title = Delete day template
 
 exception.change.success = Changes to exception successful, ID = %d.
 exception.new.title = Add new exception
+exception.delete.title = Delete exception
+exception.delete.confirm = Please confirm the deletion of this exception.
+exception.delete.success = Deleted exception, ID = %d.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

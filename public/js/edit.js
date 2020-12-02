@@ -438,6 +438,7 @@ function submitRenderForm(form, modal) {
       } else {
         $('#div-' + fieldID).html(response);
       }
+
       editCourse();
       disableEnrollmentButtons();
       $(modal).modal('hide');

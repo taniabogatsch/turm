@@ -27,177 +27,181 @@
 	});
 </script>
 
-<ul class="list-group">
+{{if .events}}
 
-  <script>
-    var fromMsg = '{{msg $ "meeting.from"}}';
-    var clockMsg = '{{msg $ "course.clock"}}';
-  </script>
+  {{template "icons/easel.html" .}}
+  &nbsp; {{msg $ "course.events.normal"}}
+  <br>
+  <br>
 
-  {{range .events}}
-    <li class="list-group-item mb-2 border rounded">
+  <ul class="list-group">
 
-      <!-- delete event -->
-      <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
-        href='#no-scroll' role="button"
-        onclick='confirmDeleteRenderModal({{msg $ "event.delete.title"}},
-          {{msg $ "event.delete.confirm" .Title}},
-          "{{url "EditEvent.Delete" .ID .CourseID}}", "events");'>
-        {{template "icons/trash.html" . }}
-      </a>
+    <script>
+      var fromMsg = '{{msg $ "meeting.from"}}';
+      var clockMsg = '{{msg $ "course.clock"}}';
+    </script>
 
-      <!-- enrollment button -->
-      {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
+    {{range .events}}
+      <li class="list-group-item mb-2 border rounded">
 
-      <!-- fullness and capacity -->
-      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
-        onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", true,
-          "{{url "EditEvent.ChangeCapacity"}}", "int", "",
-          {{msg $ "event.capacity.change.info"}}, {{.ID}}, 1);'>
-        {{template "icons/pencil.html" . }}
-      </a>
-      <small class="float-right">
-        {{.Fullness}} / <div id="div-capacity-{{.ID}}" class="d-inline">{{.Capacity}}</div>
-      </small>
+        <!-- delete event -->
+        <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+          href='#no-scroll' role="button"
+          onclick='confirmDeleteRenderModal({{msg $ "event.delete.title"}},
+            {{msg $ "event.delete.confirm" .Title}},
+            "{{url "EditEvent.Delete" .ID .CourseID}}", "events");'>
+          {{template "icons/trash.html" . }}
+        </a>
 
-      <!-- progress bar -->
-      <div class="progress float-right mr-3 edit-hide" style="width: 8rem;">
-        <div class="progress-bar bg-darkblue" role="progressbar" style="width: {{.Percentage}}%;"
-          aria-valuenow="{{.Fullness}}" aria-valuemin="0" aria-valuemax="{{.Capacity}}">
-          {{.Percentage}}%
-        </div>
-      </div>
+        <!-- enrollment button -->
+        {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
 
-      <!-- event title -->
-      <div id="div-title-{{.ID}}" class="d-inline">
-        {{.Title}}
-      </div>
-      <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
-        onclick='openChangeModal({{msg $ "event.title"}}, "title",
-          true, "{{url "EditEvent.ChangeText"}}", "text", "255",
-          {{msg $ "event.title.change.info"}}, {{.ID}}, 1);'>
-        {{template "icons/pencil.html" . }}
-      </a>
-      <br>
-
-      <!-- waiting list information -->
-      <small class="form-text text-muted">
-        <form id="change-has_waitlist-form-{{.ID}}" accept-charset="UTF-8" method="POST"
-          action='{{url "EditEvent.ChangeBool"}}'>
-          <!-- event ID -->
-          <input type="hidden" name="ID" value="{{.ID}}">
-          <!-- list type -->
-          <input type="hidden" name="listType" value="has_waitlist">
-          <!-- option -->
-          <label class="switch edit-show d-none">
-            <input type="checkbox" name="option" id="change-has_waitlist-switch-{{.ID}}"
-              {{if .HasWaitlist}}checked{{end}}>
-            <span class="slider round"></span>
-          </label>
-          <label class="form-check-label edit-show d-none" id="change-has_waitlist-info-{{.ID}}">
-            {{template "icons/listUL.html" . }} &nbsp; {{msg $ "event.waitlist.yes"}}
-          </label>
-        </form>
-      </small>
-      <script>
-
-        {{if not $.manage}}
-          $(function() {
-            let switchWaitlist = document.getElementById("change-has_waitlist-switch-{{.ID}}");
-            if (switchWaitlist.checked) {
-              document.getElementById('change-has_waitlist-info-{{.ID}}').classList.remove("d-none");
-            } else {
-              document.getElementById('change-has_waitlist-info-{{.ID}}').classList.add("d-none");
-            }
-          });
-        {{end}}
-
-        //react to has_waitlist switch events
-        $('#change-has_waitlist-switch-{{.ID}}').change(function() {
-          $('#change-has_waitlist-form-{{.ID}}').submit();
-        });
-
-        $('#change-has_waitlist-form-{{.ID}}').submit(function (event) {
-          submitJSONForm("#change-has_waitlist-form-{{.ID}}", "");
-          event.preventDefault();
-        });
-      </script>
-
-      <!-- annotation -->
-      <div id="div-edit-annotation-{{.ID}}" class="{{if not .Annotation.Valid}}d-none{{end}}">
-        <small class="form-text text-muted float-left">
-          {{template "icons/infoSquare.html" . }} &nbsp; <div id="div-annotation-{{.ID}}" class="d-inline">{{.Annotation.String}}</div>
-        </small>
-        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
-            true, "{{url "EditEvent.ChangeText"}}", "text", "255",
-            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
+        <!-- fullness and capacity -->
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"
+          onclick='openChangeModal({{msg $ "event.capacity"}}, "capacity", true,
+            "{{url "EditEvent.ChangeCapacity"}}", "int", "",
+            {{msg $ "event.capacity.change.info"}}, {{.ID}}, 1);'>
           {{template "icons/pencil.html" . }}
         </a>
-        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
-            {{msg $ "event.annotation.delete.confirm"}},
-            "{{url "EditEvent.ChangeText" .ID "annotation" ""}}");'>
-          {{template "icons/trash.html" . }}
+        <small class="float-right">
+          {{.Fullness}} / <div id="div-capacity-{{.ID}}" class="d-inline">{{.Capacity}}</div>
+        </small>
+
+        <!-- progress bar -->
+        <div class="progress float-right mr-3 edit-hide" style="width: 8rem;">
+          <div class="progress-bar bg-darkblue" role="progressbar" style="width: {{.Percentage}}%;"
+            aria-valuenow="{{.Fullness}}" aria-valuemin="0" aria-valuemax="{{.Capacity}}">
+            {{.Percentage}}%
+          </div>
+        </div>
+
+        <!-- event title -->
+        <div id="div-title-{{.ID}}" class="d-inline">
+          {{.Title}}
+        </div>
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+          onclick='openChangeModal({{msg $ "event.title"}}, "title",
+            true, "{{url "EditEvent.ChangeText"}}", "text", "255",
+            {{msg $ "event.title.change.info"}}, {{.ID}}, 1);'>
+          {{template "icons/pencil.html" . }}
         </a>
         <br>
-      </div>
 
-      <!-- enrollment key -->
-      <div id="div-edit-enrollment_key-{{.ID}}" class="{{if not .EnrollmentKey.Valid}}d-none{{end}}">
-        <small class="form-text text-muted float-left edit-show">
-          {{template "icons/lock.html" . }} &nbsp; {{msg $ "event.key.set"}}
+        <!-- waiting list information -->
+        <small class="form-text text-muted">
+          <form id="change-has_waitlist-form-{{.ID}}" accept-charset="UTF-8" method="POST"
+            action='{{url "EditEvent.ChangeBool"}}'>
+            <!-- event ID -->
+            <input type="hidden" name="ID" value="{{.ID}}">
+            <!-- list type -->
+            <input type="hidden" name="listType" value="has_waitlist">
+            <!-- option -->
+            <label class="switch edit-show d-none">
+              <input type="checkbox" name="option" id="change-has_waitlist-switch-{{.ID}}"
+                {{if .HasWaitlist}}checked{{end}}>
+              <span class="slider round"></span>
+            </label>
+            <label class="form-check-label edit-show d-none" id="change-has_waitlist-info-{{.ID}}">
+              {{template "icons/listUL.html" . }} &nbsp; {{msg $ "event.waitlist.yes"}}
+            </label>
+          </form>
         </small>
-        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='openEnrollmentKeyModal({{.ID}});'>
-          {{template "icons/pencil.html" . }}
-        </a>
-        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-          onclick='confirmDeleteJSONModal({{msg $ "event.key.delete.title"}},
-            {{msg $ "event.key.delete.confirm"}},
-            "{{url "EditEvent.DeleteEnrollmentKey" .ID}}");'>
-          {{template "icons/trash.html" . }}
-        </a>
-        <br class="edit-show">
-      </div>
+        <script>
 
-      <!-- meetings -->
-      <div id="div-meetings-{{.ID}}">
-        {{template "course/meetings.html" dict_addLocale $.currentLocale "ID" .ID "meetings" .Meetings}}
-      </div>
+          {{if not $.manage}}
+            $(function() {
+              let switchWaitlist = document.getElementById("change-has_waitlist-switch-{{.ID}}");
+              if (switchWaitlist.checked) {
+                document.getElementById('change-has_waitlist-info-{{.ID}}').classList.remove("d-none");
+              } else {
+                document.getElementById('change-has_waitlist-info-{{.ID}}').classList.add("d-none");
+              }
+            });
+          {{end}}
 
-      <!-- add a new meeting -->
-      <br class="edit-show d-none">
-      <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
-        onclick='openNewMeetingModal({{.ID}});'>
-        {{msg $ "creator.add.meeting"}}
-      </button>
+          //react to has_waitlist switch events
+          $('#change-has_waitlist-switch-{{.ID}}').change(function() {
+            $('#change-has_waitlist-form-{{.ID}}').submit();
+          });
 
-      <!-- add annotation button -->
-      <div id="div-add-annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{else}}d-inline{{end}}">
+          $('#change-has_waitlist-form-{{.ID}}').submit(function (event) {
+            submitJSONForm("#change-has_waitlist-form-{{.ID}}", "");
+            event.preventDefault();
+          });
+        </script>
+
+        <!-- annotation -->
+        <div id="div-edit-annotation-{{.ID}}" class="{{if not .Annotation.Valid}}d-none{{end}}">
+          <small class="form-text text-muted float-left">
+            {{template "icons/infoSquare.html" . }} &nbsp; <div id="div-annotation-{{.ID}}" class="d-inline">{{.Annotation.String}}</div>
+          </small>
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+            onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
+              true, "{{url "EditEvent.ChangeText"}}", "text", "255",
+              {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+            onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
+              {{msg $ "event.annotation.delete.confirm"}},
+              "{{url "EditEvent.ChangeText" .ID "annotation" ""}}");'>
+            {{template "icons/trash.html" . }}
+          </a>
+          <br>
+        </div>
+
+        <!-- enrollment key -->
+        <div id="div-edit-enrollment_key-{{.ID}}" class="{{if not .EnrollmentKey.Valid}}d-none{{end}}">
+          <small class="form-text text-muted float-left edit-show">
+            {{template "icons/lock.html" . }} &nbsp; {{msg $ "event.key.set"}}
+          </small>
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+            onclick='openEnrollmentKeyModal({{.ID}});'>
+            {{template "icons/pencil.html" . }}
+          </a>
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+            onclick='confirmDeleteJSONModal({{msg $ "event.key.delete.title"}},
+              {{msg $ "event.key.delete.confirm"}},
+              "{{url "EditEvent.DeleteEnrollmentKey" .ID}}");'>
+            {{template "icons/trash.html" . }}
+          </a>
+          <br class="edit-show">
+        </div>
+
+        <!-- meetings -->
+        <div id="div-meetings-{{.ID}}">
+          {{template "course/meetings.html" dict_addLocale $.currentLocale "ID" .ID "meetings" .Meetings}}
+        </div>
+
+        <!-- add a new meeting -->
+        <br class="edit-show d-none">
         <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
-          onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
-            "{{url "EditEvent.ChangeText"}}", "text", "255",
-            {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
-          + &nbsp; {{msg $ "event.annotation"}}
+          onclick='openNewMeetingModal({{.ID}});'>
+          {{msg $ "creator.add.meeting"}}
         </button>
-      </div>
 
-      <!-- add enrollment key button -->
-      <div id="div-add-enrollment_key-{{.ID}}" class="{{if .EnrollmentKey.Valid}}d-none{{else}}d-inline{{end}}">
-        <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
-          onclick="openEnrollmentKeyModal({{.ID}});">
-          + &nbsp; {{msg $ "event.key.title"}}
-        </button>
-      </div>
+        <!-- add annotation button -->
+        <div id="div-add-annotation-{{.ID}}" class="{{if .Annotation.Valid}}d-none{{else}}d-inline{{end}}">
+          <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
+            onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
+              "{{url "EditEvent.ChangeText"}}", "text", "255",
+              {{msg $ "event.annotation.change.info"}}, {{.ID}}, 1);'>
+            + &nbsp; {{msg $ "event.annotation"}}
+          </button>
+        </div>
 
-      <!-- enrollment information (if enrollment is not possible) -->
-      {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "option" .EnrollOption "msg" .EnrollMsg}}
-    </li>
-  {{else}}
-    <small class="text-muted">
-      {{msg $ "course.events.normal.none"}}
-    </small>
-  {{end}}
+        <!-- add enrollment key button -->
+        <div id="div-add-enrollment_key-{{.ID}}" class="{{if .EnrollmentKey.Valid}}d-none{{else}}d-inline{{end}}">
+          <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-0"
+            onclick="openEnrollmentKeyModal({{.ID}});">
+            + &nbsp; {{msg $ "event.key.title"}}
+          </button>
+        </div>
 
-</ul>
+        <!-- enrollment information (if enrollment is not possible) -->
+        {{template "course/enrollInfo.html" dict_addLocale $.currentLocale "option" .EnrollOption "msg" .EnrollMsg}}
+      </li>
+    {{end}}
+
+  </ul>
+{{end}}
