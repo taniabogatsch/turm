@@ -85,7 +85,7 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 }
 
 /*Update a day tmpl. */
-func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
+func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -93,24 +93,71 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 		return
 	}
 
-	//TODO: ensure that the updated day template does not overlap with itself
-	//TODO: not overlaps with other day template
-	//TODO: not overlaps with exception
-	//... validation
+	//validate new DayTemplate
+	tmpl.validate(v, tx)
+
+	var slots Slots
+	slots.GetAll(tx, tmpl.ID)
+
+	slotStartTime := CustomTime{}
+	slotEndTime := CustomTime{}
+
+	tmplStartTime := CustomTime{}
+	tmplStartTime.SetTime(tmpl.StartTime)
+
+	tmplEndTime := CustomTime{}
+	tmplEndTime.SetTime(tmpl.EndTime)
+
+	for _, slot := range slots {
+
+		slotStartTime.Hour, slotStartTime.Min, _ = slot.Start.Clock()
+		slotEndTime.Hour, slotEndTime.Min, _ = slot.End.Clock()
+
+		//check if slot is not within the new time
+		if !((tmplStartTime.Before(&slotStartTime) && (tmplEndTime.After(&slotEndTime) ||
+			tmplEndTime.Equals(&slotEndTime))) || int(slot.Start.Weekday()) != tmpl.DayOfWeek) {
+
+			//dont allow update if a slot in this template is currently running
+			if slot.Start.Before(time.Now()) && slot.End.After(time.Now()) {
+				v.ErrorKey("message") //TODO: language File
+				return
+			}
+
+			//slot has to be deleted
+			//delete slot
+			if err = deleteByID("id", "slots", slot.ID, tx); err != nil {
+				return
+			}
+
+			//create user for email if slot isnt in past
+			if slot.End.Before(time.Now()) {
+
+				user := User{ID: slot.UserID}
+				if err = user.Get(tx); err != nil {
+					return
+				}
+				users = append(users, user)
+			}
+
+		}
+
+		//get email data
+		err = tx.Get(&data, stmtGetCourseInfoByCalendarEvent, tmpl.CalendarEventID)
+		if err != nil {
+			log.Error("failed to get CourseID, CourseTitle and EventTitle", "day_template", *tmpl,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		}
+
+	}
 
 	//TODO: remove all slots that are no longer in day template time,
 	//or that no longer match the interval
 	//- if slot in past: no e-mail to users
 	//- else send e-mail
 
-	/*
-		if tmpl.validate(v, tx); v.HasErrors() {
-			tx.Rollback()
-			return
-		}
-	*/
-
-	//TODO: update times, interval
+	//TODO: update times, interval, day
 
 	tx.Commit()
 	return
@@ -199,7 +246,7 @@ func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 		var overlaps bool
 
 		err := tx.Get(&overlaps, stmtGetOverlappingTmpls, start.Value,
-			end.Value, tmpl.DayOfWeek, tmpl.CalendarEventID)
+			end.Value, tmpl.DayOfWeek, tmpl.CalendarEventID, tmpl.ID)
 		if err != nil {
 			log.Error("failed to validate if day templates overlap each other", "day tmpl",
 				*tmpl, "error", err.Error())
@@ -247,6 +294,7 @@ const (
 			FROM day_templates
 			WHERE $4 = calendar_event_id
 				AND day_of_week = $3
+				AND id != $4
 				AND (
 					($1 >= start_time AND $1 < end_time)
 					OR 	($2 <= end_time AND $2 > start_time)
