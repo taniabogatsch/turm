@@ -178,13 +178,18 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 }
 
 /*Insert an exception. */
-func (except *Exception) Insert(v *revel.Validation) (data EMailData, users Users,
+func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailData, users Users,
 	err error) {
 
-	tx, err := app.Db.Beginx()
-	if err != nil {
-		log.Error("failed to begin tx", "error", err.Error())
-		return
+	var txWasNil bool
+
+	if tx == nil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+		txWasNil = true
 	}
 
 	//check if all values are correct and the selected timespan is free of other exceptions
@@ -246,22 +251,56 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 		return
 	}
 
-	tx.Commit()
+	if txWasNil {
+		tx.Commit()
+	}
+
 	return
 }
 
 /*Update an exception. */
 func (except *Exception) Update(v *revel.Validation) (data EMailData, users Users, err error) {
 
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
 	//in transaction:
-	//TODO: delete old exception
-	//TODO: insert new exception
+	//delete old exception
+	except.Delete(tx, v)
+	//insert new exception
+	except.Insert(tx, v)
+
+	tx.Commit()
 	return
 }
 
 /*Delete an exception. */
-func (except *Exception) Delete(v *revel.Validation) (err error) {
-	//TODO
+func (except *Exception) Delete(tx *sqlx.Tx, v *revel.Validation) (err error) {
+
+	var txWasNil bool
+	if tx == nil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+		txWasNil = true
+	}
+
+	_, err = tx.Exec(stmtDeleteException, except.ID)
+	if err != nil {
+		log.Error("failed to delete Exception", "exception", *except,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
 	return
 }
 
@@ -354,4 +393,10 @@ const (
 			AND exception_end > now()
 		ORDER BY exception_start ASC
   `
+
+	stmtDeleteException = `
+	DELETE
+	FROM calendar_exceptions
+	WHERE id = $1
+	`
 )
