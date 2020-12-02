@@ -123,3 +123,18 @@ validation.calendar.event.wrong.interval = The time interval between the start a
 validation.calendar.event.tmpls.overlap = This day template intersects with another day template at that day.
 validation.calendar.event.slot.start.in.past = The slot starts in the past.
 validation.calendar.event.slot.start.after.end = Slots must start before they end.
+validation.calendar.event.no.fitting.tmpl = The selected time period is not within the valid time span of that day.
+validation.calendar.event.start.wrong.step.distance = The starting time must be a multiple of the step distance.
+validation.calendar.event.end.wrong.step.distance = The ending time must be a multiple of the step distance.
+validation.calendar.event.slots.overlap = The time overlaps with an already existing slot.
+validation.calendar.event.slot.overlaps.exception = The time overlaps with a blocked time interval.
+validation.calendar.event.slot.unsubscribe.end = You can not unsubscribe on such a short term notice (< 1h). Please contact the course management in urgent cases.
+
+# -------------------------------------------------------------------------------------------------- #
+# CALENDAR EXCEPTIONS
+# -------------------------------------------------------------------------------------------------- #
+
+validation.calendar.exceptions.invalid.time = The provided time is not in the required 24h format.
+validation.calendar.event.exception.start.in.past = Exceptions cannot start in the past.
+validation.calendar.event.exception.start.after.end = Exceptions must start before they end.
+validation.calendar.event.overlapping.exception = This exception overlaps with an already existing exception.

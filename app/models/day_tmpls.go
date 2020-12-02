@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 	"turm/app"
 
@@ -35,14 +34,12 @@ type TmplsOfDay []DayTmpl
 
 /*DayTmpl is a section of a week day (Monday - Sunday). */
 type DayTmpl struct {
-	ID               int            `db:"id"`
-	CalendarEventID  int            `db:"calendar_event_id"`
-	StartTime        string         `db:"start_time"`
-	EndTime          string         `db:"end_time"`
-	Interval         int            `db:"interval"`
-	DayOfWeek        int            `db:"day_of_week"` //must be an integer between [0, 6]
-	Active           bool           `db:"active"`
-	DeactiavtionDate sql.NullString `db:"deactivation_date"`
+	ID              int    `db:"id"`
+	CalendarEventID int    `db:"calendar_event_id"`
+	StartTime       string `db:"start_time"`
+	EndTime         string `db:"end_time"`
+	Interval        int    `db:"interval"`
+	DayOfWeek       int    `db:"day_of_week"` //must be an integer between [0, 6]
 
 	Slots Slots
 }
@@ -97,6 +94,14 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 	}
 
 	//TODO: ensure that the updated day template does not overlap with itself
+	//TODO: not overlaps with other day template
+	//TODO: not overlaps with exception
+	//... validation
+
+	//TODO: remove all slots that are no longer in day template time,
+	//or that no longer match the interval
+	//- if slot in past: no e-mail to users
+	//- else send e-mail
 
 	/*
 		if tmpl.validate(v, tx); v.HasErrors() {
@@ -105,8 +110,7 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (err error) {
 		}
 	*/
 
-	//TODO: delete users that are no longer in valid slots and send an e-mail
-	//TODO: update
+	//TODO: update times, interval
 
 	tx.Commit()
 	return
@@ -133,15 +137,17 @@ func (tmpl *DayTmpl) Delete() (err error) {
 	return
 }
 
-/*Get all day templates of a CalendarEvent. */
+/*Get all day templates of a CalendarEvent for a specific week. */
 func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Time) (err error) {
 
 	//init a slice for each week day
 	*dayTmpls = append(*dayTmpls, TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{},
 		TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{})
 
-	//iterate week days and get day templates of each day
+	//iterate week days
 	for i := 0; i < 7; i++ {
+
+		//get templates of each day
 		err = tx.Select(&(*dayTmpls)[i], stmtSelectDayTmpls, *calendarEventID, i)
 		if err != nil {
 			log.Error("failed to get day tmpls by week day", "calendarEventID",
@@ -216,12 +222,11 @@ const (
     RETURNING id
   `
 
-	stmtGetDayTemplateFromWeekDay = `
+	stmtSelectDayTemplatesFromWeekDay = `
     SELECT id, start_time, end_time, interval
     FROM day_templates
     WHERE day_of_week = $1
 			AND calendar_event_id = $2
-      AND active = true
 		ORDER BY start_time ASC
   `
 
@@ -229,10 +234,9 @@ const (
     SELECT id, calendar_event_id,
 			TO_CHAR (date '2001-09-28' + start_time, 'HH24:MI') AS start_time,
 			TO_CHAR (date '2001-09-28' + end_time, 'HH24:MI') AS end_time,
-			interval, day_of_week, active, deactivation_date
+			interval, day_of_week
     FROM day_templates
     WHERE calendar_event_id = $1
-      AND active = true
       AND day_of_week = $2
     ORDER BY start_time ASC
   `
@@ -242,13 +246,12 @@ const (
 			SELECT true
 			FROM day_templates
 			WHERE $4 = calendar_event_id
-				AND active = true
 				AND day_of_week = $3
 				AND (
-								($1 >= start_time AND $1 < end_time)
-						OR 	($2 <= end_time AND $2 > start_time)
-						OR 	(($1 <= start_time) AND ($2 >= end_time))
+					($1 >= start_time AND $1 < end_time)
+					OR 	($2 <= end_time AND $2 > start_time)
+					OR 	(($1 <= start_time) AND ($2 >= end_time))
 				)
-		) AS timeOverlapTmpl
+		) AS overlaps
 	`
 )

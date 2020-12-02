@@ -154,11 +154,11 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 	users := models.Users{}
 	var err error
 
-	//if for Insert, else for Update
+	//insert
 	if exception.ID == 0 {
 		data, users, err = exception.Insert(c.Validation)
 
-	} else {
+	} else { //update
 		data, users, err = exception.Update(c.Validation)
 	}
 

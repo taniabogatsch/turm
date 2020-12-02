@@ -96,5 +96,4 @@ func (t1 *CustomTime) String() {
 	} else {
 		t1.Value = t1.Value + ":" + m
 	}
-
 }

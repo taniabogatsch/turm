@@ -32,26 +32,25 @@ type Exception struct {
 /*Exceptions is a slice of exceptions. */
 type Exceptions []Exception
 
-/*Get all exceptions of a day . Monday specifies the week for which all exceptions
-must be loaded and weekday specifies the day. */
+/*Get all exceptions of a day. Monday specifies the week for which all exceptions
+must be loaded. */
 func (excepts *ExceptionsOfWeek) Get(tx *sqlx.Tx, monday time.Time) (err error) {
 
-	//end time is
 	endTime := monday.AddDate(0, 0, 7)
 
 	err = tx.Select(excepts, stmtSelectExceptionsOfWeek, monday, endTime)
 	if err != nil {
 		log.Error("failed to get exceptions of day template", "monday", monday,
-			"error", err.Error())
+			"endTime", endTime, "error", err.Error())
 		tx.Rollback()
 	}
 	return
 }
 
-//validate an exception.
+//validate an exception
 func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) {
 
-	//get the Time VALUES
+	//get the time values
 	startTime := CustomTime{}
 	endTime := CustomTime{}
 
@@ -76,10 +75,12 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 		return
 	}
 
-	//get dates out of string for timestamp cration
+	//get dates out of string for timestamp creation
 	location, err := time.LoadLocation(app.TimeZone)
 	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
+		log.Error("failed to load location", "appTimeZone", app.TimeZone,
+			"error", err.Error())
+		tx.Rollback()
 		return
 	}
 
@@ -87,17 +88,25 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 
 	yearStart, err := strconv.Atoi(splitStartDate[0])
 	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
+		log.Error("failed to convert string to int", "splitStartDate[0]",
+			splitStartDate[0], "error", err.Error())
+		tx.Rollback()
 		return
 	}
+
 	monthStart, err := strconv.Atoi(splitStartDate[1])
 	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
+		log.Error("failed to convert string to int", "splitStartDate[1]",
+			splitStartDate[1], "error", err.Error())
+		tx.Rollback()
 		return
 	}
+
 	dayStart, err := strconv.Atoi(splitStartDate[2])
 	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
+		log.Error("failed to convert string to int", "splitStartDate[2]",
+			splitStartDate[2], "error", err.Error())
+		tx.Rollback()
 		return
 	}
 
@@ -105,21 +114,32 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 
 	yearEnd, err := strconv.Atoi(splitEndDate[0])
 	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
-		return
-	}
-	monthEnd, err := strconv.Atoi(splitEndDate[1])
-	if err != nil {
-		return
-	}
-	dayEnd, err := strconv.Atoi(splitEndDate[2])
-	if err != nil {
-		v.ErrorKey("validation.calendarEvent.conversion.string.to.int")
+		log.Error("failed to convert string to int", "splitEndDate[0]",
+			splitEndDate[0], "error", err.Error())
+		tx.Rollback()
 		return
 	}
 
-	start := time.Date(yearStart, time.Month(monthStart), dayStart, startTime.Hour, startTime.Min, 0, 0, location)
-	end := time.Date(yearEnd, time.Month(monthEnd), dayEnd, endTime.Hour, endTime.Min, 0, 0, location)
+	monthEnd, err := strconv.Atoi(splitEndDate[1])
+	if err != nil {
+		log.Error("failed to convert string to int", "splitEndDate[1]",
+			splitEndDate[1], "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	dayEnd, err := strconv.Atoi(splitEndDate[2])
+	if err != nil {
+		log.Error("failed to convert string to int", "splitEndDate[2]",
+			splitEndDate[2], "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	start := time.Date(yearStart, time.Month(monthStart), dayStart, startTime.Hour,
+		startTime.Min, 0, 0, location)
+	end := time.Date(yearEnd, time.Month(monthEnd), dayEnd, endTime.Hour,
+		endTime.Min, 0, 0, location)
 
 	//check if start not in past
 	if !start.After(time.Now()) {
@@ -138,8 +158,8 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 	err = tx.Get(&exceptionOverlapping, stmtExistsOverlappingException, start,
 		end, except.CalendarEventID)
 	if err != nil {
-		log.Error("failed to get exception is overlapping with an existing exception", "exceptionStart",
-			start, "exceptionEnd", except.CalendarEventID, "calendarEventID",
+		log.Error("failed to get exception is overlapping with an existing exception",
+			"start", start, "end", except.CalendarEventID, "calendarEventID",
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -149,8 +169,6 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 		v.ErrorKey("validation.calendarEvent.overlapping.exception")
 		return
 	}
-
-	//TODO: validate annotation?
 
 	//insert the timestamp into the struct
 	except.ExceptionStartDB = start
@@ -177,7 +195,7 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 		return
 	}
 
-	//insert Exception
+	//insert exception
 	err = tx.Get(except, stmtInsertException, except.CalendarEventID,
 		except.ExceptionStartDB, except.ExceptionEndDB, except.Annotation)
 	if err != nil {
@@ -187,15 +205,14 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 		return
 	}
 
+	//delete all enrolled users in the time span
 	var userIDs []int
 
-	//delete all enrolled users in the time span
-
-	//get all the users ID in Timespan
-	err = tx.Select(&userIDs, stmtSelectUserIDInExeptionTime, except.CalendarEventID,
+	//get all IDs of users that booked slots in the timespan of the exception
+	err = tx.Select(&userIDs, stmtSelectUserIDsInExeptionTime, except.CalendarEventID,
 		except.ExceptionStartDB, except.ExceptionEndDB)
 	if err != nil {
-		log.Error("failed to get User IDs within Exception Timespan", "exception", *except,
+		log.Error("failed to get user IDs within exception timespan", "exception", *except,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -204,18 +221,14 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 	for _, userID := range userIDs {
 
 		user := User{ID: userID}
-
-		err = user.Get(tx)
-		if err != nil {
+		if err = user.Get(tx); err != nil {
 			return
 		}
-
 		users = append(users, user)
-
 	}
 
 	//get CourseID, CourseTitle and EventTitle
-	err = tx.Get(&data, stmtGetCourseInfo, except.CalendarEventID)
+	err = tx.Get(&data, stmtGetCourseInfoByCalendarEvent, except.CalendarEventID)
 	if err != nil {
 		log.Error("failed to get CourseID, CourseTitle and EventTitle", "exception", *except,
 			"error", err.Error())
@@ -223,11 +236,11 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 		return
 	}
 
-	//delete user
-	_, err = tx.Exec(stmtDeleteUserInExeptionTime, except.CalendarEventID,
+	//delete slots
+	_, err = tx.Exec(stmtDeleteSlotsInExeptionTime, except.CalendarEventID,
 		except.ExceptionStartDB, except.ExceptionEndDB)
 	if err != nil {
-		log.Error("failed to delete User within Exception Timespan", "exception", *except,
+		log.Error("failed to delete slots within exception timespan", "exception", *except,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -239,11 +252,20 @@ func (except *Exception) Insert(v *revel.Validation) (data EMailData, users User
 
 /*Update an exception. */
 func (except *Exception) Update(v *revel.Validation) (data EMailData, users Users, err error) {
+
+	//in transaction:
+	//TODO: delete old exception
+	//TODO: insert new exception
+	return
+}
+
+/*Delete an exception. */
+func (except *Exception) Delete(v *revel.Validation) (err error) {
 	//TODO
 	return
 }
 
-/*Get all exceptions that are still running. */
+/*Get all current or upcoming exceptions. */
 func (excepts *Exceptions) Get(tx *sqlx.Tx, eventID *int) (err error) {
 
 	err = tx.Select(excepts, stmtSelectExceptions, *eventID, app.TimeZone)
@@ -283,42 +305,42 @@ const (
 			SELECT true
 			FROM calendar_exceptions
 			WHERE calendar_event_id = $3
-				AND(
-								($1 >= exception_start AND $1 < exception_end)
-						OR 	($2 <= exception_end AND $2 > exception_start)
-						OR 	(($1 <= exception_start) AND ($2 >= exception_end))
+				AND (
+					($1 >= exception_start AND $1 < exception_end)
+					OR ($2 <= exception_end AND $2 > exception_start)
+					OR (($1 <= exception_start) AND ($2 >= exception_end))
 				)
-		) AS exceptionOverlapping
+		) AS exception_overlapping
 	`
 
-	stmtSelectUserIDInExeptionTime = `
+	stmtSelectUserIDsInExeptionTime = `
 		SELECT s.user_id
 		FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
 		WHERE t.calendar_event_id = $1
-		AND(
-						($2 >= s.start_time AND $2 < s.end_time)
-				OR 	($3 <= s.end_time AND $3 > s.start_time)
-				OR 	(($2 <= s.start_time) AND ($3 >= s.end_time))
+		AND (
+			($2 >= s.start_time AND $2 < s.end_time)
+			OR ($3 <= s.end_time AND $3 > s.start_time)
+			OR (($2 <= s.start_time) AND ($3 >= s.end_time))
 		)
 	`
 
-	stmtGetCourseInfo = `
+	stmtGetCourseInfoByCalendarEvent = `
 		SELECT c.id AS course_id, c.title AS course_title, ce.title AS event_title
 		FROM calendar_events ce JOIN courses c ON ce.course_id = c.id
 		WHERE ce.id = $1
 	`
 
-	stmtDeleteUserInExeptionTime = `
+	stmtDeleteSlotsInExeptionTime = `
 		DELETE
 		FROM slots
 		WHERE id IN (
 			SELECT s.id
 			FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
 			WHERE t.calendar_event_id = $1
-			AND(
-							($2 >= s.start_time AND $2 < s.end_time)
-					OR 	($3 <= s.end_time AND $3 > s.start_time)
-					OR 	(($2 <= s.start_time) AND ($3 >= s.end_time))
+				AND (
+					($2 >= s.start_time AND $2 < s.end_time)
+					OR ($3 <= s.end_time AND $3 > s.start_time)
+					OR	(($2 <= s.start_time) AND ($3 >= s.end_time))
 				)
 		)
 	`

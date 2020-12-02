@@ -251,8 +251,6 @@ CREATE TABLE day_templates (
   end_time            time without time zone      NOT NULL,
   interval            integer                     NOT NULL DEFAULT 60,
   day_of_week         integer                     NOT NULL,
-  active              boolean                     DEFAULT true,
-  deactivation_date   timestamp with time zone,
 
   FOREIGN KEY (calendar_event_id) REFERENCES calendar_events (id) ON DELETE CASCADE
 );

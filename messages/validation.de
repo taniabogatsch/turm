@@ -114,7 +114,7 @@ validation.enrollment.manual.auto.enrolled = NutzerIn würde direkt aus der Wart
 validation.enrollment.change.status.invalid = Dieser Kurs ist nicht bezahlpflichtig.
 
 # -------------------------------------------------------------------------------------------------- #
-# CALENDAR EVENTS
+# CALENDAR EVENTS AND SLOTS
 # -------------------------------------------------------------------------------------------------- #
 
 validation.calendar.event.invalid.interval = Der Wert des Intervalls muss zwischen 1 und 1440 Minuten liegen.
@@ -123,25 +123,18 @@ validation.calendar.event.wrong.interval = Start- und Endzeit müssen ein Vielfa
 validation.calendar.event.tmpls.overlap = Diese Schablone überschneidet sich mit einer anderen Schablone an diesem Tag.
 validation.calendar.event.slot.start.in.past =  Die Startzeit befindet sich in der Vergangenheit.
 validation.calendar.event.slot.start.after.end = Das Ende von Buchungen muss nach deren Anfang liegen.
-
-validation.calendarEvent.startInPast = Die Startzeit befindet sich in der Vergangenheit.
-validation.calendarEvent.startAfterEndTime = Der Startzeitpunkt darf nicht nach dem Endzeitpunkt sein.
-validation.calendarEvent.noTemplateFitting = Der ausgewählte Zeitraum ist nicht innerhalb der in dem Tag zur verfügung stehenden Zeit.
-validation.calendarEvent.startTimeWrongStepDistance = Die Startzeit muss ein vielfaches der Schrittweite entsprechen.
-validation.calendarEvent.endTimeWrongStepDistance = Die Endzeit muss ein vielfaches der Schrittweite entsprechen.
-validation.calendarEvent.startOtherDayThanEnd =
-validation.calendarEvent.overlappingTimespanDayTmpl = Die angegebene Zeit überschneidet sich mit einer vorhandenen an diesem Tag.
-validation.calendarEvent.overlappingTimespanSlot = Die angegebene Zeit überschneidet sich mit einem bereits belegtem Slot.
-validation.calendarEvent.overlappingTimespanExeption = Innerhalb der angegebenen Zeit befindet sich eine Ausnahme welche den Slot blockiert.
-validation.calendarEvent.deleteDayTemplateNotEmpty = Es gibt noch Slots welche sich auf diesem DayTemplate befinden.
-validation.calendarEvent.deleteSlotToCloseToStart = Kurzfristiges austragen (< 1h) nicht möglich. Bitte wenden sie sich an den Kursverantworlichen bei dringenden Fällen.
+validation.calendar.event.no.fitting.tmpl = Der ausgewählte Zeitraum ist nicht innerhalb der an dem Tag zur Verfügung stehenden Zeit.
+validation.calendar.event.start.wrong.step.distance = Die Startzeit muss einem Vielfachen der Schrittweite entsprechen.
+validation.calendar.event.start.wrong.step.distance = Die Endzeit muss einem Vielfachen der Schrittweite entsprechen.
+validation.calendar.event.slots.overlap = Die angegebene Zeit überschneidet sich mit einem bereits belegten Zeitraum.
+validation.calendar.event.slot.overlaps.exception = Innerhalb der angegebenen Zeit befindet sich eine Ausnahme, die den Zeitraum blockiert.
+validation.calendar.event.slot.unsubscribe.end = Kurzfristiges Austragen (< 1h) nicht möglich. Bitte wenden Sie sich bei dringenden Fällen an den Verantwortlichen.
 
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EXCEPTIONS
 # -------------------------------------------------------------------------------------------------- #
 
-validation.calendar.exceptions.invalid.time = Die angegebene Zeit ist nicht im gültigen 24h format
-validation.calendarEvent.conversion.string.to.int = Die umwandlung der Datentypen ist fehlgeschlagen, bitte wenden sie sich an den Support.
-validation.calendarEvent.overlapping.exception = Eine andere Ausnahme belegt bereits einen Teil der angegebenen Zeitspanne.
-calendar.event.exception.start.in.past =  Die Startzeit der Ausnahme befindet sich in der Vergangenheit.
-validation.calendar.event.exception.start.after.end = Das Ende von Ausnahmen muss nach deren Anfang liegen.
+validation.calendar.exceptions.invalid.time = Die angegebene Zeit ist nicht im gültigen 24h Format.
+validation.calendar.event.exception.start.in.past = Die Ausnahme darf nicht in der Vergangenheit beginnen.
+validation.calendar.event.exception.start.after.end = Der Anfang darf nicht nach dem Ende liegen.
+validation.calendar.event.overlapping.exception = Eine andere Ausnahme belegt bereits einen Teil der angegebenen Zeitspanne.
