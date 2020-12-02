@@ -495,7 +495,6 @@ func evalEditAuth(c *revel.Controller, table, sessionKey string) (authorized, ex
 		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "error", err.Error())
 		return false, false, err
 	}
-	fmt.Println(ID)
 
 	authorized, expired, err = user.AuthorizedToEdit(&table, &ID)
 	return

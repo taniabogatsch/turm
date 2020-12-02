@@ -112,7 +112,9 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	tmpl.CalendarEventID = ID
-	if err := tmpl.Update(c.Validation); err != nil {
+
+	data, users, err := tmpl.Update(c.Validation)
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
@@ -123,7 +125,23 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 	}
 
 	//TODO: when updating, validate that the tmpl ID fits the calendar event ID
-	//TODO: notify users
+
+	//send e-mail to each user that got removed from its slot
+	for _, user := range users {
+		mailData := models.EMailData{
+			User:        user,
+			CourseTitle: data.CourseTitle,
+			EventTitle:  data.EventTitle,
+			CourseID:    data.CourseID,
+		}
+		err = sendEMail(c.Controller, &mailData,
+			"email.subject.from.slot",
+			"manualRemove")
+		if err != nil {
+			return flashError(
+				errEMail, err, "", c.Controller, mailData.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("day.tmpl.edit.success", tmpl.ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
@@ -144,10 +162,10 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 
 	//insert
 	if exception.ID == 0 {
-		data, users, err = exception.Insert(c.Validation)
+		data, users, err = exception.Insert(nil, c.Validation)
 
 	} else { //update
-		data, users, err = exception.Update(c.Validation) //TODO
+		data, users, err = exception.Update(c.Validation)
 		//TODO: when updating, validate that the exception ID fits the calendar event ID
 	}
 
@@ -190,10 +208,8 @@ func (c EditCalendarEvent) DeleteException(ID, courseID int) revel.Result {
 
 	//NOTE: the interceptor assures that the day template ID is valid
 
-	//TODO: we don't need validation in function call
-
 	exception := models.Exception{ID: ID}
-	if err := exception.Delete(c.Validation); err != nil {
+	if err := exception.Delete(nil); err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")

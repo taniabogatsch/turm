@@ -181,15 +181,13 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailData, users Users,
 	err error) {
 
-	var txWasNil bool
-
-	if tx == nil {
+	txWasNil := (tx == nil)
+	if txWasNil {
 		tx, err = app.Db.Beginx()
 		if err != nil {
 			log.Error("failed to begin tx", "error", err.Error())
 			return
 		}
-		txWasNil = true
 	}
 
 	//check if all values are correct and the selected timespan is free of other exceptions
@@ -254,7 +252,6 @@ func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailDat
 	if txWasNil {
 		tx.Commit()
 	}
-
 	return
 }
 
@@ -267,32 +264,34 @@ func (except *Exception) Update(v *revel.Validation) (data EMailData, users User
 		return
 	}
 
-	//in transaction:
 	//delete old exception
-	except.Delete(tx, v)
+	if err = except.Delete(tx); err != nil {
+		return
+	}
 	//insert new exception
-	except.Insert(tx, v)
+	if data, users, err = except.Insert(tx, v); err != nil {
+		return
+	}
 
 	tx.Commit()
 	return
 }
 
 /*Delete an exception. */
-func (except *Exception) Delete(tx *sqlx.Tx, v *revel.Validation) (err error) {
+func (except *Exception) Delete(tx *sqlx.Tx) (err error) {
 
-	var txWasNil bool
-	if tx == nil {
+	txWasNil := (tx == nil)
+	if txWasNil {
 		tx, err = app.Db.Beginx()
 		if err != nil {
 			log.Error("failed to begin tx", "error", err.Error())
 			return
 		}
-		txWasNil = true
 	}
 
 	_, err = tx.Exec(stmtDeleteException, except.ID)
 	if err != nil {
-		log.Error("failed to delete Exception", "exception", *except,
+		log.Error("failed to delete exception", "exception", *except,
 			"error", err.Error())
 		tx.Rollback()
 		return
