@@ -8,24 +8,6 @@ import (
 	"github.com/revel/revel"
 )
 
-/*ScheduleEntryType is a type for encoding different schedule entries. */
-type ScheduleEntryType int
-
-const (
-	//FREE is for no entry
-	FREE ScheduleEntryType = iota
-	//SLOT is for slots
-	SLOT
-	//EXCEPTION is for exceptions
-	EXCEPTION
-	//BLOCKED is for Timeslots between
-	BLOCKED
-)
-
-func (s ScheduleEntryType) String() string {
-	return [...]string{"free", "slot", "exception", "blocked"}[s]
-}
-
 /*DayTmpls of a week for each day. */
 type DayTmpls []TmplsOfDay
 

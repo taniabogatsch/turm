@@ -2,9 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"database/sql/driver"
-	"errors"
-	"math/rand"
 	"strings"
 	"time"
 	"turm/app"
@@ -12,38 +9,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
-
-/*Salutation is a type for encoding different forms of address. */
-type Salutation int
-
-const (
-	//NONE is for no form of address
-	NONE Salutation = iota
-	//MR is for Mr.
-	MR
-	//MS is for Ms.
-	MS
-)
-
-func (s Salutation) String() string {
-	return [...]string{"none", "mr", "ms"}[s]
-}
-
-/*Role is a type for encoding different user roles. */
-type Role int
-
-const (
-	//USER is the default role without any extra privileges
-	USER Role = iota
-	//CREATOR allows the creation of courses
-	CREATOR
-	//ADMIN grants all privileges
-	ADMIN
-)
-
-func (u Role) String() string {
-	return [...]string{"user", "creator", "admin"}[u]
-}
 
 /*User is a model of the users table. */
 type User struct {
@@ -83,7 +48,7 @@ type User struct {
 }
 
 /*Validate User fields of newly registered users. */
-func (user *User) Validate(v *revel.Validation) {
+func (user *User) Validate(tx *sqlx.Tx, v *revel.Validation) {
 
 	user.EMail = strings.ToLower(user.EMail)
 
@@ -112,6 +77,7 @@ func (user *User) Validate(v *revel.Validation) {
 		Column: "email",
 		Table:  "users",
 		Value:  user.EMail,
+		Tx:     tx,
 	}
 	v.Check(data,
 		Unique{},
@@ -145,78 +111,6 @@ func (user *User) Validate(v *revel.Validation) {
 	if user.Salutation < NONE || user.Salutation > MS {
 		v.ErrorKey("validation.invalid.salutation")
 	}
-}
-
-/*Credentials entered at the login page. */
-type Credentials struct {
-	Username     string
-	EMail        string
-	Password     string
-	StayLoggedIn bool
-}
-
-/*Validate the credentials. */
-func (credentials *Credentials) Validate(v *revel.Validation) {
-
-	if credentials.Username != "" { //ldap login credentials
-
-		v.MaxSize(credentials.Username, 255).
-			MessageKey("validation.invalid.username")
-
-		v.Check(credentials.EMail,
-			NotRequired{},
-		).MessageKey("validation.invalid.credentials")
-
-	} else if credentials.EMail != "" { //external login credentials
-
-		v.Required(credentials.EMail).
-			MessageKey("validation.invalid.email")
-
-		v.Email(credentials.EMail).
-			MessageKey("validation.invalid.email")
-
-		v.Check(credentials.Username,
-			NotRequired{},
-		).MessageKey("validation.invalid.credentials")
-
-	} else { //neither username nor e-mail address was provided
-		v.ErrorKey("validation.invalid.username")
-	}
-
-	v.Check(credentials.Password,
-		revel.Required{},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.password")
-}
-
-/*Studies holds all courses of study of an user. */
-type Studies []Study
-
-/*Study is a model of the studies table. */
-type Study struct {
-	UserID            int    `db:"user_id, primarykey"`
-	Semester          int    `db:"semester"`
-	DegreeID          int    `db:"degree_id, primarykey"`
-	CourseOfStudiesID int    `db:"course_of_studies_id, primarykey"`
-	Degree            string `db:"degree"`            //not a field in the studies table
-	CourseOfStudies   string `db:"course_of_studies"` //not a field in the studies table
-}
-
-/*Validate Studies fields when loaded from the user enrollment file. */
-func (studies *Study) Validate(v *revel.Validation) {
-	//TODO
-}
-
-/*Select all courses of studies of a user. */
-func (studies *Studies) Select(tx *sqlx.Tx, userID *int) (err error) {
-
-	err = tx.Select(studies, stmtSelectUserCoursesOfStudies, *userID)
-	if err != nil {
-		log.Error("failed to get courses of studies of user", "userID", *userID,
-			"error", err.Error())
-		tx.Rollback()
-	}
-	return
 }
 
 /*Get all data of an user. */
@@ -338,33 +232,84 @@ func (user *User) Login() (err error) {
 }
 
 /*Register inserts an external user. It provides all session values of that user. */
-func (user *User) Register() (err error) {
+func (user *User) Register(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	if user.Validate(tx, v); v.HasErrors() {
+		tx.Rollback()
+		return
+	}
 
 	activationCode := generateCode()
 
 	//last login and first login
 	now := time.Now().Format(revel.TimeFormats[0])
 
-	err = app.Db.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
+	err = tx.Get(user, stmtRegisterExtern, user.FirstName, user.LastName, user.EMail,
 		user.Salutation, now, now, user.Password, activationCode, user.Language)
 	if err != nil {
 		log.Error("failed to register external user", "user", user, "error", err.Error())
+		tx.Rollback()
+		return
 	}
+
 	user.ActivationCode.String = activationCode
+	tx.Commit()
 	return
 }
 
 /*GenerateNewPassword for an user. */
-func (user *User) GenerateNewPassword() (err error) {
+func (user *User) GenerateNewPassword(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	v.Check(user.EMail,
+		revel.Required{},
+		revel.MaxSize{255},
+	).MessageKey("validation.invalid.email")
+	v.Email(user.EMail).
+		MessageKey("validation.invalid.email")
+
+	isLdapEMail := !strings.Contains(user.EMail, app.Mailer.Suffix)
+	v.Required(isLdapEMail).
+		MessageKey("validation.email.ldap")
+
+	data := ValidateUniqueData{
+		Column: "email",
+		Table:  "users",
+		Value:  user.EMail,
+		Tx:     tx,
+	}
+	v.Check(data,
+		NotUnique{},
+	).MessageKey("validation.invalid.email")
+
+	if v.HasErrors() {
+		tx.Rollback()
+		return
+	}
 
 	password := generateCode()
 
-	err = app.Db.Get(user, stmtUpdatePasswordByEMail, password, user.EMail)
+	err = tx.Get(user, stmtUpdatePasswordByEMail, password, user.EMail)
 	if err != nil {
-		log.Error("failed to update password", "user", user,
+		log.Error("failed to update password", "user", *user,
 			"password", password, "error", err.Error())
+		tx.Rollback()
+		return
 	}
+
 	user.Password.String = password
+	tx.Commit()
 	return
 }
 
@@ -589,72 +534,6 @@ func (user *User) HasElevatedRights(ID *int, table string) (authorized, expired 
 
 	tx.Commit()
 	return
-}
-
-//generateCode generates an activation code or a random password.
-func generateCode() string {
-
-	//to create a unique random, we need to take the time in nanoseconds as seed
-	rand.Seed(time.Now().UTC().UnixNano())
-	//characters that can be used in the activation code (no l, I, L, O, 0, 1)
-	var characters = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
-	//the length of the activation code
-	b := make([]byte, 7)
-
-	//generate the code
-	for i := range b {
-		b[i] = characters[rand.Intn(len(characters))]
-	}
-
-	log.Debug("generated code", "code", string(b))
-	return string(b)
-}
-
-/* --- CUSTOM SQL TYPES --- */
-
-/*Affiliations contains all affiliations of a user. */
-type Affiliations []string
-
-/*NullAffiliations represents affiliations that may be null. */
-type NullAffiliations struct {
-	Affiliations Affiliations
-	Valid        bool //Valid is true if Affiliations is not NULL
-}
-
-/*Value constructs a SQL Value from NullAffiliations. */
-func (affiliations NullAffiliations) Value() (driver.Value, error) {
-
-	if !affiliations.Valid {
-		return nil, nil
-	}
-
-	var str string
-	for _, affiliation := range affiliations.Affiliations {
-		str += `"` + affiliation + `",`
-	}
-	return driver.Value("{" + strings.TrimRight(str, ",") + "}"), nil
-}
-
-/*Scan constructs NullAffiliations from a SQL Value. */
-func (affiliations *NullAffiliations) Scan(value interface{}) error {
-
-	if value == nil {
-		affiliations.Affiliations = []string{""}
-		affiliations.Valid = false
-		return nil
-	}
-
-	affiliations.Valid = true
-
-	switch value.(type) {
-	case string:
-		str := value.(string)
-		str = strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(str, "{", ""), "}", ""))
-		affiliations.Affiliations = strings.Split(str, ",")
-	default:
-		return errors.New("incompatible type for Affiliations")
-	}
-	return nil
 }
 
 const (

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 	"turm/app"
 	"turm/app/models"
@@ -287,11 +286,11 @@ func (c EditEvent) auth() revel.Result {
 
 	if c.MethodName == "Delete" {
 
-		eventIDFits, err := evalIDsFit(c.Controller, "courseID", "ID", "event")
+		belongs, err := evalElemBelongs(c.Controller, "courseID", "ID", "events")
 		if err != nil {
 			return flashError(
 				errTypeConv, err, "/", c.Controller, "")
-		} else if !eventIDFits {
+		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
 		}
@@ -323,21 +322,21 @@ func (c EditCalendarEvent) auth() revel.Result {
 	}
 
 	//make sure that the IDs fit
-	fits := false
+	belongs := false
 
 	if c.MethodName == "DeleteException" {
-		fits, err = evalIDsFit(c.Controller, "courseID", "ID", "exception")
+		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "calendar_exceptions")
 	} else if c.MethodName == "DeleteDayTemplate" {
-		fits, err = evalIDsFit(c.Controller, "courseID", "ID", "day_template")
+		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "day_templates")
 	} else if c.MethodName == "Delete" || c.MethodName == "EditDayTemplate" ||
 		c.MethodName == "ChangeException" {
-		fits, err = evalIDsFit(c.Controller, "courseID", "ID", "calendar_event")
+		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "calendar_events")
 	}
 
 	if err != nil {
 		return flashError(
 			errTypeConv, err, "/", c.Controller, "")
-	} else if !fits {
+	} else if !belongs {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
 	}
@@ -361,11 +360,11 @@ func (c EditMeeting) auth() revel.Result {
 
 	if c.MethodName == "Delete" {
 
-		meetingIDFits, err := evalIDsFit(c.Controller, "eventID", "ID", "meeting")
+		belongs, err := evalElemBelongs(c.Controller, "eventID", "ID", "meetings")
 		if err != nil {
 			return flashError(
 				errTypeConv, err, "/", c.Controller, "")
-		} else if !meetingIDFits {
+		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
 		}
@@ -452,11 +451,11 @@ func (c Participants) auth() revel.Result {
 		c.MethodName == "Unsubscribe" || c.MethodName == "Waitlist" ||
 		c.MethodName == "ChangeStatus" {
 
-		eventIDFits, err := evalIDsFit(c.Controller, "ID", "eventID", "event")
+		belongs, err := evalElemBelongs(c.Controller, "ID", "eventID", "events")
 		if err != nil {
 			return flashError(
 				errTypeConv, err, "/", c.Controller, "")
-		} else if !eventIDFits {
+		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
 		}
@@ -537,8 +536,8 @@ func evalHasElevatedRights(c *revel.Controller, table string) (authorized, expir
 	return user.HasElevatedRights(&ID, table)
 }
 
-//evalIDsFit evaluates whether the provided event is part of the course or not
-func evalIDsFit(c *revel.Controller, param1, param2, table string) (fits bool,
+//evalElemBelongs evaluates whether the provided element belongs of another element or not
+func evalElemBelongs(c *revel.Controller, param1, param2, table string) (belongs bool,
 	err error) {
 
 	//get the ID of param 1
@@ -570,24 +569,10 @@ func evalIDsFit(c *revel.Controller, param1, param2, table string) (fits bool,
 	}
 
 	switch table {
-	case "event":
-		event := models.Event{ID: param2ID}
-		fits, err = event.BelongsToCourse(&param1ID)
-	case "meeting":
-		meeting := models.Meeting{ID: param2ID}
-		fits, err = meeting.BelongsToEvent(&param1ID)
-	case "calendar_event":
-		event := models.CalendarEvent{ID: param2ID}
-		fmt.Println(event)
-		//TODO
-	case "calendar_exception":
-		exception := models.Exception{ID: param2ID}
-		fmt.Println(exception)
-		//TODO
-	case "day_template":
-		tmpl := models.DayTmpl{ID: param2ID}
-		fmt.Println(tmpl)
-		//TODO
+	case "events", "calendar_events", "calendar_exceptions", "day_templates":
+		belongs, err = models.BelongsToElement(table, "course_id", "id", param1ID, param2ID)
+	case "meetings":
+		belongs, err = models.BelongsToElement(table, "event_id", "id", param1ID, param2ID)
 	}
 
 	return

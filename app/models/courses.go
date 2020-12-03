@@ -3,10 +3,23 @@ package models
 import (
 	"strings"
 	"turm/app"
+
+	"github.com/jmoiron/sqlx"
 )
 
 /*Courses holds different courses. */
 type Courses []Course
+
+/*CourseListInfo holds only the most essential information about courses. */
+type CourseListInfo struct {
+	ID           int    `db:"id, primarykey, autoincrement"`
+	Title        string `db:"title"`
+	CreationDate string `db:"creation_date"`
+	EMail        string `db:"email"` //e-mail address of either the creator or the editor
+}
+
+/*CourseList holds the most essential information about a list of courses. */
+type CourseList []CourseListInfo
 
 /*Search all courses. */
 func (courses *Courses) Search(value string) (err error) {
@@ -24,6 +37,113 @@ func (courses *Courses) Search(value string) (err error) {
 			searchVal, "error", err.Error())
 	}
 
+	return
+}
+
+/*GetByUserID returns all courses according to the user type.  */
+func (list *CourseList) GetByUserID(tx *sqlx.Tx, userID int, userType string, active,
+	expired bool) (err error) {
+
+	//construct SQL
+	stmtSelect := `
+		SELECT c.id, c.title, u.email,
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
+	`
+
+	stmtWhere := `
+			AND c.active = $3
+			AND (current_timestamp >= c.expiration_date) = $4
+		ORDER BY c.creation_date DESC
+	`
+
+	if !expired && !active {
+
+		stmtWhere = `
+				AND c.active = $3
+				AND (
+					(current_timestamp < c.expiration_date) = $4
+					OR
+					(current_timestamp >= c.expiration_date) = $4
+				)
+			ORDER BY c.creation_date DESC
+		`
+	}
+
+	stmt := ``
+
+	if userType == "creator" { //get all created courses
+
+		stmt = `
+		 	FROM courses c, users u
+		 	WHERE c.creator = u.id
+		 		AND u.id = $2
+		`
+
+	} else { //get all edit/instruct privilege courses
+
+		stmt = `
+			FROM courses c, users u, ` + userType + ` l
+			WHERE c.id = l.course_id
+				AND u.id = $2
+				AND u.id = l.user_id
+		`
+	}
+
+	if userType == "admin" {
+		stmt = stmtAllCoursesAdmin + stmtWhere
+	} else {
+		stmt = stmtSelect + stmt + stmtWhere
+	}
+
+	err = tx.Select(list, stmt, app.TimeZone, userID, active, expired)
+	if err != nil {
+		log.Error("failed to get course list", "userID", userID, "userType", userType,
+			"active", active, "expired", expired, "stmt", stmt, "error", err.Error())
+		tx.Rollback()
+	}
+	return
+}
+
+/*Get the course lists for the specified users. */
+func (list *CourseList) Get(active, expired bool, userID int, role string) (
+	editor, instructor CourseList, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//if the user is an admin, render all active courses
+	if role == ADMIN.String() {
+
+		err = list.GetByUserID(tx, userID, "admin", active, expired)
+		if err != nil {
+			return
+		}
+
+		tx.Commit()
+		return
+	}
+
+	err = list.GetByUserID(tx, userID, "creator", active, expired)
+	if err != nil {
+		return
+	}
+
+	err = editor.GetByUserID(tx, userID, "editors", active, expired)
+	if err != nil {
+		return
+	}
+
+	if active { //instructors are not part of drafts
+		err = instructor.GetByUserID(tx, userID, "instructors", active, expired)
+		if err != nil {
+			return
+		}
+	}
+
+	tx.Commit()
 	return
 }
 
@@ -119,4 +239,11 @@ const (
       )
 
   `
+
+	stmtAllCoursesAdmin = `
+		SELECT c.id, c.title,
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
+		FROM courses c
+		WHERE $2 = 0
+	`
 )

@@ -7,6 +7,7 @@ import (
 	"time"
 	"turm/app"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
 
@@ -55,6 +56,7 @@ type ValidateUniqueData struct {
 	Column string
 	Table  string
 	Value  string
+	Tx     *sqlx.Tx
 }
 
 /*IsSatisfied implements the validation result of Unique. */
@@ -66,14 +68,17 @@ func (uniqueV Unique) IsSatisfied(i interface{}) bool {
 		return false
 	}
 
-	selectExists := `SELECT NOT EXISTS (SELECT ` + data.Column +
+	stmt := `SELECT NOT EXISTS (SELECT ` + data.Column +
 		` FROM ` + data.Table + ` WHERE ` + data.Column + ` = $1) AS unique`
-	err := app.Db.Get(&unique, selectExists, data.Value)
+
+	err := data.Tx.Get(&unique, stmt, data.Value)
 	if err != nil {
 		log.Error("failed to retrieve information about this column",
-			"SQL", selectExists, "data", data, "error", err.Error())
+			"stmt", stmt, "data", data, "error", err.Error())
+		data.Tx.Rollback()
 		return false
 	}
+
 	return unique
 }
 

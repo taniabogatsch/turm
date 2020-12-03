@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"strconv"
 	"strings"
-	"turm/app"
 	"turm/app/auth"
 	"turm/app/models"
 
@@ -134,18 +133,14 @@ func (c User) Registration(user models.User) revel.Result {
 
 	c.Log.Debug("registration of user", "user", user)
 
-	user.Validate(c.Validation)
-	if c.Validation.HasErrors() {
+	//register the new user
+	if err := user.Register(c.Validation); err != nil {
+		return flashError(
+			errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
 		return flashError(
 			errValidation, nil, "", c.Controller, "")
 	}
-
-	//register the new user
-	if err := user.Register(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
-	}
-	c.Log.Debug("registration successful", "user", user)
 
 	c.setSession(&user)
 	c.Session["notActivated"] = "true"
@@ -154,17 +149,14 @@ func (c User) Registration(user models.User) revel.Result {
 	err := sendEMail(c.Controller, &data,
 		"email.subject.activation",
 		"activation")
+
 	if err != nil {
-		return flashError(
-			errEMail, err,
-			"/user/activationPage",
+		return flashError(errEMail, err, "/user/activationPage",
 			c.Controller, user.EMail,
 		)
 	}
 
-	c.Flash.Success(c.Message("register.success",
-		user.EMail,
-	))
+	c.Flash.Success(c.Message("register.success", user.EMail))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -187,59 +179,25 @@ func (c User) NewPassword(email string) revel.Result {
 
 	c.Log.Debug("requesting new password", "email", email)
 
-	c.Validation.Check(email,
-		revel.Required{},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.email")
-	c.Validation.Email(email).
-		MessageKey("validation.invalid.email")
-
-	isLdapEMail := !strings.Contains(strings.ToLower(email), app.Mailer.Suffix)
-	c.Validation.Required(isLdapEMail).
-		MessageKey("validation.email.ldap")
-
-	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
-	}
-
-	//TODO: use transaction and revel validation in models function
-
-	//we do not want to provide any information on whether an e-mail exists
-	data := models.ValidateUniqueData{
-		Column: "email",
-		Table:  "users",
-		Value:  strings.ToLower(email),
-	}
-	c.Validation.Check(data,
-		models.NotUnique{},
-	)
-	if c.Validation.HasErrors() {
-		c.Flash.Success(c.Message("new.pw.success",
-			email,
-		))
-		return c.Redirect(User.LoginPage)
-	}
-
 	user := models.User{EMail: strings.ToLower(email)}
-	if err := user.GenerateNewPassword(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+	err := user.GenerateNewPassword(c.Validation)
+
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
-	c.Log.Debug("set new password", "user", user)
 
 	mailData := models.EMailData{User: user}
-	err := sendEMail(c.Controller, &mailData,
+	err = sendEMail(c.Controller, &mailData,
 		"email.subject.new.pw",
 		"newPw")
+
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, user.EMail)
+		return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
 
-	c.Flash.Success(c.Message("new.pw.success",
-		email,
-	))
+	c.Flash.Success(c.Message("new.pw.success", email))
 	return c.Redirect(User.LoginPage)
 }
 
@@ -283,21 +241,18 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 	}
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	//set the activation code to null, if it matches
 	success, err := user.VerifyActivationCode()
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	if !success { //invalid activation code
 		c.Validation.ErrorKey("validation.invalid.activation")
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	c.Session.Del("notActivated")
@@ -312,32 +267,26 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 - Roles: logged in and not activated users */
 func (c User) NewActivationCode() revel.Result {
 
-	userID := c.Session["userID"].(string)
-	var user models.User
-	var err error
-
-	if user.ID, err = strconv.Atoi(userID); err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
+	user := models.User{ID: userID}
 	if err := user.NewActivationCode(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	data := models.EMailData{User: user}
 	err = sendEMail(c.Controller, &data,
 		"email.subject.activation",
 		"activation")
+
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, user.EMail)
+		return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
 
-	c.Flash.Success(c.Message("activation.resend.success",
-		user.EMail,
-	))
+	c.Flash.Success(c.Message("activation.resend.success", user.EMail))
 	return c.Redirect(User.ActivationPage)
 }
 
@@ -426,6 +375,7 @@ func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 	user := models.User{ID: userID,
 		Password: sql.NullString{Valid: true, String: oldPw}}
 	err = user.NewPassword(newPw1, newPw2, c.Validation)
+
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	} else if c.Validation.HasErrors() {
@@ -436,6 +386,7 @@ func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 	err = sendEMail(c.Controller, &mailData,
 		"email.subject.change.pw",
 		"changePw")
+
 	if err != nil {
 		return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
