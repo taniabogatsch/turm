@@ -91,6 +91,7 @@ func (list *CourseList) GetByUserID(tx *sqlx.Tx, userID int, userType string, ac
 
 	if userType == "admin" {
 		stmt = stmtAllCoursesAdmin + stmtWhere
+		userID = 0
 	} else {
 		stmt = stmtSelect + stmt + stmtWhere
 	}

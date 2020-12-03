@@ -29,6 +29,11 @@ func (c Edit) Open(ID int) revel.Result {
 		return c.Render()
 	}
 
+	if course.Expired && course.Active {
+		c.Flash.Error(c.Message("intercept.invalid.action"))
+		return c.Redirect(c.Session["callPath"].(string))
+	}
+
 	//only set these after the course is loaded
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()

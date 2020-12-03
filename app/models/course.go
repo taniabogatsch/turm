@@ -497,12 +497,10 @@ func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
 /*NewBlank creates a new blank course. */
 func (course *Course) NewBlank(creatorID *int, title *string) (err error) {
 
-	now := time.Now().Format(revel.TimeFormats[0])
-
-	err = app.Db.Get(course, stmtInsertBlankCourse, now, *creatorID, *title)
+	err = app.Db.Get(course, stmtInsertBlankCourse, *creatorID, *title)
 	if err != nil {
-		log.Error("failed to insert blank course", "now", now,
-			"creator ID", *creatorID, "error", err.Error())
+		log.Error("failed to insert blank course", "creator ID", *creatorID,
+			"title", *title, "error", err.Error())
 	}
 	return
 }
@@ -565,20 +563,19 @@ func (course *Course) Activate(v *revel.Validation) (invalid bool, err error) {
 /*Duplicate a course. */
 func (course *Course) Duplicate() (err error) {
 
-	now := time.Now().Format(revel.TimeFormats[0])
-	courseIDOld := course.ID
-
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
 	}
 
+	courseIDOld := course.ID
+
 	//duplicate general course data
-	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title, now)
+	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title)
 	if err != nil {
 		log.Error("failed to duplicate course", "course ID", course.ID, "title",
-			course.Title, "now", now, "error", err.Error())
+			course.Title, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -587,6 +584,8 @@ func (course *Course) Duplicate() (err error) {
 	if err = course.Events.Duplicate(tx, &course.ID, &courseIDOld); err != nil {
 		return
 	}
+
+	//TODO: duplicate calendar events
 
 	//duplicate user lists
 	if err = course.Editors.Duplicate(tx, &course.ID, &courseIDOld, "editors"); err != nil {
@@ -706,13 +705,8 @@ const (
 	`
 
 	stmtInsertBlankCourse = `
-		INSERT INTO courses (
-			title, creator, visible, active, only_ldap, creation_date,
-			enrollment_start, enrollment_end, expiration_date
-		)
-		VALUES (
-			$3, $2, false, false, false, $1, $1, $1, $1
-		)
+		INSERT INTO courses (title, creator)
+		VALUES ($2, $1)
 		RETURNING id, title
 	`
 
@@ -722,20 +716,21 @@ const (
 		WHERE id = $1
 			AND (
 				active = false
-				OR
-				(current_timestamp > expiration_date)
+				OR (current_timestamp > expiration_date)
 			)
 	`
 
 	stmtDuplicateCourse = `
 		INSERT INTO courses (
-			title, subtitle, active, creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end,
-			enrollment_start, expiration_date, fee, only_ldap, parent_id, speaker, unsubscribe_end, visible
+			title, subtitle, creator, custom_email, description, enroll_limit_events, enrollment_end,
+			enrollment_start, expiration_date, fee, only_ldap, parent_id, speaker, unsubscribe_end,
+			visible
 		)
 		(
 			SELECT
-					$2 AS title, subtitle, active, $3 AS creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end,
-					enrollment_start, expiration_date, fee, only_ldap, parent_id, speaker, unsubscribe_end, visible
+				$2 AS title, subtitle, creator, custom_email, description, enroll_limit_events,
+				enrollment_end, enrollment_start, expiration_date, fee, only_ldap, parent_id,
+				speaker, unsubscribe_end, visible
 			FROM courses
 			WHERE id = $1
 		)
