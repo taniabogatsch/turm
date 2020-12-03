@@ -55,8 +55,8 @@ creator.course.delete.draft.confirm = Wollen Sie den Kursentwurf '%s' wirklich l
 creator.course.delete.draft.title = Kursentwurf löschen
 
 creator.course.duplicated = Kursentwurf dupliziert: '%s', Kurs ID = %d.
-creator.course.duplicate.confirm = Kursentwurf '%s' wirklich duplizieren?
-creator.course.duplicate.title = Entwurf duplizieren
+creator.course.duplicate.info = Geben Sie den Title des duplizierten Kurses an.
+creator.course.duplicate.title = Kurs duplizieren
 
 creator.course.download.title = Kurs herunterladen
 creator.course.download.filename.info = Die Angabe eines Dateinamen ist optional.

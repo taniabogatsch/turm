@@ -1,0 +1,33 @@
+{{template "emails/components/MIMETop.html" .}}
+
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
+
+Sie haben nicht länger die Rolle {{if eq .data.CourseRole "editors"}}EditorIn{{else}}OrganisatorIn{{end}} für den Kurs '{{.data.CourseTitle}}'.
+
+Zum Kurs: {{.data.URL}}/course/open?ID={{.data.CourseID}}
+
+Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
+
+{{template "emails/components/bestRegards.html" .}}
+
+{{template "emails/components/MIMEMiddle.html" .}}
+
+<body>
+{{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
+<br>
+<br>
+Sie haben nicht länger die Rolle {{if eq .data.CourseRole "editors"}}EditorIn{{else}}OrganisatorIn{{end}} für den Kurs '{{.data.CourseTitle}}'. <br>
+<br>
+<a href="{{.data.URL}}/course/open?ID={{.data.CourseID}}">
+    Zum Kurs: {{.data.CourseTitle}}
+</a>
+<br>
+<br>
+<b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
+<br>
+<br>
+{{msg $ "email.regards" .data.URL}}
+</body>
+</html>
+
+{{template "emails/components/MIMEBottom.html" .}}

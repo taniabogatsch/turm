@@ -13,8 +13,6 @@ import (
 	"github.com/revel/revel"
 )
 
-//TODO: use GetColumnValue for other functions?
-
 /*Course is a model of the course table. */
 type Course struct {
 	ID                int             `db:"id, primarykey, autoincrement"`
@@ -60,9 +58,13 @@ type Course struct {
 	//used for enrollment
 	CourseStatus CourseStatus
 	Manage       bool
+
+	//used to render buttons for redirect
+	CanEdit               bool `db:"can_edit"`
+	CanManageParticipants bool `db:"can_manage_participants"`
 }
 
-/*Validate all Course fields. */
+/*Validate all course fields. */
 func (course *Course) Validate(v *revel.Validation) {
 
 	now := time.Now().Format(revel.TimeFormats[0])
@@ -125,7 +127,7 @@ func (course *Course) GetVisible(elem string) (err error) {
 
 	switch elem {
 	case "course":
-		err = app.Db.Get(course, stmtGetCourseVisible, course.ID)
+		err = course.GetColumnValue(nil, "visible")
 	case "event":
 		err = app.Db.Get(course, stmtGetEventVisible, course.ID)
 	default:
@@ -244,6 +246,20 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		return
 	}
 
+	//get if the user is allowed to edit the course and to manage the participants
+	if int(course.Creator.Int32) == userID {
+		course.CanEdit = true
+		course.CanManageParticipants = true
+	} else {
+		err = tx.Get(course, stmtIsEditorInstructorOfCourse, userID, course.ID)
+		if err != nil {
+			log.Error("failed to get if user is editor or instructor of the course",
+				"userID", userID, "courseID", course.ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
 	//get additional fields
 	if err = course.Editors.Get(tx, &course.ID, "editors"); err != nil {
 		return
@@ -276,6 +292,7 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	now := time.Now()
 	weekday := time.Now().Weekday()
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+
 	//get the calander events of a course
 	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
 		return
@@ -297,6 +314,8 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 			course.Events[key].validateEnrollment(course)
 		}
 	}
+
+	//TODO: get enroll information for calendar events
 
 	//get more detailed creator data
 	if course.Creator.Valid {
@@ -341,7 +360,7 @@ func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 		return
 	}
 
-	//TODO: get calendar events
+	//TODO: get calendar events ?
 
 	return
 }
@@ -495,12 +514,12 @@ func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
 }
 
 /*NewBlank creates a new blank course. */
-func (course *Course) NewBlank(creatorID *int, title *string) (err error) {
+func (course *Course) NewBlank() (err error) {
 
-	err = app.Db.Get(course, stmtInsertBlankCourse, *creatorID, *title)
+	err = app.Db.Get(course, stmtInsertBlankCourse, course.Creator, course.Title)
 	if err != nil {
-		log.Error("failed to insert blank course", "creator ID", *creatorID,
-			"title", *title, "error", err.Error())
+		log.Error("failed to insert blank course", "creator ID", course.Creator,
+			"title", course.Title, "error", err.Error())
 	}
 	return
 }
@@ -533,7 +552,8 @@ func (course *Course) Delete() (valid bool, err error) {
 }
 
 /*Activate a course. */
-func (course *Course) Activate(v *revel.Validation) (invalid bool, err error) {
+func (course *Course) Activate(v *revel.Validation) (invalid bool,
+	users []EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -550,10 +570,44 @@ func (course *Course) Activate(v *revel.Validation) (invalid bool, err error) {
 		return
 	}
 
-	//TODO: get all instructors and editors
+	//update the active flag
 	conf := EditEMailConfig{}
 	if err = course.Update(tx, "active", true, &conf); err != nil {
 		return
+	}
+
+	//set e-mail data for each editor
+	for _, editor := range course.Editors {
+
+		data := EMailData{
+			CourseTitle: course.Title,
+			CourseID:    course.ID,
+			CourseRole:  "editors",
+			ViewMatrNr:  editor.ViewMatrNr,
+		}
+		data.User.ID = editor.UserID
+		if err = data.User.Get(tx); err != nil {
+			return
+		}
+
+		users = append(users, data)
+	}
+
+	//set e-mail data for each instructor
+	for _, instructor := range course.Instructors {
+
+		data := EMailData{
+			CourseTitle: course.Title,
+			CourseID:    course.ID,
+			CourseRole:  "instructors",
+			ViewMatrNr:  instructor.ViewMatrNr,
+		}
+		data.User.ID = instructor.UserID
+		if err = data.User.Get(tx); err != nil {
+			return
+		}
+
+		users = append(users, data)
 	}
 
 	tx.Commit()
@@ -572,10 +626,10 @@ func (course *Course) Duplicate() (err error) {
 	courseIDOld := course.ID
 
 	//duplicate general course data
-	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title)
+	err = tx.Get(course, stmtDuplicateCourse, course.ID, course.Title, course.Creator)
 	if err != nil {
 		log.Error("failed to duplicate course", "course ID", course.ID, "title",
-			course.Title, "error", err.Error())
+			course.Title, "creator", course.Creator, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -640,9 +694,7 @@ func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err erro
 }
 
 /*Insert a new course from a provided course struct. */
-func (course *Course) Insert(creatorID *int, title *string) (err error) {
-
-	now := time.Now().Format(revel.TimeFormats[0])
+func (course *Course) Insert() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -650,12 +702,12 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 		return
 	}
 
-	err = tx.Get(course, stmtInsertCourse, now, *creatorID, course.CustomEMail, course.Description,
+	err = tx.Get(course, stmtInsertCourse, course.Visible, course.Creator, course.CustomEMail, course.Description,
 		course.EnrollLimitEvents, course.EnrollmentEnd, course.EnrollmentStart, course.ExpirationDate,
-		course.Fee, course.OnlyLDAP, course.Speaker, course.Subtitle, title, course.UnsubscribeEnd, course.Visible)
+		course.Fee, course.OnlyLDAP, course.Speaker, course.Subtitle, course.Title, course.UnsubscribeEnd)
 	if err != nil {
-		log.Error("failed to insert general course data", "creator ID", *creatorID,
-			"title", *title, "now", now, "course", *course, "error", err.Error())
+		log.Error("failed to insert general course data", "creator ID", course.Creator,
+			"title", course.Title, "course", *course, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -663,6 +715,7 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 	if err = course.Events.Insert(tx, &course.ID); err != nil {
 		return
 	}
+	//TODO: insert calendar events
 	if err = course.Editors.Insert(tx, &course.ID, "editors"); err != nil {
 		return
 	}
@@ -680,6 +733,38 @@ func (course *Course) Insert(creatorID *int, title *string) (err error) {
 		if err = restriction.Insert(tx, course.ID); err != nil {
 			return
 		}
+	}
+
+	tx.Commit()
+	return
+}
+
+/*InsertFromDraft inserts a new course by duplicating an existing course. */
+func (course *Course) InsertFromDraft(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	authorized := false
+	err = tx.Get(&authorized, stmtAuthorizedToEditCourse, course.Creator.Int32, course.ID)
+	if err != nil {
+		log.Error("failed to retrieve whether the user is authorized or not", "userID",
+			course.Creator, "ID", course.ID, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if !authorized {
+		v.ErrorKey("intercept.invalid.action")
+		tx.Rollback()
+		return
+	}
+
+	if err = course.Duplicate(); err != nil {
+		return
 	}
 
 	tx.Commit()
@@ -711,13 +796,15 @@ const (
 	`
 
 	stmtCourseIsInactiveOrExpired = `
-		SELECT true AS valid
-		FROM courses
-		WHERE id = $1
-			AND (
-				active = false
-				OR (current_timestamp > expiration_date)
-			)
+		SELECT EXISTS (
+			SELECT id
+			FROM courses
+			WHERE id = $1
+				AND (
+					active = false
+					OR (current_timestamp > expiration_date)
+				)
+		) AS valid
 	`
 
 	stmtDuplicateCourse = `
@@ -728,7 +815,7 @@ const (
 		)
 		(
 			SELECT
-				$2 AS title, subtitle, creator, custom_email, description, enroll_limit_events,
+				$2 AS title, subtitle, $3 AS creator, custom_email, description, enroll_limit_events,
 				enrollment_end, enrollment_start, expiration_date, fee, only_ldap, parent_id,
 				speaker, unsubscribe_end, visible
 			FROM courses
@@ -739,10 +826,10 @@ const (
 
 	stmtInsertCourse = `
 		INSERT INTO courses
-			(active, creation_date, creator, custom_email, description, enroll_limit_events, enrollment_end, enrollment_start,
-			expiration_date, fee, only_ldap, speaker, subtitle, title, unsubscribe_end, visible)
+			(visible, creator, custom_email, description, enroll_limit_events, enrollment_end, enrollment_start,
+			expiration_date, fee, only_ldap, speaker, subtitle, title, unsubscribe_end)
 		VALUES
-			(false, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 		RETURNING id, title
 	`
 
@@ -769,5 +856,21 @@ const (
 		) AS expired
 		FROM courses
 		WHERE id = $1
+	`
+
+	stmtIsEditorInstructorOfCourse = `
+		SELECT
+			EXISTS (
+				SELECT true
+				FROM editors e
+				WHERE e.user_id = $1
+					AND e.course_id = $2
+			) AS can_edit,
+			EXISTS (
+				SELECT true
+				FROM instructors i
+				WHERE i.user_id = $1
+					AND i.course_id = $2
+			) AS can_manage_participants
 	`
 )

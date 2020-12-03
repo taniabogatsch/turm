@@ -50,17 +50,19 @@
 
               <!-- download -->
               <a class="btn btn-outline-darkblue float-right" href="#no-scroll"
-                onclick='openDownloadModal({{.ID}});' role="button">
+                onclick='openDownloadModal({{.ID}});' role="button"
+                title='{{msg $ "title.manage.download"}}'>
                 {{template "icons/download.html" . }}
               </a>
 
               <!-- edit -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
+              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}'
+                role="button" title='{{msg $ "title.manage.edit"}}'>
                 {{template "icons/pencil.html" . }}
               </a>
 
               <!-- edit the course via clicking on its title -->
-              <a class="text-body" href='{{url "Edit.Open" .ID}}'>
+              <a class="text-body" href='{{url "Edit.Open" .ID}}' title='{{msg $ "title.manage.edit"}}'>
                 {{.Title}}
               </a>
 

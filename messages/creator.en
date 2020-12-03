@@ -56,8 +56,8 @@ creator.course.delete.draft.confirm = Please confirm the deletion of the course 
 creator.course.delete.draft.title = Delete course draft
 
 creator.course.duplicated = Duplicated course draft: '%s', course ID = %d.
-creator.course.duplicate.confirm = Please confirm the duplication of the course draft '%s'.
-creator.course.duplicate.title = Duplicate course draft
+creator.course.duplicate.info = Please enter the course title of the duplicated course.
+creator.course.duplicate.title = Duplicate course
 
 creator.course.download.title = Download course
 creator.course.download.filename.info = Providing a filename is optional.

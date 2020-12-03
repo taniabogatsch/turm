@@ -292,7 +292,7 @@
 </div>
 
 <!-- only ldap -->
-<div class="row mb-2 {{if not .course.OnlyLDAP}}edit-show d-none{{end}}" id="events">
+<div class="row mb-2 {{if not .course.OnlyLDAP}}edit-show d-none{{end}}">
   <div class="col-sm-4 text-muted">
     {{msg $ "course.audience"}}:
   </div>
@@ -320,50 +320,8 @@
   {{template "course/restrictions.html" dict_addLocale $.currentLocale "restrictions" .course.Restrictions}}
 </div>
 
-<br>
-<br>
-
-<!-- events info -->
-<div class="row edit-show d-none mb-2">
-  <div class="col">
-    <h5>
-      {{template "icons/people.html" .}}
-      &nbsp; {{msg $ "course.events"}}
-    </h5>
-    <small class="text-muted">
-      {{msg $ "course.events.info"}} {{msg $ "course.events.info2"}}
-    </small>
-    <hr>
-  </div>
-</div>
-
-<!-- new event -->
-<div class="row mb-2 edit-show d-none">
-  <div class="col">
-    <button type="button" class="btn btn-outline-darkblue"
-      onclick='openNewEventModal({{msg $ "creator.event.new"}},
-        "{{url "Edit.NewEvent"}}", {{.course.ID}},
-        {{msg $ "creator.title.event.working.info"}});'>
-      {{msg $ "creator.add.event"}}
-    </button>
-  </div>
-</div>
-
-<hr>
-
-<!-- event list -->
-<div id="div-events">
-  {{template "course/events.html" dict_addLocale $.currentLocale "events" .course.Events "manage" .course.Manage}}
-</div>
-
-<!-- calendar event list -->
-<div id="div-calendar_events">
-  {{template "course/calendarEvents.html" dict_addLocale $.currentLocale "events" .course.CalendarEvents}}
-</div>
-
 <br id="more-settings">
 <br>
-
 
 <!-- more settings -->
 <div class="row edit-show d-none mb-2">
@@ -522,6 +480,47 @@
 <!-- blacklist -->
 <div id="div-blacklists">
   {{template "course/blacklist.html" dict_addLocale $.currentLocale "blacklist" .course.Blacklist}}
+</div>
+
+<br id="events">
+<br>
+
+<!-- events info -->
+<div class="row edit-show d-none mb-2">
+  <div class="col">
+    <h5>
+      {{template "icons/people.html" .}}
+      &nbsp; {{msg $ "course.events"}}
+    </h5>
+    <small class="text-muted">
+      {{msg $ "course.events.info"}} {{msg $ "course.events.info2"}}
+    </small>
+    <hr>
+  </div>
+</div>
+
+<!-- new event -->
+<div class="row mb-2 edit-show d-none">
+  <div class="col">
+    <button type="button" class="btn btn-outline-darkblue"
+      onclick='openNewEventModal({{msg $ "creator.event.new"}},
+        "{{url "Edit.NewEvent"}}", {{.course.ID}},
+        {{msg $ "creator.title.event.working.info"}});'>
+      {{msg $ "creator.add.event"}}
+    </button>
+  </div>
+</div>
+
+<hr>
+
+<!-- event list -->
+<div id="div-events">
+  {{template "course/events.html" dict_addLocale $.currentLocale "events" .course.Events "manage" .course.Manage}}
+</div>
+
+<!-- calendar event list -->
+<div id="div-calendar_events">
+  {{template "course/calendarEvents.html" dict_addLocale $.currentLocale "events" .course.CalendarEvents}}
 </div>
 
 <script>

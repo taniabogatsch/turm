@@ -22,7 +22,7 @@ type CourseListInfo struct {
 type CourseList []CourseListInfo
 
 /*Search all courses. */
-func (courses *Courses) Search(value string) (err error) {
+func (list *CourseList) Search(value string) (err error) {
 
 	//we need to divide the string into substrings so we don't have whitespaces
 	strSlice := strings.Split(value, " ")
@@ -31,7 +31,31 @@ func (courses *Courses) Search(value string) (err error) {
 		searchVal += "%" + str + "%"
 	}
 
-	err = app.Db.Select(courses, stmtSearchCourses, searchVal)
+	err = app.Db.Select(list, stmtSearchCourses, searchVal)
+	if err != nil {
+		log.Error("failed to search courses", "value", value, "searchVal",
+			searchVal, "error", err.Error())
+	}
+
+	return
+}
+
+/*SearchForDrafts returns all courses that can be duplicated by a creator. */
+func (list *CourseList) SearchForDrafts(value string, userID int, role string) (err error) {
+
+	//we need to divide the string into substrings so we don't have whitespaces
+	strSlice := strings.Split(value, " ")
+	searchVal := ""
+	for _, str := range strSlice {
+		searchVal += "%" + str + "%"
+	}
+
+	if role == ADMIN.String() {
+		err = app.Db.Select(list, stmtSearchCoursesForDraftAdmin, searchVal)
+	} else {
+		err = app.Db.Select(list, stmtSearchCoursesForDraft, searchVal)
+	}
+
 	if err != nil {
 		log.Error("failed to search courses", "value", value, "searchVal",
 			searchVal, "error", err.Error())
@@ -247,4 +271,205 @@ const (
 		FROM courses c
 		WHERE $2 = 0
 	`
+
+	stmtSearchCoursesForDraft = `
+    /* search course fields */
+    SELECT c.id, c.title
+    FROM courses c LEFT OUTER JOIN events e ON c.id = e.course_id
+      LEFT OUTER JOIN meetings m ON e.id = m.event_id
+    WHERE (
+        c.title ILIKE $1
+        OR c.description ILIKE $1
+        OR c.speaker ILIKE $1
+        OR c.subtitle ILIKE $1
+        OR e.title ILIKE $1
+        OR e.annotation ILIKE $1
+        OR m.place ILIKE $1
+        OR m.annotation ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+    UNION
+
+    /* search editors */
+    SELECT c.id, c.title
+    FROM courses c JOIN editors e ON c.id = e.course_id
+      JOIN users u ON u.id = e.user_id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+    UNION
+
+    /* search instructors */
+    SELECT c.id, c.title
+    FROM courses c JOIN instructors i ON c.id = i.course_id
+      JOIN users u ON u.id = i.user_id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+    UNION
+
+    /* search groups */
+    SELECT c.id, c.title
+    FROM courses c
+    WHERE c.parent_id IN (
+        SELECT g.id
+        FROM groups g
+        WHERE g.name ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+    UNION
+
+    /* search creators */
+    SELECT c.id, c.title
+    FROM courses c JOIN users u ON c.creator = u.id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+    UNION
+
+    /* search calendar events */
+    SELECT c.id, c.title
+    FROM courses c LEFT OUTER JOIN calendar_events e ON c.id = e.course_id
+    WHERE (
+        e.title ILIKE $1
+        OR e.annotation ILIKE $1
+      )
+			AND (
+					c.id IN (
+						SELECT e.course_id AS id
+						FROM editors e
+						WHERE e.user_id = $2
+					)
+				OR
+					c.creator = $2
+			)
+
+  `
+
+	stmtSearchCoursesForDraftAdmin = `
+    /* search course fields */
+    SELECT c.id, c.title
+    FROM courses c LEFT OUTER JOIN events e ON c.id = e.course_id
+      LEFT OUTER JOIN meetings m ON e.id = m.event_id
+    WHERE (
+        c.title ILIKE $1
+        OR c.description ILIKE $1
+        OR c.speaker ILIKE $1
+        OR c.subtitle ILIKE $1
+        OR e.title ILIKE $1
+        OR e.annotation ILIKE $1
+        OR m.place ILIKE $1
+        OR m.annotation ILIKE $1
+      )
+
+    UNION
+
+    /* search editors */
+    SELECT c.id, c.title
+    FROM courses c JOIN editors e ON c.id = e.course_id
+      JOIN users u ON u.id = e.user_id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+
+    UNION
+
+    /* search instructors */
+    SELECT c.id, c.title
+    FROM courses c JOIN instructors i ON c.id = i.course_id
+      JOIN users u ON u.id = i.user_id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+
+    UNION
+
+    /* search groups */
+    SELECT c.id, c.title
+    FROM courses c
+    WHERE c.parent_id IN (
+        SELECT g.id
+        FROM groups g
+        WHERE g.name ILIKE $1
+      )
+
+    UNION
+
+    /* search creators */
+    SELECT c.id, c.title
+    FROM courses c JOIN users u ON c.creator = u.id
+    WHERE (
+        u.first_name ILIKE $1
+        OR u.last_name ILIKE $1
+        OR u.email ILIKE $1
+      )
+
+    UNION
+
+    /* search calendar events */
+    SELECT c.id, c.title
+    FROM courses c LEFT OUTER JOIN calendar_events e ON c.id = e.course_id
+    WHERE (
+        e.title ILIKE $1
+        OR e.annotation ILIKE $1
+      )
+  `
 )

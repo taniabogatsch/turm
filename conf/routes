@@ -74,6 +74,8 @@ POST    /creator/duplicate                          Creator.Duplicate
 POST    /creator/expire                             Creator.Expire
 POST    /creator/new                                Creator.New
 
+GET     /creator/search                             Creator.Search
+
 
 # ---------------------------------------------------------------------------- #
 # Edit (course, event, meeting, calendar event)

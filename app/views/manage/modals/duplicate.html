@@ -1,0 +1,59 @@
+<!-- modal for duplicating a course -->
+
+<div class="modal fade" id="duplicate-course-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- form -->
+      <form accept-charset="UTF-8" method="POST" class="needs-validation" novalidate
+        action='{{url "Creator.Duplicate"}}'>
+
+        <!-- modal header -->
+        <div class="modal-header bg-darkblue border-radius-2">
+          <h5 class="modal-title text-white">
+            {{msg $ "creator.course.duplicate.info"}}
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- course ID -->
+          <input type="hidden" name="ID" id="duplicate-course-ID">
+
+          <!-- value -->
+          <small class="text-muted">
+            {{msg $ "creator.course.duplicate.info"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input name="title" placeholder='{{msg $ "course.title"}}' type="text" maxlength="255"
+              class="form-control rounded-right" required minlength="3" id="duplicate-course-title">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.text"}}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.confirm"}}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

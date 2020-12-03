@@ -272,13 +272,24 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
-	if err := entry.Insert(listType); err != nil {
+	active, data, err := entry.Insert(listType)
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
 			c.Controller, "")
 	}
 
-	//TODO: if the course is active, the user should get a notification e-mail
+	//if the course is active, the user gets a notification e-mail
+	if active {
+
+		err = sendEMail(c.Controller, &data,
+			"email.subject.new.course.role",
+			"newCourseRole")
+
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("course."+listType+".change.success",
 		entry.EMail,
@@ -316,13 +327,24 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID}
-	if err := entry.Delete(listType); err != nil {
+	active, data, err := entry.Delete(listType)
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
 			c.Controller, "")
 	}
 
-	//TODO: if the course is active, the user should get a notification e-mail
+	//if the course is active, the user gets a notification e-mail
+	if active {
+
+		err = sendEMail(c.Controller, &data,
+			"email.subject.course.role.deleted",
+			"deleteCourseRole")
+
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("course."+listType+".delete.success", ID))
 
@@ -357,13 +379,24 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 	}
 
 	entry := models.UserListEntry{UserID: userID, CourseID: ID, ViewMatrNr: option}
-	if err := entry.Update(listType); err != nil {
+	active, data, err := entry.Update(listType)
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/editorInstructorList?ID="+strconv.Itoa(ID),
 			c.Controller, "")
 	}
 
-	//TODO: if the course is active, the user should get a notification e-mail
+	//if the course is active, the user gets a notification e-mail
+	if active {
+
+		err = sendEMail(c.Controller, &data,
+			"email.subject.course.role.authorization",
+			"changeViewMatrNr")
+
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("course.matr.nr.change.success", entry.EMail, entry.CourseID))
 	return c.Redirect(Course.EditorInstructorList, ID)

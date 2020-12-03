@@ -7,34 +7,37 @@
     <button type="button" class="btn btn-outline-darkblue float-right"
       onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
         {{msg $ "creator.course.delete.draft.confirm" .Title}},
-        {{url "Creator.Delete" .ID}});'>
+        {{url "Creator.Delete" .ID}});'
+      title='{{msg $ "title.manage.delete"}}'>
       {{template "icons/trash.html" . }}
     </button>
 
     <!-- duplicate -->
     <button type="button" class="btn btn-outline-darkblue float-right mr-3"
-      onclick='confirmPOSTModal({{msg $ "creator.course.duplicate.title"}},
-        {{msg $ "creator.course.duplicate.confirm" .Title}},
-        {{url "Creator.Duplicate" .ID .Title}});'>
+      onclick='openDuplicateModal({{.ID}});'
+      title='{{msg $ "title.manage.duplicate"}}'>
       {{template "icons/files.html" . }}
     </button>
 
     <!-- download -->
     <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
-      onclick='openDownloadModal({{.ID}});' role="button">
+      onclick='openDownloadModal({{.ID}});' role="button"
+      title='{{msg $ "title.manage.download"}}'>
       {{template "icons/download.html" . }}
     </a>
 
     <!-- edit -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}' role="button">
+    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}'
+      role="button" title='{{msg $ "title.manage.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
 
-    <a class="text-body" href='{{url "Edit.Open" .ID}}'>
+    <!-- edit the course via clicking on its title -->
+    <a class="text-body" href='{{url "Edit.Open" .ID}}'
+      title='{{msg $ "title.manage.edit"}}'>
       {{.Title}}
     </a>
 
-    <!-- edit the course via clicking on its title -->
     <small class="form-text text-muted">
       {{template "icons/calendar.html" . }} &nbsp; {{.CreationDate}}
     </small>

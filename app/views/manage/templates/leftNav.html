@@ -51,8 +51,9 @@
   </div>
 </div>
 
-<!-- new course modal and download course modal -->
-{{template "manage/templates/new.html" dict_addLocale $.currentLocale}}
-{{template "manage/templates/download.html" dict_addLocale $.currentLocale}}
+<!-- load modals -->
+{{template "manage/modals/new.html" dict_addLocale $.currentLocale}}
+{{template "manage/modals/download.html" dict_addLocale $.currentLocale}}
+{{template "manage/modals/duplicate.html" dict_addLocale $.currentLocale}}
 
 <script src="/public/js/manage.js"></script>

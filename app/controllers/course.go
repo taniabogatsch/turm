@@ -28,6 +28,13 @@ func (c Course) Open(ID int) revel.Result {
 		return c.Render()
 	}
 
+	if c.Session["role"] != nil {
+		if c.Session["role"].(string) == models.ADMIN.String() {
+			course.CanEdit = true
+			course.CanManageParticipants = true
+		}
+	}
+
 	//only render content if the course is publicly visible
 	if !course.Visible && userID == 0 {
 		course = models.Course{
@@ -62,7 +69,7 @@ func (c Course) Search(value string) revel.Result {
 		return c.Render()
 	}
 
-	var courses models.Courses
+	var courses models.CourseList
 	if err := courses.Search(value); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()

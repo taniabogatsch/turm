@@ -25,6 +25,22 @@
       {{end}}
     {{end}}
 
+    <!-- participants -->
+    {{if .course.CanManageParticipants}}
+      <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .course.ID}}'
+        role="button" title='{{msg $ "title.manage.participants"}}'>
+        {{template "icons/people.html" . }}
+      </a>
+    {{end}}
+
+    <!-- edit -->
+    {{if .course.CanEdit}}
+      <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .course.ID}}'
+        role="button" title='{{msg $ "title.manage.edit"}}'>
+        {{template "icons/pencil.html" . }}
+      </a>
+    {{end}}
+
     {{if or .session.userID .course.Visible}}
       {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
     {{end}}

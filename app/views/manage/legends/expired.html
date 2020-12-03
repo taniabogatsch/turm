@@ -20,6 +20,12 @@
     <hr>
   </div>
 
+  <div class="d-none admin creator">
+    {{template "icons/files.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.duplicate"}}
+    <hr>
+  </div>
+
   {{template "icons/people.html" . }} &nbsp;
   {{msg $ "creator.info.expired.user"}}
 

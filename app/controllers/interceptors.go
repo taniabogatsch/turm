@@ -221,7 +221,9 @@ func (c Creator) auth() revel.Result {
 	}
 
 	//admins and creators are authorized to create new courses
-	if c.MethodName == "New" && c.Session["role"] != nil {
+	if (c.MethodName == "New" || c.MethodName == "Search") &&
+		c.Session["role"] != nil {
+
 		if c.Session["role"] == models.ADMIN.String() ||
 			c.Session["role"] == models.CREATOR.String() {
 			return nil

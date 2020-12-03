@@ -202,3 +202,62 @@ function bookSlotModal(calendarEventID, date, year) {
   //show the modal
   $('#book-slot-modal').modal('show');
 }
+
+function searchCourse(valDiv, resultDiv, dropdownID, action) {
+
+  let dropdown = document.getElementById(resultDiv);
+  let contains = dropdown.classList.contains("show");
+
+  let value = $('#' + valDiv).val();
+  if (value != "") {
+    $.get(action, {
+      "value": value
+    }, function(data) {
+      $('#' + resultDiv).html(data);
+    })
+
+    if (!contains) {
+      $('#' + dropdownID).dropdown('toggle');
+    }
+    dropdown.classList.remove("d-none");
+  } else {
+
+    if (contains) {
+      $('#' + dropdownID).dropdown('toggle');
+    }
+    dropdown.classList.add("d-none");
+  }
+}
+
+function searchCourseDrafts(valDiv, resultDiv, action) {
+
+  let result = document.getElementById(resultDiv);
+
+  let value = $('#' + valDiv).val();
+
+  if (value != "") {
+
+    $.get(action, {
+      "value": value
+    }, function(data) {
+      $('#' + resultDiv).html(data);
+    })
+
+    result.classList.remove("d-none");
+
+  } else {
+
+    result.classList.add("d-none");
+  }
+}
+
+function selectCourseIDOfDraft(ID) {
+
+  $('#new-course-input-ID').val(ID);
+
+  let items = document.getElementsByClassName("new-course-list-item");
+  for (let i = 0; i < items.length; i++) {
+    items[i].classList.remove("active");
+  }
+  document.getElementById('new-course-list-item-' + ID).classList.add("active");
+}

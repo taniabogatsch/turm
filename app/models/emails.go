@@ -24,6 +24,10 @@ type EMailData struct {
 
 	//used for changing the enrollment status
 	Status EnrollmentStatus
+
+	//new course role type
+	CourseRole string
+	ViewMatrNr bool
 }
 
 /*EditEMailConfig provides all information for sending edit notification e-mails. */

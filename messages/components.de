@@ -55,6 +55,8 @@ button.new.day.tmpl = Neue Schablone
 button.book.slot = Zeitraum buchen
 button.book = Buchen
 
+button.select = Auswählen
+
 # -------------------------------------------------------------------------------------------------- #
 # ERRORS
 # -------------------------------------------------------------------------------------------------- #
@@ -158,6 +160,9 @@ email.subject.manual.unsubscribed = Turm2 - Information zum manuellen Austragen
 email.subject.change.status = Turm2 - Ihr Bezahlstatus wurde geändert
 email.subject.change.pw = Turm2 - Ihr Passwort wurde geändert
 email.subject.from.slot = Turm2 - Ihre Buchung wurde manuell entfernt
+email.subject.new.course.role = Turm2 - Neue Kursrolle
+email.subject.course.role.deleted = Turm2 - Kursrolle gelöscht
+email.subject.course.role.authorization = Turm2 - Kursberechtigungen geändert
 
 email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
 email.edit.info = Bitte geben Sie die NutzerInnen an, die über die vorgenommene Änderung via E-Mail informiert werden sollen. Bitte geben Sie außerdem an, ob EditorInnen und OrganisatorInnen über die Änderung via E-Mail informiert werden sollen.
@@ -227,6 +232,8 @@ title.manage.course.view = Zur Kursansicht
 title.manage.edit = Kurs bearbeiten
 title.manage.download = Kurs herunterladen
 title.manage.participants = Zur Teilnehmerverwaltung
+title.manage.delete = Kurs löschen
+title.manage.duplicate = Kurs duplizieren
 
 title.edit.preview = Kursvorschau
 title.edit.validate = Kursfelder validieren

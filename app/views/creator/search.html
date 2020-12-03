@@ -1,0 +1,27 @@
+<!-- template rendering all course search results -->
+
+<small class="text-muted form-text">
+  {{msg $ "search.limit" 5}}
+</small>
+<ul class="list-group list-group-flush">
+{{range .courses}}
+  <li class="list-group-item new-course-list-item" id="new-course-list-item-{{.ID}}">
+    {{.Title}}
+    <button type="button" class="btn btn-outline-darkblue float-right"
+      onclick="selectCourseIDOfDraft({{.ID}});">
+      {{msg $ "button.select"}}
+    </button>
+  </li>
+
+{{else}}
+  {{if .errMsg}}
+    <div class="val-div w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{else}}
+    <small class="text-muted">
+      {{msg $ "search.no.results"}}
+    </small>
+  {{end}}
+{{end}}
+</ul>

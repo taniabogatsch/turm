@@ -49,24 +49,26 @@
 
               <!-- participants -->
               <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Participants.Open" .ID}}'
-                role="button">
+                role="button" title='{{msg $ "title.manage.participants"}}'>
                 {{template "icons/people.html" . }}
               </a>
 
               <!-- download -->
               <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
-                onclick='openDownloadModal({{.ID}});' role="button">
+                onclick='openDownloadModal({{.ID}});' role="button"
+                title='{{msg $ "title.manage.download"}}'>
                 {{template "icons/download.html" . }}
               </a>
 
               <!-- go to -->
               <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Course.Open" .ID}}'
-                role="button">
+                role="button" title='{{msg $ "title.manage.course.view"}}'>
                 {{template "icons/eye.html" . }}
               </a>
 
               <!-- title and go to -->
-              <a class="text-body" href='{{url "Course.Open" .ID}}'>
+              <a class="text-body" href='{{url "Course.Open" .ID}}'
+                title='{{msg $ "title.manage.course.view"}}'>
                 {{.Title}}
               </a>
 
@@ -95,18 +97,19 @@
 
               <!-- participants -->
               <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .ID}}'
-                role="button">
+                role="button" title='{{msg $ "title.manage.participants"}}'>
                 {{template "icons/people.html" . }}
               </a>
 
               <!-- go to -->
               <a class="btn btn-outline-darkblue float-right mr-3" role="button"
-                href='{{url "Course.Open" .ID}}'>
+                href='{{url "Course.Open" .ID}}' title='{{msg $ "title.manage.course.view"}}'>
                 {{template "icons/eye.html" . }}
               </a>
 
               <!-- title and go to -->
-              <a class="text-body" href='{{url "Course.Open" .ID}}'>
+              <a class="text-body" href='{{url "Course.Open" .ID}}'
+                title='{{msg $ "title.manage.course.view"}}'>
                 {{.Title}}
               </a>
 

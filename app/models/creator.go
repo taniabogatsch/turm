@@ -7,22 +7,6 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Option encodes the different options to create a new course. */
-type Option int
-
-const (
-	//BLANK is for empty courses
-	BLANK Option = iota
-	//DRAFT is for using existing courses
-	DRAFT
-	//UPLOAD is for uploading courses
-	UPLOAD
-)
-
-func (op Option) String() string {
-	return [...]string{"empty", "draft", "upload"}[op]
-}
-
 /*NewCourseParam holds all information about the different options to create a new course. */
 type NewCourseParam struct {
 	Title    string
@@ -47,7 +31,6 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 
 		v.Check(param.CourseID,
 			revel.Required{},
-			//TODO: user is only allowed to use drafts of courses that he created or of whom he was an editor
 		).MessageKey("validation.invalid.courseID")
 
 	} else if param.Option == UPLOAD {

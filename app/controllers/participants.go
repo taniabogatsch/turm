@@ -215,8 +215,7 @@ func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 		"manualEnroll")
 
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("enroll.manual.success"))
@@ -246,8 +245,7 @@ func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 		"manualUnsub")
 
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	//send e-mail to each auto enrolled user
@@ -262,8 +260,7 @@ func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 			"email.subject.from.wait.list",
 			"fromWaitlist")
 		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, mailData.User.EMail)
+			return flashError(errEMail, err, "", c.Controller, mailData.User.EMail)
 		}
 	}
 
@@ -295,8 +292,7 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 		"manualWaitlist")
 
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	//send e-mail to each auto enrolled user
@@ -311,8 +307,7 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 			"email.subject.from.wait.list",
 			"fromWaitlist")
 		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, mailData.User.EMail)
+			return flashError(errEMail, err, "", c.Controller, mailData.User.EMail)
 		}
 	}
 

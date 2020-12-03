@@ -109,7 +109,7 @@
         <!-- input -->
         <input class="form-control dropdown-toggle rounded-right" type="search"
           placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
-          onkeyup="searchCourse('dropdown-search', 'content-search', 'dropdown-search');"
+          onkeyup='searchCourse("dropdown-search", "content-search", "dropdown-search", {{url "Course.Search"}});'
           aria-expanded="false" id="dropdown-search">
 
         <!-- menu -->

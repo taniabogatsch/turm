@@ -9,6 +9,13 @@
       {{template "icons/people.html" . }}
     </a>
 
+    <!-- duplicate -->
+    <button type="button" class="btn btn-outline-darkblue float-right mr-3"
+      onclick='openDuplicateModal({{.ID}});'
+      title='{{msg $ "title.manage.duplicate"}}'>
+      {{template "icons/files.html" . }}
+    </button>
+
     <!-- download -->
     <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
       onclick='openDownloadModal({{.ID}});' role="button" title='{{msg $ "title.manage.download"}}'>

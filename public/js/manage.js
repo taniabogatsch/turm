@@ -38,3 +38,9 @@ function submitDownloadCourse() {
   $('#download-course-modal').modal('hide');
   $('#download-course-modal-form').submit();
 }
+
+function openDuplicateModal(ID) {
+
+  $('#duplicate-course-ID').val(ID);
+  $('#duplicate-course-modal').modal('show');
+}

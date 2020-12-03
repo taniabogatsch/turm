@@ -23,12 +23,12 @@
     <!-- input -->
     <input class="form-control dropdown-toggle rounded-right" type="search"
       placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
-      onkeyup="searchCourse('dropdown-index-search', 'content-index-search', 'dropdown-index-search');"
+      onkeyup='searchCourse("dropdown-index-search", "content-index-search", "dropdown-index-search", {{url "Course.Search"}});'
       aria-expanded="false" id="dropdown-index-search">
 
-      <!-- results -->
-      <div class="dropdown-menu d-none" id="content-index-search">
-      </div>
+    <!-- results -->
+    <div class="dropdown-menu d-none" id="content-index-search">
+    </div>
   </div>
 
   <br>

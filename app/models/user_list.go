@@ -35,7 +35,13 @@ type UserListEntry struct {
 }
 
 /*Insert the provided user list entry of a course. */
-func (user *UserListEntry) Insert(table string) (err error) {
+func (user *UserListEntry) Insert(table string) (active bool, data EMailData, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
 
 	//construct SQL
 	colViewMatrNr := ""
@@ -57,19 +63,61 @@ func (user *UserListEntry) Insert(table string) (err error) {
 	`
 
 	if table == "editors" || table == "instructors" {
-		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID, true)
+
+		//get if the course is active
+		course := Course{ID: user.CourseID}
+		if err = course.GetColumnValue(tx, "active"); err != nil {
+			return
+		}
+		active = course.Active
+
+		if active {
+
+			//get missing e-mail data
+			if err = course.GetColumnValue(tx, "title"); err != nil {
+				return
+			}
+
+			//set e-mail data
+			data.CourseTitle = course.Title
+			data.CourseID = course.ID
+			data.User.ID = user.UserID
+			if err = data.User.Get(tx); err != nil {
+				return
+			}
+
+			data.CourseRole = table
+			data.ViewMatrNr = true
+		}
+
+		//insert user
+		err = tx.Get(user, insertUser, user.UserID, user.CourseID, true)
+
 	} else {
-		err = app.Db.Get(user, insertUser, user.UserID, user.CourseID)
+
+		//insert user
+		err = tx.Get(user, insertUser, user.UserID, user.CourseID)
 	}
+
 	if err != nil {
 		log.Error("failed to insert user into user list", "user", user,
 			"table", table, "error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	tx.Commit()
 	return
 }
 
 /*Delete the provided user list entry of a course. */
-func (user *UserListEntry) Delete(table string) (err error) {
+func (user *UserListEntry) Delete(table string) (active bool, data EMailData, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
 
 	deleteUser := `
 		DELETE FROM ` + table + `
@@ -77,16 +125,54 @@ func (user *UserListEntry) Delete(table string) (err error) {
 			AND course_id = $2
 	`
 
-	_, err = app.Db.Exec(deleteUser, user.UserID, user.CourseID)
+	_, err = tx.Exec(deleteUser, user.UserID, user.CourseID)
 	if err != nil {
 		log.Error("failed to delete user from user list", "user", user,
 			"table", table, "error", err.Error())
+		tx.Rollback()
+		return
 	}
+
+	if table == "editors" || table == "instructors" {
+
+		//get if the course is active
+		course := Course{ID: user.CourseID}
+		if err = course.GetColumnValue(tx, "active"); err != nil {
+			return
+		}
+		active = course.Active
+
+		if active {
+
+			//get missing e-mail data
+			if err = course.GetColumnValue(tx, "title"); err != nil {
+				return
+			}
+
+			//set e-mail data
+			data.CourseTitle = course.Title
+			data.CourseID = course.ID
+			data.User.ID = user.UserID
+			if err = data.User.Get(tx); err != nil {
+				return
+			}
+
+			data.CourseRole = table
+		}
+	}
+
+	tx.Commit()
 	return
 }
 
 /*Update updates the ViewMatrNr field of a list entry of a course. */
-func (user *UserListEntry) Update(table string) (err error) {
+func (user *UserListEntry) Update(table string) (active bool, data EMailData, err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
 
 	updateUser := `
 		UPDATE ` + table + `
@@ -100,11 +186,41 @@ func (user *UserListEntry) Update(table string) (err error) {
 		), course_id
 	`
 
-	err = app.Db.Get(user, updateUser, user.UserID, user.CourseID, user.ViewMatrNr)
+	err = tx.Get(user, updateUser, user.UserID, user.CourseID, user.ViewMatrNr)
 	if err != nil {
 		log.Error("failed to update user from user list", "user", user,
 			"table", table, "error", err.Error())
 	}
+
+	if table == "editors" || table == "instructors" {
+
+		//get if the course is active
+		course := Course{ID: user.CourseID}
+		if err = course.GetColumnValue(tx, "active"); err != nil {
+			return
+		}
+		active = course.Active
+
+		if active {
+
+			//get missing e-mail data
+			if err = course.GetColumnValue(tx, "title"); err != nil {
+				return
+			}
+
+			//set e-mail data
+			data.CourseTitle = course.Title
+			data.CourseID = course.ID
+			data.User.ID = user.UserID
+			if err = data.User.Get(tx); err != nil {
+				return
+			}
+
+			data.ViewMatrNr = user.ViewMatrNr
+		}
+	}
+
+	tx.Commit()
 	return
 }
 

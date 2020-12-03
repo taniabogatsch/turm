@@ -75,6 +75,9 @@
           </div>
 
           <div id="search-draft-section" class="d-none">
+
+            <input type="hidden" name="param.CourseID" id="new-course-input-ID">
+
             <small class="form-text text-muted">
               {{msg $ "creator.course.draft.info"}}
             </small>
@@ -84,9 +87,15 @@
                   {{template "icons/search.html" . }}
                 </span>
               </div>
-              <input type="search" class="form-control rounded-right" placeholder='{{msg $ "search.enter.value"}}' maxlength="127" minlength="3">
-              <div class="invalid-feedback">
-                {{msg $ "validation.invalid.searchValue"}}
+
+              <!-- input -->
+              <input class="form-control dropdown-toggle rounded-right" type="search"
+                placeholder='{{msg $ "search.course"}}' id="new-index-search"
+                onkeyup='searchCourseDrafts("new-index-search", "content-index-search",
+                  {{url "Creator.Search"}});'>
+
+              <!-- results -->
+              <div class="d-none" id="content-index-search">
               </div>
             </div>
           </div>

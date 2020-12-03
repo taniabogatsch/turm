@@ -95,6 +95,15 @@ func updateByID(tx *sqlx.Tx, column, table string, value, selection, model inter
 //getColumnValue returns the column value of the specified table
 func getColumnValue(tx *sqlx.Tx, column, table string, selection, model interface{}) (err error) {
 
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
 	stmt := `SELECT ` + column + `
 	FROM ` + table + `
 	WHERE id = $1`
@@ -104,6 +113,11 @@ func getColumnValue(tx *sqlx.Tx, column, table string, selection, model interfac
 		log.Error("failed to get column value", "stmt", stmt,
 			"selection", selection, "error", err.Error())
 		tx.Rollback()
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
 	}
 	return
 }
