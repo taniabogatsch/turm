@@ -58,8 +58,11 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailDa
 must be loaded and weekday specifies the day. */
 func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday int) (err error) {
 
+	//set time of monday to 00:00
+	monday = time.Date(monday.Year(), monday.Month(), monday.Day(), 0, 0, 0, 0, monday.Location())
+
 	//[startTime, endTime] is [day 00:00 - day 24:00]
-	startTime := monday.AddDate(0, 0, weekday-1)
+	startTime := monday.AddDate(0, 0, weekday)
 	endTime := startTime.Add(1000000000 * 60 * 60 * 24)
 
 	err = tx.Select(slots, stmtSelectSlots, dayTmplID, startTime, endTime)

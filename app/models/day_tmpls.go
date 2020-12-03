@@ -69,6 +69,9 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 /*Update a day tmpl. */
 func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, err error) {
 
+	//map to remember which user is already getting an E-Mail
+	userIDs := make(map[int]bool)
+
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
@@ -95,9 +98,15 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 		slotStartTime.Hour, slotStartTime.Min, _ = slot.Start.Clock()
 		slotEndTime.Hour, slotEndTime.Min, _ = slot.End.Clock()
 
+		//all the cases in which a slot has to be deleted
+		hasToBeDeleted := slotEndTime.After(&tmplEndTime) ||
+			tmplStartTime.After(&slotStartTime) || //delete if slot colides with new times
+			int(slot.Start.Weekday())-1 != tmpl.DayOfWeek || //if weekday is changed delete slot
+			(slotEndTime.Sub(&tmplStartTime)%tmpl.Interval) != 0 || //checks for intervall stepps
+			(slotStartTime.Sub(&tmplStartTime)%tmpl.Interval) != 0
+
 		//check if slot is not within the new time
-		if !((tmplStartTime.Before(&slotStartTime) && (tmplEndTime.After(&slotEndTime) ||
-			tmplEndTime.Equals(&slotEndTime))) || int(slot.Start.Weekday()) != tmpl.DayOfWeek) {
+		if hasToBeDeleted {
 
 			//dont allow update if a slot in this template is currently running
 			if slot.Start.Before(time.Now()) && slot.End.After(time.Now()) {
@@ -111,13 +120,14 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 				return
 			}
 
-			//create user for email if slot isnt in past
-			if slot.End.Before(time.Now()) {
-
+			//create user for email if slot isnt in past and not in mailing(users) list already
+			if slot.End.After(time.Now()) && !userIDs[slot.UserID] {
 				user := User{ID: slot.UserID}
 				if err = user.Get(tx); err != nil {
 					return
 				}
+
+				userIDs[slot.UserID] = true
 				users = append(users, user)
 			}
 
@@ -134,12 +144,22 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 
 	}
 
-	//TODO: remove all slots that are no longer in day template time,
-	//or that no longer match the interval
-	//- if slot in past: no e-mail to users
-	//- else send e-mail
+	//update times
+	if err = updateByID(tx, "start_time", "day_templates", tmpl.StartTime, tmpl.ID, tmpl); err != nil {
+		return
+	}
 
-	//TODO: update times, interval, day
+	if err = updateByID(tx, "end_time", "day_templates", tmpl.EndTime, tmpl.ID, tmpl); err != nil {
+		return
+	}
+
+	if err = updateByID(tx, "interval", "day_templates", tmpl.Interval, tmpl.ID, tmpl); err != nil {
+		return
+	}
+
+	if err = updateByID(tx, "day_of_week", "day_templates", tmpl.DayOfWeek, tmpl.ID, tmpl); err != nil {
+		return
+	}
 
 	tx.Commit()
 	return
@@ -276,7 +296,7 @@ const (
 			FROM day_templates
 			WHERE $4 = calendar_event_id
 				AND day_of_week = $3
-				AND id != $4
+				AND id != $5
 				AND (
 					($1 >= start_time AND $1 < end_time)
 					OR 	($2 <= end_time AND $2 > start_time)
