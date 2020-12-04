@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 	"turm/app"
 
@@ -73,6 +74,11 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 			return
 		}
 
+		//get the exceptions of each day of that week (as defined by monday)
+		if err = (*events)[i].ExceptionsOfWeek.Get(tx, &(*events)[i].ID, monday); err != nil {
+			return
+		}
+
 		//get the slot schedule
 		if err = (*events)[i].getSchedule(tx, monday); err != nil {
 			return
@@ -120,6 +126,11 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 		return
 	}
 
+	//get the exceptions of each day of that week (as defined by monday)
+	if err = event.ExceptionsOfWeek.Get(tx, &event.ID, monday); err != nil {
+		return
+	}
+
 	//get the slot schedule
 	if err = event.getSchedule(tx, monday); err != nil {
 		return
@@ -136,11 +147,6 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 }
 
 func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
-
-	//get the exceptions of each day of that week (as defined by monday)
-	if err = event.ExceptionsOfWeek.Get(tx, monday); err != nil {
-		return
-	}
 
 	day := monday
 
@@ -229,6 +235,21 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//no day templates for this day
 			schedule.Entries = append(schedule.Entries,
 				ScheduleEntry{"00:00", "24:00", BLOCKED})
+		}
+
+		//override Exceptions
+
+		//for every exception check if it is relevant for this days
+		//then look which entries they overlapp and replace them with an exception block
+
+		for e := range event.ExceptionsOfWeek {
+			fmt.Print(event.ExceptionsOfWeek[e].ExceptionStartDB)
+			fmt.Print(" : ")
+			fmt.Println(event.ExceptionsOfWeek[e].ExceptionEndDB)
+
+			/*for s := range schedule.Entries {
+
+			}*/
 		}
 
 		event.ScheduleWeek = append(event.ScheduleWeek, schedule)

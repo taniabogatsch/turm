@@ -32,15 +32,16 @@ type Exception struct {
 /*Exceptions is a slice of exceptions. */
 type Exceptions []Exception
 
-/*Get all exceptions of a day. Monday specifies the week for which all exceptions
+/*Get all exceptions of a week. Monday specifies the week for which all exceptions
 must be loaded. */
-func (excepts *ExceptionsOfWeek) Get(tx *sqlx.Tx, monday time.Time) (err error) {
+func (excepts *ExceptionsOfWeek) Get(tx *sqlx.Tx, eventID *int, monday time.Time) (err error) {
 
+	monday = time.Date(monday.Year(), monday.Month(), monday.Day(), 0, 0, 0, 0, monday.Location())
 	endTime := monday.AddDate(0, 0, 7)
 
-	err = tx.Select(excepts, stmtSelectExceptionsOfWeek, monday, endTime)
+	err = tx.Select(excepts, stmtSelectExceptionsOfWeek, eventID, monday, endTime)
 	if err != nil {
-		log.Error("failed to get exceptions of day template", "monday", monday,
+		log.Error("failed to get exceptions of week", "monday", monday,
 			"endTime", endTime, "error", err.Error())
 		tx.Rollback()
 	}
@@ -320,10 +321,11 @@ const (
 	stmtSelectExceptionsOfWeek = `
     SELECT id, calendar_event_id, exception_start, exception_end, annotation
     FROM calendar_exceptions
-    WHERE (
-			($1 >= exception_start AND $1 < exception_end)
-			OR ($2 > exception_start AND $2 <= exception_end)
-			OR ($1 < exception_start AND $2 > exception_end )
+    WHERE
+		calendar_event_id = $1
+		AND(	($2 >= exception_start AND $2 < exception_end)
+			OR 	($3 > exception_start AND $3 <= exception_end)
+			OR 	($2 <= exception_start AND $3 >= exception_end )
 		)
 		ORDER BY exception_start ASC
   `
