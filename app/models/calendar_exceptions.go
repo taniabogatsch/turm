@@ -352,7 +352,7 @@ const (
 	`
 
 	stmtSelectUserIDsInExeptionTime = `
-		SELECT s.user_id
+		SELECT DISTINCT s.user_id
 		FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
 		WHERE t.calendar_event_id = $1
 		AND (
