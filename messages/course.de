@@ -164,6 +164,7 @@ event.type.normal = Normale Veranstaltung
 event.capacity = Teilnehmeranzahl
 event.capacity.change.info = Die Teilnehmeranzahl ist die maximale Anzahl an TeilnehmerInnen, die sich in diese Veranstaltung einschreiben dürfen.
 event.capacity.change.success = Teilnehmeranzahl zu %d geändert.
+event.capacity.change.info.active = <b> ACHTUNG:</b> Wenn der Kurs aktiv ist, diese Veranstaltung eine Warteliste besitzt und Sie die maximale Teilnehmeranzahl erhöhen, dann rutschen automatisch TeilnehmerInnen von der Warteliste nach.
 
 event.title.change.info = Der Veranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Einleitung', 'Thema 1', ...
 event.title.change.success = Veranstaltungstitel zu '%s' geändert.
@@ -211,7 +212,7 @@ day.tmpl.delete.title = Schablone löschen
 
 exception.change.success = Änderungen an Ausnahme erfolgreich, ID = %d.
 exception.new.title = Neue Ausnahme hinzufügen
-exception.delete.title = Ausnahme löschen 
+exception.delete.title = Ausnahme löschen
 exception.delete.confirm = Möchten Sie diese Ausnahme wirklich löschen?
 exception.delete.success = Ausnahme gelöscht, ID = %d.
 

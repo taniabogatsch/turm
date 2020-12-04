@@ -79,8 +79,6 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	//TODO: auto enroll users from wait list
-
 	c.Validation.Check(value,
 		revel.Min{1},
 		revel.Max{1000000},
@@ -97,15 +95,28 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 	}
 
 	event := models.Event{ID: ID}
-	err := event.Update(nil, fieldID, value, nil)
+	users, err := event.Update(nil, fieldID, value, nil)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
+	//auto enroll users from wait list if the capacity is changed
+	for _, user := range users {
+
+		err = sendEMail(c.Controller, &user,
+			"email.subject.from.wait.list",
+			"fromWaitlist")
+
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, user.User.EMail)
+		}
+	}
+
 	msg := c.Message("event.capacity.change.success", event.Capacity)
 	return c.RenderJSON(
-		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: strconv.Itoa(value), ID: ID})
+		response{Status: SUCCESS, Msg: msg, FieldID: fieldID,
+			Value: strconv.Itoa(value), ID: ID, Fullness: strconv.Itoa(event.Fullness)})
 }
 
 /*ChangeText changes the text of the provided column.
@@ -141,7 +152,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 	conf.IsEvent = true
 
 	event := models.Event{ID: ID}
-	err := event.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
+	_, err := event.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -234,7 +245,7 @@ func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
 	//NOTE: the interceptor assures that the event ID is valid
 
 	event := models.Event{ID: ID}
-	err := event.Update(nil, "enrollment_key", sql.NullString{"", false}, nil)
+	_, err := event.Update(nil, "enrollment_key", sql.NullString{"", false}, nil)
 
 	if err != nil {
 		return c.RenderJSON(

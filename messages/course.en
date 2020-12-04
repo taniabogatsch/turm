@@ -162,6 +162,7 @@ event.delete.title = Delete event
 event.capacity = Number of participants
 event.capacity.change.info = The number of participants is the maximum number of users that are allowed to enroll in this event.
 event.capacity.change.success = Changed the number of participants to %d.
+event.capacity.change.info.active = <b> INFO:</b> If this course is active, if this event has a wait list and you increase the capacity, then users will get enrolled from the wait list.
 
 event.title.change.info = The event title comprises the purpose of the event, e.g. 'Introduction', 'Topic 1', ...
 event.title.change.success = Changed event title to '%s'.

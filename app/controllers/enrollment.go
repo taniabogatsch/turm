@@ -39,11 +39,13 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 		err = sendEMail(c.Controller, &data,
 			"email.subject.wait.list",
 			"waitlist")
+
 	} else {
 		err = sendEMail(c.Controller, &data,
 			"email.subject.enroll",
 			"enroll")
 	}
+
 	if err != nil {
 		return flashError(
 			errEMail, err, "", c.Controller, data.User.EMail)
@@ -94,18 +96,20 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 	//send e-mail to each auto enrolled user
 	for _, user := range users {
+
 		mailData := models.EMailData{
 			User:        user,
 			CourseTitle: data.CourseTitle,
 			EventTitle:  data.EventTitle,
 			CourseID:    data.CourseID,
 		}
+
 		err = sendEMail(c.Controller, &mailData,
 			"email.subject.from.wait.list",
 			"fromWaitlist")
+
 		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, mailData.User.EMail)
+			return flashError(errEMail, err, "", c.Controller, mailData.User.EMail)
 		}
 	}
 

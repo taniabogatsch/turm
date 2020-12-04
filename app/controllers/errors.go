@@ -112,6 +112,10 @@ type response struct {
 	Valid   bool
 	Value   string
 	ID      int
+
+	//used to render fullness correctly if users got auto enrolled
+	//from the wait list
+	Fullness string
 }
 
 const (

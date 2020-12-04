@@ -24,6 +24,18 @@ function openChangeModal(title, field, valid, action, modal, max, info, ID, even
   $('#change-' + modal + '-modal-form').attr('action', action);
   $('#change-' + modal + '-modal-info').html(info);
 
+  if (field == "capacity") {
+    let activeInfo = document.getElementById("change-int-modal-info-active")
+    if(activeInfo) {
+      activeInfo.classList.remove("d-none");
+    }
+  } else {
+    let activeInfo = document.getElementById("change-int-modal-info-active")
+    if(activeInfo) {
+      activeInfo.classList.add("d-none");
+    }
+  }
+
   //set the value
   if (valid) {
     if (modal == "timestamp") {
@@ -335,6 +347,10 @@ function handleEditResult(response) {
     if (response.FieldID == "capacity" || response.FieldID == "title" ||
       response.FieldID == "calendar_title") {
       $('#div-' + response.FieldID + "-" + response.ID).html(response.Value);
+
+      if (response.FieldID == "capacity") {
+        $('#div-fullness-' + response.ID).html(response.Fullness);
+      }
 
       //not mandatory
     } else if (response.FieldID == "annotation" || response.FieldID == "enrollment_key" ||

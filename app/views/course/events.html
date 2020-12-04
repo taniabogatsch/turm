@@ -64,7 +64,7 @@
           {{template "icons/pencil.html" . }}
         </a>
         <small class="float-right">
-          {{.Fullness}} / <div id="div-capacity-{{.ID}}" class="d-inline">{{.Capacity}}</div>
+          <div id="div-fullness-{{.ID}}" class="d-inline">{{.Fullness}}</div> / <div id="div-capacity-{{.ID}}" class="d-inline">{{.Capacity}}</div>
         </small>
 
         <!-- progress bar -->

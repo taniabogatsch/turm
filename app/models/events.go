@@ -58,7 +58,7 @@ func (event *Event) NewBlank(conf *EditEMailConfig) (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(tx *sqlx.Tx, column string, value interface{},
-	conf *EditEMailConfig) (err error) {
+	conf *EditEMailConfig) (users []EMailData, err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
@@ -77,6 +77,60 @@ func (event *Event) Update(tx *sqlx.Tx, column string, value interface{},
 	if conf != nil {
 		if err = conf.Get(tx); err != nil {
 			return
+		}
+	}
+
+	//if the capacity was changed and the user has a wait list
+	//then get all users that get auto enrolled from that wait list
+	if column == "capacity" {
+
+		if err = event.GetColumnValue(tx, "has_waitlist"); err != nil {
+			return
+		}
+
+		if event.HasWaitlist {
+
+			if err = event.GetColumnValue(tx, "course_id"); err != nil {
+				return
+			}
+
+			//get all information required for sending the e-mail
+			course := Course{ID: event.CourseID}
+			if err = course.GetColumnValue(tx, "title"); err != nil {
+				return
+			}
+			if err = course.GetColumnValue(tx, "fee"); err != nil {
+				return
+			}
+
+			status := ENROLLED
+			if course.Fee.Valid {
+				status = AWAITINGPAYMENT
+			}
+
+			//auto enroll users
+			autoEnrollUsers := Users{}
+			err = autoEnrollUsers.AutoEnrollFromWaitList(tx, &event.ID, status)
+			if err != nil {
+				return
+			}
+
+			if err = event.Get(tx); err != nil {
+				return
+			}
+
+			//set e-mail data
+			for _, user := range autoEnrollUsers {
+
+				eMailUser := EMailData{
+					CourseTitle: course.Title,
+					CourseID:    course.ID,
+					EventTitle:  event.Title,
+					User:        user,
+				}
+
+				users = append(users, eMailUser)
+			}
 		}
 	}
 
