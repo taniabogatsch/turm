@@ -48,7 +48,6 @@ func (c Course) Open(ID int) revel.Result {
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("course")
 
-	c.Log.Debug("loaded course", "course", course)
 	return c.Render(course)
 }
 

@@ -118,11 +118,19 @@
     </a>
   {{end}}
 
+  <!-- duplicate meeting -->
+  <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+    onclick='openDuplicateDeleteModal({{msg $ "meeting.duplicate.title"}},
+      {{msg $ "meeting.duplicate.confirm"}}, "{{url "EditMeeting.Duplicate"}}",
+      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'>
+    {{template "icons/files.html" . }}
+  </a>
+
   <!-- delete meeting -->
   <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
-    onclick='confirmDeleteRenderModal({{msg $ "meeting.delete.title"}},
-      {{msg $ "meeting.delete.confirm"}},
-      "{{url "EditMeeting.Delete" .ID .EventID}}", "meetings-{{.EventID}}");'>
+    onclick='openDuplicateDeleteModal({{msg $ "meeting.delete.title"}},
+      {{msg $ "meeting.delete.confirm"}}, "{{url "EditMeeting.Delete"}}",
+      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'>
     {{template "icons/trash.html" . }}
   </a>
 {{end}}

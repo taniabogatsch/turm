@@ -45,21 +45,56 @@ func (c EditMeeting) Edit(ID int, meeting models.Meeting,
 
 /*Delete a meeting.
 - Roles: creator and editors of the course of the meeting */
-func (c EditMeeting) Delete(ID, eventID int) revel.Result {
+func (c EditMeeting) Delete(ID, eventID int,
+	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("delete meeting", "ID", ID, "eventID", eventID)
 
 	//NOTE: the interceptor assures that the event ID is valid
 
+	conf.ID = eventID
+	conf.IsEvent = true
+
 	meeting := models.Meeting{ID: ID}
-	if err := meeting.Delete(); err != nil {
+	if err := meeting.Delete(&conf); err != nil {
 		return flashError(
 			errDB, err, "/course/meetings?ID="+strconv.Itoa(eventID),
 			c.Controller, "")
 	}
 
-	//TODO: notify enrolled users if deleted
+	//if the course is active, send notification e-mail
+	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
+		return flashError(errEMail, err, "", c.Controller, "")
+	}
 
 	c.Flash.Success(c.Message("meeting.delete.success", ID))
+	return c.Redirect(Course.Meetings, eventID)
+}
+
+/*Duplicate a meeting.
+- Roles: creator and editors of the course of the meeting */
+func (c EditMeeting) Duplicate(ID, eventID int,
+	conf models.EditEMailConfig) revel.Result {
+
+	c.Log.Debug("duplicate meeting", "ID", ID, "eventID", eventID)
+
+	//NOTE: the interceptor assures that the event ID is valid
+
+	conf.ID = eventID
+	conf.IsEvent = true
+
+	meeting := models.Meeting{ID: ID, EventID: eventID}
+	if err := meeting.Duplicate(&conf); err != nil {
+		return flashError(
+			errDB, err, "/course/meetings?ID="+strconv.Itoa(eventID),
+			c.Controller, "")
+	}
+
+	//if the course is active, send notification e-mail
+	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
+		return flashError(errEMail, err, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("meeting.duplicate.success", ID))
 	return c.Redirect(Course.Meetings, eventID)
 }

@@ -526,3 +526,16 @@ function openChangeExceptionModal(title, ID, start, end, annotation, exceptionID
   //show the modal
   $('#change-exception-modal').modal('show');
 }
+
+function openDuplicateDeleteModal(title, content, action, fieldID, meetingID, eventID) {
+
+  $('#duplicate-delete-title').html(title);
+  $('#duplicate-delete-form').attr("action", action);
+  $('#duplicate-delete-content').html(content);
+  $('#duplicate-delete-list').val(fieldID);
+  $('#duplicate-delete-meeting-ID').val(meetingID);
+  $('#duplicate-delete-meeting-event-ID').val(eventID);
+
+  //show the modal
+  $('#duplicate-delete-modal').modal('show');
+}

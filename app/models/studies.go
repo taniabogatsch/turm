@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/revel/revel"
 )
 
 /*Studies holds all courses of study of an user. */
@@ -16,11 +15,6 @@ type Study struct {
 	CourseOfStudiesID int    `db:"course_of_studies_id, primarykey"`
 	Degree            string `db:"degree"`            //not a field in the studies table
 	CourseOfStudies   string `db:"course_of_studies"` //not a field in the studies table
-}
-
-/*Validate Studies fields when loaded from the user enrollment file. */
-func (studies *Study) Validate(v *revel.Validation) {
-	//TODO
 }
 
 /*Select all courses of studies of a user. */

@@ -154,8 +154,49 @@ func (meeting *Meeting) Update(conf *EditEMailConfig) (err error) {
 }
 
 /*Delete a meeting. */
-func (meeting *Meeting) Delete() (err error) {
-	return deleteByID("id", "meetings", meeting.ID, nil)
+func (meeting *Meeting) Delete(conf *EditEMailConfig) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = deleteByID("id", "meetings", meeting.ID, tx)
+	if err != nil {
+		return
+	}
+
+	if err = conf.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+/*Duplicate a meeting. */
+func (meeting *Meeting) Duplicate(conf *EditEMailConfig) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	_, err = tx.Exec(stmtDuplicateMeeting, meeting.EventID, meeting.ID)
+	if err != nil {
+		log.Error("failed to duplicate meeting", "meeting",
+			*meeting, "error", err.Error())
+		tx.Rollback()
+	}
+
+	if err = conf.Get(tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
 }
 
 /*Meetings holds all meetings of an event. */
@@ -182,13 +223,13 @@ func (meetings *Meetings) Get(tx *sqlx.Tx, eventID *int) (err error) {
 /*Duplicate all meetings of an event. */
 func (meetings *Meetings) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
 
-	_, err = tx.Exec(stmtDuplicateMeeting, *eventIDNew, *eventIDOld)
+	_, err = tx.Exec(stmtDuplicateMeetings, *eventIDNew, *eventIDOld)
 	if err != nil {
-		log.Error("failed to duplicate event", "event ID new",
-			*eventIDNew, "event ID old", *eventIDOld, "error", err.Error())
+		log.Error("failed to duplicate meetings", "eventIDNew",
+			*eventIDNew, "eventIDOld", *eventIDOld, "error", err.Error())
 		tx.Rollback()
-		return
 	}
+
 	return
 }
 
@@ -244,14 +285,29 @@ const (
 		RETURNING id
 	`
 
-	stmtDuplicateMeeting = `
+	stmtDuplicateMeetings = `
 		INSERT INTO meetings
-			(annotation, event_id, meeting_end, meeting_start, meeting_interval, place, weekday)
+			(annotation, event_id, meeting_end, meeting_start, meeting_interval,
+				place, weekday)
 		(
 			SELECT
-				annotation, $1 AS event_id, meeting_end, meeting_start, meeting_interval, place, weekday
+				annotation, $1 AS event_id, meeting_end, meeting_start, meeting_interval,
+				place, weekday
 			FROM meetings
 			WHERE event_id = $2
+		)
+	`
+
+	stmtDuplicateMeeting = `
+		INSERT INTO meetings
+			(annotation, event_id, meeting_end, meeting_start, meeting_interval,
+				place, weekday)
+		(
+			SELECT
+				annotation, $1 AS event_id, meeting_end, meeting_start, meeting_interval,
+				place, weekday
+			FROM meetings
+			WHERE id = $2
 		)
 	`
 

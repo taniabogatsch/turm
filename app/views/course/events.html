@@ -53,6 +53,15 @@
           {{template "icons/trash.html" . }}
         </a>
 
+        <!-- duplicate event -->
+        <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+          href='#no-scroll' role="button"
+          onclick='confirmDeleteRenderModal({{msg $ "event.duplicate.title"}},
+            {{msg $ "event.duplicate.confirm" .Title}},
+            "{{url "EditEvent.Duplicate" .ID .CourseID}}", "events");'>
+          {{template "icons/files.html" . }}
+        </a>
+
         <!-- enrollment button -->
         {{if $.session.userID}}
           {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}

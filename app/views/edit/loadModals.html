@@ -15,6 +15,7 @@
 {{template "edit/modals/newMeeting.html" dict_addLocale $.currentLocale "active" .course.Active}}
 {{template "edit/modals/editMeetingSingle.html" dict_addLocale $.currentLocale "active" .course.Active}}
 {{template "edit/modals/editMeetingWeekly.html" dict_addLocale $.currentLocale "active" .course.Active}}
+{{template "edit/modals/duplicateDeleteMeeting.html" dict_addLocale $.currentLocale "active" .course.Active}}
 
 {{template "edit/modals/changeDayTmpl.html" dict_addLocale $.currentLocale "courseID" .course.ID}}
 {{template "edit/modals/changeException.html" dict_addLocale $.currentLocale "courseID" .course.ID}}
@@ -218,6 +219,11 @@
     }
 
     submitRenderForm("#edit-meeting-weekly-form", "#edit-meeting-weekly");
+    event.preventDefault();
+  });
+
+  $('#duplicate-delete-form').submit(function (event) {
+    submitRenderForm("#duplicate-delete-form", "#duplicate-delete-modal");
     event.preventDefault();
   });
 </script>

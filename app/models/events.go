@@ -241,6 +241,38 @@ func (event *Event) Delete(v *revel.Validation) (err error) {
 	return
 }
 
+/*Duplicate an event. */
+func (event *Event) Duplicate(tx *sqlx.Tx) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	var newID int
+	err = tx.Get(&newID, stmtDuplicateEvent, event.CourseID, event.ID)
+	if err != nil {
+		log.Error("failed to duplicate event", "event", *event,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate all meetings of this event
+	if err = event.Meetings.Duplicate(tx, &newID, &event.ID); err != nil {
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
 /*Get returns all data of one event. */
 func (event *Event) Get(tx *sqlx.Tx) (err error) {
 
@@ -466,20 +498,11 @@ func (events *Events) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err
 		return
 	}
 
-	//duplicate each event and its meetings
+	//duplicate each event
 	for _, event := range *events {
 
-		var newID int
-		err = tx.Get(&newID, stmtDuplicateEvent, *courseIDNew, event.ID)
-		if err != nil {
-			log.Error("failed to duplicate event", "course ID new",
-				*courseIDNew, "error", err.Error())
-			tx.Rollback()
-			return
-		}
-
-		//duplicate all meetings of this event
-		if err = event.Meetings.Duplicate(tx, &newID, &event.ID); err != nil {
+		event.CourseID = *courseIDNew
+		if err = event.Duplicate(tx); err != nil {
 			return
 		}
 	}

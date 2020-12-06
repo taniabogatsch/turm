@@ -45,8 +45,15 @@ func general(c *revel.Controller) revel.Result {
 		}
 	}
 
-	//TODO: is a user is logged in, render all courses of that user for the navigation bar
-	//TODO: but do so via an ajax call!
+	//NOTE: we log, but do not handle the error because we need to avoid redirect loops
+	userID, _ := getIntFromSession(c, "userID")
+
+	//if a user is logged in, render all courses of that user for the navigation bar
+	if userID != 0 {
+		navUser := models.User{ID: userID}
+		navUser.GetNavigationData()
+		c.ViewArgs["navUser"] = navUser
+	}
 
 	return nil
 }
@@ -278,20 +285,20 @@ func (c EditEvent) auth() revel.Result {
 	c.Log.Debug("executing auth edit events interceptor")
 
 	authorized, expired, err := evalEditAuth(c.Controller, "events", "ID")
+
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if expired || !authorized {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
 	}
 
-	if c.MethodName == "Delete" {
+	if c.MethodName == "Delete" || c.MethodName == "Duplicate" {
 
 		belongs, err := evalElemBelongs(c.Controller, "courseID", "ID", "events")
+
 		if err != nil {
-			return flashError(
-				errTypeConv, err, "/", c.Controller, "")
+			return flashError(errTypeConv, err, "/", c.Controller, "")
 		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
@@ -355,20 +362,20 @@ func (c EditMeeting) auth() revel.Result {
 	c.Log.Debug("executing auth edit meetings interceptor")
 
 	authorized, expired, err := evalEditAuth(c.Controller, "meetings", "ID")
+
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if expired || !authorized {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
 	}
 
-	if c.MethodName == "Delete" {
+	if c.MethodName == "Delete" || c.MethodName == "Duplicate" {
 
 		belongs, err := evalElemBelongs(c.Controller, "eventID", "ID", "meetings")
+
 		if err != nil {
-			return flashError(
-				errTypeConv, err, "/", c.Controller, "")
+			return flashError(errTypeConv, err, "/", c.Controller, "")
 		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)

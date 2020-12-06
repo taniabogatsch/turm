@@ -8,6 +8,7 @@ footer.support.email = Bei Fragen wenden Sie sich bitte an unseren <a href="mail
 footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href='app/dataPrivacy'>hier</a>.
 
 nav.help = Hilfen
+nav.my.courses = Meine Kurse
 
 toast.error = Fehler
 toast.success = Erfolg

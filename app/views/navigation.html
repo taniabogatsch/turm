@@ -70,6 +70,29 @@
         </div>
       </li>
 
+      <!-- courses of user -->
+      {{if .session.userID}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" href="#" role="button"
+            aria-haspopup="true" aria-expanded="false">
+            {{msg $ "nav.my.courses"}}
+          </a>
+          <div class="dropdown-menu">
+            {{range $i, $v := .navUser.ActiveEnrollments}}
+              {{if ne $i 0}}<div class="dropdown-divider"></div>{{end}}
+              <a class="dropdown-item" href='{{url "Course.Open" .CourseID}}'
+                style="word-wrap: break-word; white-space: normal;">
+                {{.CourseTitle}}, {{.EventTitle}}
+              </a>
+            {{else}}
+              <h6 class="dropdown-header">
+                {{msg $ "profile.active.events.none"}}
+              </h6>
+            {{end}}
+          </div>
+        </li>
+      {{end}}
+
       <!-- profile -->
       {{if .session.userID}}
         <li class="nav-item active">

@@ -141,6 +141,10 @@ meeting.delete.success = Deleted meeting, ID = %d.
 meeting.delete.confirm = Please confirm the deletion of the meeting.
 meeting.delete.title = Delete meeting
 
+meeting.duplicate.success = Duplicated meeting, ID = %d.
+meeting.duplicate.confirm = Please confirm the duplication of the meeting.
+meeting.duplicate.title = Duplicate meeting
+
 meeting.update.success = Updated meeting, ID = %d.
 
 meeting.single.edit = Edit single meeting
@@ -158,6 +162,11 @@ event.type.normal = Normal event
 event.delete.success = Deleted event, ID = %d.
 event.delete.confirm = Please confirm the deletion of event '%s'.
 event.delete.title = Delete event
+
+event.duplicate.success = Duplicated event, ID = %d.
+event.duplicate.confirm = Please confirm the duplication of event '%s'.
+event.duplicate.title = Duplicate event
+
 
 event.capacity = Number of participants
 event.capacity.change.info = The number of participants is the maximum number of users that are allowed to enroll in this event.

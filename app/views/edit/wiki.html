@@ -33,27 +33,51 @@
   </strong>
   {{msg $ "creator.info.preview"}}
 
-  {{if not .active}}
-
+  {{if not .course.Active}}
     <!-- validate -->
     <hr>
     {{template "icons/checkAll.html" . }} &nbsp;
     <strong> {{msg $ "creator.course.validate"}}: </strong>
     {{msg $ "creator.info.validate"}}
+  {{end}}
 
-    <!-- activate -->
-    <hr>
-    {{template "icons/unlock.html" . }} &nbsp;
-    <strong> {{msg $ "creator.course.activate"}}: </strong>
-    {{msg $ "creator.info.activate"}}
+  {{if eq .session.role "admin"}}
+    {{if not .course.Active}}
 
-  {{else}}
-    <!-- expire -->
-    {{if not .expired}}
+      <!-- activate -->
+      <hr>
+      {{template "icons/unlock.html" . }} &nbsp;
+      <strong> {{msg $ "creator.course.activate"}}: </strong>
+      {{msg $ "creator.info.activate"}}
+
+    {{else}}
+
+      <!-- expire -->
       <hr>
       {{template "icons/archive.html" . }} &nbsp;
       <strong> {{msg $ "creator.course.expire"}}: </strong>
       {{msg $ "creator.info.expire"}}
+
+    {{end}}
+  {{else}}
+    {{if eq .course.CreatorID .session.userID}}
+      {{if not .course.Active}}
+
+        <!-- activate -->
+        <hr>
+        {{template "icons/unlock.html" . }} &nbsp;
+        <strong> {{msg $ "creator.course.activate"}}: </strong>
+        {{msg $ "creator.info.activate"}}
+
+      {{else}}
+
+        <!-- expire -->
+        <hr>
+        {{template "icons/archive.html" . }} &nbsp;
+        <strong> {{msg $ "creator.course.expire"}}: </strong>
+        {{msg $ "creator.info.expire"}}
+
+      {{end}}
     {{end}}
   {{end}}
 

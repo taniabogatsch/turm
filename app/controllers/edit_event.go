@@ -32,6 +32,25 @@ func (c EditEvent) Delete(ID, courseID int) revel.Result {
 	return c.Redirect(Course.Events, courseID)
 }
 
+/*Duplicate event data.
+- Roles: creator and editors of the course of the event */
+func (c EditEvent) Duplicate(ID, courseID int) revel.Result {
+
+	c.Log.Debug("duplicate event", "ID", ID)
+
+	//NOTE: the interceptor assures that the event ID is valid
+
+	event := models.Event{ID: ID, CourseID: courseID}
+	if err := event.Duplicate(nil); err != nil {
+		return flashError(
+			errDB, err, "/course/events?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("event.duplicate.success", ID))
+	return c.Redirect(Course.Events, courseID)
+}
+
 /*NewMeeting creates a new blank meeting in an event.
 - Roles: creator and editors of the course of the event */
 func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,

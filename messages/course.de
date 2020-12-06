@@ -143,6 +143,10 @@ meeting.delete.success = Termin gelöscht, ID = %d.
 meeting.delete.confirm = Termin wirklich löschen?
 meeting.delete.title = Termin löschen
 
+meeting.duplicate.success = Termin dupliziert, ID = %d.
+meeting.duplicate.confirm = Termin wirklich duplizieren?
+meeting.duplicate.title = Termin duplizieren
+
 meeting.update.success = Termin aktualisiert, ID = %d.
 
 meeting.single.edit = Einzeltermin bearbeiten
@@ -157,6 +161,10 @@ event.new.success = Veranstaltung '%s' hinzugefügt, Kurs ID = %d.
 event.delete.success = Veranstaltung gelöscht, ID = %d.
 event.delete.confirm = Veranstaltung '%s' wirklich löschen?
 event.delete.title = Veranstaltung löschen
+
+event.duplicate.success = Veranstaltung dupliziert, ID = %d.
+event.duplicate.confirm = Veranstaltung '%s' wirklich duplizieren?
+event.duplicate.title = Veranstaltung duplizieren
 
 event.type = Art der Veranstaltung
 event.type.normal = Normale Veranstaltung

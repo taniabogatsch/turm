@@ -171,6 +171,27 @@ func (user *User) GetProfileData() (err error) {
 	return
 }
 
+/*GetNavigationData returns all information used for the navigation bar. */
+func (user *User) GetNavigationData() (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return err
+	}
+
+	//get all active enrollments
+	err = user.ActiveEnrollments.SelectByUser(tx, &user.ID, false)
+	if err != nil {
+		return
+	}
+
+	//TODO: get all calendar slots
+
+	tx.Commit()
+	return
+}
+
 /*Login inserts or updates a user. It provides all session values of that user. */
 func (user *User) Login() (err error) {
 
