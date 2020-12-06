@@ -324,15 +324,18 @@ func (c EditCalendarEvent) auth() revel.Result {
 	}
 
 	//make sure that the IDs fit
-	belongs := false
+	belongs := true //ChangeText
 
 	if c.MethodName == "DeleteException" {
 		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "calendar_exceptions")
+
 	} else if c.MethodName == "DeleteDayTemplate" {
 		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "day_templates")
+
 	} else if c.MethodName == "Delete" || c.MethodName == "EditDayTemplate" ||
-		c.MethodName == "ChangeException" {
+		c.MethodName == "ChangeException" || c.MethodName == "NewDayTemplate" {
 		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "calendar_events")
+
 	}
 
 	if err != nil {

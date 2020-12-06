@@ -42,7 +42,7 @@
     {{end}}
 
     {{if or .session.userID .course.Visible}}
-      {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+      {{template "course/course.html" .}}
     {{end}}
   {{end}}
 </div>

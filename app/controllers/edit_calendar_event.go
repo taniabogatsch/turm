@@ -9,8 +9,6 @@ import (
 	"github.com/revel/revel"
 )
 
-//TODO: interceptor: make sure that ID is part of this course (courseID)
-
 /*ChangeText changes the text of the provided column.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Result {

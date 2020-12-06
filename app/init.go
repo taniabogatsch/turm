@@ -50,7 +50,9 @@ func init() {
 	revel.OnAppStart(func() {
 		jobs.Schedule("@every 5s", sendEMails{})
 		jobs.Schedule(jobSchedules["jobs.dbbackup"], backupDB{})
+		jobs.Schedule(jobSchedules["jobs.fetchEnrollData"], fetchEnrollData{})
 		jobs.Schedule(jobSchedules["jobs.parseStudies"], parseStudies{})
+		jobs.Schedule(jobSchedules["jobs.deleteCourses"], deleteCourses{})
 		jobs.Schedule(jobSchedules["jobs.connTest"], dbConnTest{})
 	}, 5)
 

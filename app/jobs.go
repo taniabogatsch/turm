@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"recipes/app"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
 
@@ -20,6 +22,7 @@ var (
 
 	//enrollFilePath holds the path to the enrollment data file
 	enrollFilePath string
+	enrollFileName string
 
 	//jobSchedules holds the time of each scheduled job
 	jobSchedules map[string]string
@@ -68,7 +71,7 @@ func backup() (err error) {
 	out, err := exec.Command("pg_dump", "--no-owner", connStr, "-f", fpath).CombinedOutput()
 	if err != nil {
 		revel.AppLog.Error("failed to create local backup", "connStr", connStr, "filepath",
-			fpath, "err", err.Error(), "out", string(out))
+			fpath, "error", err.Error(), "out", string(out))
 		return
 	}
 
@@ -78,7 +81,7 @@ func backup() (err error) {
 	out, err = exec.Command("curl", "-u", authStr, "-T", fpath, connStr).CombinedOutput()
 	if err != nil {
 		revel.AppLog.Error("failed to upload backup to cloud", "authStr", authStr, "fpath",
-			fpath, "connStr", connStr, "err", err.Error(), "out", string(out))
+			fpath, "connStr", connStr, "error", err.Error(), "out", string(out))
 		return
 	}
 
@@ -86,10 +89,26 @@ func backup() (err error) {
 	return
 }
 
-/*fetchEnrollData moves the old file containing all courses of study into a backup folder,
-fetches the newest version of that file and deletes all files in the backup folder that are
-older than the last month. */
-func fetchEnrollData() (err error) {
+//fetchEnrollData moves the old file containing all courses of study into a backup folder,
+//fetches the newest version of that file and deletes all files in the backup folder that are
+//older than the last month
+type fetchEnrollData struct{}
+
+/*Run executes the job to fetch the enrollment data file. */
+func (e fetchEnrollData) Run() {
+
+	if !revel.DevMode {
+		if err := fetch(); err != nil {
+			SendErrorNote()
+		}
+
+	} else {
+		revel.AppLog.Warn("not in production mode, skip fetching studies...")
+	}
+}
+
+//fetch the enrollment data file
+func fetch() (err error) {
 
 	//TODO: write this function less problem specific for a general file to be fetched
 	//e.g. put the filename and the host in the config, set a custom backup folder, etc.
@@ -97,22 +116,22 @@ func fetchEnrollData() (err error) {
 	//move old file in 'bak' folder
 	now := time.Now().Format("2006-01-02_15:04:05")
 	fname := "outdated_" + now + ".csv"
-	source := filepath.Join(enrollFilePath, "enrollment-data-turm2.csv")
+	source := filepath.Join(enrollFilePath, enrollFileName)
 	dest := filepath.Join(enrollFilePath, "bak", fname)
 
 	_, err = exec.Command("mv", source, dest).Output()
 	if err != nil {
 		revel.AppLog.Error("failed to move file into backup folder",
-			"source", source, "dest", dest, "err", err.Error())
+			"source", source, "dest", dest, "error", err.Error())
 		return
 	}
 
 	//now get the new file
-	host := "https://vdxo.rz.tu-ilmenau.de:8543/turm2/a504be42-6751-4627-ae37-54b81c863f76/enrollment-data-turm2.csv"
+	host := "https://vdxo.rz.tu-ilmenau.de:8543/turm2/a504be42-6751-4627-ae37-54b81c863f76/" + enrollFileName
 	_, err = exec.Command("wget", "-P", enrollFilePath, host).Output()
 	if err != nil {
 		revel.AppLog.Error("failed to fetch the new file", "path", enrollFilePath,
-			"host", host, "err", err.Error())
+			"host", host, "error", err.Error())
 		return
 	}
 
@@ -149,7 +168,7 @@ func fetchEnrollData() (err error) {
 				_, err = exec.Command("rm", filepath.Join(enrollFilePath, "bak", line)).Output()
 				if err != nil {
 					revel.AppLog.Error("failed to delete file", "filepath",
-						filepath.Join(enrollFilePath, "bak", line), "err", err.Error())
+						filepath.Join(enrollFilePath, "bak", line), "error", err.Error())
 					return
 				}
 			}
@@ -159,14 +178,14 @@ func fetchEnrollData() (err error) {
 	return
 }
 
-/*parseStudies parses the courses of studies of all ldap users. */
+//parseStudies parses the courses of studies of all ldap users
 type parseStudies struct{}
 
 /*Run executes the parse studies job. */
 func (e parseStudies) Run() {
 
 	if !revel.DevMode {
-		if err := parse(); err != nil {
+		if err := Parse(nil); err != nil {
 			SendErrorNote()
 		}
 
@@ -175,119 +194,120 @@ func (e parseStudies) Run() {
 	}
 }
 
-//parse the csv file containing all user studies and insert each line into the DB. */
-func parse() (err error) {
+/*Parse the csv file containing all user studies and insert each line into the DB. */
+func Parse(tx *sqlx.Tx) (err error) {
 
 	revel.AppLog.Warn("start parsing studies...")
 
-	if err = fetchEnrollData(); err != nil {
+	fpath := filepath.Join(enrollFilePath, enrollFileName)
 
-		//TODO: get filename from config (see fetchEnrollData())
-		fpath := filepath.Join(enrollFilePath, "enrollment-data-turm2.csv")
+	//open the file containing all entries
+	f, err := os.Open(fpath)
+	if err != nil {
+		revel.AppLog.Error("cannot open enrollment file", "filepath", fpath,
+			"error", err.Error())
+		return err
+	}
 
-		//open the file containing all entries
-		f, err := os.Open(fpath)
-		if err != nil {
-			revel.AppLog.Error("cannot open enrollment file", "filepath", fpath,
-				"err", err.Error())
-			return err
-		}
+	defer f.Close()
+	//opened file, init csv reader
+	r := csv.NewReader(f)
+	r.Comma = ';'
 
-		defer f.Close()
-		//opened file, init csv reader
-		r := csv.NewReader(f)
-		r.Comma = ';'
-
-		//start the transaction to insert each row of the csv file
-		tx, err := Db.Beginx()
+	//start the transaction to insert each row of the csv file
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
 		if err != nil {
 			revel.AppLog.Error("failed to begin tx", "error", err.Error())
-			return err
+			return
 		}
+	}
 
-		//first untouch the studies table
-		_, err = tx.Exec(stmtUntouchStudies)
+	//first untouch the studies table
+	_, err = tx.Exec(stmtUntouchStudies)
+	if err != nil {
+		revel.AppLog.Error("failed to untouch studies table", "error", err.Error())
+		tx.Rollback()
+		return err
+	}
+
+	//read row and insert data
+	for {
+
+		record, err := r.Read()
 		if err != nil {
-			revel.AppLog.Error("failed to untouch studies table", "err", err.Error())
+			if err == io.EOF { //end of file
+
+				//delete all untouched studies entries
+				_, err = tx.Exec(stmtDeleteUntouched)
+				if err != nil {
+					revel.AppLog.Error("failed to delete untouched entries", "error", err.Error())
+					tx.Rollback()
+					return err
+				}
+
+				if txWasNil {
+					tx.Commit()
+				}
+				err = nil
+				revel.AppLog.Warn("finished parsing studies...")
+				return err
+			}
+
+			revel.AppLog.Error("failed to read csv row", "error", err.Error())
 			tx.Rollback()
 			return err
 		}
 
-		//read row and insert data
-		for {
+		//insert entry if row data is valid
+		if len(record) > 3 {
 
-			record, err := r.Read()
+			//insert degree
+			_, err = tx.Exec(stmtInsertDegree, record[3])
 			if err != nil {
-				if err == io.EOF { //end of file
-
-					//delete all untouched studies entries
-					_, err = tx.Exec(stmtDeleteUntouched)
-					if err != nil {
-						revel.AppLog.Error("failed to delete untouched entries", "err", err.Error())
-						tx.Rollback()
-						return err
-					}
-
-					tx.Commit()
-					err = nil
-					revel.AppLog.Warn("finished parsing studies...")
-					return err
-				}
-
-				revel.AppLog.Error("failed to read csv row", "err", err.Error())
+				revel.AppLog.Error("failed to insert degree", "error", err.Error())
 				tx.Rollback()
 				return err
 			}
+		}
 
-			//insert entry if row data is valid
-			if len(record) > 3 {
+		//insert course of studies
+		_, err = tx.Exec(stmtInsertCourseOfStudies, record[1])
+		if err != nil {
+			revel.AppLog.Error("failed to insert course of studies",
+				"error", err.Error())
+			tx.Rollback()
+			return err
+		}
 
-				//insert degree
-				_, err = tx.Exec(stmtInsertDegree, record[3])
-				if err != nil {
-					revel.AppLog.Error("failed to insert degree", "err", err.Error())
-					tx.Rollback()
-					return err
-				}
-			}
+		//convert the semester from string to int
+		semester, err := strconv.Atoi(record[2])
+		if err != nil {
+			revel.AppLog.Error("semester type conversion error", "semester",
+				record[2], "error", err.Error())
+			tx.Rollback()
+			return err
+		}
 
-			//insert course of studies
-			_, err = tx.Exec(stmtInsertCourseOfStudies, record[1])
-			if err != nil {
-				revel.AppLog.Error("failed to insert course of studies",
-					"err", err.Error())
-				tx.Rollback()
-				return err
-			}
+		//convert the matr nr from string to int
+		matrnr, err := strconv.Atoi(record[0])
+		if err != nil {
+			revel.AppLog.Error("matr nr type conversion error", "matr nr",
+				record[0], "error", err.Error())
+			tx.Rollback()
+			return err
+		}
 
-			//convert the semester from string to int
-			semester, err := strconv.Atoi(record[2])
-			if err != nil {
-				revel.AppLog.Error("semester type conversion error", "semester",
-					record[2], "err", err.Error())
-				tx.Rollback()
-				return err
-			}
-
-			//convert the matr nr from string to int
-			matrnr, err := strconv.Atoi(record[0])
-			if err != nil {
-				revel.AppLog.Error("matr nr type conversion error", "matr nr",
-					record[0], "err", err.Error())
-				tx.Rollback()
-				return err
-			}
-
-			//insert the studies entry
-			_, err = tx.Exec(stmtInsertStudies, matrnr, record[1], /*studies*/
-				record[3] /*degree*/, semester)
-			if err != nil {
-				revel.AppLog.Error("failed to insert studies entry", "record", record,
-					"matr nr", matrnr, "semester", semester, "err", err.Error())
-				tx.Rollback()
-				return err
-			}
-		} /* end of for */
+		//insert the studies entry
+		_, err = tx.Exec(stmtInsertStudies, matrnr, record[1], /*studies*/
+			record[3] /*degree*/, semester)
+		if err != nil {
+			revel.AppLog.Error("failed to insert studies entry", "record", record,
+				"matr nr", matrnr, "semester", semester, "error", err.Error())
+			tx.Rollback()
+			return err
+		}
 
 	}
 
@@ -303,7 +323,25 @@ func (e dbConnTest) Run() {
 	revel.AppLog.Warn("running DB connection test...")
 	err := Db.Ping()
 	if err != nil {
-		revel.AppLog.Error("DB connection test failed", "err", err.Error())
+		revel.AppLog.Error("DB connection test failed", "error", err.Error())
+		SendErrorNote()
+	}
+}
+
+//deleteCourses deletes all courses older than 10 years
+type deleteCourses struct{}
+
+/*Run the job to delete all courses older than 10 years. */
+func (e deleteCourses) Run() {
+
+	revel.AppLog.Warn("running DB job to delete all courses older than 10 years...")
+
+	stmt := `DELETE FROM courses
+		WHERE DATE_PART('year', current_date) - DATE_PART('year', creation_date) >= 10`
+
+	if _, err := Db.Exec(stmt); err != nil {
+		revel.AppLog.Error("job to delete all courses older than 10 years failed",
+			"error", err.Error())
 		SendErrorNote()
 	}
 }
@@ -328,6 +366,9 @@ func initJobData() {
 	if enrollFilePath, found = revel.Config.String("enroll.data"); !found {
 		revel.AppLog.Fatal("cannot find key in config", "key", "enroll.data")
 	}
+	if enrollFileName, found = revel.Config.String("enroll.file"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "enroll.file")
+	}
 }
 
 //initJobSchedules initializes all execution times of jobs
@@ -342,6 +383,13 @@ func initJobSchedules() {
 	}
 	jobSchedules["jobs.dbbackup"] = backupDB
 
+	//fetch enrollment file
+	enrollFile, found := revel.Config.String("jobs.fetchEnrollData")
+	if !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.fetchEnrollData")
+	}
+	jobSchedules["jobs.fetchEnrollData"] = enrollFile
+
 	//parse studies
 	studies, found := revel.Config.String("jobs.parseStudies")
 	if !found {
@@ -355,6 +403,13 @@ func initJobSchedules() {
 		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.connTest")
 	}
 	jobSchedules["jobs.connTest"] = connTest
+
+	//delete courses
+	deleteCourses, found := revel.Config.String("jobs.deleteCourses")
+	if !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.deleteCourses")
+	}
+	jobSchedules["jobs.deleteCourses"] = deleteCourses
 }
 
 const (

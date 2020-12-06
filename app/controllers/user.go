@@ -31,8 +31,7 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	credentials.Validate(c.Validation)
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	var user models.User
@@ -40,15 +39,14 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 	if credentials.Username != "" { //ldap login, authenticate the user
 
 		success, err := auth.LDAPServerAuth(&credentials, &user)
+
 		if err != nil {
-			return flashError(
-				errAuth, err, "", c.Controller, "")
-		}
-		if !success {
+			return flashError(errAuth, err, "", c.Controller, "")
+		} else if !success {
 			c.Validation.ErrorKey("login.ldap.auth.failed")
-			return flashError(
-				errValidation, nil, "", c.Controller, "")
+			return flashError(errValidation, nil, "", c.Controller, "")
 		}
+
 		c.Log.Debug("ldap authentication successful", "user", user)
 
 	} else { //external login
@@ -61,15 +59,13 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 
 	//login of user
 	if err := user.Login(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Validation.Required(user.ID).
 		MessageKey("validation.invalid.login")
 	if c.Validation.HasErrors() { //invalid external user credentials
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	c.setSession(&user)

@@ -54,7 +54,14 @@
         </a>
 
         <!-- enrollment button -->
-        {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
+        {{if $.session.userID}}
+          {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
+        {{else}}
+          <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
+            href='{{url "User.LoginPage"}}'>
+            {{msg $ "button.login"}}
+          </a>
+        {{end}}
 
         <!-- fullness and capacity -->
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-right"

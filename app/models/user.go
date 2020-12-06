@@ -202,9 +202,19 @@ func (user *User) Login() (err error) {
 			return
 		}
 
-		if user.MatrNr.Valid && user.FirstLogin == now { //update the courses of study of that user
+		//used to compare dates for first login
+		nowSplit := strings.Split(now, " ")
+		if len(nowSplit) == 3 {
+			now = nowSplit[0] + " " + nowSplit[1]
+		}
+
+		if user.MatrNr.Valid && user.FirstLogin == now {
+
+			//first login, update the courses of study of that user
 			log.Debug("first login", "time", user.FirstLogin)
-			//TODO: update the courses of study
+			if err = app.Parse(tx); err != nil {
+				return
+			}
 		}
 
 	} else { //external login

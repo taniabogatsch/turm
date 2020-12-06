@@ -90,9 +90,9 @@
         {{.errMsg}}
       </div>
     {{else}}
-      {{template "course/course.html" dict_addLocale $.currentLocale "course" .course}}
+      {{template "course/course.html" .}}
       <!-- load all modals responsible for changing content -->
-      {{template "edit/loadModals.html" dict_addLocale $.currentLocale "course" .course}}
+      {{template "edit/loadModals.html" .}}
     {{end}}
   </div>
 </div>

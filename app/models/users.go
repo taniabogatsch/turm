@@ -52,8 +52,8 @@ func (users *Users) Search(value *string, searchInactive *bool) (err error) {
 
 /*AutoEnrollFromWaitList is a function that is triggered in many different situations:
 - A user unsubscribes from an event and now there is a free slot.
-- When increasing the course capacity (TODO).
-- When manually unsubscribing an user from an event (TODO).
+- When increasing the course capacity.
+- When manually unsubscribing an user from an event.
 */
 func (users *Users) AutoEnrollFromWaitList(tx *sqlx.Tx, eventID *int,
 	status EnrollmentStatus) (err error) {
