@@ -12,12 +12,15 @@ active instructor                   | yes   | -     | -             | -         
 expired creator                     | yes   | -     | -             | -         | yes       | -         | yes         | yes           | -       | yes
 expired editor                      | yes   | -     | -             | -         | yes       | -         | -           | yes           | -       | -
 expired instructor                  | yes   | -     | -             | -         | -         | -         | -           | yes           | -       | -
-participants creator active | | | | | | | | | |
-participants editor active | | | | | | | | | |
-participants instructor active | | | | | | | | | |
-participants creator expired | | | | | | | | | |
-participants editor expired | | | | | | | | | |
-participants instructor expired | | | | | | | | | |
-course creator | | | | | | | | | |
-course editor | | | | | | | | | |
-course instructor | | | | | | | | | |
+participants creator active         | yes   | yes   | -             | -         | yes       | -         | yes         | -             | yes     | -
+participants editor active          | yes   | yes   | -             | -         | yes       | -         | -           | -             | -       | -
+participants instructor active      | yes   | -     | -             | -         | -         | -         | -           | -             | -       | -
+participants creator expired        | yes   | -     | -             | -         | yes       | -         | yes         | -             | -       | yes
+participants editor expired         | yes   | -     | -             | -         | yes       | -         | -           | -             | -       | -
+participants instructor expired     | yes   | -     | -             | -         | -         | -         | -           | -             | -       | -
+course creator active | | | | | | | | | |
+course editor active | | | | | | | | | |
+course instructor active | | | | | | | | | |
+course creator expired | | | | | | | | | |
+course editor expired | | | | | | | | | |
+course instructor expired | | | | | | | | | |
