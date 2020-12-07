@@ -221,6 +221,8 @@ enroll.manual.to.wait.list.success = Manually enrolled user to wait list.
 title.duplicate = Duplicate
 title.edit = Edit
 title.delete = Delete
+title.download = Download
+title.activate = Activate
 
 title.enroll = Enroll user
 title.unsubscribe = Unsubscribe user
@@ -233,10 +235,11 @@ title.delete.group = Delete group
 
 title.course.open = Open course
 
-title.manage.course.view = Open course view
+title.manage.options = Course option
+title.manage.course.view = Course view
 title.manage.edit = Edit course
 title.manage.download = Download course
-title.manage.participants = Open participants management
+title.manage.participants = Participants management
 title.manage.delete = Delete course
 title.manage.duplicate = Duplicate course
 

@@ -65,7 +65,10 @@ func (c Creator) Delete(ID int) revel.Result {
 	}
 
 	c.Flash.Success(c.Message("creator.course.deleted", ID))
-	return c.Redirect(c.Session["currPath"])
+	if course.Active {
+		return c.Redirect(Manage.Expired)
+	}
+	return c.Redirect(Manage.Drafts)
 }
 
 /*Duplicate a course draft.

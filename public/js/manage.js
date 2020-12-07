@@ -1,10 +1,5 @@
 /* This file comprises js functions required at the manage courses page. */
 
-function openDownloadModal(ID) {
-  $('#download-course-modal-ID').val(ID);
-  $('#download-course-modal').modal('show');
-}
-
 function uploadFeedback() {
   const filepath = $('#custom-file-upload').val();
   let path = filepath.split("/");
@@ -31,16 +26,4 @@ function showChosenOption() {
     $('#search-draft-section').addClass("d-none");
     $("#custom-file-upload").prop('required', false);
   }
-}
-
-function submitDownloadCourse() {
-
-  $('#download-course-modal').modal('hide');
-  $('#download-course-modal-form').submit();
-}
-
-function openDuplicateModal(ID) {
-
-  $('#duplicate-course-ID').val(ID);
-  $('#duplicate-course-modal').modal('show');
 }

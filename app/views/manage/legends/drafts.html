@@ -20,6 +20,13 @@
   <hr>
 
   <div class="d-none admin creator">
+    {{template "icons/unlock.html" . }} &nbsp;
+    <strong> {{msg $ "creator.course.activate"}}: </strong>
+    {{msg $ "creator.info.activate"}}
+    <hr>
+  </div>
+
+  <div class="d-none admin creator">
     {{template "icons/files.html" . }} &nbsp;
     {{msg $ "creator.info.draft.duplicate"}}
     <hr>

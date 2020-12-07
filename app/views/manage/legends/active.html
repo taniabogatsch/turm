@@ -35,4 +35,11 @@
   {{template "icons/people.html" . }} &nbsp;
   {{msg $ "creator.info.active.user"}}
 
+  <div class="d-none admin creator">
+    <hr>
+    {{template "icons/archive.html" . }} &nbsp;
+    <strong> {{msg $ "creator.course.expire"}}: </strong>
+    {{msg $ "creator.info.expire"}}
+  </div>
+
 </small>

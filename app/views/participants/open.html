@@ -11,6 +11,59 @@
       <!-- show either an open draft or an open course -->
       {{template "icons/people.html" . }}
       &nbsp; {{msg $ "pcpts.tab"}}
+
+      {{if not .participants.Expired}}
+        <!-- expire -->
+        <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
+          onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
+            {{msg $ "creator.course.expire.confirm" .participants.Title}},
+            {{url "Creator.Expire" .participants.ID}});'
+          title='{{msg $ "title.edit.expire"}}'>
+          {{template "icons/archive.html" . }}
+        </button>
+      {{end}}
+
+      {{if .participants.Expired}}
+        <!-- delete -->
+        <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
+          onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
+            {{msg $ "creator.course.delete.draft.confirm" .participants.Title}},
+            {{url "Creator.Delete" .participants.ID}});'
+          title='{{msg $ "title.manage.delete"}}'>
+          {{template "icons/trash.html" . }}
+        </button>
+      {{end}}
+
+      <!-- duplicate -->
+      <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
+        onclick='openDuplicateModal({{.participants.ID}});'
+        title='{{msg $ "title.manage.duplicate"}}'>
+        {{template "icons/files.html" . }}
+      </button>
+
+      <!-- download -->
+      <a class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator editor"
+        href="#no-scroll" title='{{msg $ "title.manage.download"}}'
+        onclick='openDownloadModal({{.participants.ID}});' role="button">
+        {{template "icons/download.html" . }}
+      </a>
+
+      {{if not .participants.Expired}}
+        <!-- edit -->
+        <a class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator editor"
+          href='{{url "Edit.Open" .participants.ID}}' role="button"
+          title='{{msg $ "title.manage.edit"}}'>
+          {{template "icons/pencil.html" . }}
+        </a>
+      {{end}}
+
+      <!-- go to -->
+      <a class="btn btn-outline-darkblue float-lg-right"
+        href='{{url "Course.Open" .participants.ID}}' role="button"
+        title='{{msg $ "title.manage.course.view"}}'>
+        {{template "icons/eye.html" . }}
+      </a>
+
     </h4>
     <hr>
 

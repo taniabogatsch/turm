@@ -13,6 +13,86 @@
     </div>
   {{else}}
 
+    {{if .course.Expired}}
+      <div class="text-danger edit-hide">
+        {{msg $ "validation.enrollment.not.active"}}
+        <br>
+      </div>
+      <hr>
+    {{end}}
+
+    {{if or .course.CanManageParticipants .course.CanEdit}}
+      <div class="row">
+        <div class="col-sm-12">
+
+          {{if not .course.Expired}}
+            <!-- expire -->
+            {{if .course.IsCreator}}
+              <a type="button" class="btn btn-outline-darkblue float-right ml-3"
+                onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
+                  {{msg $ "creator.course.expire.confirm" .course.Title}},
+                  {{url "Creator.Expire" .course.ID}});'
+                title='{{msg $ "title.edit.expire"}}'>
+                {{template "icons/archive.html" . }}
+              </a>
+            {{end}}
+          {{end}}
+
+          {{if .course.Expired}}
+            <!-- delete -->
+            {{if .course.IsCreator}}
+              <a type="button" class="btn btn-outline-darkblue float-right ml-3"
+                onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
+                  {{msg $ "creator.course.delete.draft.confirm" .course.Title}},
+                  {{url "Creator.Delete" .course.ID}});'
+                title='{{msg $ "title.manage.delete"}}'>
+                {{template "icons/trash.html" . }}
+              </a>
+            {{end}}
+          {{end}}
+
+          <!-- participants -->
+          {{if or .course.CanEdit .course.CanManageParticipants}}
+            <a class="btn btn-outline-darkblue float-right ml-3"
+              href='{{url "Participants.Open" .course.ID}}'
+              role="button" title='{{msg $ "title.manage.participants"}}'>
+              {{template "icons/people.html" . }}
+            </a>
+          {{end}}
+
+          <!-- duplicate -->
+          {{if .course.IsCreator}}
+            <a type="button" class="btn btn-outline-darkblue float-right ml-3"
+              onclick='openDuplicateModal({{.course.ID}});'
+              title='{{msg $ "title.manage.duplicate"}}'>
+              {{template "icons/files.html" . }}
+            </a>
+          {{end}}
+
+          <!-- download -->
+          {{if .course.CanEdit}}
+            <a class="btn btn-outline-darkblue float-right ml-3" href="#no-scroll"
+              onclick='openDownloadModal({{.course.ID}});' role="button"
+              title='{{msg $ "title.manage.download"}}'>
+              {{template "icons/download.html" . }}
+            </a>
+          {{end}}
+
+          <!-- edit -->
+          {{if not .course.Expired}}
+            {{if .course.CanEdit}}
+              <a class="btn btn-outline-darkblue float-right ml-3" href='{{url "Edit.Open" .course.ID}}'
+               role="button" title='{{msg $ "title.manage.edit"}}'>
+               {{template "icons/pencil.html" . }}
+              </a>
+            {{end}}
+          {{end}}
+        </div>
+      </div>
+
+      <hr>
+    {{end}}
+
     {{if not .session.userID}}
       {{if not .course.Visible}}
         {{.session.userID}}
@@ -31,22 +111,6 @@
       {{end}}
     {{end}}
 
-    <!-- participants -->
-    {{if .course.CanManageParticipants}}
-      <a class="btn btn-outline-darkblue float-right" href='{{url "Participants.Open" .course.ID}}'
-        role="button" title='{{msg $ "title.manage.participants"}}'>
-        {{template "icons/people.html" . }}
-      </a>
-    {{end}}
-
-    <!-- edit -->
-    {{if .course.CanEdit}}
-      <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .course.ID}}'
-        role="button" title='{{msg $ "title.manage.edit"}}'>
-        {{template "icons/pencil.html" . }}
-      </a>
-    {{end}}
-
     {{if or .session.userID .course.Visible}}
       {{template "course/course.html" .}}
     {{end}}
@@ -59,5 +123,8 @@
 
 {{template "course/modals/enterKeyModal.html" .}}
 {{template "course/modals/bookSlotModal.html" .}}
+
+{{template "manage/modals/download.html" dict_addLocale $.currentLocale}}
+{{template "manage/modals/duplicate.html" dict_addLocale $.currentLocale}}
 
 {{template "footer.html" .}}

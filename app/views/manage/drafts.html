@@ -48,18 +48,30 @@
           {{range .editor}}
             <li class="list-group-item">
 
-              <!-- download -->
-              <a class="btn btn-outline-darkblue float-right" href="#no-scroll"
-                onclick='openDownloadModal({{.ID}});' role="button"
-                title='{{msg $ "title.manage.download"}}'>
-                {{template "icons/download.html" . }}
-              </a>
+              <div class="dropdown">
+                <button class="btn btn-outline-darkblue float-right" type="button"
+                  id="dropdown-options-editor-{{.ID}}" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false" title='{{msg $ "title.manage.options"}}'>
+                  {{template "icons/threeDots.html" .}}
+                </button>
 
-              <!-- edit -->
-              <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Edit.Open" .ID}}'
-                role="button" title='{{msg $ "title.manage.edit"}}'>
-                {{template "icons/pencil.html" . }}
-              </a>
+                <div class="dropdown-menu" aria-labelledby="dropdown-options-editor-{{.ID}}">
+
+                  <!-- edit -->
+                  <a class="btn dropdown-item" href='{{url "Edit.Open" .ID}}' role="button">
+                    {{template "icons/pencil.html" . }}
+                    &nbsp; {{msg $ "title.edit"}}
+                  </a>
+
+                  <!-- download -->
+                  <a class="btn dropdown-item" href="#no-scroll" role="button"
+                    onclick='openDownloadModal({{.ID}});'>
+                    {{template "icons/download.html" . }}
+                    &nbsp; {{msg $ "title.download"}}
+                  </a>
+
+                </div>
+              </div>
 
               <!-- edit the course via clicking on its title -->
               <a class="text-body" href='{{url "Edit.Open" .ID}}' title='{{msg $ "title.manage.edit"}}'>

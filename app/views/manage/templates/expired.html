@@ -3,40 +3,51 @@
 {{range .entries}}
   <li class="list-group-item">
 
-    <!-- delete -->
-    <button type="button" class="btn btn-outline-darkblue float-right"
-      onclick='confirmPOSTModal({{msg $ "creator.course.delete.title"}},
-        {{msg $ "creator.course.delete.confirm" .Title}},
-        {{url "Creator.Delete" .ID}});'
-      title='{{msg $ "title.manage.delete"}}'>
-      {{template "icons/trash.html" . }}
-    </button>
+    <div class="dropdown">
+      <button class="btn btn-outline-darkblue float-right" type="button"
+        id="dropdown-options-creator-{{.ID}}" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false" title='{{msg $ "title.manage.options"}}'>
+        {{template "icons/threeDots.html" .}}
+      </button>
 
-    <!-- participants -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href='{{url "Participants.Open" .ID}}'
-      role="button" title='{{msg $ "title.manage.participants"}}'>
-      {{template "icons/people.html" . }}
-    </a>
+      <div class="dropdown-menu" aria-labelledby="dropdown-options-creator-{{.ID}}">
 
-    <!-- duplicate -->
-    <button type="button" class="btn btn-outline-darkblue float-right mr-3"
-      onclick='openDuplicateModal({{.ID}});'
-      title='{{msg $ "title.manage.duplicate"}}'>
-      {{template "icons/files.html" . }}
-    </button>
+        <!-- go to -->
+        <a class="btn dropdown-item" role="button" href='{{url "Course.Open" .ID}}'>
+          {{template "icons/eye.html" . }}
+          &nbsp; {{msg $ "title.manage.course.view"}}
+        </a>
 
-    <!-- download -->
-    <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
-      onclick='openDownloadModal({{.ID}});' role="button"
-      title='{{msg $ "title.manage.download"}}'>
-      {{template "icons/download.html" . }}
-    </a>
+        <!-- download -->
+        <a class="btn dropdown-item" href="#no-scroll" role="button"
+          onclick='openDownloadModal({{.ID}});'>
+          {{template "icons/download.html" . }}
+          &nbsp; {{msg $ "title.download"}}
+        </a>
 
-    <!-- go to -->
-    <a class="btn btn-outline-darkblue float-right mr-3" role="button"
-      href='{{url "Course.Open" .ID}}' title='{{msg $ "title.manage.course.view"}}'>
-      {{template "icons/eye.html" . }}
-    </a>
+        <!-- duplicate -->
+        <button type="button" class="btn dropdown-item" onclick='openDuplicateModal({{.ID}});'>
+          {{template "icons/files.html" . }}
+          &nbsp; {{msg $ "title.duplicate"}}
+        </button>
+
+        <!-- participants -->
+        <a class="btn dropdown-item" href='{{url "Participants.Open" .ID}}' role="button">
+          {{template "icons/people.html" . }}
+          &nbsp; {{msg $ "title.manage.participants"}}
+        </a>
+
+        <!-- delete -->
+        <button type="button" class="btn dropdown-item"
+          onclick='confirmPOSTModal({{msg $ "creator.course.delete.title"}},
+            {{msg $ "creator.course.delete.confirm" .Title}},
+            {{url "Creator.Delete" .ID}});'>
+          {{template "icons/trash.html" . }}
+          &nbsp; {{msg $ "title.manage.delete"}}
+        </button>
+
+      </div>
+    </div>
 
     <!-- title and go to -->
     <a class="text-body" href='{{url "Course.Open" .ID}}' title='{{msg $ "title.manage.course.view"}}'>

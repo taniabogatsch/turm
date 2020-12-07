@@ -221,6 +221,8 @@ enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste e
 title.duplicate = Duplizieren
 title.edit = Bearbeiten
 title.delete = Löschen
+title.download = Herunterladen
+title.activate = Aktivieren
 
 title.enroll = NutzerIn einschreiben
 title.unsubscribe = NutzerIn austragen
@@ -233,10 +235,11 @@ title.delete.group = Gruppe löschen
 
 title.course.open = Kurs anzeigen
 
-title.manage.course.view = Zur Kursansicht
+title.manage.options = Kursoptionen
+title.manage.course.view = Kursansicht
 title.manage.edit = Kurs bearbeiten
 title.manage.download = Kurs herunterladen
-title.manage.participants = Zur Teilnehmerverwaltung
+title.manage.participants = Teilnehmerverwaltung
 title.manage.delete = Kurs löschen
 title.manage.duplicate = Kurs duplizieren
 

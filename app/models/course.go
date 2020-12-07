@@ -62,6 +62,7 @@ type Course struct {
 	//used to render buttons for redirect
 	CanEdit               bool `db:"can_edit"`
 	CanManageParticipants bool `db:"can_manage_participants"`
+	IsCreator             bool
 }
 
 /*Validate all course fields. */
@@ -538,6 +539,10 @@ func (course *Course) Delete() (valid bool, err error) {
 		log.Error("failed to get validity of course deletion", "course ID", course.ID,
 			"error", err.Error())
 		tx.Rollback()
+		return
+	}
+
+	if err = course.GetColumnValue(tx, "active"); err != nil {
 		return
 	}
 

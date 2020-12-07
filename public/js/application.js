@@ -261,3 +261,20 @@ function selectCourseIDOfDraft(ID) {
   }
   document.getElementById('new-course-list-item-' + ID).classList.add("active");
 }
+
+function openDownloadModal(ID) {
+  $('#download-course-modal-ID').val(ID);
+  $('#download-course-modal').modal('show');
+}
+
+function submitDownloadCourse() {
+
+  $('#download-course-modal').modal('hide');
+  $('#download-course-modal-form').submit();
+}
+
+function openDuplicateModal(ID) {
+
+  $('#duplicate-course-ID').val(ID);
+  $('#duplicate-course-modal').modal('show');
+}

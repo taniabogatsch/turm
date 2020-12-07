@@ -22,6 +22,13 @@
 
 <small class="form-text text-muted">
 
+  <!-- view -->
+  {{if .course.Active}}
+    {{template "icons/eye.html" . }} &nbsp;
+    {{msg $ "creator.info.active.goto"}}
+    <hr>
+  {{end}}
+
   <!-- preview, edit -->
   {{template "icons/aspectRatio.html" . }} &nbsp;
   <strong>
@@ -47,6 +54,13 @@
   {{template "icons/download.html" . }} &nbsp;
   {{msg $ "creator.info.draft.download"}}
 
+  <!-- duplicate -->
+  <div class="d-none admin creator">
+    <hr>
+    {{template "icons/files.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.duplicate"}}
+  </div>
+
   {{if not .course.Active}}
 
     <!-- activate -->
@@ -57,7 +71,20 @@
       {{msg $ "creator.info.activate"}}
     </div>
 
-  {{else}}
+    <!-- delete -->
+    <div class="d-none admin creator">
+      <hr>
+      {{template "icons/trash.html" . }} &nbsp;
+      {{msg $ "creator.info.draft.delete"}}
+    </div>
+  {{end}}
+
+  {{if .course.Active}}
+
+    <!-- participants -->
+    <hr>
+    {{template "icons/people.html" . }} &nbsp;
+    {{msg $ "creator.info.active.user"}}
 
     <!-- expire -->
     <div class="d-none admin creator">
@@ -66,20 +93,6 @@
       <strong> {{msg $ "creator.course.expire"}}: </strong>
       {{msg $ "creator.info.expire"}}
     </div>
-
   {{end}}
-
-  <div class="d-none admin creator">
-    <hr>
-    {{template "icons/files.html" . }} &nbsp;
-    {{msg $ "creator.info.draft.duplicate"}}
-  </div>
-
-
-  <div class="d-none admin creator">
-    <hr>
-    {{template "icons/trash.html" . }} &nbsp;
-    {{msg $ "creator.info.draft.delete"}}
-  </div>
 
 </small>

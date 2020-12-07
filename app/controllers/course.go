@@ -32,6 +32,9 @@ func (c Course) Open(ID int) revel.Result {
 		if c.Session["role"].(string) == models.ADMIN.String() {
 			course.CanEdit = true
 			course.CanManageParticipants = true
+			course.IsCreator = true
+		} else if int(course.Creator.Int32) == userID {
+			course.IsCreator = true
 		}
 	}
 

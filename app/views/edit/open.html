@@ -16,26 +16,19 @@
         &nbsp; {{msg $ "creator.course.draft.is.open"}}
       {{end}}
 
-      <!-- delete -->
-      <button type="button" class="btn btn-outline-darkblue float-lg-right d-none admin creator"
-        onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
-          {{msg $ "creator.course.delete.draft.confirm" .course.Title}},
-          {{url "Creator.Delete" .course.ID}});'
-        title='{{msg $ "title.manage.delete"}}'>
-        {{template "icons/trash.html" . }}
-      </button>
-
-      <!-- duplicate -->
-      <button type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none admin creator"
-        onclick='openDuplicateModal({{.course.ID}});'
-        title='{{msg $ "title.manage.duplicate"}}'>
-        {{template "icons/files.html" . }}
-      </button>
-
       {{if not .course.Active}}
 
+        <!-- delete -->
+        <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
+          onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
+            {{msg $ "creator.course.delete.draft.confirm" .course.Title}},
+            {{url "Creator.Delete" .course.ID}});'
+          title='{{msg $ "title.manage.delete"}}'>
+          {{template "icons/trash.html" . }}
+        </button>
+
         <!-- activate -->
-        <button type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none admin creator"
+        <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
           onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
             {{msg $ "creator.course.activate.confirm" .course.Title}},
             {{url "Creator.Activate" .course.ID}});'
@@ -43,10 +36,12 @@
           {{template "icons/unlock.html" . }}
         </button>
 
-      {{else}}
+      {{end}}
+
+      {{if .course.Active}}
 
         <!-- expire -->
-        <button type="button" class="btn btn-outline-darkblue float-lg-right d-none admin creator"
+        <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
           onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
             {{msg $ "creator.course.expire.confirm" .course.Title}},
             {{url "Creator.Expire" .course.ID}});'
@@ -54,33 +49,54 @@
           {{template "icons/archive.html" . }}
         </button>
 
+        <!-- participants -->
+        <a class="btn btn-outline-darkblue float-lg-right ml-3" href='{{url "Participants.Open" .course.ID}}'
+          role="button" title='{{msg $ "title.manage.participants"}}'>
+          {{template "icons/people.html" . }}
+        </a>
+
       {{end}}
 
+      <!-- duplicate -->
+      <button type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none admin creator"
+        onclick='openDuplicateModal({{.course.ID}});'
+        title='{{msg $ "title.manage.duplicate"}}'>
+        {{template "icons/files.html" . }}
+      </button>
+
       <!-- download -->
-      <a class="btn btn-outline-darkblue float-lg-right mr-3" href="#no-scroll"
+      <a class="btn btn-outline-darkblue float-lg-right ml-3" href="#no-scroll"
         onclick='openDownloadModal({{.course.ID}});' role="button"
         title='{{msg $ "title.manage.download"}}'>
         {{template "icons/download.html" . }}
       </a>
 
       {{if not .course.Active}}
-
-        <!-- validate course -->
-        <form class="float-left float-lg-right mr-3" action='{{url "Edit.Validate" .course.ID}}' method="POST">
+        <!-- validate -->
+        <form class="float-left float-lg-right ml-3" action='{{url "Edit.Validate" .course.ID}}' method="POST">
           <button type="submit" class="btn btn-outline-darkblue" title='{{msg $ "title.edit.validate"}}'>
             {{template "icons/checkAll.html" . }}
           </button>
         </form>
       {{end}}
 
-      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right mr-3"
+      <!-- preview/edit -->
+      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right ml-3"
         onclick="plainCourse();" title='{{msg $ "title.edit.preview"}}'>
         {{template "icons/aspectRatio.html" . }}
       </button>
-      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none"
+      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right ml-3 d-none"
         onclick="editCourse();" title='{{msg $ "title.edit.course"}}'>
         {{template "icons/pencil.html" . }}
       </button>
+
+      <!-- view -->
+      {{if .course.Active}}
+        <a class="btn btn-outline-darkblue float-lg-right" role="button"
+          href='{{url "Course.Open" .course.ID}}' title='{{msg $ "title.manage.course.view"}}'>
+          {{template "icons/eye.html" . }}
+        </a>
+      {{end}}
     </h4>
     <hr>
 
