@@ -22,6 +22,7 @@
 
 <small class="form-text text-muted">
 
+  <!-- preview, edit -->
   {{template "icons/aspectRatio.html" . }} &nbsp;
   <strong>
     {{msg $ "creator.course.preview"}}
@@ -33,52 +34,52 @@
   </strong>
   {{msg $ "creator.info.preview"}}
 
+  <!-- validate -->
   {{if not .course.Active}}
-    <!-- validate -->
     <hr>
     {{template "icons/checkAll.html" . }} &nbsp;
     <strong> {{msg $ "creator.course.validate"}}: </strong>
     {{msg $ "creator.info.validate"}}
   {{end}}
 
-  {{if eq .session.role "admin"}}
-    {{if not .course.Active}}
+  <!-- download -->
+  <hr>
+  {{template "icons/download.html" . }} &nbsp;
+  {{msg $ "creator.info.draft.download"}}
 
-      <!-- activate -->
+  {{if not .course.Active}}
+
+    <!-- activate -->
+    <div class="d-none admin creator">
       <hr>
       {{template "icons/unlock.html" . }} &nbsp;
       <strong> {{msg $ "creator.course.activate"}}: </strong>
       {{msg $ "creator.info.activate"}}
+    </div>
 
-    {{else}}
+  {{else}}
 
-      <!-- expire -->
+    <!-- expire -->
+    <div class="d-none admin creator">
       <hr>
       {{template "icons/archive.html" . }} &nbsp;
       <strong> {{msg $ "creator.course.expire"}}: </strong>
       {{msg $ "creator.info.expire"}}
+    </div>
 
-    {{end}}
-  {{else}}
-    {{if eq .course.CreatorID .session.userID}}
-      {{if not .course.Active}}
-
-        <!-- activate -->
-        <hr>
-        {{template "icons/unlock.html" . }} &nbsp;
-        <strong> {{msg $ "creator.course.activate"}}: </strong>
-        {{msg $ "creator.info.activate"}}
-
-      {{else}}
-
-        <!-- expire -->
-        <hr>
-        {{template "icons/archive.html" . }} &nbsp;
-        <strong> {{msg $ "creator.course.expire"}}: </strong>
-        {{msg $ "creator.info.expire"}}
-
-      {{end}}
-    {{end}}
   {{end}}
+
+  <div class="d-none admin creator">
+    <hr>
+    {{template "icons/files.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.duplicate"}}
+  </div>
+
+
+  <div class="d-none admin creator">
+    <hr>
+    {{template "icons/trash.html" . }} &nbsp;
+    {{msg $ "creator.info.draft.delete"}}
+  </div>
 
 </small>

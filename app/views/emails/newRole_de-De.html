@@ -4,11 +4,11 @@
 
 Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet
 {{if eq .data.User.Role 0}}
-  {{msg $ "user.role.user"}}
+  {{msg $ "user.role.user"}}.
 {{else if eq .data.User.Role 1}}
-  {{msg $ "user.role.creator"}}
+  {{msg $ "user.role.creator"}}.
 {{else if eq .data.User.Role 2}}
-  {{msg $ "user.role.admin"}}
+  {{msg $ "user.role.admin"}}.
 {{end}}.
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
@@ -25,13 +25,13 @@ Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet
 <br>
 <b>
   {{if eq .data.User.Role 0}}
-    {{msg $ "user.role.user"}}
+    {{msg $ "user.role.user"}}.
   {{else if eq .data.User.Role 1}}
-    {{msg $ "user.role.creator"}}
+    {{msg $ "user.role.creator"}}.
   {{else if eq .data.User.Role 2}}
-    {{msg $ "user.role.admin"}}
+    {{msg $ "user.role.admin"}}.
   {{end}}
-</b>.
+</b>
 <br>
 <br>
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>

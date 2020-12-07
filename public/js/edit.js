@@ -532,7 +532,7 @@ function openDuplicateDeleteModal(title, content, action, fieldID, meetingID, ev
   $('#duplicate-delete-title').html(title);
   $('#duplicate-delete-form').attr("action", action);
   $('#duplicate-delete-content').html(content);
-  $('#duplicate-delete-list').val(fieldID);
+  $('#duplicate-delete-modal-list').val(fieldID);
   $('#duplicate-delete-meeting-ID').val(meetingID);
   $('#duplicate-delete-meeting-event-ID').val(eventID);
 

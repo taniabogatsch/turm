@@ -19,6 +19,15 @@
       {{template "icons/files.html" . }}
     </button>
 
+    <!-- activate the course -->
+    <button type="button" class="btn btn-outline-darkblue float-right mr-3"
+      onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
+        {{msg $ "creator.course.activate.confirm" .Title}},
+        {{url "Creator.Activate" .ID}});'
+      title='{{msg $ "title.edit.activate"}}'>
+      {{template "icons/unlock.html" . }}
+    </button>
+
     <!-- download -->
     <a class="btn btn-outline-darkblue float-right mr-3" href="#no-scroll"
       onclick='openDownloadModal({{.ID}});' role="button"

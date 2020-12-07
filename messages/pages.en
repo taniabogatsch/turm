@@ -59,7 +59,7 @@ new.pw.info = Please enter your e-mail address. We will send a new password to t
 activation.tab = Activate account
 activation.page = Activate account
 
-activation.success = Account activated.
+activation.success = Activated account.
 activation.resend.success = A new activation code was send to %s.
 activation.code = Activation code
 activation.resend = Resend activation code
@@ -149,9 +149,9 @@ profile.page = User profile
 
 profile.user.info = User information
 profile.active.events = Active events
-profile.active.events.none = No active events
+profile.active.events.none = No active events.
 profile.expired.events = Expired events
-profile.expired.events.none = No expired events
+profile.expired.events.none = No expired events.
 
 profile.change.pw = Change password
 profile.change.pw.success = Changed password

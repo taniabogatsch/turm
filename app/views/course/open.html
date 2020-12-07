@@ -20,7 +20,13 @@
           {{.course.Title}}
         </h4>
         <div class="text-info">
+          <br>
           {{msg $ "course.not.visible.info"}}
+          <br>
+          <br>
+          <a class="btn btn-outline-darkblue" href='{{url "User.LoginPage"}}'>
+            {{msg $ "button.login"}}
+          </a>
         </div>
       {{end}}
     {{end}}

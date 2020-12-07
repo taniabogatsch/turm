@@ -40,7 +40,7 @@
             {{if .CourseOfStudiesID.Valid}}{{.StudiesName.String}}{{end}}
             {{if .MinimumSemester.Valid}}
               <small class="text-muted d-inline">
-                {{msg $ "course.minimum.semester"}}:{{.MinimumSemester.Int64}}
+                {{msg $ "course.minimum.semester"}}: {{.MinimumSemester.Int64}}
               </small>
             {{end}}
 
@@ -52,7 +52,8 @@
             <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
               onclick='confirmDeleteRenderModal({{msg $ "course.restriction.delete.title"}},
                 {{msg $ "course.restriction.delete.confirm"}},
-                {{url "Edit.DeleteRestriction" .CourseID .ID}}, "restrictions");'>
+                {{url "Edit.DeleteRestriction" .CourseID .ID}}, "restrictions");'
+              title='{{msg $ "title.delete"}}'>
               {{template "icons/trash.html" . }}
             </a>
           </li>

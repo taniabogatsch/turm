@@ -28,6 +28,8 @@ func (c Admin) Roles() revel.Result {
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
+	//TODO: transaction
+
 	//get all admins
 	var admins models.Users
 	if err := admins.Get(models.ADMIN); err != nil {

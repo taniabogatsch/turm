@@ -16,53 +16,52 @@
         &nbsp; {{msg $ "creator.course.draft.is.open"}}
       {{end}}
 
-      {{if eq .session.role "admin"}}
-        {{if not .course.Active}}
+      <!-- delete -->
+      <button type="button" class="btn btn-outline-darkblue float-lg-right d-none admin creator"
+        onclick='confirmPOSTModal({{msg $ "creator.course.delete.draft.title"}},
+          {{msg $ "creator.course.delete.draft.confirm" .course.Title}},
+          {{url "Creator.Delete" .course.ID}});'
+        title='{{msg $ "title.manage.delete"}}'>
+        {{template "icons/trash.html" . }}
+      </button>
 
-          <!-- activate the course -->
-          <button type="button" class="btn btn-outline-darkblue float-lg-right"
-            onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
-              {{msg $ "creator.course.activate.confirm" .course.Title}},
-              {{url "Creator.Activate" .course.ID}});'
-            title='{{msg $ "title.edit.activate"}}'>
-            {{template "icons/unlock.html" . }}
-          </button>
-        {{else}}
+      <!-- duplicate -->
+      <button type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none admin creator"
+        onclick='openDuplicateModal({{.course.ID}});'
+        title='{{msg $ "title.manage.duplicate"}}'>
+        {{template "icons/files.html" . }}
+      </button>
 
-          <!-- expire the course -->
-          <button type="button" class="btn btn-outline-darkblue float-lg-right"
-            onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
-              {{msg $ "creator.course.expire.confirm" .course.Title}},
-              {{url "Creator.Expire" .course.ID}});'
-            title='{{msg $ "title.edit.expire"}}'>
-            {{template "icons/archive.html" . }}
-          </button>
-        {{end}}
+      {{if not .course.Active}}
+
+        <!-- activate -->
+        <button type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none admin creator"
+          onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
+            {{msg $ "creator.course.activate.confirm" .course.Title}},
+            {{url "Creator.Activate" .course.ID}});'
+          title='{{msg $ "title.edit.activate"}}'>
+          {{template "icons/unlock.html" . }}
+        </button>
+
       {{else}}
-        {{if eq .course.CreatorID .session.userID}}
-          {{if not .course.Active}}
 
-            <!-- activate the course -->
-            <button type="button" class="btn btn-outline-darkblue float-left float-lg-right"
-              onclick='confirmPOSTModal({{msg $ "creator.course.activate.title"}},
-                {{msg $ "creator.course.activate.confirm" .course.Title}},
-                {{url "Creator.Activate" .course.ID}});'
-              title='{{msg $ "title.edit.activate"}}'>
-              {{template "icons/unlock.html" . }}
-            </button>
-          {{else}}
+        <!-- expire -->
+        <button type="button" class="btn btn-outline-darkblue float-lg-right d-none admin creator"
+          onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
+            {{msg $ "creator.course.expire.confirm" .course.Title}},
+            {{url "Creator.Expire" .course.ID}});'
+          title='{{msg $ "title.edit.expire"}}'>
+          {{template "icons/archive.html" . }}
+        </button>
 
-            <!-- expire the course -->
-            <button type="button" class="btn btn-outline-darkblue float-left float-lg-right"
-              onclick='confirmPOSTModal({{msg $ "creator.course.expire.title"}},
-                {{msg $ "creator.course.expire.confirm" .course.Title}},
-                {{url "Creator.Expire" .course.ID}});'
-              title='{{msg $ "title.edit.activate"}}'>
-              {{template "icons/archive.html" . }}
-            </button>
-          {{end}}
-        {{end}}
       {{end}}
+
+      <!-- download -->
+      <a class="btn btn-outline-darkblue float-lg-right mr-3" href="#no-scroll"
+        onclick='openDownloadModal({{.course.ID}});' role="button"
+        title='{{msg $ "title.manage.download"}}'>
+        {{template "icons/download.html" . }}
+      </a>
 
       {{if not .course.Active}}
 
@@ -74,11 +73,11 @@
         </form>
       {{end}}
 
-      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3"
+      <button id="preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right mr-3"
         onclick="plainCourse();" title='{{msg $ "title.edit.preview"}}'>
         {{template "icons/aspectRatio.html" . }}
       </button>
-      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-left float-lg-right mr-3 d-none"
+      <button id="hide-preview-btn" type="button" class="btn btn-outline-darkblue float-lg-right mr-3 d-none"
         onclick="editCourse();" title='{{msg $ "title.edit.course"}}'>
         {{template "icons/pencil.html" . }}
       </button>

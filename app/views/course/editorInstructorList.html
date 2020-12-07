@@ -48,7 +48,8 @@
           <a href="#no-scroll" class="badge btn-outline-darkblue"
             onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}",
               {{msg $ "course.see.matr.nr.info"}}, {{msg $ "course.not.see.matr.nr.info"}},
-              {{.ViewMatrNr}}, {{.UserID}}, "editors", {{.CourseID}});'>
+              {{.ViewMatrNr}}, {{.UserID}}, "editors", {{.CourseID}});'
+            title='{{msg $ "title.edit"}}'>
             {{template "icons/pencil.html" . }}
           </a>
           |
@@ -56,7 +57,8 @@
             onclick='confirmDeleteRenderModal({{msg $ "course.editor.delete.title"}},
               {{msg $ "course.editor.delete.confirm" .EMail}},
               "{{url "Edit.DeleteFromUserList" .CourseID .UserID "editors"}}",
-              "editors");'>
+              "editors");'
+            title='{{msg $ "title.delete"}}'>
             {{template "icons/trash.html" . }}
           </a>
         </div>
@@ -75,7 +77,8 @@
           <a href="#no-scroll" class="badge btn-outline-darkblue"
             onclick='openBoolModal({{msg $ "course.matr.nr.change.title"}}, "{{url "Edit.ChangeViewMatrNr"}}",
               {{msg $ "course.see.matr.nr.info"}}, {{msg $ "course.not.see.matr.nr.info"}},
-              {{.ViewMatrNr}}, {{.UserID}}, "instructors", {{.CourseID}});'>
+              {{.ViewMatrNr}}, {{.UserID}}, "instructors", {{.CourseID}});'
+            title='{{msg $ "title.edit"}}'>
             {{template "icons/pencil.html" . }}
           </a>
           |
@@ -83,7 +86,8 @@
             onclick='confirmDeleteRenderModal({{msg $ "course.instructor.delete.title"}},
               {{msg $ "course.instructor.delete.confirm" .EMail}},
               "{{url "Edit.DeleteFromUserList" .CourseID .UserID "instructors"}}",
-              "instructors");'>
+              "instructors");'
+            title='{{msg $ "title.delete"}}'>
             {{template "icons/trash.html" . }}
           </a>
         </div>

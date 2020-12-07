@@ -106,14 +106,16 @@
   {{if eq .MeetingInterval 0}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}},
-      {{.Place.String}}, {{.Annotation.String}}, 0, 0, {{.EventID}});'>
+        {{.Place.String}}, {{.Annotation.String}}, 0, 0, {{.EventID}});'
+      title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
 
   {{else}} <!-- edit weekly meeting -->
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
       onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}}, {{.Place.String}},
-      {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}}, {{.EventID}});'>
+        {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}}, {{.EventID}});'
+      title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
   {{end}}
@@ -122,7 +124,8 @@
   <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
     onclick='openDuplicateDeleteModal({{msg $ "meeting.duplicate.title"}},
       {{msg $ "meeting.duplicate.confirm"}}, "{{url "EditMeeting.Duplicate"}}",
-      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'>
+      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'
+    title='{{msg $ "title.duplicate"}}'>
     {{template "icons/files.html" . }}
   </a>
 
@@ -130,7 +133,8 @@
   <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
     onclick='openDuplicateDeleteModal({{msg $ "meeting.delete.title"}},
       {{msg $ "meeting.delete.confirm"}}, "{{url "EditMeeting.Delete"}}",
-      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'>
+      "meetings-{{.EventID}}", {{.ID}}, {{.EventID}});'
+    title='{{msg $ "title.delete"}}'>
     {{template "icons/trash.html" . }}
   </a>
 {{end}}

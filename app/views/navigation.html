@@ -30,26 +30,28 @@
     <ul class="navbar-nav mr-auto">
 
       <!-- get back to main page -->
-      <li class="nav-item active">
-        <a class="nav-link" href='{{url "App.Index"}}'>
-          {{msg $ "index.page"}}
-        </a>
-      </li>
+      {{if not .session.notActivated}}
+        <li class="nav-item active">
+          <a class="nav-link" href='{{url "App.Index"}}'>
+            {{msg $ "index.page"}}
+          </a>
+        </li>
 
-      <!-- data privacy, news feed, FAQ, tutorials, imprint-->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-white" href="#"
-          id="dropdownHelpPages" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          {{msg $ "nav.help"}}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
-          <a class="dropdown-item" href='{{url "App.DataPrivacy"}}'> {{msg $ "data.privacy.tab"}} </a>
-          <a class="dropdown-item" href='{{url "App.News"}}'> {{msg $ "news.feed.tab"}} </a>
-          <a class="dropdown-item" href='{{url "App.FAQs"}}'> {{msg $ "faq.tab"}} </a>
-          <a class="dropdown-item" href='{{url "App.Imprint"}}'> {{msg $ "imprint.tab"}} </a>
-        </div>
-      </li>
+        <!-- data privacy, news feed, FAQ, tutorials, imprint-->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#"
+            id="dropdownHelpPages" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            {{msg $ "nav.help"}}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="dropdownHelpPages">
+            <a class="dropdown-item" href='{{url "App.DataPrivacy"}}'> {{msg $ "data.privacy.tab"}} </a>
+            <a class="dropdown-item" href='{{url "App.News"}}'> {{msg $ "news.feed.tab"}} </a>
+            <a class="dropdown-item" href='{{url "App.FAQs"}}'> {{msg $ "faq.tab"}} </a>
+            <a class="dropdown-item" href='{{url "App.Imprint"}}'> {{msg $ "imprint.tab"}} </a>
+          </div>
+        </li>
+      {{end}}
 
       <!--languages -->
       <li class="nav-item dropdown">
@@ -71,50 +73,53 @@
       </li>
 
       <!-- courses of user -->
-      {{if .session.userID}}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" href="#" role="button"
-            aria-haspopup="true" aria-expanded="false">
-            {{msg $ "nav.my.courses"}}
+      {{if not .session.notActivated}}
+        {{if .session.userID}}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" data-toggle="dropdown" href="#" role="button"
+              aria-haspopup="true" aria-expanded="false">
+              {{msg $ "nav.my.courses"}}
+            </a>
+            <div class="dropdown-menu">
+              {{range $i, $v := .navUser.ActiveEnrollments}}
+                {{if ne $i 0}}<div class="dropdown-divider"></div>{{end}}
+                <a class="dropdown-item" href='{{url "Course.Open" .CourseID}}'
+                  style="word-wrap: break-word; white-space: normal;">
+                  {{.CourseTitle}}, {{.EventTitle}}
+                </a>
+              {{else}}
+                <h6 class="dropdown-header">
+                  {{msg $ "profile.active.events.none"}}
+                </h6>
+              {{end}}
+            </div>
+          </li>
+        {{end}}
+
+
+        <!-- profile -->
+        {{if .session.userID}}
+          <li class="nav-item active">
+            <a class="nav-link" href='{{url "User.Profile"}}'>
+              {{msg $ "profile.tab"}}
+            </a>
+          </li>
+        {{end}}
+
+        <!-- course management -->
+        <li class="nav-item active d-none admin creator editor instructor">
+          <a class="nav-link" href='{{url "Manage.Active"}}'>
+            {{msg $ "creator.tab"}}
           </a>
-          <div class="dropdown-menu">
-            {{range $i, $v := .navUser.ActiveEnrollments}}
-              {{if ne $i 0}}<div class="dropdown-divider"></div>{{end}}
-              <a class="dropdown-item" href='{{url "Course.Open" .CourseID}}'
-                style="word-wrap: break-word; white-space: normal;">
-                {{.CourseTitle}}, {{.EventTitle}}
-              </a>
-            {{else}}
-              <h6 class="dropdown-header">
-                {{msg $ "profile.active.events.none"}}
-              </h6>
-            {{end}}
-          </div>
+        </li>
+
+        <!-- admin page -->
+        <li class="nav-item active d-none admin">
+          <a class="nav-link" href='{{url "Admin.Users"}}'>
+            {{msg $ "admin.page"}}
+          </a>
         </li>
       {{end}}
-
-      <!-- profile -->
-      {{if .session.userID}}
-        <li class="nav-item active">
-          <a class="nav-link" href='{{url "User.Profile"}}'>
-            {{msg $ "profile.tab"}}
-          </a>
-        </li>
-      {{end}}
-
-      <!-- course management -->
-      <li class="nav-item active d-none admin creator editor instructor">
-        <a class="nav-link" href='{{url "Manage.Active"}}'>
-          {{msg $ "creator.tab"}}
-        </a>
-      </li>
-
-      <!-- admin page -->
-      <li class="nav-item active d-none admin">
-        <a class="nav-link" href='{{url "Admin.Users"}}'>
-          {{msg $ "admin.page"}}
-        </a>
-      </li>
     </ul> <!-- end of left aligned entries -->
 
     {{if .session.userID}}
@@ -126,24 +131,26 @@
     {{end}}
 
     <!-- course search -->
-    <form class="form-inline mt-2 mt-lg-0 mr-0 mr-lg-3">
-      <div class="input-group">
+    {{if not .session.notActivated}}
+      <form class="form-inline mt-2 mt-lg-0 mr-0 mr-lg-3">
+        <div class="input-group">
 
-        <!-- input -->
-        <input class="form-control dropdown-toggle rounded-right" type="search"
-          placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
-          onkeyup='searchCourse("dropdown-search", "content-search", "dropdown-search", {{url "Course.Search"}});'
-          aria-expanded="false" id="dropdown-search">
+          <!-- input -->
+          <input class="form-control dropdown-toggle rounded-right" type="search"
+            placeholder='{{msg $ "search.course"}}' data-toggle="dropdown" aria-haspopup="true"
+            onkeyup='searchCourse("dropdown-search", "content-search", "dropdown-search", {{url "Course.Search"}});'
+            aria-expanded="false" id="dropdown-search">
 
-        <!-- menu -->
-        <div class="dropdown-menu dropdown-menu-right d-none" id="content-search">
+          <!-- menu -->
+          <div class="dropdown-menu dropdown-menu-right d-none" id="content-search">
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
 
-    <button class="btn btn-outline-light mt-2 mt-lg-0 mr-0 mr-lg-3" type="button" onclick="openGroupsNav();">
-      {{msg $ "groups"}}
-    </button>
+      <button class="btn btn-outline-light mt-2 mt-lg-0 mr-0 mr-lg-3" type="button" onclick="openGroupsNav();">
+        {{msg $ "groups"}}
+      </button>
+    {{end}}
 
     <!-- a user is logged in -->
     {{if .session.userID}}

@@ -5,7 +5,7 @@
 header.no.javascript = JavaScript ist deaktiviert. Teile der Seite können sich anders verhalten als erwartet.
 
 footer.support.email = Bei Fragen wenden Sie sich bitte an unseren <a href="mailto:%s?Subject=SupportTurm2" target="_top">Support</a>.
-footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href='app/dataPrivacy'>hier</a>.
+footer.data.policy = Unsere Datenschutzerklärung finden Sie <a href='/app/dataPrivacy'>hier</a>.
 
 nav.help = Hilfen
 nav.my.courses = Meine Kurse
@@ -217,6 +217,10 @@ enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste e
 # -------------------------------------------------------------------------------------------------- #
 # TITLES
 # -------------------------------------------------------------------------------------------------- #
+
+title.duplicate = Duplizieren
+title.edit = Bearbeiten
+title.delete = Löschen
 
 title.enroll = NutzerIn einschreiben
 title.unsubscribe = NutzerIn austragen

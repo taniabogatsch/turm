@@ -31,7 +31,8 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.title"}}, "title",
           true, "{{url "Edit.ChangeText"}}", "text", "511",
-          {{msg $ "course.title.change.info"}}, {{.course.ID}}, 0);'>
+          {{msg $ "course.title.change.info"}}, {{.course.ID}}, 0);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
     </h4>
@@ -49,13 +50,15 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
           onclick='openChangeModal({{msg $ "course.subtitle"}}, "subtitle", true,
             "{{url "Edit.ChangeText"}}", "text", "511",
-            {{msg $ "course.subtitle.change.info"}}, {{.course.ID}}, 0);'>
+            {{msg $ "course.subtitle.change.info"}}, {{.course.ID}}, 0);'
+          title='{{msg $ "title.edit"}}'>
           {{template "icons/pencil.html" . }}
         </a>
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
           onclick='confirmDeleteJSONModal({{msg $ "course.subtitle.delete.title"}},
             {{msg $ "course.subtitle.delete.confirm"}},
-            "{{url "Edit.ChangeText" .course.ID "subtitle" ""}}");'>
+            "{{url "Edit.ChangeText" .course.ID "subtitle" ""}}");'
+          title='{{msg $ "title.delete"}}'>
           {{template "icons/trash.html" . }}
         </a>
       </h5>
@@ -106,7 +109,8 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollment_start",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}}, 0);'>
+        {{msg $ "course.enrollment.start.change.info"}}, {{.course.ID}}, 0);'
+      title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
     <br>
@@ -114,7 +118,8 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollment_end",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}}, 0);'>
+        {{msg $ "course.enrollment.end.change.info"}}, {{.course.ID}}, 0);'
+      title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
@@ -131,13 +136,15 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", true,
           "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}}, 0);'>
+          {{msg $ "course.unsubscribe.end.info"}}, {{.course.ID}}, 0);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='confirmDeleteJSONModal({{msg $ "course.unsubscribe.end.delete.title"}},
           {{msg $ "course.unsubscribe.end.delete.confirm"}},
-          "{{url "Edit.ChangeTimestamp" .course.ID "unsubscribe_end" "" ""}}");'>
+          "{{url "Edit.ChangeTimestamp" .course.ID "unsubscribe_end" "" ""}}");'
+        title='{{msg $ "title.delete"}}'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
@@ -171,13 +178,15 @@
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
          onclick='openChangeModal({{msg $ "course.fee"}}, "fee", true,
            "{{url "Edit.ChangeText"}}", "text", "",
-           {{msg $ "course.fee.change.info"}}, {{.course.ID}}, 0);'>
+           {{msg $ "course.fee.change.info"}}, {{.course.ID}}, 0);'
+        title='{{msg $ "title.edit"}}'>
          {{template "icons/pencil.html" . }}
        </a>
        <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
          onclick='confirmDeleteJSONModal({{msg $ "course.fee.delete.title"}},
            {{msg $ "course.fee.delete.confirm"}},
-           "{{url "Edit.ChangeText" .course.ID "fee" ""}}");'>
+           "{{url "Edit.ChangeText" .course.ID "fee" ""}}");'
+          title='{{msg $ "title.delete"}}'>
          {{template "icons/trash.html" . }}
        </a>
      </div>
@@ -213,13 +222,15 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.description"}},
           "description", true, "{{url "Edit.ChangeText"}}",
-          {{msg $ "course.description.change.info"}}, false);'>
+          {{msg $ "course.description.change.info"}}, false);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='confirmDeleteJSONModal({{msg $ "course.description.delete.title"}},
           {{msg $ "course.description.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "description" ""}}#course-registration-period");'>
+          "{{url "Edit.ChangeText" .course.ID  "description" ""}}#course-registration-period");'
+        title='{{msg $ "title.delete"}}'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
@@ -259,13 +270,15 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.speaker"}},
           "speaker", true, "{{url "Edit.ChangeText"}}",
-          {{msg $ "course.speaker.change.info"}}, false);'>
+          {{msg $ "course.speaker.change.info"}}, false);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='confirmDeleteJSONModal({{msg $ "course.speaker.delete.title"}},
           {{msg $ "course.speaker.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "speaker" ""}}");'>
+          "{{url "Edit.ChangeText" .course.ID  "speaker" ""}}");'
+        title='{{msg $ "title.delete"}}'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
@@ -381,7 +394,8 @@
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expiration_date",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
-        {{msg $ "course.expiration.date.change.info"}}, {{.course.ID}}, 0);'>
+        {{msg $ "course.expiration.date.change.info"}}, {{.course.ID}}, 0);'
+      title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
     </a>
   </div>
@@ -398,13 +412,15 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.enroll.limit.events"}}, "enroll_limit_events",
           true, "{{url "Edit.ChangeEnrollLimit"}}", "int", "",
-          {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}}, 0);'>
+          {{msg $ "course.enroll.limit.events.change.info"}}, {{.course.ID}}, 0);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='confirmDeleteJSONModal({{msg $ "course.enroll.limit.events.delete.title"}},
           {{msg $ "course.enroll.limit.events.delete.confirm"}},
-          "{{url "Edit.ChangeEnrollLimit" .course.ID "enroll_limit_events" ""}}");'>
+          "{{url "Edit.ChangeEnrollLimit" .course.ID "enroll_limit_events" ""}}");'
+        title='{{msg $ "title.delete"}}'>
         {{template "icons/trash.html" . }}
       </a>
     </div>
@@ -440,13 +456,15 @@
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openTextAreaModal({{msg $ "course.custom.email"}},
           "custom_email", true, "{{url "Edit.ChangeText"}}",
-          {{msg $ "course.custom.email.change.info"}}, true);'>
+          {{msg $ "course.custom.email.change.info"}}, true);'
+        title='{{msg $ "title.edit"}}'>
         {{template "icons/pencil.html" . }}
       </a>
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='confirmDeleteJSONModal({{msg $ "course.customemail.delete.title"}},
           {{msg $ "course.customemail.delete.confirm"}},
-          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}");'>
+          "{{url "Edit.ChangeText" .course.ID  "custom_email" ""}}");'
+        title='{{msg $ "title.delete"}}'>
         {{template "icons/trash.html" . }}
       </a>
     </div>

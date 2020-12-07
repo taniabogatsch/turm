@@ -108,7 +108,7 @@ const (
 
 	stmtSelectUsers = `
 		SELECT id, last_name, first_name, email, salutation, title, academic_title, name_affix,
-			TO_CHAR (last_login AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as last_login
+			TO_CHAR (last_login AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as last_login, role
 		FROM users
 		WHERE role = $1
 			AND activation_code IS NULL

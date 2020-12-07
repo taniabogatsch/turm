@@ -22,20 +22,20 @@ creator.courses.expired = Expired courses
 
 
 # --- drafts
-creator.drafts.none = No drafts yet.
-creator.drafts.editor.none = Not yet an editor of a draft.
+creator.drafts.none = No drafts.
+creator.drafts.editor.none = Not an editor of a draft.
 
 
 # --- active
-creator.active.none = No active courses yet.
-creator.active.editor.none = Not yet an editor of an active course.
-creator.active.instructor.none = Not yet an instructor of an active course.
+creator.active.none = No active courses.
+creator.active.editor.none = Not an editor of an active course.
+creator.active.instructor.none = Not an instructor of an active course.
 
 
 # --- expired
-creator.expired.none = No expired courses yet.
-creator.expired.editor.none = Not yet an editor of an expired course.
-creator.expired.instructor.none = Not yet an instructor of an expired course.
+creator.expired.none = No expired courses.
+creator.expired.editor.none = Not an editor of an expired course.
+creator.expired.instructor.none = Not an instructor of an expired course.
 
 
 

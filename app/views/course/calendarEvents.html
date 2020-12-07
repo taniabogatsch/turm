@@ -45,7 +45,8 @@
           href='#no-scroll' role="button"
           onclick='confirmDeleteRenderModal({{msg $ "event.calendar.delete.title"}},
             {{msg $ "event.calendar.delete.confirm" .Title}},
-            "{{url "EditCalendarEvent.Delete" .ID .CourseID}}", "calendar_events");'>
+            "{{url "EditCalendarEvent.Delete" .ID .CourseID}}", "calendar_events");'
+          title='{{msg $ "title.delete"}}'>
           {{template "icons/trash.html" . }}
         </a>
 
@@ -56,7 +57,8 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
           onclick='openChangeModal({{msg $ "event.calendar.title"}}, "title",
             true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
-            {{msg $ "event.calendar.title.change.info"}}, {{.ID}}, 2);'>
+            {{msg $ "event.calendar.title.change.info"}}, {{.ID}}, 2);'
+          title='{{msg $ "title.edit"}}'>
           {{template "icons/pencil.html" . }}
         </a>
         <br>
@@ -70,13 +72,15 @@
           <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
             onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
               true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
-              {{msg $ "event.annotation.change.info"}}, {{.ID}}, 2);'>
+              {{msg $ "event.annotation.change.info"}}, {{.ID}}, 2);'
+            title='{{msg $ "title.edit"}}'>
             {{template "icons/pencil.html" . }}
           </a>
           <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
             onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
               {{msg $ "event.annotation.delete.confirm"}},
-              "{{url "EditCalendarEvent.ChangeText" .ID "annotation" ""}}");'>
+              "{{url "EditCalendarEvent.ChangeText" .ID "annotation" ""}}");'
+            title='{{msg $ "title.delete"}}'>
             {{template "icons/trash.html" . }}
           </a>
           <br>
@@ -157,7 +161,8 @@
                         <a href="#no-scroll" class="badge btn-outline-darkblue"
                           onclick='openChangeDayTmplModal({{url "EditCalendarEvent.EditDayTemplate"}},
                             {{msg $ "day.tmpl.edit.title"}}, {{.CalendarEventID}}, {{.DayOfWeek}},
-                            {{.StartTime}}, {{.EndTime}}, {{.Interval}}, {{.ID}});'>
+                            {{.StartTime}}, {{.EndTime}}, {{.Interval}}, {{.ID}});'
+                          title='{{msg $ "title.edit"}}'>
                           {{template "icons/pencil.html" . }}
                         </a>
 
@@ -166,7 +171,8 @@
                           onclick='confirmDeleteRenderModal({{msg $ "day.tmpl.delete.title"}},
                             {{msg $ "day.tmpl.delete.confirm"}},
                             "{{url "EditCalendarEvent.DeleteDayTemplate" .ID $ev.CourseID}}",
-                            "calendar_events");'>
+                            "calendar_events");'
+                          title='{{msg $ "title.delete"}}'>
                           {{template "icons/trash.html" . }}
                         </a>
                       </div>
@@ -288,7 +294,8 @@
                   <!-- edit exception -->
                   <a href="#no-scroll" class="badge btn-outline-darkblue d-inline"
                     onclick='openChangeExceptionModal({{msg $ "exception.new.title"}}, {{.CalendarEventID}},
-                      {{.ExceptionStart}}, {{.ExceptionEnd}}, {{.Annotation.String}}, {{.ID}});'>
+                      {{.ExceptionStart}}, {{.ExceptionEnd}}, {{.Annotation.String}}, {{.ID}});'
+                    title='{{msg $ "title.edit"}}'>
                     {{template "icons/pencil.html" . }}
                   </a>
 
@@ -297,7 +304,8 @@
                     onclick='confirmDeleteRenderModal({{msg $ "exception.delete.title"}},
                       {{msg $ "exception.delete.confirm"}},
                       "{{url "EditCalendarEvent.DeleteException" .ID $ev.CourseID}}",
-                      "calendar_events");'>
+                      "calendar_events");'
+                    title='{{msg $ "title.delete"}}'>
                     {{template "icons/trash.html" . }}
                   </a>
                 </li>

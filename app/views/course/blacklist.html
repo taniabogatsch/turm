@@ -44,7 +44,8 @@
         <a href="#no-scroll" class="badge btn-outline-darkblue"
           onclick='confirmDeleteRenderModal({{msg $ "course.blacklist.delete.title"}},
             {{msg $ "course.blacklist.delete.confirm" .EMail}},
-            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "blacklists"}}", "blacklists");'>
+            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "blacklists"}}", "blacklists");'
+          title='{{msg $ "title.delete"}}'>
           {{template "icons/trash.html" . }}
         </a>
       {{end}}

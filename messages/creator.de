@@ -22,20 +22,20 @@ creator.courses.expired = Abgelaufene Kurse
 
 
 # --- drafts
-creator.drafts.none = Noch keine Entwürfe.
-creator.drafts.editor.none = Noch keinE EditorIn eines Entwurfs.
+creator.drafts.none = Keine Entwürfe.
+creator.drafts.editor.none = KeinE EditorIn eines Entwurfs.
 
 
 # --- active
-creator.active.none = Noch keine aktiven Kurse.
-creator.active.editor.none = Noch keinE EditorIn eines aktiven Kurses.
-creator.active.instructor.none = Noch keinE OrganisatorIn eines aktiven Kurses.
+creator.active.none = Keine aktiven Kurse.
+creator.active.editor.none = KeinE EditorIn eines aktiven Kurses.
+creator.active.instructor.none = KeinE OrganisatorIn eines aktiven Kurses.
 
 
 # --- expired
-creator.expired.none = Noch keine abgelaufenen Kurse.
-creator.expired.editor.none = Noch keinE EditorIn eines abgelaufenen Kurses.
-creator.expired.instructor.none = Noch keinE OrganisatorIn eines abgelaufenen Kurses.
+creator.expired.none = Keine abgelaufenen Kurse.
+creator.expired.editor.none = KeinE EditorIn eines abgelaufenen Kurses.
+creator.expired.instructor.none = KeinE OrganisatorIn eines abgelaufenen Kurses.
 
 
 # --- course options
@@ -55,7 +55,7 @@ creator.course.delete.draft.confirm = Wollen Sie den Kursentwurf '%s' wirklich l
 creator.course.delete.draft.title = Kursentwurf löschen
 
 creator.course.duplicated = Kursentwurf dupliziert: '%s', Kurs ID = %d.
-creator.course.duplicate.info = Geben Sie den Title des duplizierten Kurses an.
+creator.course.duplicate.info = Geben Sie den Titel des duplizierten Kurses an.
 creator.course.duplicate.title = Kurs duplizieren
 
 creator.course.download.title = Kurs herunterladen

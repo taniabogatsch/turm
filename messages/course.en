@@ -38,9 +38,11 @@ course.creator.email = E-mail address of course creator
 
 course.events = Events
 course.events.info = A course can have a multitude of events. Users can enroll in these events.
-course.events.info2 = There are two types of events: normal events and calendar events. You can use both of them.
+course.events.info2 = There are two types of events: events and calendar events. You can use both of them.
 
-course.events.normal.none = This course has no normal events.
+course.events.normal = Events
+course.events.normal.none = This course has no events.
+course.events.calendar = Calendar events
 course.events.calendar.none = This course has no calendar events.
 
 # -------------------------------------------------------------------------------------------------- #
@@ -157,7 +159,7 @@ meeting.weekly.edit = Edit weekly meeting
 event.new.success = Added event '%s', course ID = %d.
 
 event.type = Event type
-event.type.normal = Normal event
+event.type.normal = Event
 
 event.delete.success = Deleted event, ID = %d.
 event.delete.confirm = Please confirm the deletion of event '%s'.
