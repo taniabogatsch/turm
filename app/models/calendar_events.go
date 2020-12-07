@@ -3,6 +3,9 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"math"
+	"strconv"
+	"strings"
 	"time"
 	"turm/app"
 
@@ -79,14 +82,14 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 			return
 		}
 
+		//set the current week
+		_, (*events)[i].Week = monday.ISOWeek()
+		(*events)[i].Year = monday.Year()
+
 		//get the slot schedule
 		if err = (*events)[i].getSchedule(tx, monday); err != nil {
 			return
 		}
-
-		//set the current week
-		_, (*events)[i].Week = monday.ISOWeek()
-		(*events)[i].Year = monday.Year()
 
 		//get all calendar exceptions
 		if err = (*events)[i].Exceptions.Get(tx, &(*events)[i].ID); err != nil {
@@ -131,136 +134,19 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 		return
 	}
 
+	//set the current week
+	_, event.Week = monday.ISOWeek()
+	event.Year = monday.Year()
+
 	//get the slot schedule
 	if err = event.getSchedule(tx, monday); err != nil {
 		return
 	}
 
-	//set the current week
-	_, event.Week = monday.ISOWeek()
-	event.Year = monday.Year()
-
 	if txWasNil {
 		tx.Commit()
 	}
 	return
-}
-
-func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
-
-	day := monday
-
-	//prepare a schedule for the whole week by looping all day templates and
-	//their slots for each day respectively
-	for _, tmplsOfDay := range event.Days {
-
-		//generate blocked and free blocks of this schedule
-		schedule := Schedule{Date: day.Format("02.01.")}
-		day = day.AddDate(0, 0, 1)
-
-		if len(tmplsOfDay) != 0 {
-
-			//set blocked slot from 0 to start of the first day template
-			if tmplsOfDay[0].StartTime != "00:00" {
-				schedule.Entries = append(schedule.Entries,
-					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, BLOCKED})
-			}
-
-			//insert all slots and free spaces of a day template and
-			//the blocked space between this day template and the next day template
-			for i := range tmplsOfDay {
-
-				//if two day templates are not exactly subsequent to each other,
-				//then insert a BLOCKED schedule entry
-				if i != 0 {
-					if tmplsOfDay[i].StartTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
-						schedule.Entries = append(schedule.Entries,
-							ScheduleEntry{
-								schedule.Entries[len(schedule.Entries)-1].EndTime,
-								tmplsOfDay[i].StartTime,
-								BLOCKED},
-						)
-					}
-				}
-
-				//insert all BOOKED and FREE schedule entries for the current day template
-				for j := range tmplsOfDay[i].Slots {
-
-					//get start time as string
-					slotStart := CustomTime{"", tmplsOfDay[i].Slots[j].Start.Hour(),
-						tmplsOfDay[i].Slots[j].Start.Minute()}
-					slotStart.String()
-
-					//get end time as string
-					slotEnd := CustomTime{"", tmplsOfDay[i].Slots[j].End.Hour(),
-						tmplsOfDay[i].Slots[j].End.Minute()}
-					slotEnd.String()
-
-					//check if there is free space before the first BOOKED slot
-					if j == 0 {
-						//insert FREE schedule entry
-						if tmplsOfDay[i].StartTime != slotStart.Value {
-							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-								slotStart.Value, FREE})
-						}
-					} else {
-						//check for FREE space between two slots
-						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
-							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-								slotStart.Value, FREE})
-						}
-					}
-
-					//insert slot as schedule entry
-					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
-						SLOT})
-
-				} //end of for loop of slots
-
-				//check for FREE space from the last slot to the end of the day template
-				if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
-					schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-						tmplsOfDay[i].EndTime, FREE})
-				}
-
-			} //end of for loop of day templates
-
-			//check for BLOCKED space from the end of the last day template to 24:00
-			if schedule.Entries[len(schedule.Entries)-1].EndTime != "24:00" {
-				schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-					"24:00", BLOCKED})
-			}
-
-		} else {
-			//no day templates for this day
-			schedule.Entries = append(schedule.Entries,
-				ScheduleEntry{"00:00", "24:00", BLOCKED})
-		}
-
-		//override Exceptions
-
-		//for every exception check if it is relevant for this days
-		//then look which entries they overlapp and replace them with an exception block
-
-		for e := range event.ExceptionsOfWeek {
-			fmt.Print(event.ExceptionsOfWeek[e].ExceptionStartDB)
-			fmt.Print(" : ")
-			fmt.Println(event.ExceptionsOfWeek[e].ExceptionEndDB)
-
-			/*for s := range schedule.Entries {
-
-			}*/
-		}
-
-		event.ScheduleWeek = append(event.ScheduleWeek, schedule)
-	}
-
-	return
-}
-
-//helper functions for Schedule
-func insertScheduleEntry(array []ScheduleEntry, element ScheduleEntry, i int) []ScheduleEntry {
-	return append(array[:i], append([]ScheduleEntry{element}, array[i:]...)...)
 }
 
 /*Update the specific column in the CalendarEvent. */
@@ -286,6 +172,240 @@ func (event *CalendarEvent) Delete() (err error) {
 	}
 
 	tx.Commit()
+	return
+}
+
+func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
+
+	day := monday
+
+	//prepare a schedule for the whole week by looping all day templates and
+	//their slots for each day respectively
+	for _, tmplsOfDay := range event.Days {
+
+		//generate blocked and free blocks of this schedule
+		schedule := Schedule{Date: day.Format("02.01.")}
+		day = day.AddDate(0, 0, 1)
+
+		if len(tmplsOfDay) != 0 {
+
+			//set blocked slot from 0 to start of the first day template
+			if tmplsOfDay[0].StartTime != "00:00" {
+				schedule.Entries = append(schedule.Entries,
+					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED})
+			}
+
+			//insert all slots and free spaces of a day template and
+			//the blocked space between this day template and the next day template
+			for i := range tmplsOfDay {
+
+				//if two day templates are not exactly subsequent to each other,
+				//then insert a BLOCKED schedule entry
+				if i != 0 {
+
+					if tmplsOfDay[i].StartTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+						schedule.Entries = append(schedule.Entries,
+							ScheduleEntry{
+								schedule.Entries[len(schedule.Entries)-1].EndTime,
+								tmplsOfDay[i].StartTime,
+								0, BLOCKED},
+						)
+					}
+				}
+
+				//insert all BOOKED and FREE schedule entries for the current day template
+				for j := range tmplsOfDay[i].Slots {
+
+					//get start time as string
+					slotStart := CustomTime{"", tmplsOfDay[i].Slots[j].Start.Hour(),
+						tmplsOfDay[i].Slots[j].Start.Minute()}
+					slotStart.String()
+
+					//get end time as string
+					slotEnd := CustomTime{"", tmplsOfDay[i].Slots[j].End.Hour(),
+						tmplsOfDay[i].Slots[j].End.Minute()}
+					slotEnd.String()
+
+					//check if there is free space before the first BOOKED slot
+					if j == 0 {
+						//insert FREE schedule entry
+						if tmplsOfDay[i].StartTime != slotStart.Value {
+							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
+								slotStart.Value, tmplsOfDay[i].Interval, FREE})
+						}
+					} else {
+						//check for FREE space between two slots
+						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
+							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
+								slotStart.Value, tmplsOfDay[i].Interval, FREE})
+						}
+					}
+
+					//insert slot as schedule entry
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
+						tmplsOfDay[i].Interval, SLOT})
+
+				} //end of for loop of slots
+
+				if len(schedule.Entries) > 0 {
+					//check for FREE space from the last slot to the end of the day template
+					if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+						schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
+							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE})
+					}
+				} else {
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
+						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE})
+				}
+
+			} //end of for loop of day templates
+
+			//check for BLOCKED space from the end of the last day template to 24:00
+			if schedule.Entries[len(schedule.Entries)-1].EndTime != "24:00" {
+				schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
+					"24:00", 0, BLOCKED})
+			}
+
+		} else {
+			//no day templates for this day
+			schedule.Entries = append(schedule.Entries,
+				ScheduleEntry{"00:00", "24:00", 0, BLOCKED})
+		}
+
+		//after each day, loop all exceptions of the week and
+		//test if any overlap with that day
+
+		for eIdx := range event.ExceptionsOfWeek {
+
+			//used to remember the first and last slot overlapping the exception
+			startSlotIdx := -1
+			endSlotIdx := -1
+
+			//loop entries to find those overlapping with the exception
+			for idx := range schedule.Entries {
+
+				//get start and end
+				start, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+					schedule.Entries[idx].StartTime)
+				if err != nil {
+					return err
+				}
+				end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+					schedule.Entries[idx].EndTime)
+				if err != nil {
+					return err
+				}
+
+				if startSlotIdx == -1 && event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Before(end) &&
+					event.ExceptionsOfWeek[eIdx].ExceptionEndDB.After(start) {
+					startSlotIdx = idx
+				}
+
+				if end.After(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) ||
+					end.Equal(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) {
+					endSlotIdx = idx
+					break
+				}
+			}
+
+			//set to last index if the exception did not end on that day
+			if endSlotIdx == -1 {
+				endSlotIdx = len(schedule.Entries) - 1
+			}
+
+			//if an overlapping exception was found
+			if startSlotIdx != -1 {
+
+				//remove all slots overlapping with the exception [startSlotIdx, endSlotIdx]
+				if endSlotIdx == len(schedule.Entries)-1 {
+					schedule.Entries = schedule.Entries[:startSlotIdx]
+				} else {
+					schedule.Entries = append(schedule.Entries[:startSlotIdx],
+						schedule.Entries[endSlotIdx+1:]...)
+				}
+
+				//get start and end times for Exception which are within stepping distance
+				start, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+					schedule.Entries[startSlotIdx].StartTime)
+				if err != nil {
+					return err
+				}
+
+				//get start and end times for Exception which are within stepping distance
+				startTime := getExceptionScheduleTimes(schedule.Entries[startSlotIdx].Interval,
+					start, event.ExceptionsOfWeek[eIdx].ExceptionStartDB, true)
+				fmt.Println(startTime) // TODO remove
+				//TODO: insert free slot from last scedule end to startTime (über mir) falls lücke
+				schedule.Entries = insertScheduleEntry(schedule.Entries,
+					ScheduleEntry{"00:00", "24:00", 0, FREE}, startSlotIdx)
+				//selbe hier nur mit freier zeit nach exception (vorher getExceptionScheduleTimes für endzeit)
+			}
+		}
+		//insert the schedule of the day in the Week-Schedule slice
+		event.ScheduleWeek = append(event.ScheduleWeek, schedule)
+	}
+
+	return
+}
+
+func parseDate(tx *sqlx.Tx, year, date, str string) (t time.Time, err error) {
+
+	//create start/end date + time from entry to compare with exception start/end date + time
+	split := strings.Split(date, ".")
+	loc, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		log.Error("failed to parse location", "loc", app.TimeZone,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	addDay := false
+	value := ""
+
+	//get for start time of entry
+	if str == "24:00" { //ParseInLocation is not compatible with 24:00
+		value = year + "-" + split[1] + "-" + split[0] + "T" + "00:00:00"
+		addDay = true
+	} else {
+		value = year + "-" + split[1] + "-" + split[0] + "T" + str + ":00"
+	}
+
+	t, err = time.ParseInLocation("2006-01-02T15:04:05", value, loc)
+	if err != nil {
+		log.Error("failed to parse string to time", "value", value, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	if addDay { //if it was 24:00
+		t.AddDate(0, 0, 1) //now 00:00 of next day
+	}
+
+	return
+}
+
+//helper functions for Schedule
+func insertScheduleEntry(array []ScheduleEntry, element ScheduleEntry, i int) []ScheduleEntry {
+	return append(array[:i], append([]ScheduleEntry{element}, array[i:]...)...)
+}
+
+//exceptStart true -> get next Time before , false -> get next time after
+func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.Time, exceptStart bool) (time string) {
+
+	rangeMin := (exceptTime.Hour()*60 + exceptTime.Minute()) - (sStart.Hour()*60 + sStart.Minute())
+	var min int
+
+	if exceptStart {
+		flo := float64(rangeMin / interval)
+		min = int(math.Floor(flo)) * interval
+	} else {
+		flo := float64(rangeMin / interval)
+		min = int(math.Ceil(flo)) * interval
+	}
+	hour := math.Floor(float64(min) / float64(60))
+	time = strconv.Itoa(int(hour)) + ":" + strconv.Itoa(int(min-60*int(hour)))
+
 	return
 }
 
