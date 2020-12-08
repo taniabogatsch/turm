@@ -28,6 +28,10 @@ type EMailData struct {
 	//new course role type
 	CourseRole string
 	ViewMatrNr bool
+
+	//used for slot enrollments
+	Start string
+	End   string
 }
 
 /*EditEMailConfig provides all information for sending edit notification e-mails. */

@@ -12,22 +12,29 @@ import (
 type Users []User
 
 /*Get specific users. */
-func (users *Users) Get(role Role) (err error) {
+func (users *Users) Get(creators *Users) (err error) {
 
-	switch role {
-	case ADMIN:
-		err = app.Db.Select(users, stmtSelectUsers, ADMIN, app.TimeZone)
-		if err != nil {
-			log.Error("failed to get users", "role", ADMIN, "error", err.Error())
-		}
-	case CREATOR:
-		err = app.Db.Select(users, stmtSelectUsers, CREATOR, app.TimeZone)
-		if err != nil {
-			log.Error("failed to get users", "role", CREATOR, "error", err.Error())
-		}
-	default:
-		log.Error("invalid role provided", "role", role)
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
 	}
+
+	err = tx.Select(users, stmtSelectUsers, ADMIN, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get users", "role", ADMIN, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	err = tx.Select(creators, stmtSelectUsers, CREATOR, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get users", "role", CREATOR, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	return
 }
 

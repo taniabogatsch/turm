@@ -40,11 +40,23 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailDa
 		return
 	}
 
-	//insert Slot
+	//insert slot
 	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
 		slot.Start, slot.End, time.Now())
 	if err != nil {
-		log.Error("failed to insert slot", "slot", *slot,
+		log.Error("failed to insert slot", "slot", *slot, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get e-mail data
+	data.User.ID = slot.UserID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+	err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -283,5 +295,15 @@ const (
 		FROM slots
 		WHERE day_tmpl_id = $1
 		ORDER BY start_time ASC
+	`
+
+	stmtGetSlotEMailData = `
+		SELECT c.title AS course_title, e.title AS event_title, c.id AS course_id,
+			TO_CHAR (s.start_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS start,
+			TO_CHAR (s.end_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS end
+		FROM slots s JOIN day_templates d ON s.day_tmpl_id = d.id
+			JOIN calendar_events e ON e.id = d.calendar_event_id
+			JOIN courses c ON c.id = e.course_id
+		WHERE s.id = $1
 	`
 )

@@ -2,11 +2,13 @@
 
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
-Leider ist die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' bereits voll.
-Sie stehen jetzt auf der Warteliste und r&uuml;cken automatisch nach, wenn ein Platz frei wird.
+
+Leider ist die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' bereits voll. Sie stehen jetzt auf der Warteliste und rücken automatisch nach, wenn ein Platz frei wird.
+
 Zum Kurs: {{.data.URL}}/course/open?ID={{.data.CourseID}}
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
+
 
 {{template "emails/components/bestRegards.html" .}}
 
@@ -16,14 +18,16 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 <br>
 <br>
-Leider ist die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' schon voll. <br>
-Sie stehen jetzt auf der Warteliste und rücken automatisch nach, wenn ein Platz frei wird. <br>
+<br>
+Leider ist die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' bereits voll. Sie stehen jetzt auf der Warteliste und rücken automatisch nach, wenn ein Platz frei wird. <br>
+<br>
 <a href="{{.data.URL}}/course/open?ID={{.data.CourseID}}">
     Zum Kurs: {{.data.CourseTitle}}
 </a>
 <br>
 <br>
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
+<br>
 <br>
 <br>
 {{msg $ "email.regards" .data.URL}}

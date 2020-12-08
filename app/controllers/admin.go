@@ -28,18 +28,11 @@ func (c Admin) Roles() revel.Result {
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
 
-	//TODO: transaction
-
-	//get all admins
+	//get all admins and creators
 	var admins models.Users
-	if err := admins.Get(models.ADMIN); err != nil {
-		renderQuietError(errDB, err, c.Controller)
-		return c.Render()
-	}
-
-	//get all creators
 	var creators models.Users
-	if err := creators.Get(models.CREATOR); err != nil {
+
+	if err := admins.Get(&creators); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -115,29 +108,26 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 	}
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	if err := user.ChangeRole(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	data := models.EMailData{User: user}
 	err := sendEMail(c.Controller, &data,
 		"email.subject.new.role",
 		"newRole")
+
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, user.EMail)
+		return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
 
 	//update the session if the user updated his own role
 	sessionID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 	if sessionID == user.ID {
 		c.Session["role"] = user.Role.String()
@@ -158,19 +148,16 @@ func (c Admin) InsertGroup(group models.Group) revel.Result {
 	c.Log.Debug("insert group", "group", group)
 
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err = group.Insert(&userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("group.insert.success",
@@ -190,19 +177,16 @@ func (c Admin) UpdateGroup(group models.Group) revel.Result {
 		MessageKey("validation.invalid.params")
 
 	if group.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err = group.Update(&userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("group.update.success",
@@ -226,19 +210,15 @@ func (c Admin) DeleteGroup(ID int) revel.Result {
 	).MessageKey("validation.invalid.groupID")
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	group := models.Group{ID: ID}
 	if err := group.Delete(); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("group.delete.success",
-		group.ID,
-	))
+	c.Flash.Success(c.Message("group.delete.success", group.ID))
 	return c.Redirect(c.Session["currPath"])
 }
 
@@ -254,19 +234,16 @@ func (c Admin) InsertCategory(category models.Category, table string) revel.Resu
 	}
 
 	if category.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err = category.Insert(&table, &userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("category.insert.success",
@@ -290,19 +267,16 @@ func (c Admin) UpdateCategory(category models.Category, table string) revel.Resu
 		MessageKey("validation.invalid.params")
 
 	if category.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err := category.Update(&table, &userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("category.update.success",
@@ -326,19 +300,15 @@ func (c Admin) DeleteCategory(ID int, table string) revel.Result {
 		MessageKey("validation.invalid.params")
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	category := models.Category{ID: ID}
 	if err := category.Delete(&table); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("category.delete.success",
-		category.ID,
-	))
+	c.Flash.Success(c.Message("category.delete.success", category.ID))
 	return c.Redirect(c.Session["currPath"])
 }
 
@@ -349,19 +319,16 @@ func (c Admin) InsertHelpPageEntry(entry models.HelpPageEntry) revel.Result {
 	c.Log.Debug("insert entry", "entry", entry)
 
 	if entry.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err := entry.Insert(&userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("entry.insert.success",
@@ -382,19 +349,16 @@ func (c Admin) UpdateHelpPageEntry(entry models.HelpPageEntry) revel.Result {
 		MessageKey("validation.invalid.params")
 
 	if entry.Validate(c.Validation); c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	if err := entry.Update(&userID); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
 	c.Flash.Success(c.Message("entry.update.success",
@@ -418,18 +382,14 @@ func (c Admin) DeleteHelpPageEntry(ID int, table string) revel.Result {
 		MessageKey("validation.invalid.params")
 
 	if c.Validation.HasErrors() {
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	entry := models.HelpPageEntry{ID: ID}
 	if err := entry.Delete(&table); err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	}
 
-	c.Flash.Success(c.Message("entry.delete.success",
-		entry.ID,
-	))
+	c.Flash.Success(c.Message("entry.delete.success", entry.ID))
 	return c.Redirect(c.Session["currPath"])
 }

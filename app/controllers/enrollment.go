@@ -177,23 +177,21 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) 
 	}
 
 	//enroll user
-	_, err = slot.Insert(c.Validation, ID)
+	data, err := slot.Insert(c.Validation, ID)
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	} else if c.Validation.HasErrors() {
 		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
-	//TODO: send e-mail to the user who enrolled
-	/*
-		err = sendEMail(c.Controller, &data,
-			"email.subject.enroll.slot",
-			"enrollToSlot")
-		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, data.User.EMail)
-		}
-	*/
+	//send e-mail to the user who enrolled
+	err = sendEMail(c.Controller, &data,
+		"email.subject.enroll.slot",
+		"enrollToSlot")
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
 
 	c.Flash.Success(c.Message("event.enroll.success"))
 	return c.Redirect(c.Session["currPath"])

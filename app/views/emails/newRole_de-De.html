@@ -2,16 +2,18 @@
 
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
-Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet
+
+ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet:
 {{if eq .data.User.Role 0}}
-  {{msg $ "user.role.user"}}.
+{{msg $ "user.role.user"}}
 {{else if eq .data.User.Role 1}}
-  {{msg $ "user.role.creator"}}.
+{{msg $ "user.role.creator"}}
 {{else if eq .data.User.Role 2}}
-  {{msg $ "user.role.admin"}}.
-{{end}}.
+{{msg $ "user.role.admin"}}
+{{end}}
 
 Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
+
 
 {{template "emails/components/bestRegards.html" .}}
 
@@ -21,20 +23,21 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 <br>
 <br>
-Ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet
 <br>
-<b>
-  {{if eq .data.User.Role 0}}
-    {{msg $ "user.role.user"}}.
-  {{else if eq .data.User.Role 1}}
-    {{msg $ "user.role.creator"}}.
-  {{else if eq .data.User.Role 2}}
-    {{msg $ "user.role.admin"}}.
-  {{end}}
-</b>
+ein Admin hat Ihre Nutzerrolle aktualisiert. Ihre neue Nutzerrolle lautet: <br>
+<font color="#16A085">
+{{if eq .data.User.Role 0}}
+{{msg $ "user.role.user"}}
+{{else if eq .data.User.Role 1}}
+{{msg $ "user.role.creator"}}
+{{else if eq .data.User.Role 2}}
+{{msg $ "user.role.admin"}}
+{{end}}
+</font>
 <br>
 <br>
 <b> Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht. </b>
+<br>
 <br>
 <br>
 {{msg $ "email.regards" .data.URL}}
