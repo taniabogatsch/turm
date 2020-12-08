@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -279,7 +278,9 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 			//used to remember the first and last slot overlapping the exception
 			startSlotIdx := -1
+			var startSched ScheduleEntry
 			endSlotIdx := -1
+			var endSched ScheduleEntry
 
 			//loop entries to find those overlapping with the exception
 			for idx := range schedule.Entries {
@@ -299,11 +300,13 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 				if startSlotIdx == -1 && event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Before(end) &&
 					event.ExceptionsOfWeek[eIdx].ExceptionEndDB.After(start) {
 					startSlotIdx = idx
+					startSched = schedule.Entries[idx]
 				}
 
 				if end.After(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) ||
 					end.Equal(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) {
 					endSlotIdx = idx
+					endSched = schedule.Entries[idx]
 					break
 				}
 			}
@@ -326,19 +329,82 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 				//get start and end times for Exception which are within stepping distance
 				start, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
-					schedule.Entries[startSlotIdx].StartTime)
+					startSched.StartTime)
 				if err != nil {
 					return err
 				}
 
-				//get start and end times for Exception which are within stepping distance
-				startTime := getExceptionScheduleTimes(schedule.Entries[startSlotIdx].Interval,
-					start, event.ExceptionsOfWeek[eIdx].ExceptionStartDB, true)
-				fmt.Println(startTime) // TODO remove
-				//TODO: insert free slot from last scedule end to startTime (über mir) falls lücke
-				schedule.Entries = insertScheduleEntry(schedule.Entries,
-					ScheduleEntry{"00:00", "24:00", 0, FREE}, startSlotIdx)
-				//selbe hier nur mit freier zeit nach exception (vorher getExceptionScheduleTimes für endzeit)
+				if event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Day() == start.Day() {
+					//get start and end times for Exception which are within stepping distance
+					startTime := getExceptionScheduleTimes(startSched.Interval,
+						start, event.ExceptionsOfWeek[eIdx].ExceptionStartDB, true)
+
+					if len(schedule.Entries) > startSlotIdx {
+
+						end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+							startSched.EndTime)
+						if err != nil {
+							return err
+						}
+
+						endTime := getExceptionScheduleTimes(endSched.Interval,
+							end, event.ExceptionsOfWeek[eIdx].ExceptionEndDB, false)
+
+						if startSched.StartTime != startTime {
+							schedule.Entries = insertScheduleEntry(schedule.Entries,
+								ScheduleEntry{startSched.StartTime, startTime,
+									startSched.Interval, FREE}, startSlotIdx)
+							startSlotIdx++
+						}
+
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{startTime, endTime,
+								0, EXCEPTION}, startSlotIdx)
+						startSlotIdx++
+
+						if endTime != endSched.EndTime {
+							schedule.Entries = insertScheduleEntry(schedule.Entries,
+								ScheduleEntry{endTime, endSched.EndTime,
+									endSched.Interval, FREE}, startSlotIdx)
+						}
+
+					} else { // exception is last entrie
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{startSched.EndTime, startTime,
+								startSched.Interval, FREE}, startSlotIdx)
+
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{startTime, "24:00",
+								0, EXCEPTION}, startSlotIdx+1)
+					}
+
+				} else { //exception start at 00:00
+
+					if len(schedule.Entries) > startSlotIdx {
+
+						end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+							schedule.Entries[startSlotIdx].EndTime)
+						if err != nil {
+							return err
+						}
+
+						endTime := getExceptionScheduleTimes(schedule.Entries[startSlotIdx].Interval,
+							end, event.ExceptionsOfWeek[eIdx].ExceptionEndDB, false)
+
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{"00:00", endTime,
+								schedule.Entries[startSlotIdx-1].Interval, EXCEPTION}, startSlotIdx)
+
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{endTime, schedule.Entries[startSlotIdx].StartTime,
+								schedule.Entries[startSlotIdx-1].Interval, FREE}, startSlotIdx+1)
+					} else { // exception is last entrie
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{"00:00", "24:00",
+								startSched.Interval, EXCEPTION}, startSlotIdx)
+					}
+
+				}
 			}
 		}
 		//insert the schedule of the day in the Week-Schedule slice
@@ -391,22 +457,66 @@ func insertScheduleEntry(array []ScheduleEntry, element ScheduleEntry, i int) []
 }
 
 //exceptStart true -> get next Time before , false -> get next time after
-func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.Time, exceptStart bool) (time string) {
+func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.Time,
+	exceptStart bool) (sTime string) {
 
-	rangeMin := (exceptTime.Hour()*60 + exceptTime.Minute()) - (sStart.Hour()*60 + sStart.Minute())
-	var min int
-
-	if exceptStart {
-		flo := float64(rangeMin / interval)
-		min = int(math.Floor(flo)) * interval
-	} else {
-		flo := float64(rangeMin / interval)
-		min = int(math.Ceil(flo)) * interval
+	if interval == 0 {
+		//TODO: this looks ugly
+		return strconv.Itoa(exceptTime.Hour()) + ":" + strconv.Itoa(exceptTime.Minute())
 	}
-	hour := math.Floor(float64(min) / float64(60))
-	time = strconv.Itoa(int(hour)) + ":" + strconv.Itoa(int(min-60*int(hour)))
 
-	return
+	if exceptTime.After(sStart) {
+
+		rangeMin := (exceptTime.Hour()*60 + exceptTime.Minute()) - (sStart.Hour()*60 + sStart.Minute())
+		var min int
+
+		if exceptStart {
+			flo := float64(rangeMin) / float64(interval)
+			min = int(math.Floor(flo)) * interval
+		} else {
+			flo := float64(rangeMin) / float64(interval)
+			min = int(math.Ceil(flo)) * interval
+		}
+
+		minStr, _ := time.ParseDuration(strconv.Itoa(min) + "m")
+
+		sStart = sStart.Add(minStr)
+
+		sHour := prettyTime(sStart.Hour())
+		sMin := prettyTime(sStart.Minute())
+		sTime = sHour + ":" + sMin
+
+		return
+	} else {
+		rangeMin := (sStart.Hour()*60 + sStart.Minute()) - (exceptTime.Hour()*60 + exceptTime.Minute())
+		var min int
+
+		if exceptStart {
+			flo := float64(rangeMin) / float64(interval)
+			min = int(math.Floor(flo)) * interval
+		} else {
+			flo := float64(rangeMin) / float64(interval)
+			min = int(math.Ceil(flo)) * interval
+		}
+
+		minStr, _ := time.ParseDuration(strconv.Itoa(min) + "m")
+
+		sStart = sStart.Add(minStr)
+
+		sHour := prettyTime(sStart.Hour())
+		sMin := prettyTime(sStart.Minute())
+		sTime = sHour + ":" + sMin
+
+		return
+	}
+}
+
+func prettyTime(i int) string {
+
+	if i < 10 {
+		return "0" + strconv.Itoa(i)
+	}
+	return strconv.Itoa(i)
 }
 
 const (
