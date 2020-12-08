@@ -278,3 +278,15 @@ function openDuplicateModal(ID) {
   $('#duplicate-course-ID').val(ID);
   $('#duplicate-course-modal').modal('show');
 }
+
+function renderCalendarEvent(ID, courseID, shift, monday, action) {
+
+  $.get(action, {
+    "ID": ID,
+    "courseID": courseID,
+    "shift": shift,
+    "monday": monday
+  }, function(data) {
+    $('#calendar-event-' + ID).html(data);
+  })
+}

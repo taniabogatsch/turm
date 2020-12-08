@@ -60,8 +60,9 @@ GET     /course/blacklist                           Course.Blacklist
 GET     /course/path                                Course.Path
 GET     /course/restrictions                        Course.Restrictions
 GET     /course/events                              Course.Events
-GET     /course/calendarEvents                      Course.CalendarEvents
 GET     /course/meetings                            Course.Meetings
+GET     /course/calendarEvents                      Course.CalendarEvents
+GET     /course/calendarEvent                       Course.CalendarEvent
 
 
 # ---------------------------------------------------------------------------- #

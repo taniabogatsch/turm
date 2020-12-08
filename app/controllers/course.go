@@ -210,19 +210,18 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 
 /*CalendarEvent of a course.
 - Roles: if public all, else logged in users. */
-func (c Course) CalendarEvent(ID int, monday time.Time) revel.Result {
+func (c Course) CalendarEvent(ID, courseID, shift int, monday time.Time) revel.Result {
 
-	c.Log.Debug("load calendar event of course", "ID", ID)
+	c.Log.Debug("load calendar event of course", "ID", ID, "courseID",
+		courseID, "shift", shift, "monday", monday)
 
-	//TODO
-	return c.Render()
-}
+	monday.AddDate(0, 0, shift)
 
-/*NavigateWeek loads the previous or next week of a calendar event. */
-func (c Course) NavigateWeek() revel.Result {
+	event := models.CalendarEvent{ID: ID}
+	if err := event.Get(nil, &courseID, monday); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
 
-	c.Log.Debug("navigate to the next/previous week")
-
-	//TODO
-	return c.Render()
+	return c.Render(event)
 }

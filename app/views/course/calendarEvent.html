@@ -1,5 +1,32 @@
 <!-- template rendering the content of one calendar event -->
 
+{{if .errMsg}}
+  <div class="val-div w-100 text-danger">
+    {{.errMsg}}
+  </div>
+{{end}}
+
+<div id="flash-errors-calendar-events" class="d-none">
+  {{range .errors}}
+    <div class="val-div w-100 text-danger">
+      {{.}}
+    </div>
+  {{end}}
+</div>
+
+<script>
+	$(function(){
+		{{if .flash.success}}
+			showToast('{{.flash.success}}', 'success');
+		{{else if .flash.error}}
+			showToast('{{.flash.error}}', 'danger');
+		{{else if .errors}}
+			let msg = document.getElementById('flash-errors-calendar-events').innerHTML;
+			showToast(msg, 'danger');
+		{{end}}
+	});
+</script>
+
 <li class="list-group-item mb-2 border rounded">
 
   <!-- delete event -->
@@ -67,7 +94,12 @@
           <div class="row">
             <!-- navigate through weeks: PREVIOUS -->
             <div class="col-sm-1 text-left">
-              {{template "icons/caretLeft.html" .}}
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='renderCalendarEvent({{.event.ID}}, {{.event.CourseID}},
+                  -1, "TODO", {{url "Course.CalendarEvent"}});'
+                title='TODO'>
+                {{template "icons/caretLeft.html" .}}
+              </a>
             </div>
 
             <!-- week -->
@@ -77,7 +109,12 @@
 
             <!-- navigate through weeks: NEXT -->
             <div class="col-sm-1 text-right">
-              {{template "icons/caretRight.html" .}}
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='renderCalendarEvent({{.event.ID}}, {{.event.CourseID}},
+                  1, "TODO", {{url "Course.CalendarEvent"}});'
+                title='TODO'>
+                {{template "icons/caretRight.html" .}}
+              </a>
             </div>
           </div>
         </div>
