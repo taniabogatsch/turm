@@ -165,6 +165,7 @@ email.subject.new.course.role = Turm2 - Neue Kursrolle
 email.subject.course.role.deleted = Turm2 - Kursrolle gelöscht
 email.subject.course.role.authorization = Turm2 - Kursberechtigungen geändert
 email.subject.enroll.slot = Turm2 - Buchung erfolgreich.
+email.subject.unsubscribe.from.slot = Turm2 - Stornierung Ihrer Buchung
 
 email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
 email.edit.info = Bitte geben Sie die NutzerInnen an, die über die vorgenommene Änderung via E-Mail informiert werden sollen. Bitte geben Sie außerdem an, ob EditorInnen und OrganisatorInnen über die Änderung via E-Mail informiert werden sollen.

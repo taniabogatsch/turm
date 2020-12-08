@@ -90,7 +90,7 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 func (slots *Slots) GetAll(tx *sqlx.Tx, dayTmplID int) (err error) {
 
 	//get slot data for validation
-	err = tx.Select(&slots, stmtSelectAllSlotsOfDayTemplate, dayTmplID)
+	err = tx.Select(slots, stmtSelectAllSlotsOfDayTemplate, dayTmplID)
 	if err != nil {
 		log.Error("failed to get all slots of a day template", "dayTmplID", dayTmplID,
 			"error", err.Error())
@@ -208,7 +208,7 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx, calendarEventID int
 }
 
 /*Delete a slot if it it is more than an hour away. */
-func (slot *Slot) Delete(v *revel.Validation) (err error) {
+func (slot *Slot) Delete(v *revel.Validation) (data EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -234,8 +234,25 @@ func (slot *Slot) Delete(v *revel.Validation) (err error) {
 		return
 	}
 
+	//get e-mail data
+	data.User.ID = slot.UserID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+	err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
 	//delete slot
-	if err = deleteByID("id", "slots", slot.ID, tx); err != nil {
+	_, err = tx.Exec(stmtDeleteSlot, slot.ID, slot.UserID)
+	if err != nil {
+		log.Error("failed to delete the slot", "slot", *slot,
+			"error", err.Error())
+		tx.Rollback()
 		return
 	}
 
@@ -307,5 +324,11 @@ const (
 			JOIN calendar_events e ON e.id = d.calendar_event_id
 			JOIN courses c ON c.id = e.course_id
 		WHERE s.id = $1
+	`
+
+	stmtDeleteSlot = `
+		DELETE FROM slots
+		WHERE id = $1
+			AND user_id = $2
 	`
 )

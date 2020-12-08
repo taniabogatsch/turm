@@ -1,0 +1,318 @@
+<!-- template rendering the content of one calendar event -->
+
+<li class="list-group-item mb-2 border rounded">
+
+  <!-- delete event -->
+  <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+    href='#no-scroll' role="button"
+    onclick='confirmDeleteRenderModal({{msg $ "event.calendar.delete.title"}},
+      {{msg $ "event.calendar.delete.confirm" .event.Title}},
+      "{{url "EditCalendarEvent.Delete" .event.ID .event.CourseID}}", "calendar_events");'
+    title='{{msg $ "title.delete"}}'>
+    {{template "icons/trash.html" . }}
+  </a>
+
+  <!-- event title -->
+  <div id="div-calendar_title-{{.event.ID}}" class="d-inline">
+    {{.event.Title}}
+  </div>
+  <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+    onclick='openChangeModal({{msg $ "event.calendar.title"}}, "title",
+      true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+      {{msg $ "event.calendar.title.change.info"}}, {{.event.ID}}, 2);'
+    title='{{msg $ "title.edit"}}'>
+    {{template "icons/pencil.html" . }}
+  </a>
+  <br>
+
+  <!-- annotation -->
+  <div id="div-edit-calendar_annotation-{{.event.ID}}"
+    class="{{if not .Annotation.Valid}}d-none{{end}}">
+    <small class="form-text text-muted float-left">
+      {{template "icons/infoSquare.html" . }} &nbsp; <div id="div-calendar_annotation-{{.event.ID}}" class="d-inline">{{.event.Annotation.String}}</div>
+    </small>
+    <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+      onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation",
+        true, "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+        {{msg $ "event.annotation.change.info"}}, {{.event.ID}}, 2);'
+      title='{{msg $ "title.edit"}}'>
+      {{template "icons/pencil.html" . }}
+    </a>
+    <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left"
+      onclick='confirmDeleteJSONModal({{msg $ "event.annotation.delete.title"}},
+        {{msg $ "event.annotation.delete.confirm"}},
+        "{{url "EditCalendarEvent.ChangeText" .event.ID "annotation" ""}}");'
+      title='{{msg $ "title.delete"}}'>
+      {{template "icons/trash.html" . }}
+    </a>
+    <br>
+  </div>
+
+  <!-- add annotation button -->
+  <div id="div-add-calendar_annotation-{{.event.ID}}" class="{{if .event.Annotation.Valid}}d-none{{else}}d-inline{{end}}">
+    <button type="button" class="btn btn-outline-darkblue edit-show d-none mt-2 mt-lg-1"
+      onclick='openChangeModal({{msg $ "event.annotation"}}, "annotation", false,
+        "{{url "EditCalendarEvent.ChangeText"}}", "text", "255",
+        {{msg $ "event.annotation.change.info"}}, {{.event.ID}}, 2);'>
+      + &nbsp; {{msg $ "event.annotation"}}
+    </button>
+  </div>
+
+  <!-- week header -->
+  <div class="row border rounded mt-3 m-0">
+    <div class="col-sm-12">
+      <div class="row">
+        <div class="col-sm-12 rounded-top">
+
+          <div class="row">
+            <!-- navigate through weeks: PREVIOUS -->
+            <div class="col-sm-1 text-left">
+              {{template "icons/caretLeft.html" .}}
+            </div>
+
+            <!-- week -->
+            <div class="col-sm-10 text-center">
+              <strong>{{msg $ "event.calendar.week"}} {{.event.Week}} ({{.event.Year}})</strong>
+            </div>
+
+            <!-- navigate through weeks: NEXT -->
+            <div class="col-sm-1 text-right">
+              {{template "icons/caretRight.html" .}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- week days header -->
+      <div class="row border-top pt-2">
+        <div class="col-sm-2">
+          {{msg $ "event.calendar.mo"}}
+        </div>
+        <div class="col-sm-2">
+          {{msg $ "event.calendar.tu"}}
+        </div>
+        <div class="col-sm-2">
+          {{msg $ "event.calendar.we"}}
+        </div>
+        <div class="col-sm-2">
+          {{msg $ "event.calendar.th"}}
+        </div>
+        <div class="col-sm-2">
+          {{msg $ "event.calendar.fr"}}
+        </div>
+        <div class="col-sm-1">
+          {{msg $ "event.calendar.sa"}}
+        </div>
+        <div class="col-sm-1">
+          {{msg $ "event.calendar.so"}}
+        </div>
+      </div>
+
+      <!-- dates -->
+      <div class="row edit-hide">
+        {{range $k, $v := .event.ScheduleWeek}}
+          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-hide">
+            {{.Date}}
+          </div>
+        {{end}}
+      </div>
+
+      <!-- content -->
+      <br>
+      <div class="row">
+
+        <!-- range each week day and list day templates -->
+        {{range $k, $v := .event.Days}}
+          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-show d-none">
+
+            <!-- range day templates of a day -->
+            {{range .}}
+              <div class="card mb-1">
+                <div class="card-body pl-1 pr-1 pt-1 pb-0">
+                  {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                  {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                </div>
+
+                <div class="d-inline text-center">
+
+                  <!-- edit day template -->
+                  <a href="#no-scroll" class="badge btn-outline-darkblue"
+                    onclick='openChangeDayTmplModal({{url "EditCalendarEvent.EditDayTemplate"}},
+                      {{msg $ "day.tmpl.edit.title"}}, {{.CalendarEventID}}, {{.DayOfWeek}},
+                      {{.StartTime}}, {{.EndTime}}, {{.Interval}}, {{.ID}});'
+                    title='{{msg $ "title.edit"}}'>
+                    {{template "icons/pencil.html" . }}
+                  </a>
+
+                  <!-- delete day template -->
+                  <a href="#no-scroll" class="badge btn-outline-darkblue"
+                    onclick='confirmDeleteRenderModal({{msg $ "day.tmpl.delete.title"}},
+                      {{msg $ "day.tmpl.delete.confirm"}},
+                      "{{url "EditCalendarEvent.DeleteDayTemplate" .ID $.event.CourseID}}",
+                      "calendar_events");'
+                    title='{{msg $ "title.delete"}}'>
+                    {{template "icons/trash.html" . }}
+                  </a>
+                </div>
+
+              </div>
+            {{end}}
+
+          </div>
+        {{end}}
+
+        <!-- show schedule of each day -->
+        {{range $k, $v := .event.ScheduleWeek}}
+          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-hide">
+
+            {{$freeSlot := false}}
+
+            {{range .Entries}}
+
+              {{if eq .Type 0}} <!-- FREE -->
+
+                <div class="card mb-1 alert-success">
+                  <div class="card-body p-1 text-center">
+                    {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}}
+                  </div>
+                </div>
+                {{$freeSlot = true}}
+
+              {{else if eq .Type 1}} <!-- SLOT -->
+
+                {{$ownSlot := false}}
+                {{if $.session.userID}}
+                  {{if ne $.session.userID "0"}} <!-- TODO -->
+                    {{$ownSlot = true}}
+                  {{end}}
+                {{end}}
+
+                {{if $ownSlot}} <!-- slot booked by user -->
+                  <div class="card mb-1 alert-primary">
+                    <div class="card-body p-1 text-center">
+                      {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                      <a class="btn btn-outline-light btn-sm" style="color:#004085; border-color: #004085"
+                        href='{{url "Enrollment.UnsubscribeFromSlot" 0}}'>
+                        {{msg $ "button.unsubscribe"}}
+                      </a>
+                    </div>
+                  </div>
+
+                {{else}} <!-- slot booked by other user -->
+                  <div class="card mb-1 alert-dark">
+                    <div class="card-body p-1 text-center">
+                      {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                    </div>
+                  </div>
+                {{end}}
+
+              {{else if eq .Type 2}} <!-- EXCEPTION -->
+
+                <div class="card mb-1 alert-danger">
+                  <div class="card-body p-1 text-center">
+                    {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                  </div>
+                </div>
+
+              {{else if eq .Type 3}} <!-- BLOCKED -->
+
+                <div class="card mb-1 alert-light">
+                  <div class="card-body p-1 text-center">
+                    {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                  </div>
+                </div>
+
+              {{end}}
+            {{end}}
+
+            {{if $freeSlot}}
+              <br>
+              <div class="text-center">
+                <button type="button" class="btn btn-success w-100"
+                  onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}});'>
+                  {{msg $ "button.book.slot"}}
+                </button>
+              </div>
+              <br>
+            {{end}}
+          </div>
+        {{end}}
+
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="edit-hide">
+    <div class="card-body p-1 d-inline mr-2">
+      {{msg $ "event.calendar.legend"}}:
+    </div>
+    <div class="card-body p-1 alert-primary d-inline mr-2 border rounded">
+      {{msg $ "event.calendar.slot.booking"}}
+    </div>
+    <div class="card-body p-1 alert-success d-inline mr-2 border rounded">
+      {{msg $ "event.calendar.slot.free"}}
+    </div>
+    <div class="card-body p-1 alert-dark d-inline mr-2 border rounded">
+      {{msg $ "event.calendar.slot.booked"}}
+    </div>
+    <div class="card-body p-1 alert-danger d-inline mr-2 border rounded">
+      {{msg $ "event.calendar.slot.blocked"}}
+    </div>
+    <div class="card-body p-1 alert-light d-inline border rounded">
+      {{msg $ "event.calendar.slot.not.available"}}
+    </div>
+  </div>
+
+  <div class="d-inline">
+
+    <!-- button for adding new day templates -->
+    <button type="button" class="btn btn-outline-darkblue edit-show d-none"
+      onclick='openChangeDayTmplModal({{url "EditCalendarEvent.NewDayTemplate"}},
+        {{msg $ "day.tmpl.new.title"}}, {{.event.ID}}, 0, "", "", 60, 0);'>
+      + &nbsp; {{msg $ "button.new.day.tmpl"}}
+    </button>
+
+    <!-- button for adding exceptions -->
+    <button type="button" class="btn btn-outline-darkblue edit-show d-none"
+      onclick='openChangeExceptionModal({{msg $ "exception.new.title"}},
+        {{.event.ID}}, "", "", "", 0);'>
+      + &nbsp; {{msg $ "event.calendar.add.exception"}}
+    </button>
+  </div>
+
+  {{if .event.Exceptions}}
+    <div class="edit-show d-none">
+      <hr>
+      {{msg $ "event.calendar.list.exceptions"}}:
+
+      <ul>
+        {{range .event.Exceptions}}
+          <li>
+            <small class="text-muted">
+              {{if .Annotation.Valid}}{{.Annotation.String}}: {{end}}{{.ExceptionStart}} {{msg $ "meeting.to.time"}} {{.ExceptionEnd}}
+            </small>
+
+            <!-- edit exception -->
+            <a href="#no-scroll" class="badge btn-outline-darkblue d-inline"
+              onclick='openChangeExceptionModal({{msg $ "exception.new.title"}}, {{.CalendarEventID}},
+                {{.ExceptionStart}}, {{.ExceptionEnd}}, {{.Annotation.String}}, {{.ID}});'
+              title='{{msg $ "title.edit"}}'>
+              {{template "icons/pencil.html" . }}
+            </a>
+
+            <!-- delete exception -->
+            <a href="#no-scroll" class="badge btn-outline-darkblue d-inline"
+              onclick='confirmDeleteRenderModal({{msg $ "exception.delete.title"}},
+                {{msg $ "exception.delete.confirm"}},
+                "{{url "EditCalendarEvent.DeleteException" .ID $.event.CourseID}}",
+                "calendar_events");'
+              title='{{msg $ "title.delete"}}'>
+              {{template "icons/trash.html" . }}
+            </a>
+          </li>
+        {{end}}
+      </ul>
+    </div>
+  {{end}}
+
+</li>

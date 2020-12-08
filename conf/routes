@@ -130,6 +130,7 @@ POST    /edit/calendar/deleteException              EditCalendarEvent.DeleteExce
 GET     /enrollment/enroll                          Enrollment.Enroll
 GET     /enrollment/unsubscribe                     Enrollment.Unsubscribe
 GET     /enrollment/enrollInSlot                    Enrollment.EnrollInSlot
+GET     /enrollment/unsubscribeFromSlot             Enrollment.UnsubscribeFromSlot
 
 
 # ---------------------------------------------------------------------------- #

@@ -85,6 +85,7 @@ event.calendar.so = So
 
 event.calendar.legend = Legend
 
+event.calendar.slot.booking = Booking
 event.calendar.slot.free = Free
 event.calendar.slot.booked = Booked
 event.calendar.slot.blocked = Blocked
@@ -169,7 +170,6 @@ event.duplicate.success = Duplicated event, ID = %d.
 event.duplicate.confirm = Please confirm the duplication of event '%s'.
 event.duplicate.title = Duplicate event
 
-
 event.capacity = Number of participants
 event.capacity.change.info = The number of participants is the maximum number of users that are allowed to enroll in this event.
 event.capacity.change.success = Changed the number of participants to %d.
@@ -216,14 +216,16 @@ day.tmpl.edit.title = Edit day template
 day.tmpl.edit.success = Edited day template, ID = %d.
 
 day.tmpl.delete.success = Deleted day template, ID = %d.
-day.tmpl.delete.confirm = Please confirm the deletion of this day template. <br><br> CAREFUL: All users who booked slots for this day template will be removed and notified by e-mail.
+day.tmpl.delete.confirm = Please confirm the deletion of this day template. <br><br> <small class="text-muted form-text"><b>CAREFUL</b>: All users who booked slots for this day template will be removed and notified by e-mail.</small>
 day.tmpl.delete.title = Delete day template
+day.tmpl.edit.info = <b>CAREFUL:</b> If you edit a day template, then all users who booked slots for this day template will be removed and notified by e-mail.
 
 exception.change.success = Changes to exception successful, ID = %d.
 exception.new.title = Add new exception
 exception.delete.title = Delete exception
 exception.delete.confirm = Please confirm the deletion of this exception.
 exception.delete.success = Deleted exception, ID = %d.
+exception.edit.info = <b>CAREFUL:</b> If you add or edit an exception, then all users who booked slots during this exception will be removed and notified by e-mail.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

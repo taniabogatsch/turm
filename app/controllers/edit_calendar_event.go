@@ -213,13 +213,23 @@ func (c EditCalendarEvent) DeleteDayTemplate(ID, courseID int) revel.Result {
 	//NOTE: the interceptor assures that the day template ID is valid
 
 	tmpl := models.DayTmpl{ID: ID}
-	if err := tmpl.Delete(); err != nil {
+	users, err := tmpl.Delete()
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
 
-	//TODO: return users and write e-mail
+	//send e-mail to each user that got removed from its slot
+	for _, user := range users {
+
+		err = sendEMail(c.Controller, &user,
+			"email.subject.from.slot",
+			"manualRemove")
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, user.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("day.tmpl.delete.success", ID))
 	return c.Redirect(Course.CalendarEvents, courseID)

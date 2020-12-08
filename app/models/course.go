@@ -289,7 +289,6 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		return
 	}
 
-	//get the last (current) monday
 	now := time.Now()
 	weekday := time.Now().Weekday()
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))

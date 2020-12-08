@@ -165,6 +165,7 @@ email.subject.new.course.role = Turm2 - New course role
 email.subject.course.role.deleted = Turm2 - Deleted course role
 email.subject.course.role.authorization = Turm2 - Changed course authorization
 email.subject.enroll.slot = Turm2 - Booking confirmation
+email.subject.unsubscribe.from.slot = Turm2 - Canceled booking
 
 email.edit.info.bold = The course/the event is already active!
 email.edit.info = Please select all users which you want to notify about your changes. Please also select whether you want to notify editors and/or instructors about your changes or not.

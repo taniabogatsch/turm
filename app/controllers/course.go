@@ -207,3 +207,22 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 
 	return c.Render(events)
 }
+
+/*CalendarEvent of a course.
+- Roles: if public all, else logged in users. */
+func (c Course) CalendarEvent(ID int, monday time.Time) revel.Result {
+
+	c.Log.Debug("load calendar event of course", "ID", ID)
+
+	//TODO
+	return c.Render()
+}
+
+/*NavigateWeek loads the previous or next week of a calendar event. */
+func (c Course) NavigateWeek() revel.Result {
+
+	c.Log.Debug("navigate to the next/previous week")
+
+	//TODO
+	return c.Render()
+}

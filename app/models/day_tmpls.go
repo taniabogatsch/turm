@@ -174,7 +174,7 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) 
 }
 
 /*Delete a day template if it has no slots. */
-func (tmpl *DayTmpl) Delete() (err error) {
+func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -182,8 +182,36 @@ func (tmpl *DayTmpl) Delete() (err error) {
 		return
 	}
 
-	//TODO: get all users that have booked slots for this day template (in the future)
-	//TODO: return these and write them an e-mail
+	//get all slots of this day template
+	var slots Slots
+	if err = slots.GetAll(tx, tmpl.ID); err != nil {
+		return
+	}
+
+	//get all users that have booked slots for this day template (in the future)
+	for _, slot := range slots {
+
+		//append e-mail data (if slot is upcoming)
+		if slot.End.After(time.Now()) {
+
+			//get e-mail data
+			data := EMailData{}
+			data.User.ID = slot.UserID
+			if err = data.User.Get(tx); err != nil {
+				return
+			}
+
+			err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+			if err != nil {
+				log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+					"error", err.Error())
+				tx.Rollback()
+				return
+			}
+
+			users = append(users, data)
+		}
+	}
 
 	//delete day template
 	if err = deleteByID("id", "day_templates", tmpl.ID, tx); err != nil {

@@ -124,6 +124,8 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) 
 	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "year", year, "startTime",
 		startTime, "endTime", endTime, "date", date)
 
+	//TODO: redirect to calendar event render, do not reload the page, just this calendar event
+
 	//get user
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -188,6 +190,41 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) 
 	err = sendEMail(c.Controller, &data,
 		"email.subject.enroll.slot",
 		"enrollToSlot")
+	if err != nil {
+		return flashError(
+			errEMail, err, "", c.Controller, data.User.EMail)
+	}
+
+	c.Flash.Success(c.Message("event.enroll.success"))
+	return c.Redirect(c.Session["currPath"])
+}
+
+/*UnsubscribeFromSlot deletes a slot of an user. */
+func (c Enrollment) UnsubscribeFromSlot(ID int) revel.Result {
+
+	c.Log.Debug("unsubscribe a user from a slot (delete the slot)", "ID", ID)
+
+	//TODO: redirect to calendar event render, do not reload the page, just this calendar event
+
+	//get user
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return flashError(errTypeConv, err, "", c.Controller, "")
+	}
+
+	//delete slot
+	slot := models.Slot{ID: ID, UserID: userID}
+	data, err := slot.Delete(c.Validation)
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(errValidation, nil, "", c.Controller, "")
+	}
+
+	//send e-mail to the user who enrolled
+	err = sendEMail(c.Controller, &data,
+		"email.subject.unsubscribe.from.slot",
+		"unsubscribeFromSlot")
 	if err != nil {
 		return flashError(
 			errEMail, err, "", c.Controller, data.User.EMail)

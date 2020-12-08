@@ -531,7 +531,7 @@
 
 <!-- calendar event list -->
 <div id="div-calendar_events">
-  {{template "course/calendarEvents.html" dict_addLocale $.currentLocale "events" .course.CalendarEvents}}
+  {{template "course/calendarEvents.html" dict_addLocale $.currentLocale "events" .course.CalendarEvents "session" .session}}
 </div>
 
 <script>

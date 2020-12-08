@@ -28,6 +28,13 @@
           <!-- fieldID -->
           <input type="hidden" value="calendar_events" id="change-exception-modal-list">
 
+          {{if .active}}
+            <small class="text-muted form-text">
+              {{msg $ "exception.edit.info"}}
+            </small>
+            <hr>
+          {{end}}
+
           <!-- start -->
           <p>
             {{msg $ "meeting.start"}}:

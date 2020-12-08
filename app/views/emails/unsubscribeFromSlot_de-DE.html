@@ -3,9 +3,9 @@
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
 
-Sie haben sich erfolgreich in die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' eingeschrieben.
+Sie haben sich erfolgreich aus der Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' ausgetragen.
 
-Ihr gebuchter Zeitraum: {{.data.Start}} bis {{.data.End}}.
+Freigegebener Zeitraum: {{.data.Start}} bis {{.data.End}}.
 
 Zum Kurs: {{.data.URL}}/course/open?ID={{.data.CourseID}}
 
@@ -21,9 +21,9 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 <br>
 <br>
 <br>
-Sie haben sich erfolgreich in die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' eingeschrieben. <br>
+Sie haben sich erfolgreich aus der Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' ausgetragen. <br>
 <br>
-Ihr gebuchter Zeitraum: {{.data.Start}} bis {{.data.End}}. <br>
+Freigegebener Zeitraum: {{.data.Start}} bis {{.data.End}}. <br>
 <br>
 <a href="{{.data.URL}}/course/open?ID={{.data.CourseID}}">
     Zum Kurs: {{.data.CourseTitle}}

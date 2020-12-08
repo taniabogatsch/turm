@@ -85,6 +85,7 @@ event.calendar.so = So
 
 event.calendar.legend = Legende
 
+event.calendar.slot.booking = Buchung
 event.calendar.slot.free = Frei
 event.calendar.slot.booked = Gebucht
 event.calendar.slot.blocked = Gesperrt
@@ -213,9 +214,10 @@ day.tmpl.new.success = Neue Schablone hinzugefügt, ID = %d.
 day.tmpl.new.title = Neue Schablone hinzufügen
 day.tmpl.edit.title = Schablone bearbeiten
 day.tmpl.edit.success = Schablone bearbeitet, ID = %d.
+day.tmpl.edit.info = <b>ACHTUNG:</b> Wenn Sie eine Schablone bearbeiten, dann werden alle NutzerInnen, deren Buchungen nicht länger gültig sind, ausgetragen und per E-Mail benachrichtigt.
 
 day.tmpl.delete.success = Schablone gelöscht, ID = %d.
-day.tmpl.delete.confirm = Schablone wirklich löschen? <br><br> ACHTUNG: Alle NutzerInnen, die bereits Buchungen für diese Schablone vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.
+day.tmpl.delete.confirm = Schablone wirklich löschen? <br><br> <small class="text-muted form-text"><b>ACHTUNG</b>: Alle NutzerInnen, die bereits Buchungen für diese Schablone vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.</small>
 day.tmpl.delete.title = Schablone löschen
 
 exception.change.success = Änderungen an Ausnahme erfolgreich, ID = %d.
@@ -223,6 +225,7 @@ exception.new.title = Neue Ausnahme hinzufügen
 exception.delete.title = Ausnahme löschen
 exception.delete.confirm = Möchten Sie diese Ausnahme wirklich löschen?
 exception.delete.success = Ausnahme gelöscht, ID = %d.
+exception.edit.info = <b>ACHTUNG:</b> Wenn Sie eine Ausnahme hinzufügen oder bearbeiten, dann werden alle NutzerInnen, deren Buchungen nicht länger gültig sind, ausgetragen und per E-Mail benachrichtigt.
 
 # -------------------------------------------------------------------------------------------------- #
 # COURSE CHANGE MODALS

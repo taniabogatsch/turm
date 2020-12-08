@@ -28,6 +28,13 @@
           <!-- fieldID -->
           <input type="hidden" value="calendar_events" id="change-day-tmpl-modal-list">
 
+          {{if .active}}
+            <small class="text-muted form-text">
+              {{msg $ "day.tmpl.edit.info"}}
+            </small>
+            <hr>
+          {{end}}
+
           <!-- weekday -->
           <div class="input-group mb-3">
             <div class="input-group-prepend">
