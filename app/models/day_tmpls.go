@@ -36,6 +36,7 @@ type Schedule struct {
 type ScheduleEntry struct {
 	StartTime string
 	EndTime   string //should be the same as the subsequent start time
+	Interval  int
 	Type      ScheduleEntryType
 }
 
@@ -46,6 +47,10 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
+	}
+
+	if tmpl.EndTime == "00:00" {
+		tmpl.EndTime = "24:00"
 	}
 
 	if tmpl.validate(v, tx); v.HasErrors() {
@@ -78,8 +83,16 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 		return
 	}
 
+	if tmpl.EndTime == "00:00" {
+		tmpl.EndTime = "24:00"
+	}
+
 	//validate new DayTemplate
 	tmpl.validate(v, tx)
+	if v.HasErrors() {
+		tx.Rollback()
+		return
+	}
 
 	var slots Slots
 	slots.GetAll(tx, tmpl.ID)
@@ -211,6 +224,9 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 			if err != nil {
 				return
 			}
+			if ((*dayTmpls)[i])[j].EndTime == "00:00" {
+				((*dayTmpls)[i])[j].EndTime = "24:00"
+			}
 		}
 	}
 
@@ -231,7 +247,7 @@ func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 		v.ErrorKey("validation.invalid.timestamp")
 	}
 
-	if !start.Before(&end) {
+	if !end.After(&start) {
 		v.ErrorKey("validation.calendar.event.start.after.end")
 	}
 
@@ -253,6 +269,7 @@ func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 			log.Error("failed to validate if day templates overlap each other", "day tmpl",
 				*tmpl, "error", err.Error())
 			v.ErrorKey("error.db")
+			tx.Rollback()
 			return
 		}
 
