@@ -158,6 +158,7 @@ func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailCon
 		}
 
 		//if the course is active, send notification e-mail
+		conf.Field = "email.edit.new.event"
 		if err := sendEMailsEdit(c.Controller, &conf); err != nil {
 			return c.RenderJSON(
 				response{Status: ERROR, Msg: c.Message(errEMail.String())})
@@ -233,6 +234,8 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 
 	//if the course is active, send notification e-mail
 	if fieldID != "expiration_date" {
+
+		conf.Field = "email.edit." + fieldID
 		if err = sendEMailsEdit(c.Controller, &conf); err != nil {
 			return c.RenderJSON(
 				response{Status: ERROR, Msg: c.Message(errEMail.String())})
@@ -492,6 +495,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit." + fieldID
 	if err = sendEMailsEdit(c.Controller, &conf); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errEMail.String())})

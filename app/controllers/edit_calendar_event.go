@@ -111,7 +111,7 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 
 	tmpl.CalendarEventID = ID
 
-	data, users, err := tmpl.Update(c.Validation)
+	users, err := tmpl.Update(c.Validation)
 	if err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
@@ -126,18 +126,12 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 
 	//send e-mail to each user that got removed from its slot
 	for _, user := range users {
-		mailData := models.EMailData{
-			User:        user,
-			CourseTitle: data.CourseTitle,
-			EventTitle:  data.EventTitle,
-			CourseID:    data.CourseID,
-		}
-		err = sendEMail(c.Controller, &mailData,
+
+		err = sendEMail(c.Controller, &user,
 			"email.subject.from.slot",
 			"manualRemove")
 		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, mailData.User.EMail)
+			return flashError(errEMail, err, "", c.Controller, user.User.EMail)
 		}
 	}
 
@@ -154,16 +148,15 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	exception.CalendarEventID = ID
-	data := models.EMailData{}
-	users := models.Users{}
+	users := []models.EMailData{}
 	var err error
 
 	//insert
 	if exception.ID == 0 {
-		data, users, err = exception.Insert(nil, c.Validation)
+		users, err = exception.Insert(nil, c.Validation)
 
 	} else { //update
-		data, users, err = exception.Update(c.Validation)
+		users, err = exception.Update(c.Validation)
 		//TODO: when updating, validate that the exception ID fits the calendar event ID
 	}
 
@@ -179,18 +172,12 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 
 	//send e-mail to each user that got removed from its slot
 	for _, user := range users {
-		mailData := models.EMailData{
-			User:        user,
-			CourseTitle: data.CourseTitle,
-			EventTitle:  data.EventTitle,
-			CourseID:    data.CourseID,
-		}
-		err = sendEMail(c.Controller, &mailData,
+
+		err = sendEMail(c.Controller, &user,
 			"email.subject.from.slot",
 			"manualRemove")
 		if err != nil {
-			return flashError(
-				errEMail, err, "", c.Controller, mailData.User.EMail)
+			return flashError(errEMail, err, "", c.Controller, user.User.EMail)
 		}
 	}
 

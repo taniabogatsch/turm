@@ -8,6 +8,9 @@ import (
 	"github.com/revel/revel"
 )
 
+/*EMailsData holds the data for multiple e-mails. */
+type EMailsData []EMailData
+
 /*EMailData holds all data that is rendered in the different e-mail templates. */
 type EMailData struct {
 
@@ -30,8 +33,12 @@ type EMailData struct {
 	ViewMatrNr bool
 
 	//used for slot enrollments
-	Start string
-	End   string
+	Start  string `db:"end"`
+	End    string `db:"start"`
+	UserID int    `db:"user_id"`
+
+	//used for notifying users about edits
+	Field string
 }
 
 /*EditEMailConfig provides all information for sending edit notification e-mails. */
@@ -48,6 +55,8 @@ type EditEMailConfig struct {
 	CourseTitle string `db:"course_title"`
 	EventTitle  string `db:"event_title"`
 	CourseID    int    `db:"course_id"`
+
+	Field string
 }
 
 /*GetEMailSubjectBody assigns the template content to the e-mail body and sets the e-mail subject. */

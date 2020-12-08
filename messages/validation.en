@@ -129,6 +129,7 @@ validation.calendar.event.end.wrong.step.distance = The ending time must be a mu
 validation.calendar.event.slots.overlap = The time overlaps with an already existing slot.
 validation.calendar.event.slot.overlaps.exception = The time overlaps with a blocked time interval.
 validation.calendar.event.slot.unsubscribe.end = You can not unsubscribe on such a short term notice (< 1h). Please contact the course management in urgent cases.
+validation.calendar.event.slot.running = Your changes would affect a currently active booking.
 
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EXCEPTIONS

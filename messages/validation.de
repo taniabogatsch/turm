@@ -129,6 +129,7 @@ validation.calendar.event.start.wrong.step.distance = Die Endzeit muss einem Vie
 validation.calendar.event.slots.overlap = Die angegebene Zeit überschneidet sich mit einem bereits belegten Zeitraum.
 validation.calendar.event.slot.overlaps.exception = Innerhalb der angegebenen Zeit befindet sich eine Ausnahme, die den Zeitraum blockiert.
 validation.calendar.event.slot.unsubscribe.end = Kurzfristiges Austragen (< 1h) nicht möglich. Bitte wenden Sie sich bei dringenden Fällen an den Verantwortlichen.
+validation.calendar.event.slot.running = Ihre Änderungen an dieser Schablone würden eine zur Zeit aktive Buchung betreffen.
 
 # -------------------------------------------------------------------------------------------------- #
 # CALENDAR EXCEPTIONS

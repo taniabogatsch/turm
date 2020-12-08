@@ -179,6 +179,21 @@ email.edit.option.editors = Nur EditorInnen
 email.edit.option.instructors = Nur OrganisatorInnen
 email.edit.option.none = Niemand
 
+email.edit.new.event = Weitere Veranstaltung
+email.edit.new.meeting = Weiterer Termin
+email.edit.enrollment_start = Beginn des Einschreibezeitraums
+email.edit.enrollment_end = Ende des Einschreibezeitraums
+email.edit.unsubscribe_end = Ende des Austragezeitraums
+email.edit.description = Kursbeschreibung
+email.edit.custom_email = Individuelle Willkommensemail
+email.edit.speaker = ReferentIn
+email.edit.title = Kurstitel
+email.edit.subtitle = Untertitel
+email.edit.fee = Teilnahmegebühr
+email.edit.event.title = Veranstaltungstitel
+email.edit.event.annotation = Anmerkung
+email.edit.meeting = Termin(e)
+
 email.send.success = E-Mail an %d TeilnehmerInnen versendet.
 
 # -------------------------------------------------------------------------------------------------- #

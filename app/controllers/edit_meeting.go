@@ -35,6 +35,7 @@ func (c EditMeeting) Edit(ID int, meeting models.Meeting,
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit.meeting"
 	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
 		return flashError(errEMail, err, "", c.Controller, "")
 	}
@@ -63,6 +64,7 @@ func (c EditMeeting) Delete(ID, eventID int,
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit.meeting"
 	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
 		return flashError(errEMail, err, "", c.Controller, "")
 	}
@@ -91,6 +93,7 @@ func (c EditMeeting) Duplicate(ID, eventID int,
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit.meeting"
 	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
 		return flashError(errEMail, err, "", c.Controller, "")
 	}

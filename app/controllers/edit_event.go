@@ -82,6 +82,7 @@ func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit.new.meeting"
 	if err := sendEMailsEdit(c.Controller, &conf); err != nil {
 		return flashError(errEMail, err, "", c.Controller, "")
 	}
@@ -178,6 +179,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 	}
 
 	//if the course is active, send notification e-mail
+	conf.Field = "email.edit." + fieldID
 	if err = sendEMailsEdit(c.Controller, &conf); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errEMail.String())})

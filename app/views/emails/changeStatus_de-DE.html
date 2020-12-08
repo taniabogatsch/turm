@@ -3,7 +3,7 @@
 {{template "emails/components/salutation.html" dict_addLocale $.currentLocale "User" .data.User}}
 
 
-Ihr Bezahlstatus für die Veranstaltung {{.data.EventTitle}} des Kurses {{.data.CourseTitle}} wurde geändert. Ihr neuer Status lautet:
+Ihr Bezahlstatus für die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' wurde geändert. Ihr neuer Status lautet:
 {{if eq .data.Status 2}}
 {{msg $ "enroll.status.awaiting.payment"}}
 {{else if eq .data.Status 3}}
@@ -26,7 +26,7 @@ Dies ist eine automatisch generierte E-Mail, bitte beantworten Sie sie nicht.
 <br>
 <br>
 <br>
-Ihr Bezahlstatus für die Veranstaltung {{.data.EventTitle}} des Kurses {{.data.CourseTitle}} wurde geändert. Ihr neuer Status lautet: <br>
+Ihr Bezahlstatus für die Veranstaltung '{{.data.EventTitle}}' des Kurses '{{.data.CourseTitle}}' wurde geändert. Ihr neuer Status lautet: <br>
 {{if eq .data.Status 2}}
 <font color="#C0392B">{{msg $ "enroll.status.awaiting.payment"}}</font>
 {{else if eq .data.Status 3}}

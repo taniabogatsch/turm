@@ -179,8 +179,7 @@ func (except *Exception) validate(v *revel.Validation, tx *sqlx.Tx) (err error) 
 }
 
 /*Insert an exception. */
-func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailData, users Users,
-	err error) {
+func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (users EMailsData, err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
@@ -209,39 +208,26 @@ func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailDat
 		return
 	}
 
-	//delete all enrolled users in the time span
-	var userIDs []int
-
-	//get all IDs of users that booked slots in the timespan of the exception
-	err = tx.Select(&userIDs, stmtSelectUserIDsInExeptionTime, except.CalendarEventID,
-		except.ExceptionStartDB, except.ExceptionEndDB)
+	//get all slots that are booked during the exception for e-mail data
+	err = tx.Select(&users, stmtSelectSlotsDuringException, except.CalendarEventID,
+		except.ExceptionStartDB, except.ExceptionEndDB, app.TimeZone)
 	if err != nil {
-		log.Error("failed to get user IDs within exception timespan", "exception", *except,
+		log.Error("failed to get slots during exception", "exception", *except,
 			"error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	for _, userID := range userIDs {
-
-		user := User{ID: userID}
-		if err = user.Get(tx); err != nil {
+	//get more detailed user data
+	for idx := range users {
+		users[idx].User.ID = users[idx].UserID
+		if err = users[idx].User.Get(tx); err != nil {
 			return
 		}
-		users = append(users, user)
-	}
-
-	//get CourseID, CourseTitle and EventTitle
-	err = tx.Get(&data, stmtGetCourseInfoByCalendarEvent, except.CalendarEventID)
-	if err != nil {
-		log.Error("failed to get CourseID, CourseTitle and EventTitle", "exception", *except,
-			"error", err.Error())
-		tx.Rollback()
-		return
 	}
 
 	//delete slots
-	_, err = tx.Exec(stmtDeleteSlotsInExeptionTime, except.CalendarEventID,
+	_, err = tx.Exec(stmtDeleteSlotsDuringException, except.CalendarEventID,
 		except.ExceptionStartDB, except.ExceptionEndDB)
 	if err != nil {
 		log.Error("failed to delete slots within exception timespan", "exception", *except,
@@ -257,7 +243,7 @@ func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (data EMailDat
 }
 
 /*Update an exception. */
-func (except *Exception) Update(v *revel.Validation) (data EMailData, users Users, err error) {
+func (except *Exception) Update(v *revel.Validation) (users EMailsData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -270,7 +256,7 @@ func (except *Exception) Update(v *revel.Validation) (data EMailData, users User
 		return
 	}
 	//insert new exception
-	if data, users, err = except.Insert(tx, v); err != nil {
+	if users, err = except.Insert(tx, v); err != nil {
 		return
 	}
 
@@ -353,10 +339,15 @@ const (
 		) AS exception_overlapping
 	`
 
-	stmtSelectUserIDsInExeptionTime = `
-		SELECT DISTINCT s.user_id
-		FROM slots s JOIN day_templates t ON t.id = s.day_tmpl_id
-		WHERE t.calendar_event_id = $1
+	stmtSelectSlotsDuringException = `
+		SELECT c.title AS course_title, e.title AS event_title, c.id AS course_id,
+			TO_CHAR (s.start_time AT TIME ZONE $4, 'YYYY-MM-DD HH24:MI') AS start,
+			TO_CHAR (s.end_time AT TIME ZONE $4, 'YYYY-MM-DD HH24:MI') AS end,
+			s.user_id AS user_id
+		FROM slots s JOIN day_templates d ON d.id = s.day_tmpl_id
+			JOIN calendar_events e ON e.id = d.calendar_event_id
+			JOIN courses c ON c.id = e.course_id
+		WHERE e.id = $1
 		AND (
 			($2 >= s.start_time AND $2 < s.end_time)
 			OR ($3 <= s.end_time AND $3 > s.start_time)
@@ -364,13 +355,7 @@ const (
 		)
 	`
 
-	stmtGetCourseInfoByCalendarEvent = `
-		SELECT c.id AS course_id, c.title AS course_title, ce.title AS event_title
-		FROM calendar_events ce JOIN courses c ON ce.course_id = c.id
-		WHERE ce.id = $1
-	`
-
-	stmtDeleteSlotsInExeptionTime = `
+	stmtDeleteSlotsDuringException = `
 		DELETE
 		FROM slots
 		WHERE id IN (

@@ -46,6 +46,7 @@ func sendEMailsEdit(c *revel.Controller, conf *models.EditEMailConfig) (err erro
 		CourseTitle: conf.CourseTitle,
 		EventTitle:  conf.EventTitle,
 		CourseID:    conf.CourseID,
+		Field:       conf.Field,
 	}
 
 	subject := "email.subject.course.edit"

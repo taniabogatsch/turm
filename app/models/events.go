@@ -58,7 +58,7 @@ func (event *Event) NewBlank(conf *EditEMailConfig) (err error) {
 
 /*Update the specified column in the event table. */
 func (event *Event) Update(tx *sqlx.Tx, column string, value interface{},
-	conf *EditEMailConfig) (users []EMailData, err error) {
+	conf *EditEMailConfig) (users EMailsData, err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {

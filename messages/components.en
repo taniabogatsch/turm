@@ -179,6 +179,21 @@ email.edit.option.editors = Only editors
 email.edit.option.instructors = Only instructors
 email.edit.option.none = Nobody
 
+email.edit.new.event = additional event
+email.edit.new.meeting = additional meeting
+email.edit.enrollment_start = begin of enrollment period
+email.edit.enrollment_end = end of enrollment period
+email.edit.unsubscribe_end = end of unsubscribe period
+email.edit.description = course description
+email.edit.custom_email = enrollment e-mail
+email.edit.speaker = speaker
+email.edit.title = course title
+email.edit.subtitle = subtitle
+email.edit.fee = fee
+email.edit.event.title = event title
+email.edit.event.annotation = annotation
+email.edit.meeting = meeting(s)
+
 email.send.success = E-mail was send to %d participants.
 
 # -------------------------------------------------------------------------------------------------- #

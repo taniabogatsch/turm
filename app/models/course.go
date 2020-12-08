@@ -558,7 +558,7 @@ func (course *Course) Delete() (valid bool, err error) {
 
 /*Activate a course. */
 func (course *Course) Activate(v *revel.Validation) (invalid bool,
-	users []EMailData, err error) {
+	users EMailsData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {

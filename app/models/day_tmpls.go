@@ -72,10 +72,7 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 }
 
 /*Update a day tmpl. */
-func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, err error) {
-
-	//map to remember which user is already getting an E-Mail
-	userIDs := make(map[int]bool)
+func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -95,7 +92,9 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 	}
 
 	var slots Slots
-	slots.GetAll(tx, tmpl.ID)
+	if err = slots.GetAll(tx, tmpl.ID); err != nil {
+		return
+	}
 
 	slotStartTime := CustomTime{}
 	slotEndTime := CustomTime{}
@@ -113,63 +112,59 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (data EMailData, users Users, e
 
 		//all the cases in which a slot has to be deleted
 		hasToBeDeleted := slotEndTime.After(&tmplEndTime) ||
-			tmplStartTime.After(&slotStartTime) || //delete if slot colides with new times
-			int(slot.Start.Weekday())-1 != tmpl.DayOfWeek || //if weekday is changed delete slot
-			(slotEndTime.Sub(&tmplStartTime)%tmpl.Interval) != 0 || //checks for intervall stepps
+			tmplStartTime.After(&slotStartTime) || //delete if slot collides with new times
+			int(slot.Start.Weekday())-1 != tmpl.DayOfWeek || //delete if weekday is changed
+			(slotEndTime.Sub(&tmplStartTime)%tmpl.Interval) != 0 || //checks for interval steps
 			(slotStartTime.Sub(&tmplStartTime)%tmpl.Interval) != 0
 
 		//check if slot is not within the new time
 		if hasToBeDeleted {
 
-			//dont allow update if a slot in this template is currently running
+			//don't allow update if a slot in this template is currently running
 			if slot.Start.Before(time.Now()) && slot.End.After(time.Now()) {
-				v.ErrorKey("message") //TODO: language File
+				v.ErrorKey("validation.calendar.event.slot.running")
+				tx.Rollback()
 				return
 			}
 
-			//slot has to be deleted
+			//append e-mail data (if slot is upcoming)
+			if slot.End.After(time.Now()) {
+
+				//get e-mail data
+				data := EMailData{}
+				data.User.ID = slot.UserID
+				if err = data.User.Get(tx); err != nil {
+					return
+				}
+
+				err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+				if err != nil {
+					log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+						"error", err.Error())
+					tx.Rollback()
+					return
+				}
+
+				users = append(users, data)
+			}
+
 			//delete slot
 			if err = deleteByID("id", "slots", slot.ID, tx); err != nil {
 				return
 			}
-
-			//create user for email if slot isnt in past and not in mailing(users) list already
-			if slot.End.After(time.Now()) && !userIDs[slot.UserID] {
-				user := User{ID: slot.UserID}
-				if err = user.Get(tx); err != nil {
-					return
-				}
-
-				userIDs[slot.UserID] = true
-				users = append(users, user)
-			}
-
 		}
-
-		//get email data
-		err = tx.Get(&data, stmtGetCourseInfoByCalendarEvent, tmpl.CalendarEventID)
-		if err != nil {
-			log.Error("failed to get CourseID, CourseTitle and EventTitle", "day_template", *tmpl,
-				"error", err.Error())
-			tx.Rollback()
-			return
-		}
-
 	}
 
-	//update times
+	//update day template
 	if err = updateByID(tx, "start_time", "day_templates", tmpl.StartTime, tmpl.ID, tmpl); err != nil {
 		return
 	}
-
 	if err = updateByID(tx, "end_time", "day_templates", tmpl.EndTime, tmpl.ID, tmpl); err != nil {
 		return
 	}
-
 	if err = updateByID(tx, "interval", "day_templates", tmpl.Interval, tmpl.ID, tmpl); err != nil {
 		return
 	}
-
 	if err = updateByID(tx, "day_of_week", "day_templates", tmpl.DayOfWeek, tmpl.ID, tmpl); err != nil {
 		return
 	}

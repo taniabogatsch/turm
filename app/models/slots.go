@@ -86,15 +86,17 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 	return
 }
 
-//GetAll slots of a day template.
+/*GetAll slots of a day template. */
 func (slots *Slots) GetAll(tx *sqlx.Tx, dayTmplID int) (err error) {
 
-	err = tx.Select(slots, stmtSelectAllSlotsOfDayTemplate, dayTmplID)
+	//get slot data for validation
+	err = tx.Select(&slots, stmtSelectAllSlotsOfDayTemplate, dayTmplID)
 	if err != nil {
 		log.Error("failed to get all slots of a day template", "dayTmplID", dayTmplID,
 			"error", err.Error())
 		tx.Rollback()
 	}
+
 	return
 }
 
@@ -291,7 +293,7 @@ const (
 	`
 
 	stmtSelectAllSlotsOfDayTemplate = `
-		SELECT id, user_id, day_tmpl_id, start_time, end_time, created
+		SELECT id, user_id, day_tmpl_id, start_time, end_time
 		FROM slots
 		WHERE day_tmpl_id = $1
 		ORDER BY start_time ASC
