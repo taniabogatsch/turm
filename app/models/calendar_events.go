@@ -278,9 +278,9 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 			//used to remember the first and last slot overlapping the exception
 			startSlotIdx := -1
-			var startSched ScheduleEntry
+			var startEntry ScheduleEntry
 			endSlotIdx := -1
-			var endSched ScheduleEntry
+			var endEntry ScheduleEntry
 
 			//loop entries to find those overlapping with the exception
 			for idx := range schedule.Entries {
@@ -297,16 +297,23 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 					return err
 				}
 
+				if schedule.Entries[idx].EndTime == "24:00" {
+					end = end.AddDate(0, 0, 1)
+				}
+
+				//test if this entry overlaps with the exception and is thus the first
+				//overlapping entry
 				if startSlotIdx == -1 && event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Before(end) &&
 					event.ExceptionsOfWeek[eIdx].ExceptionEndDB.After(start) {
 					startSlotIdx = idx
-					startSched = schedule.Entries[idx]
+					startEntry = schedule.Entries[idx]
 				}
 
+				//test if any of the schedule entries is the last one overlapping with this exception
 				if end.After(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) ||
 					end.Equal(event.ExceptionsOfWeek[eIdx].ExceptionEndDB) {
 					endSlotIdx = idx
-					endSched = schedule.Entries[idx]
+					endEntry = schedule.Entries[idx]
 					break
 				}
 			}
@@ -314,6 +321,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//set to last index if the exception did not end on that day
 			if endSlotIdx == -1 {
 				endSlotIdx = len(schedule.Entries) - 1
+				endEntry = schedule.Entries[len(schedule.Entries)-1]
 			}
 
 			//if an overlapping exception was found
@@ -327,81 +335,118 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 						schedule.Entries[endSlotIdx+1:]...)
 				}
 
-				//get start and end times for Exception which are within stepping distance
+				//convert start and end time of schedule entry to date + time
 				start, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
-					startSched.StartTime)
+					startEntry.StartTime)
 				if err != nil {
 					return err
 				}
 
-				if event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Day() == start.Day() {
-					//get start and end times for Exception which are within stepping distance
-					startTime := getExceptionScheduleTimes(startSched.Interval,
-						start, event.ExceptionsOfWeek[eIdx].ExceptionStartDB, true)
+				end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
+					endEntry.StartTime)
+				if err != nil {
+					return err
+				}
 
-					if len(schedule.Entries) > startSlotIdx {
+				//get the starting time of the exception with respect to the step interval
+				startTime := getExceptionScheduleTimes(startEntry.Interval,
+					start, event.ExceptionsOfWeek[eIdx].ExceptionStartDB, true)
 
-						end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
-							startSched.EndTime)
-						if err != nil {
-							return err
+				endTime := getExceptionScheduleTimes(endEntry.Interval,
+					end, event.ExceptionsOfWeek[eIdx].ExceptionEndDB, false)
+
+				//test if the exception starts and ends at the same day as the current schedule
+				if event.ExceptionsOfWeek[eIdx].ExceptionStartDB.YearDay() == start.YearDay() &&
+					event.ExceptionsOfWeek[eIdx].ExceptionStartDB.Year() == start.Year() {
+
+					if event.ExceptionsOfWeek[eIdx].ExceptionEndDB.YearDay() == end.YearDay() &&
+						event.ExceptionsOfWeek[eIdx].ExceptionEndDB.Year() == end.Year() {
+
+						//insert the entry slice upfront the exception, FREE or BLOCKED
+						if startEntry.StartTime != startTime {
+							if startEntry.Interval != 0 {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{startEntry.StartTime, startTime,
+										startEntry.Interval, FREE}, startSlotIdx)
+								startSlotIdx++
+							} else {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{startEntry.StartTime, startTime,
+										startEntry.Interval, BLOCKED}, startSlotIdx)
+								startSlotIdx++
+							}
 						}
 
-						endTime := getExceptionScheduleTimes(endSched.Interval,
-							end, event.ExceptionsOfWeek[eIdx].ExceptionEndDB, false)
-
-						if startSched.StartTime != startTime {
-							schedule.Entries = insertScheduleEntry(schedule.Entries,
-								ScheduleEntry{startSched.StartTime, startTime,
-									startSched.Interval, FREE}, startSlotIdx)
-							startSlotIdx++
-						}
-
+						//insert the EXCEPTION entry
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{startTime, endTime,
 								0, EXCEPTION}, startSlotIdx)
 						startSlotIdx++
 
-						if endTime != endSched.EndTime {
-							schedule.Entries = insertScheduleEntry(schedule.Entries,
-								ScheduleEntry{endTime, endSched.EndTime,
-									endSched.Interval, FREE}, startSlotIdx)
+						//insert the entry slice after the exception, FREE or BLOCKED
+						if endTime != endEntry.EndTime {
+							if endEntry.Interval != 0 {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{endTime, endEntry.EndTime,
+										endEntry.Interval, FREE}, startSlotIdx)
+							} else {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{endTime, endEntry.EndTime,
+										endEntry.Interval, BLOCKED}, startSlotIdx)
+							}
+						}
+					} else { //end is 24:00
+
+						//insert the entry slice upfront the exception, FREE or BLOCKED
+						if startEntry.StartTime != startTime {
+							if startEntry.Interval != 0 {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{startEntry.StartTime, startTime,
+										startEntry.Interval, FREE}, startSlotIdx)
+								startSlotIdx++
+							} else {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{startEntry.StartTime, startTime,
+										startEntry.Interval, BLOCKED}, startSlotIdx)
+								startSlotIdx++
+							}
 						}
 
-					} else { // exception is last entrie
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
-							ScheduleEntry{startSched.EndTime, startTime,
-								startSched.Interval, FREE}, startSlotIdx)
+							ScheduleEntry{startTime, "24: 00",
+								startEntry.Interval, EXCEPTION}, startSlotIdx)
 
-						schedule.Entries = insertScheduleEntry(schedule.Entries,
-							ScheduleEntry{startTime, "24:00",
-								0, EXCEPTION}, startSlotIdx+1)
 					}
-
 				} else { //exception start at 00:00
 
-					if len(schedule.Entries) > startSlotIdx {
+					//exception start at 00:00 and ends at 24:00
+					if event.ExceptionsOfWeek[eIdx].ExceptionEndDB.YearDay() != end.YearDay() ||
+						event.ExceptionsOfWeek[eIdx].ExceptionEndDB.Year() != end.Year() {
 
-						end, err := parseDate(tx, strconv.Itoa(event.Year), schedule.Date,
-							schedule.Entries[startSlotIdx].EndTime)
-						if err != nil {
-							return err
-						}
+						schedule.Entries = insertScheduleEntry(schedule.Entries,
+							ScheduleEntry{"00:00", "24:00",
+								startEntry.Interval, EXCEPTION}, startSlotIdx)
 
-						endTime := getExceptionScheduleTimes(schedule.Entries[startSlotIdx].Interval,
+					} else { //exception only starts at 00:00
+						endTime := getExceptionScheduleTimes(endEntry.Interval,
 							end, event.ExceptionsOfWeek[eIdx].ExceptionEndDB, false)
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{"00:00", endTime,
-								schedule.Entries[startSlotIdx-1].Interval, EXCEPTION}, startSlotIdx)
+								startEntry.Interval, EXCEPTION}, startSlotIdx)
 
-						schedule.Entries = insertScheduleEntry(schedule.Entries,
-							ScheduleEntry{endTime, schedule.Entries[startSlotIdx].StartTime,
-								schedule.Entries[startSlotIdx-1].Interval, FREE}, startSlotIdx+1)
-					} else { // exception is last entrie
-						schedule.Entries = insertScheduleEntry(schedule.Entries,
-							ScheduleEntry{"00:00", "24:00",
-								startSched.Interval, EXCEPTION}, startSlotIdx)
+						//insert the entry slice after the exception, FREE or BLOCKED
+						if endTime != endEntry.EndTime {
+							if endEntry.Interval != 0 {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{endTime, endEntry.EndTime,
+										endEntry.Interval, FREE}, startSlotIdx)
+							} else {
+								schedule.Entries = insertScheduleEntry(schedule.Entries,
+									ScheduleEntry{endTime, endEntry.EndTime,
+										endEntry.Interval, BLOCKED}, startSlotIdx+1)
+							}
+						}
 					}
 
 				}
@@ -462,7 +507,7 @@ func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.T
 
 	if interval == 0 {
 		//TODO: this looks ugly
-		return strconv.Itoa(exceptTime.Hour()) + ":" + strconv.Itoa(exceptTime.Minute())
+		return prettyTime(exceptTime.Hour()) + ":" + prettyTime(exceptTime.Minute())
 	}
 
 	if exceptTime.After(sStart) {
@@ -486,7 +531,6 @@ func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.T
 		sMin := prettyTime(sStart.Minute())
 		sTime = sHour + ":" + sMin
 
-		return
 	} else {
 		rangeMin := (sStart.Hour()*60 + sStart.Minute()) - (exceptTime.Hour()*60 + exceptTime.Minute())
 		var min int
@@ -506,9 +550,8 @@ func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.T
 		sHour := prettyTime(sStart.Hour())
 		sMin := prettyTime(sStart.Minute())
 		sTime = sHour + ":" + sMin
-
-		return
 	}
+	return
 }
 
 func prettyTime(i int) string {
