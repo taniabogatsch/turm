@@ -18,9 +18,9 @@ participants instructor active      | yes   | -     | -             | -         
 participants creator expired        | yes   | -     | -             | -         | yes       | -         | yes         | -             | -       | yes
 participants editor expired         | yes   | -     | -             | -         | yes       | -         | -           | -             | -       | -
 participants instructor expired     | yes   | -     | -             | -         | -         | -         | -           | -             | -       | -
-course creator active | | | | | | | | | |
-course editor active | | | | | | | | | |
-course instructor active | | | | | | | | | |
-course creator expired | | | | | | | | | |
-course editor expired | | | | | | | | | |
-course instructor expired | | | | | | | | | |
+course creator active               | -     | yes   | -             | -         | yes       | -         | yes         | yes           | yes     | -
+course editor active                | -     | yes   | -             | -         | yes       | -         | -           | yes           | -       | -
+course instructor active            | -     | -     | -             | -         | -         | -         | -           | yes           | -       | -
+course creator expired              | -     | -     | -             | -         | yes       | -         | yes         | yes           | -       | yes
+course editor expired               | -     | -     | -             | -         | yes       | -         | -           | yes           | -       | -
+course instructor expired           | -     | -     | -             | -         | -         | -         | -           | yes           | -       | -
