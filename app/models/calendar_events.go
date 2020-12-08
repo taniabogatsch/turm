@@ -22,8 +22,9 @@ type CalendarEvent struct {
 	Annotation sql.NullString `db:"annotation"`
 
 	//loaded week
-	Week int
-	Year int
+	Monday string
+	Week   int
+	Year   int
 
 	//day templates for this week [0...6]
 	Days DayTmpls
@@ -182,8 +183,10 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 	//their slots for each day respectively
 	for _, tmplsOfDay := range event.Days {
 
+		inPast := day.Before(time.Now())
+
 		//generate blocked and free blocks of this schedule
-		schedule := Schedule{Date: day.Format("02.01.")}
+		schedule := Schedule{Date: day.Format("02.01."), InPast: inPast}
 		day = day.AddDate(0, 0, 1)
 
 		if len(tmplsOfDay) != 0 {
@@ -191,7 +194,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//set blocked slot from 0 to start of the first day template
 			if tmplsOfDay[0].StartTime != "00:00" {
 				schedule.Entries = append(schedule.Entries,
-					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED})
+					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED, 0, 0})
 			}
 
 			//insert all slots and free spaces of a day template and
@@ -207,7 +210,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							ScheduleEntry{
 								schedule.Entries[len(schedule.Entries)-1].EndTime,
 								tmplsOfDay[i].StartTime,
-								0, BLOCKED},
+								0, BLOCKED, 0, 0},
 						)
 					}
 				}
@@ -230,19 +233,20 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 						//insert FREE schedule entry
 						if tmplsOfDay[i].StartTime != slotStart.Value {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE})
+								slotStart.Value, tmplsOfDay[i].Interval, FREE, 0, 0})
 						}
 					} else {
 						//check for FREE space between two slots
 						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE})
+								slotStart.Value, tmplsOfDay[i].Interval, FREE, 0, 0})
 						}
 					}
 
 					//insert slot as schedule entry
 					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
-						tmplsOfDay[i].Interval, SLOT})
+						tmplsOfDay[i].Interval, SLOT,
+						tmplsOfDay[i].Slots[j].UserID, tmplsOfDay[i].Slots[j].ID})
 
 				} //end of for loop of slots
 
@@ -250,11 +254,11 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 					//check for FREE space from the last slot to the end of the day template
 					if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
 						schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE})
+							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, 0, 0})
 					}
 				} else {
 					schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE})
+						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, 0, 0})
 				}
 
 			} //end of for loop of day templates
@@ -262,13 +266,13 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//check for BLOCKED space from the end of the last day template to 24:00
 			if schedule.Entries[len(schedule.Entries)-1].EndTime != "24:00" {
 				schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-					"24:00", 0, BLOCKED})
+					"24:00", 0, BLOCKED, 0, 0})
 			}
 
 		} else {
 			//no day templates for this day
 			schedule.Entries = append(schedule.Entries,
-				ScheduleEntry{"00:00", "24:00", 0, BLOCKED})
+				ScheduleEntry{"00:00", "24:00", 0, BLOCKED, 0, 0})
 		}
 
 		//after each day, loop all exceptions of the week and
@@ -367,12 +371,12 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if startEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, FREE}, startSlotIdx)
+										startEntry.Interval, FREE, 0, 0}, startSlotIdx)
 								startSlotIdx++
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, BLOCKED}, startSlotIdx)
+										startEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
 								startSlotIdx++
 							}
 						}
@@ -380,7 +384,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 						//insert the EXCEPTION entry
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{startTime, endTime,
-								0, EXCEPTION}, startSlotIdx)
+								0, EXCEPTION, 0, 0}, startSlotIdx)
 						startSlotIdx++
 
 						//insert the entry slice after the exception, FREE or BLOCKED
@@ -388,11 +392,11 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if endEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, FREE}, startSlotIdx)
+										endEntry.Interval, FREE, 0, 0}, startSlotIdx)
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, BLOCKED}, startSlotIdx)
+										endEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
 							}
 						}
 					} else { //end is 24:00
@@ -402,19 +406,19 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if startEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, FREE}, startSlotIdx)
+										startEntry.Interval, FREE, 0, 0}, startSlotIdx)
 								startSlotIdx++
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, BLOCKED}, startSlotIdx)
+										startEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
 								startSlotIdx++
 							}
 						}
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{startTime, "24: 00",
-								startEntry.Interval, EXCEPTION}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
 
 					}
 				} else { //exception start at 00:00
@@ -425,7 +429,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{"00:00", "24:00",
-								startEntry.Interval, EXCEPTION}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
 
 					} else { //exception only starts at 00:00
 						endTime := getExceptionScheduleTimes(endEntry.Interval,
@@ -433,22 +437,21 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{"00:00", endTime,
-								startEntry.Interval, EXCEPTION}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
 
 						//insert the entry slice after the exception, FREE or BLOCKED
 						if endTime != endEntry.EndTime {
 							if endEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, FREE}, startSlotIdx)
+										endEntry.Interval, FREE, 0, 0}, startSlotIdx)
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, BLOCKED}, startSlotIdx+1)
+										endEntry.Interval, BLOCKED, 0, 0}, startSlotIdx+1)
 							}
 						}
 					}
-
 				}
 			}
 		}

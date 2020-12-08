@@ -30,6 +30,7 @@ type DayTmpl struct {
 type Schedule struct {
 	Date    string
 	Entries []ScheduleEntry
+	InPast  bool
 }
 
 /*ScheduleEntry containing all information to print a section of a day template. */
@@ -38,6 +39,9 @@ type ScheduleEntry struct {
 	EndTime   string //should be the same as the subsequent start time
 	Interval  int
 	Type      ScheduleEntryType
+
+	UserID int
+	SlotID int
 }
 
 /*Insert a day template. */
