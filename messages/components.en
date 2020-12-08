@@ -265,3 +265,6 @@ title.edit.validate = Validate course fields
 title.edit.activate = Activate course
 title.edit.expire = Change course status to expired
 title.edit.course = Edit course
+
+title.shift.left = Previous week
+title.shift.right = Next week

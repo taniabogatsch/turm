@@ -22,7 +22,7 @@ type CalendarEvent struct {
 	Annotation sql.NullString `db:"annotation"`
 
 	//loaded week
-	Monday string
+	Monday time.Time
 	Week   int
 	Year   int
 
@@ -83,6 +83,7 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 		}
 
 		//set the current week
+		(*events)[i].Monday = monday
 		_, (*events)[i].Week = monday.ISOWeek()
 		(*events)[i].Year = monday.Year()
 
@@ -135,6 +136,7 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 	}
 
 	//set the current week
+	event.Monday = monday
 	_, event.Week = monday.ISOWeek()
 	event.Year = monday.Year()
 
@@ -194,7 +196,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//set blocked slot from 0 to start of the first day template
 			if tmplsOfDay[0].StartTime != "00:00" {
 				schedule.Entries = append(schedule.Entries,
-					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED, 0, 0})
+					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED, "0", 0})
 			}
 
 			//insert all slots and free spaces of a day template and
@@ -210,7 +212,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							ScheduleEntry{
 								schedule.Entries[len(schedule.Entries)-1].EndTime,
 								tmplsOfDay[i].StartTime,
-								0, BLOCKED, 0, 0},
+								0, BLOCKED, "0", 0},
 						)
 					}
 				}
@@ -233,20 +235,21 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 						//insert FREE schedule entry
 						if tmplsOfDay[i].StartTime != slotStart.Value {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE, 0, 0})
+								slotStart.Value, tmplsOfDay[i].Interval, FREE, "0", 0})
 						}
 					} else {
 						//check for FREE space between two slots
 						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE, 0, 0})
+								slotStart.Value, tmplsOfDay[i].Interval, FREE, "0", 0})
 						}
 					}
 
 					//insert slot as schedule entry
 					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
 						tmplsOfDay[i].Interval, SLOT,
-						tmplsOfDay[i].Slots[j].UserID, tmplsOfDay[i].Slots[j].ID})
+						strconv.Itoa(tmplsOfDay[i].Slots[j].UserID),
+						tmplsOfDay[i].Slots[j].ID})
 
 				} //end of for loop of slots
 
@@ -254,11 +257,11 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 					//check for FREE space from the last slot to the end of the day template
 					if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
 						schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, 0, 0})
+							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, "0", 0})
 					}
 				} else {
 					schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, 0, 0})
+						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, "0", 0})
 				}
 
 			} //end of for loop of day templates
@@ -266,13 +269,13 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 			//check for BLOCKED space from the end of the last day template to 24:00
 			if schedule.Entries[len(schedule.Entries)-1].EndTime != "24:00" {
 				schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-					"24:00", 0, BLOCKED, 0, 0})
+					"24:00", 0, BLOCKED, "0", 0})
 			}
 
 		} else {
 			//no day templates for this day
 			schedule.Entries = append(schedule.Entries,
-				ScheduleEntry{"00:00", "24:00", 0, BLOCKED, 0, 0})
+				ScheduleEntry{"00:00", "24:00", 0, BLOCKED, "0", 0})
 		}
 
 		//after each day, loop all exceptions of the week and
@@ -371,12 +374,12 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if startEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, FREE, 0, 0}, startSlotIdx)
+										startEntry.Interval, FREE, "0", 0}, startSlotIdx)
 								startSlotIdx++
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
+										startEntry.Interval, BLOCKED, "0", 0}, startSlotIdx)
 								startSlotIdx++
 							}
 						}
@@ -384,7 +387,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 						//insert the EXCEPTION entry
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{startTime, endTime,
-								0, EXCEPTION, 0, 0}, startSlotIdx)
+								0, EXCEPTION, "0", 0}, startSlotIdx)
 						startSlotIdx++
 
 						//insert the entry slice after the exception, FREE or BLOCKED
@@ -392,11 +395,11 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if endEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, FREE, 0, 0}, startSlotIdx)
+										endEntry.Interval, FREE, "0", 0}, startSlotIdx)
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
+										endEntry.Interval, BLOCKED, "0", 0}, startSlotIdx)
 							}
 						}
 					} else { //end is 24:00
@@ -406,19 +409,19 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 							if startEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, FREE, 0, 0}, startSlotIdx)
+										startEntry.Interval, FREE, "0", 0}, startSlotIdx)
 								startSlotIdx++
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{startEntry.StartTime, startTime,
-										startEntry.Interval, BLOCKED, 0, 0}, startSlotIdx)
+										startEntry.Interval, BLOCKED, "0", 0}, startSlotIdx)
 								startSlotIdx++
 							}
 						}
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{startTime, "24: 00",
-								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, "0", 0}, startSlotIdx)
 
 					}
 				} else { //exception start at 00:00
@@ -429,7 +432,7 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{"00:00", "24:00",
-								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, "0", 0}, startSlotIdx)
 
 					} else { //exception only starts at 00:00
 						endTime := getExceptionScheduleTimes(endEntry.Interval,
@@ -437,18 +440,18 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 
 						schedule.Entries = insertScheduleEntry(schedule.Entries,
 							ScheduleEntry{"00:00", endTime,
-								startEntry.Interval, EXCEPTION, 0, 0}, startSlotIdx)
+								startEntry.Interval, EXCEPTION, "0", 0}, startSlotIdx)
 
 						//insert the entry slice after the exception, FREE or BLOCKED
 						if endTime != endEntry.EndTime {
 							if endEntry.Interval != 0 {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, FREE, 0, 0}, startSlotIdx)
+										endEntry.Interval, FREE, "0", 0}, startSlotIdx)
 							} else {
 								schedule.Entries = insertScheduleEntry(schedule.Entries,
 									ScheduleEntry{endTime, endEntry.EndTime,
-										endEntry.Interval, BLOCKED, 0, 0}, startSlotIdx+1)
+										endEntry.Interval, BLOCKED, "0", 0}, startSlotIdx+1)
 							}
 						}
 					}
@@ -487,7 +490,8 @@ func parseDate(tx *sqlx.Tx, year, date, str string) (t time.Time, err error) {
 
 	t, err = time.ParseInLocation("2006-01-02T15:04:05", value, loc)
 	if err != nil {
-		log.Error("failed to parse string to time", "value", value, "error", err.Error())
+		log.Error("failed to parse string to time", "value", value, "loc", loc,
+			"error", err.Error())
 		tx.Rollback()
 		return
 	}

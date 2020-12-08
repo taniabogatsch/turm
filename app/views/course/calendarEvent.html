@@ -96,8 +96,8 @@
             <div class="col-sm-1 text-left">
               <a href="#no-scroll" class="badge btn-outline-darkblue"
                 onclick='renderCalendarEvent({{.event.ID}}, {{.event.CourseID}},
-                  -1, "TODO", {{url "Course.CalendarEvent"}});'
-                title='TODO'>
+                  -1, {{.event.Monday}}, {{url "Course.CalendarEvent"}});'
+                title='{{msg $ "title.shift.previous"}}'>
                 {{template "icons/caretLeft.html" .}}
               </a>
             </div>
@@ -111,8 +111,8 @@
             <div class="col-sm-1 text-right">
               <a href="#no-scroll" class="badge btn-outline-darkblue"
                 onclick='renderCalendarEvent({{.event.ID}}, {{.event.CourseID}},
-                  1, "TODO", {{url "Course.CalendarEvent"}});'
-                title='TODO'>
+                  1, {{.event.Monday}}, {{url "Course.CalendarEvent"}});'
+                title='{{msg $ "title.shift.next"}}'>
                 {{template "icons/caretRight.html" .}}
               </a>
             </div>
@@ -219,7 +219,7 @@
 
                 {{$ownSlot := false}}
                 {{if $.session.userID}}
-                  {{if ne $.session.userID "0"}} <!-- TODO -->
+                  {{if eq $.session.userID .UserID}}
                     {{$ownSlot = true}}
                   {{end}}
                 {{end}}
@@ -229,7 +229,7 @@
                     <div class="card-body p-1 text-center">
                       {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
                       <a class="btn btn-outline-light btn-sm" style="color:#004085; border-color: #004085"
-                        href='{{url "Enrollment.UnsubscribeFromSlot" 0}}'>
+                        href='{{url "Enrollment.UnsubscribeFromSlot" .SlotID}}'>
                         {{msg $ "button.unsubscribe"}}
                       </a>
                     </div>
@@ -263,14 +263,16 @@
             {{end}}
 
             {{if $freeSlot}}
-              <br>
-              <div class="text-center">
-                <button type="button" class="btn btn-success w-100"
-                  onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}});'>
-                  {{msg $ "button.book.slot"}}
-                </button>
-              </div>
-              <br>
+              {{if not $v.InPast}}
+                <br>
+                <div class="text-center">
+                  <button type="button" class="btn btn-success w-100"
+                    onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}});'>
+                    {{msg $ "button.book.slot"}}
+                  </button>
+                </div>
+                <br>
+              {{end}}
             {{end}}
           </div>
         {{end}}

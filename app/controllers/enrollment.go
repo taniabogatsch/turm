@@ -230,6 +230,6 @@ func (c Enrollment) UnsubscribeFromSlot(ID int) revel.Result {
 			errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
-	c.Flash.Success(c.Message("event.enroll.success"))
+	c.Flash.Success(c.Message("event.unsubscribe.success"))
 	return c.Redirect(c.Session["currPath"])
 }

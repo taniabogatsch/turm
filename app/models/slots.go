@@ -306,7 +306,6 @@ const (
 		SELECT start_time
 		FROM slots
 		WHERE id = $1
-		AS start_time
 	`
 
 	stmtSelectAllSlotsOfDayTemplate = `

@@ -40,7 +40,7 @@ type ScheduleEntry struct {
 	Interval  int
 	Type      ScheduleEntryType
 
-	UserID int
+	UserID string
 	SlotID int
 }
 

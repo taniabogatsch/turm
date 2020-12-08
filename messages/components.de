@@ -265,3 +265,6 @@ title.edit.validate = Kursfelder validieren
 title.edit.activate = Kurs aktivieren
 title.edit.expire = Kurs auf abgelaufen setzen
 title.edit.course = Kurs bearbeiten
+
+title.shift.previous = Vorherige Woche
+title.shift.next = Nächste Woche

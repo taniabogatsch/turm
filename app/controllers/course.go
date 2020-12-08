@@ -3,6 +3,7 @@ package controllers
 import (
 	"strings"
 	"time"
+	"turm/app"
 	"turm/app/models"
 
 	"github.com/revel/revel"
@@ -210,15 +211,31 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 
 /*CalendarEvent of a course.
 - Roles: if public all, else logged in users. */
-func (c Course) CalendarEvent(ID, courseID, shift int, monday time.Time) revel.Result {
+func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Result {
 
 	c.Log.Debug("load calendar event of course", "ID", ID, "courseID",
 		courseID, "shift", shift, "monday", monday)
 
-	monday.AddDate(0, 0, shift)
+	loc, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		c.Log.Error("failed to parse location", "loc", app.TimeZone,
+			"error", err.Error())
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	t, err := time.ParseInLocation("2006-01-02T15:04:05-07:00", monday, loc)
+	if err != nil {
+		c.Log.Error("failed to parse string to time", "monday", monday,
+			"loc", loc, "error", err.Error())
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	t = t.AddDate(0, 0, shift*7)
 
 	event := models.CalendarEvent{ID: ID}
-	if err := event.Get(nil, &courseID, monday); err != nil {
+	if err := event.Get(nil, &courseID, t); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
