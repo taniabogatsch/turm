@@ -156,6 +156,40 @@ func (event *CalendarEvent) Update(column string, value interface{}) (err error)
 	return updateByID(nil, column, "calendar_events", value, event.ID, event)
 }
 
+/*Duplicate an CalendarEvent. */
+func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	var newID int
+	err = tx.Get(&newID, stmtDuplicateCalendarEvent, event.CourseID, event.ID)
+	if err != nil {
+		log.Error("failed to duplicate calendar Event", "Calendar event", *event,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate all day templates of this event
+	tmpls := DayTmpls{}
+	err = tmpls.Duplicate(tx, &newID, &event.ID)
+	if err != nil {
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
 /*Delete a calendar event. */
 func (event *CalendarEvent) Delete() (err error) {
 
@@ -463,6 +497,30 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 	return
 }
 
+/*Duplicate all CalendarEvents of a course. */
+func (events *CalendarEvents) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err error) {
+
+	//get all event IDs
+	err = tx.Select(events, stmtGetCalendarEventIDs, *courseIDOld)
+	if err != nil {
+		log.Error("failed to get all events for duplication", "course ID old",
+			*courseIDOld, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate each event
+	for _, event := range *events {
+
+		event.CourseID = *courseIDNew
+		if err = event.Duplicate(tx); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func parseDate(tx *sqlx.Tx, year, date, str string) (t time.Time, err error) {
 
 	//create start/end date + time from entry to compare with exception start/end date + time
@@ -582,6 +640,12 @@ const (
 		ORDER BY id ASC
 	`
 
+	stmtGetCalendarEventIDs = `
+		SELECT id
+		FROM calendar_events
+		WHERE course_id = $1
+	`
+
 	stmtGetCalendarEvent = `
 		SELECT id, course_id, title, annotation
 		FROM calendar_events
@@ -594,5 +658,17 @@ const (
 		SELECT course_id AS id
 		FROM calendar_events
 		WHERE id = $1
+	`
+
+	stmtDuplicateCalendarEvent = `
+		INSERT INTO calendar_events
+			(annotation, course_id, title)
+		(
+			SELECT
+				annotation, $1 AS course_id, title
+			FROM calendar_events
+			WHERE id = $2
+		)
+		RETURNING id AS new_id
 	`
 )

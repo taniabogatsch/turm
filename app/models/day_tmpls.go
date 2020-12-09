@@ -183,6 +183,19 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) 
 	return
 }
 
+/*Duplicate all day_templates if the eventIDOld into the eventIDNew*/
+func (tmpls *DayTmpls) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
+
+	_, err = tx.Exec(stmtDuplicateDayTemplates, *eventIDNew, *eventIDOld)
+	if err != nil {
+		log.Error("failed to duplicate day templates", "eventIDNew",
+			*eventIDNew, "eventIDOld", *eventIDOld, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
 /*Delete a day template if it has no slots. */
 func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 
@@ -375,6 +388,19 @@ const (
       AND day_of_week = $2
     ORDER BY start_time ASC
   `
+
+	stmtDuplicateDayTemplates = `
+		INSERT INTO day_templates
+			(calendar_event_id, start_time, end_time, interval,
+				day_of_week)
+		(
+			SELECT
+				$1 AS calendar_event_id, start_time, end_time, interval,
+				 day_of_week
+			FROM day_templates
+			WHERE calendar_event_id = $2
+		)
+	`
 
 	stmtGetOverlappingTmpls = `
 		SELECT EXISTS(
