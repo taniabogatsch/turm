@@ -8,7 +8,6 @@
   <div class="tab-content">
 
     <h4>
-      <!-- show either an open draft or an open course -->
       {{template "icons/people.html" . }}
       &nbsp; {{msg $ "pcpts.tab"}}
 
@@ -223,11 +222,16 @@
             {{end}}
 
           {{else}}
+
+            <!-- slots -->
             <h5>
-              Wochenübersicht
+              {{template "icons/calendar.html" . }}
+              &nbsp; {{msg $ "pcpts.week.details"}}
             </h5>
             <hr>
-            {{template "participants/days.html" dict_addLocale $.currentLocale "days" .Days}}
+            <div id="participants-slots-days-{{.ID}}">
+              {{template "participants/days.html" dict_addLocale $.currentLocale "days" .Days "ID" $.participants.ID "eventID" .ID "monday" .Monday "week" .Week "year" .Year}}
+            </div>
             <hr>
             <br>
           {{end}}

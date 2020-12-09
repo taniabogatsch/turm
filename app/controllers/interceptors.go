@@ -465,8 +465,29 @@ func (c Participants) auth() revel.Result {
 
 		belongs, err := evalElemBelongs(c.Controller, "ID", "eventID", "events")
 		if err != nil {
-			return flashError(
-				errTypeConv, err, "/", c.Controller, "")
+			return flashError(errTypeConv, err, "/", c.Controller, "")
+		} else if !belongs {
+			c.Flash.Error(c.Message("intercept.invalid.action"))
+			return c.Redirect(App.Index)
+		}
+	}
+
+	if c.MethodName == "Days" || c.MethodName == "DeleteSlot" {
+
+		belongs, err := evalElemBelongs(c.Controller, "ID", "eventID", "calendar_events")
+		if err != nil {
+			return flashError(errTypeConv, err, "/", c.Controller, "")
+		} else if !belongs {
+			c.Flash.Error(c.Message("intercept.invalid.action"))
+			return c.Redirect(App.Index)
+		}
+	}
+
+	if c.MethodName == "DeleteSlot" {
+
+		belongs, err := evalElemBelongs(c.Controller, "eventID", "slotID", "slots")
+		if err != nil {
+			return flashError(errTypeConv, err, "/", c.Controller, "")
 		} else if !belongs {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
@@ -585,6 +606,11 @@ func evalElemBelongs(c *revel.Controller, param1, param2, table string) (belongs
 		belongs, err = models.BelongsToElement(table, "course_id", "id", param1ID, param2ID)
 	case "meetings":
 		belongs, err = models.BelongsToElement(table, "event_id", "id", param1ID, param2ID)
+	case "slots":
+		//TODO remove comments once function exists
+		//slot := models.Slot{ID: param2ID}
+		//belongs, err = slot.BelongsToEvent(param1ID)
+		belongs = true
 	}
 
 	return

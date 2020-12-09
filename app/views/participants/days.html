@@ -1,46 +1,181 @@
 <!-- template rendering all slots of each day of a week -->
 
+<!-- header row -->
+<div class="row">
+  <!-- navigate through weeks: PREVIOUS -->
+  <div class="col-sm-1 text-left">
+    <a href="#no-scroll" class="badge btn-outline-darkblue"
+      onclick='renderDays({{$.ID}}, {{$.eventID}}, -1, {{$.monday}}, {{url "Participants.Days"}});'
+      title='{{msg $ "title.shift.previous"}}'>
+      {{template "icons/caretLeft.html" .}}
+    </a>
+  </div>
+
+  <!-- week -->
+  <div class="col-sm-10 text-center">
+    <strong>{{msg $ "event.calendar.week"}} {{$.week}} ({{$.year}})</strong>
+  </div>
+
+  <!-- navigate through weeks: NEXT -->
+  <div class="col-sm-1 text-right">
+    <a href="#no-scroll" class="badge btn-outline-darkblue"
+      onclick='renderDays({{$.ID}}, {{$.eventID}}, 1, {{$.monday}}, {{url "Participants.Days"}});'
+      title='{{msg $ "title.shift.next"}}'>
+      {{template "icons/caretRight.html" .}}
+    </a>
+  </div>
+</div>
+<hr>
+
+<div class="row">
+  <div class="col-sm-2 break-text">
+    {{msg $ "user.participant"}}
+  </div>
+  <div class="col-sm-2 break-text">
+    {{msg $ "user.affiliation"}}, {{msg $ "user.matr.nr"}}
+  </div>
+  <div class="col-sm-2 break-text">
+    {{msg $ "user.course.of.studies"}}
+  </div>
+  <div class="col-sm-2 break-text">
+    {{msg $ "enroll.start.time"}}
+  </div>
+  <div class="col-sm-2 break-text">
+    {{msg $ "enroll.end.time"}}
+  </div>
+  <div class="col-sm-2 break-text">
+    {{msg $ "pcpts.actions"}}
+  </div>
+</div>
+<br>
+
 <!-- range each week day and list day templates -->
 {{range $k, $v := .days}}
 
-  <button class="btn list-group-item w-100 text-left" aria-controls="week-day-{{$k}}"
-    type="button" data-toggle="collapse" data-target="#week-day-{{$k}}" aria-expanded="false">
+  {{if .DayTmpls}}
 
-    {{if eq $k 0}}
-      {{msg $ "event.calendar.monday"}}
-    {{else if eq $k 1}}
-      {{msg $ "event.calendar.tuesday"}}
-    {{else if eq $k 2}}
-      {{msg $ "event.calendar.wednesday"}}
-    {{else if eq $k 3}}
-      {{msg $ "event.calendar.thursday"}}
-    {{else if eq $k 4}}
-      {{msg $ "event.calendar.friday"}}
-    {{else if eq $k 5}}
-      {{msg $ "event.calendar.saturday"}}
-    {{else}}
-      {{msg $ "event.calendar.sunday"}}
-    {{end}}
-  </button>
+    <button class="btn list-group-item w-100 text-left" aria-controls="week-day-{{$k}}"
+      type="button" data-toggle="collapse" data-target="#week-day-{{$k}}" aria-expanded="false">
 
-  <div class="row">
-    <div class="col">
-      <div class="collapse multi-collapse" id="week-day-{{$k}}">
-        <div class="card card-body">
+      {{if eq $k 0}}
+        {{msg $ "event.calendar.monday"}}, {{.Date}}
+      {{else if eq $k 1}}
+        {{msg $ "event.calendar.tuesday"}}, {{.Date}}
+      {{else if eq $k 2}}
+        {{msg $ "event.calendar.wednesday"}}, {{.Date}}
+      {{else if eq $k 3}}
+        {{msg $ "event.calendar.thursday"}}, {{.Date}}
+      {{else if eq $k 4}}
+        {{msg $ "event.calendar.friday"}}, {{.Date}}
+      {{else if eq $k 5}}
+        {{msg $ "event.calendar.saturday"}}, {{.Date}}
+      {{else}}
+        {{msg $ "event.calendar.sunday"}}, {{.Date}}
+      {{end}}
 
-          {{range .DayTmpls}}
+    </button>
 
-            {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
-            {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}} <br>
-            <hr>
-            SLOTS
-            {{range .Slots}}
-              {{.}}
+    <div class="row">
+      <div class="col">
+        <div class="collapse multi-collapse" id="week-day-{{$k}}">
+          <div class="card card-body">
+
+            {{$slotsExist := false}}
+
+            {{range .DayTmpls}}
+
+              <!-- range over all slots and print their user -->
+              {{range $i, $slot := .Slots}}
+
+                {{$slotsExist = true}}
+                {{if ne $i 0}}<hr>{{end}}
+
+                <div class="row mb-1">
+
+                  <!-- salutation, e-mail -->
+                  <div class="col-sm-2 break-text">
+                    <small class="text-muted">
+                      {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" .User}}
+                      <br>
+                      {{.User.EMail}}
+                    </small>
+                  </div>
+
+                  <!-- affiliations, matriculation number -->
+                  <div class="col-sm-2 break-text">
+                    <small class="text-muted">
+                      {{if .User.Affiliations.Valid}}
+                        {{range $idx, $affiliation := .User.Affiliations.Affiliations}}
+                          {{if ne $idx 0}}, {{end}}{{$affiliation}}
+                        {{end}}
+                      {{else}}
+                        -
+                      {{end}}
+                      <br>
+                      {{if .User.MatrNr.Valid}}
+                        {{if eq .User.MatrNr.Int32 12345}}
+                          {{msg $ "user.matr.nr.not.visible"}}
+                        {{else}}
+                          {{.User.MatrNr.Int32}}
+                        {{end}}
+                      {{else}}
+                        {{msg $ "user.no.matr.nr"}}
+                      {{end}}
+                    </small>
+                  </div>
+
+                  <!-- course of studies -->
+                  <div class="col-sm-2 break-text">
+                    <small class="text-muted">
+                      {{range $idx, $study := .User.Studies}}
+                        {{if ne $idx 0}}<br>{{end}}
+                        {{.Degree}}
+                        <br>
+                        {{.CourseOfStudies}}
+                        <br>
+                        {{.Semester}}. {{msg $ "user.semester"}}
+                      {{else}}
+                        -
+                      {{end}}
+                    </small>
+                  </div>
+
+                  <!-- start -->
+                  <div class="col-sm-2 break-text">
+                    {{.Start}}
+                  </div>
+
+                  <!-- end -->
+                  <div class="col-sm-2 break-text">
+                    {{.End}}
+                  </div>
+
+                  <!-- remove slot -->
+                  <div class="col-sm-2 break-text">
+                    <small class="text-muted">
+
+                      <a class="btn btn-outline-danger d-inline" title='{{msg $ "title.remove.slot"}}'
+                        role="button" onclick='deleteSlot({{$.ID}}, {{$.eventID}}, {{.ID}},
+                          {{$.monday}}, {{url "Participants.DeleteSlot"}});' href="#">
+                        {{template "icons/arrowRightIn.html" .}}
+                      </a>
+                    </small>
+                  </div>
+                </div>
+
+              {{end}}
             {{end}}
-          {{end}}
+
+            {{if not $slotsExist}}
+              <small class="text-muted">
+                {{msg $ "pcpts.no.bookings"}}
+              </small>
+            {{end}}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+  {{end}}
 
 {{end}}

@@ -160,7 +160,7 @@ email.subject.manual.wait.list = Turm2 - Information about manual enrollment to 
 email.subject.manual.unsubscribed = Turm2 - Information about manual unsubscribe
 email.subject.change.status = Turm2 - Your payment status was updated
 email.subject.change.pw = Turm2 - Your password has been changed
-email.subject.from.slot = Turm2 - Your slot was removed manually
+email.subject.from.slot = Turm2 - Your booking was canceled manually
 email.subject.new.course.role = Turm2 - New course role
 email.subject.course.role.deleted = Turm2 - Deleted course role
 email.subject.course.role.authorization = Turm2 - Changed course authorization
@@ -229,9 +229,10 @@ enroll.time = Time of enrollment
 enroll.start.time = Start
 enroll.end.time = End
 
-enroll.manual.success = Manually enrolled user.
+enroll.manual.success = Enrolled user manually.
 enroll.manual.unsubscribe.success = User was unsubscribed.
-enroll.manual.to.wait.list.success = Manually enrolled user to wait list.
+enroll.manual.to.wait.list.success = Enrolled user to wait list manually.
+enroll.manual.delete.slot.success = Deleted booking manually.
 
 # -------------------------------------------------------------------------------------------------- #
 # TITLES
@@ -270,3 +271,5 @@ title.edit.course = Edit course
 
 title.shift.previous = Previous week
 title.shift.next = Next week
+
+title.remove.slot = Remove slot

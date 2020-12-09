@@ -156,6 +156,7 @@ GET     /participants/days                          Participants.Days
 GET     /participants/enroll                        Participants.Enroll
 GET     /participants/unsubscribe                   Participants.Unsubscribe
 GET     /participants/waitlist                      Participants.Waitlist
+GET     /participants/deleteSlot                    Participants.DeleteSlot
 
 GET     /participants/changeStatus                  Participants.ChangeStatus
 

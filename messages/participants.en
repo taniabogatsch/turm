@@ -33,3 +33,7 @@ pcpts.unsubscribed = List of unsubscribed participants
 pcpts.change.status.title = Change payment status
 pcpts.new.status.info = Here you can select the new payment status.
 pcpts.change.status.success = Changed enrollment status.
+
+pcpts.no.bookings = No bookings.
+
+pcpts.week.details = Week details

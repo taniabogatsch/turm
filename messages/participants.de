@@ -33,3 +33,7 @@ pcpts.unsubscribed = Ausgetragene TeilnehmerInnen
 pcpts.change.status.title = Bezahlstatus ändern
 pcpts.new.status.info = Hier können Sie den neuen Bezahlstatus setzen.
 pcpts.change.status.success = Bezahlstatus geändert.
+
+pcpts.no.bookings = Keine Buchungen.
+
+pcpts.week.details = Wochenübersicht

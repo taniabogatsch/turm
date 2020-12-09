@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -347,9 +348,10 @@ func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) re
 }
 
 /*Days renders all slots of each day of a week. */
-func (c Participants) Days(ID, shift int, monday string) revel.Result {
+func (c Participants) Days(ID, eventID, shift int, t string) revel.Result {
 
-	c.Log.Debug("load slots of days of week", "ID", ID, "shift", shift, "monday", monday)
+	c.Log.Debug("load slots of days of week", "ID", ID, "eventID", eventID,
+		"shift", shift, "t", t)
 
 	loc, err := time.LoadLocation(app.TimeZone)
 	if err != nil {
@@ -359,23 +361,56 @@ func (c Participants) Days(ID, shift int, monday string) revel.Result {
 		return c.Render()
 	}
 
-	t, err := time.ParseInLocation("2006-01-02T15:04:05-07:00", monday, loc)
+	monday, err := time.ParseInLocation("2006-01-02T15:04:05-07:00", t, loc)
 	if err != nil {
-		c.Log.Error("failed to parse string to time", "monday", monday,
+		c.Log.Error("failed to parse string to time", "t", t,
 			"loc", loc, "error", err.Error())
 		renderQuietError(errTypeConv, err, c.Controller)
 		return c.Render()
 	}
 
-	t = t.AddDate(0, 0, shift*7)
+	monday = monday.AddDate(0, 0, shift*7)
+	_, week := monday.ISOWeek()
+	year := monday.Year()
 
 	days := models.Days{}
-	if err = days.Get(nil, &ID, t, true); err != nil {
+	if err = days.Get(nil, &eventID, monday, true); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
 
-	return c.Render(days)
+	return c.Render(days, ID, eventID, monday, week, year)
+}
+
+/*DeleteSlot removes an slot. */
+func (c Participants) DeleteSlot(ID, eventID, slotID int, t string) revel.Result {
+
+	c.Log.Debug("manually delete a slot", "ID", ID, "eventID", eventID,
+		"slotID", slotID, "t", t)
+
+	//delete slot
+	slot := models.Slot{ID: slotID}
+	fmt.Println(slot)
+
+	//TODO
+	/*
+		data, err := slot.DeleteManual()
+		if err != nil {
+			return flashError(errDB, err, "", c.Controller, "")
+		}
+
+		//send e-mail to the user
+		err = sendEMail(c.Controller, &data,
+			"email.subject.from.slot",
+			"manualRemove")
+
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+		}
+	*/
+
+	c.Flash.Success(c.Message("enroll.manual.delete.slot.success"))
+	return c.Redirect(Participants.Days, ID, eventID, 0, t)
 }
 
 func createCSV(c *revel.Controller, participants *models.Participants,

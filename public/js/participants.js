@@ -49,3 +49,27 @@ function openChangeStatusModal(eventID, userID, status) {
 
   $('#change-status-modal').modal('show');
 }
+
+function renderDays(ID, eventID, shift, monday, action) {
+
+  $.get(action, {
+    "ID": ID,
+    "eventID": eventID,
+    "shift": shift,
+    "t": monday
+  }, function(data) {
+    $('#participants-slots-days-' + eventID).html(data);
+  })
+}
+
+function deleteSlot(ID, eventID, slotID, monday, action) {
+
+  $.get(action, {
+    "ID": ID,
+    "eventID": eventID,
+    "slotID": slotID,
+    "t": monday
+  }, function(data) {
+    $('#participants-slots-days-' + eventID).html(data);
+  })
+}

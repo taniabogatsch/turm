@@ -160,11 +160,11 @@ email.subject.manual.wait.list = Turm2 - Information zum manuellen Einschreiben 
 email.subject.manual.unsubscribed = Turm2 - Information zum manuellen Austragen
 email.subject.change.status = Turm2 - Ihr Bezahlstatus wurde geändert
 email.subject.change.pw = Turm2 - Ihr Passwort wurde geändert
-email.subject.from.slot = Turm2 - Ihre Buchung wurde manuell entfernt
+email.subject.from.slot = Turm2 - Ihre Buchung wurde manuell storniert
 email.subject.new.course.role = Turm2 - Neue Kursrolle
 email.subject.course.role.deleted = Turm2 - Kursrolle gelöscht
 email.subject.course.role.authorization = Turm2 - Kursberechtigungen geändert
-email.subject.enroll.slot = Turm2 - Buchung erfolgreich.
+email.subject.enroll.slot = Turm2 - Buchung erfolgreich
 email.subject.unsubscribe.from.slot = Turm2 - Stornierung Ihrer Buchung
 
 email.edit.info.bold = Der Kurs/Die Veranstaltung ist bereits aktiv!
@@ -232,6 +232,7 @@ enroll.end.time = Bis
 enroll.manual.success = Manuelle Einschreibung erfolgreich.
 enroll.manual.unsubscribe.success = Manuelles austragen erfolgreich.
 enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste erfolgreich.
+enroll.manual.delete.slot.success = Manuelles Löschen der Buchung erfolgreich.
 
 # -------------------------------------------------------------------------------------------------- #
 # TITLES
@@ -270,3 +271,5 @@ title.edit.course = Kurs bearbeiten
 
 title.shift.previous = Vorherige Woche
 title.shift.next = Nächste Woche
+
+title.remove.slot = Buchung entfernen

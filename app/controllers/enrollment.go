@@ -26,12 +26,10 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 	enrolled := models.Enrolled{EventID: ID, UserID: userID}
 	data, waitList, _, msg, err := enrolled.EnrollOrUnsubscribe(models.ENROLL, key)
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	} else if msg != "" {
 		c.Validation.ErrorKey(msg)
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	//send e-mail to the user
