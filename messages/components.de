@@ -226,6 +226,8 @@ enroll.status.freed = Befreit
 enroll.status.unsubscribed = Ausgetragen
 
 enroll.time = Einschreibezeitpunkt
+enroll.start.time = Von
+enroll.end.time = Bis
 
 enroll.manual.success = Manuelle Einschreibung erfolgreich.
 enroll.manual.unsubscribe.success = Manuelles austragen erfolgreich.

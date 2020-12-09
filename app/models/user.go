@@ -45,6 +45,8 @@ type User struct {
 	//used for profile page
 	ActiveEnrollments  Enrollments
 	ExpiredEnrollments Enrollments
+	ActiveSlots        Enrollments
+	ExpiredSlots       Enrollments
 }
 
 /*Validate User fields of newly registered users. */
@@ -165,7 +167,17 @@ func (user *User) GetProfileData() (err error) {
 		return
 	}
 
-	//TODO: get all calendar slots
+	//TODO: get active and expired Slots if an user
+	//get all active slots
+	err = user.ActiveSlots.SelectSlotsByUser(tx, &user.ID, false)
+	if err != nil {
+		return
+	}
+	//get all expired slots
+	err = user.ExpiredSlots.SelectSlotsByUser(tx, &user.ID, true)
+	if err != nil {
+		return
+	}
 
 	tx.Commit()
 	return
