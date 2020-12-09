@@ -149,9 +149,11 @@
         <div class="collapse select-option select-option-{{.ID}}">
 
           <!-- event information -->
-          {{msg $ "user.participants"}}: {{.Fullness}}/{{.Capacity}}
+          {{if not .IsCalendarEvent}}
+            {{msg $ "user.participants"}}: {{.Fullness}}/{{.Capacity}}
+            {{if .Annotation.Valid}}<br>{{end}}
+          {{end}}
           {{if .Annotation.Valid}}
-            <br>
             {{msg $ "event.annotation"}}: {{.Annotation.String}}
           {{end}}
           <hr>
@@ -183,40 +185,51 @@
           <br>
           <div id="user-search-results-{{$k}}"></div>
 
-          <!-- participants -->
-          {{if .Participants}}
-            <h5>
-              {{template "icons/people.html" . }}
-              &nbsp; {{msg $ "pcpts.participants.list"}}
-            </h5>
-            <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
-            <hr>
-            <br>
-          {{end}}
-
-          <!-- wait list -->
-          {{if .Waitlist}}
-            {{if .HasWaitlist}}
+          {{if not .IsCalendarEvent}}
+            <!-- participants -->
+            {{if .Participants}}
               <h5>
-                {{template "icons/clock.html" . }}
-                &nbsp; {{msg $ "pcpts.wait.list"}}
+                {{template "icons/people.html" . }}
+                &nbsp; {{msg $ "pcpts.participants.list"}}
               </h5>
               <hr>
-              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
+              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Participants "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
               <hr>
               <br>
             {{end}}
-          {{end}}
 
-          <!-- unsubscribed users -->
-          {{if .Unsubscribed}}
+            <!-- wait list -->
+            {{if .Waitlist}}
+              {{if .HasWaitlist}}
+                <h5>
+                  {{template "icons/clock.html" . }}
+                  &nbsp; {{msg $ "pcpts.wait.list"}}
+                </h5>
+                <hr>
+                {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Waitlist "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
+                <hr>
+                <br>
+              {{end}}
+            {{end}}
+
+            <!-- unsubscribed users -->
+            {{if .Unsubscribed}}
+              <h5>
+                {{template "icons/arrowRightIn.html" . }}
+                &nbsp; {{msg $ "pcpts.unsubscribed"}}
+              </h5>
+              <hr>
+              {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
+            {{end}}
+
+          {{else}}
             <h5>
-              {{template "icons/arrowRightIn.html" . }}
-              &nbsp; {{msg $ "pcpts.unsubscribed"}}
+              Wochenübersicht
             </h5>
             <hr>
-            {{template "participants/list.html" dict_addLocale $.currentLocale "list" .Unsubscribed "ID" .CourseID "eventID" .ID "hasWaitlist" .HasWaitlist}}
+            {{template "participants/days.html" dict_addLocale $.currentLocale "days" .Days}}
+            <hr>
+            <br>
           {{end}}
 
         </div>

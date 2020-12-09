@@ -83,6 +83,14 @@ event.calendar.fr = Fr
 event.calendar.sa = Sa
 event.calendar.so = So
 
+event.calendar.monday = Monday
+event.calendar.tuesday = Tuesday
+event.calendar.wednesday = Wednesday
+event.calendar.thursday = Thursday
+event.calendar.friday = Friday
+event.calendar.saturday = Saturday
+event.calendar.sunday = Sunday
+
 event.calendar.legend = Legend
 
 event.calendar.slot.booking = Booking

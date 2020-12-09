@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"strconv"
 	"strings"
+	"time"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -81,31 +82,31 @@ type ParticipantLists []ParticipantList
 
 /*ParticipantList of an event. */
 type ParticipantList struct {
-	ID          int            `db:"id, primarykey, autoincrement"`
-	CourseID    int            `db:"course_id"`
-	Capacity    int            `db:"capacity"`
-	HasWaitlist bool           `db:"has_waitlist"`
-	Title       string         `db:"title"`
-	Annotation  sql.NullString `db:"annotation"`
 
-	//Fullness is the number of users that enrolled in this event
-	Fullness int ``
-	//Percentage is (Fullness * 100) / Capacity
-	Percentage int ``
+	//general event information
+	Event
 
 	//all participant lists of the event
 	Participants Entries
 	Waitlist     Entries
 	Unsubscribed Entries
+
+	//additional calendar event information
+	IsCalendarEvent bool `db:"is_calendar_event"`
+	Monday          time.Time
+	Week            int
+	Year            int
+	//day templates for this week [0...6]
+	Days Days
 }
 
 /*Get all participant lists of a course. */
-func (lists *ParticipantLists) Get(tx *sqlx.Tx, partsID *int, viewMatrNr bool) (err error) {
+func (lists *ParticipantLists) Get(tx *sqlx.Tx, courseID *int, viewMatrNr bool) (err error) {
 
 	//get event data for lists
-	err = tx.Select(lists, stmtSelectEventListsData, *partsID)
+	err = tx.Select(lists, stmtSelectEventData, *courseID)
 	if err != nil {
-		log.Error("failed to get event lists data", "partsID", *partsID,
+		log.Error("failed to get event lists data", "courseID", *courseID,
 			"error", err.Error())
 		tx.Rollback()
 		return
@@ -114,25 +115,50 @@ func (lists *ParticipantLists) Get(tx *sqlx.Tx, partsID *int, viewMatrNr bool) (
 	//get the lists for each event
 	for key, list := range *lists {
 
-		//set the percentage field
-		(*lists)[key].Percentage = (list.Fullness * 100) / list.Capacity
+		if list.IsCalendarEvent { //get all slots of the current week
 
-		//participants list
-		if err = (*lists)[key].Participants.Get(tx, "participants", &list.ID, viewMatrNr); err != nil {
-			return
-		}
+			//get the last (current) monday
+			now := time.Now()
+			weekday := time.Now().Weekday()
+			monday := now.AddDate(0, 0, -1*(int(weekday)-1))
 
-		//wait list (if exists)
-		if (*lists)[key].HasWaitlist {
-			if err = (*lists)[key].Waitlist.Get(tx, "waitlist", &list.ID, viewMatrNr); err != nil {
+			//set the current week
+			(*lists)[key].Monday = monday
+			_, (*lists)[key].Week = monday.ISOWeek()
+			(*lists)[key].Year = monday.Year()
+
+			//get the slots of each day
+			err = (*lists)[key].Days.Get(tx, &list.ID, monday, true)
+			if err != nil {
+				return
+			}
+
+		} else { //get all user lists for normal events
+
+			//set the percentage field
+			(*lists)[key].Percentage = (list.Fullness * 100) / list.Capacity
+
+			//participants list
+			err = (*lists)[key].Participants.Get(tx, "participants", &list.ID, viewMatrNr)
+			if err != nil {
+				return
+			}
+
+			//wait list (if exists)
+			if (*lists)[key].HasWaitlist {
+				err = (*lists)[key].Waitlist.Get(tx, "waitlist", &list.ID, viewMatrNr)
+				if err != nil {
+					return
+				}
+			}
+
+			//get unsubscribed list
+			err = (*lists)[key].Unsubscribed.Get(tx, "unsubscribed", &list.ID, viewMatrNr)
+			if err != nil {
 				return
 			}
 		}
 
-		//get unsubscribed list
-		if err = (*lists)[key].Unsubscribed.Get(tx, "unsubscribed", &list.ID, viewMatrNr); err != nil {
-			return
-		}
 	}
 	return
 }
@@ -258,10 +284,10 @@ const (
     WHERE id = $1
   `
 
-	stmtSelectEventListsData = `
-    SELECT
+	stmtSelectEventData = `
+    (SELECT
       e.id, e.course_id, e.capacity, e.has_waitlist,
-      e.title,
+      e.title, e.annotation, false AS is_calendar_event,
       (
         SELECT COUNT(en.user_id)
         FROM enrolled en
@@ -269,8 +295,18 @@ const (
           AND status != 1 /*on waitlist*/
       ) AS fullness
     FROM events e
-    WHERE e.course_id = $1
-		ORDER BY e.id ASC
+    WHERE e.course_id = $1)
+
+		UNION ALL
+
+		(SELECT
+			e.id, e.course_id, 0 AS capacity, false AS has_waitlist,
+			e.title, e.annotation, true AS is_calendar_event,
+			0 AS fullness
+		FROM calendar_events e
+		WHERE e.course_id = $1)
+
+		ORDER BY id ASC
   `
 
 	stmtSelectParticipants = `

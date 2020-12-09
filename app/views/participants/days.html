@@ -1,0 +1,46 @@
+<!-- template rendering all slots of each day of a week -->
+
+<!-- range each week day and list day templates -->
+{{range $k, $v := .days}}
+
+  <button class="btn list-group-item w-100 text-left" aria-controls="week-day-{{$k}}"
+    type="button" data-toggle="collapse" data-target="#week-day-{{$k}}" aria-expanded="false">
+
+    {{if eq $k 0}}
+      {{msg $ "event.calendar.monday"}}
+    {{else if eq $k 1}}
+      {{msg $ "event.calendar.tuesday"}}
+    {{else if eq $k 2}}
+      {{msg $ "event.calendar.wednesday"}}
+    {{else if eq $k 3}}
+      {{msg $ "event.calendar.thursday"}}
+    {{else if eq $k 4}}
+      {{msg $ "event.calendar.friday"}}
+    {{else if eq $k 5}}
+      {{msg $ "event.calendar.saturday"}}
+    {{else}}
+      {{msg $ "event.calendar.sunday"}}
+    {{end}}
+  </button>
+
+  <div class="row">
+    <div class="col">
+      <div class="collapse multi-collapse" id="week-day-{{$k}}">
+        <div class="card card-body">
+
+          {{range .DayTmpls}}
+
+            {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+            {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}} <br>
+            <hr>
+            SLOTS
+            {{range .Slots}}
+              {{.}}
+            {{end}}
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{{end}}

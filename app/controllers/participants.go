@@ -346,6 +346,38 @@ func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) re
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
+/*Days renders all slots of each day of a week. */
+func (c Participants) Days(ID, shift int, monday string) revel.Result {
+
+	c.Log.Debug("load slots of days of week", "ID", ID, "shift", shift, "monday", monday)
+
+	loc, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		c.Log.Error("failed to parse location", "loc", app.TimeZone,
+			"error", err.Error())
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	t, err := time.ParseInLocation("2006-01-02T15:04:05-07:00", monday, loc)
+	if err != nil {
+		c.Log.Error("failed to parse string to time", "monday", monday,
+			"loc", loc, "error", err.Error())
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	t = t.AddDate(0, 0, shift*7)
+
+	days := models.Days{}
+	if err = days.Get(nil, &ID, t, true); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(days)
+}
+
 func createCSV(c *revel.Controller, participants *models.Participants,
 	conf *models.ListConf) (filepath string, err error) {
 

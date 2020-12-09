@@ -21,6 +21,9 @@ type Slot struct {
 	//date + time
 	Start time.Time `db:"start_time"`
 	End   time.Time `db:"end_time"`
+
+	//used for participants management
+	User User
 }
 
 /*Insert a new slot. */

@@ -8,11 +8,17 @@ import (
 	"github.com/revel/revel"
 )
 
-/*DayTmpls of a week for each day. */
-type DayTmpls []TmplsOfDay
+/*Days of a week. */
+type Days []Day
 
-/*TmplsOfDay contains all day templates of a specific week day. */
-type TmplsOfDay []DayTmpl
+/*Day contains all day templates of a specific week day. */
+type Day struct {
+	Date     string
+	DayTmpls DayTmpls
+}
+
+/*DayTmpls holds all day templates of a specific week day. */
+type DayTmpls []DayTmpl
 
 /*DayTmpl is a section of a week day (Monday - Sunday). */
 type DayTmpl struct {
@@ -226,18 +232,33 @@ func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 	return
 }
 
-/*Get all day templates of a CalendarEvent for a specific week. */
-func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Time) (err error) {
+/*Get all days of a calendar event for a specific week. */
+func (days *Days) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Time,
+	participants bool) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	weekDay := monday
 
 	//init a slice for each week day
-	*dayTmpls = append(*dayTmpls, TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{},
-		TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{}, TmplsOfDay{})
+	*days = append(*days, Day{}, Day{}, Day{}, Day{}, Day{}, Day{}, Day{})
 
 	//iterate week days
 	for i := 0; i < 7; i++ {
 
+		//set the date
+		(*days)[i].Date = weekDay.Format("02.01.")
+		weekDay = weekDay.AddDate(0, 0, 1)
+
 		//get templates of each day
-		err = tx.Select(&(*dayTmpls)[i], stmtSelectDayTmpls, *calendarEventID, i)
+		err = tx.Select(&(*days)[i].DayTmpls, stmtSelectDayTmpls, *calendarEventID, i)
 		if err != nil {
 			log.Error("failed to get day tmpls by week day", "calendarEventID",
 				*calendarEventID, "i", i, "error", err.Error())
@@ -245,18 +266,39 @@ func (dayTmpls *DayTmpls) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Tim
 			return
 		}
 
-		//get slots
-		for j := range (*dayTmpls)[i] {
-			err = ((*dayTmpls)[i])[j].Slots.Get(tx, ((*dayTmpls)[i])[j].ID, monday, i)
+		for j := range (*days)[i].DayTmpls {
+
+			//get slots
+			err = ((*days)[i].DayTmpls)[j].Slots.Get(tx, ((*days)[i].DayTmpls)[j].ID, monday, i)
 			if err != nil {
 				return
 			}
-			if ((*dayTmpls)[i])[j].EndTime == "00:00" {
-				((*dayTmpls)[i])[j].EndTime = "24:00"
+
+			//format time
+			if ((*days)[i].DayTmpls)[j].EndTime == "00:00" {
+				((*days)[i].DayTmpls)[j].EndTime = "24:00"
 			}
+
+			//TODO: get if user is allowed to view matriculation numbers
+
+			if participants {
+
+				//get detailed user information
+				for idx, slot := range ((*days)[i].DayTmpls)[j].Slots {
+					((*days)[i].DayTmpls)[j].Slots[idx].User.ID = slot.UserID
+					err = ((*days)[i].DayTmpls)[j].Slots[idx].User.Get(tx)
+					if err != nil {
+						return
+					}
+				}
+			}
+
 		}
 	}
 
+	if txWasNil {
+		tx.Commit()
+	}
 	return
 }
 

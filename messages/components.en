@@ -266,5 +266,5 @@ title.edit.activate = Activate course
 title.edit.expire = Change course status to expired
 title.edit.course = Edit course
 
-title.shift.left = Previous week
-title.shift.right = Next week
+title.shift.previous = Previous week
+title.shift.next = Next week

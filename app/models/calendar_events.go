@@ -27,7 +27,7 @@ type CalendarEvent struct {
 	Year   int
 
 	//day templates for this week [0...6]
-	Days DayTmpls
+	Days Days
 
 	//all upcoming exceptions
 	Exceptions Exceptions
@@ -71,8 +71,8 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 
 	for i := range *events {
 
-		//get all day templates of this event
-		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, monday)
+		//get all day templates of each week day of this event
+		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, monday, false)
 		if err != nil {
 			return
 		}
@@ -126,7 +126,7 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 	}
 
 	//get all day templates of this event
-	if err = event.Days.Get(tx, &event.ID, monday); err != nil {
+	if err = event.Days.Get(tx, &event.ID, monday, false); err != nil {
 		return
 	}
 
@@ -179,89 +179,87 @@ func (event *CalendarEvent) Delete() (err error) {
 
 func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
 
-	day := monday
-
 	//prepare a schedule for the whole week by looping all day templates and
 	//their slots for each day respectively
-	for _, tmplsOfDay := range event.Days {
+	for _, day := range event.Days {
 
-		inPast := day.Before(time.Now())
+		inPast := monday.Before(time.Now())
 
 		//generate blocked and free blocks of this schedule
-		schedule := Schedule{Date: day.Format("02.01."), InPast: inPast}
-		day = day.AddDate(0, 0, 1)
+		schedule := Schedule{Date: monday.Format("02.01."), InPast: inPast}
+		monday = monday.AddDate(0, 0, 1)
 
-		if len(tmplsOfDay) != 0 {
+		if len(day.DayTmpls) != 0 {
 
 			//set blocked slot from 0 to start of the first day template
-			if tmplsOfDay[0].StartTime != "00:00" {
+			if day.DayTmpls[0].StartTime != "00:00" {
 				schedule.Entries = append(schedule.Entries,
-					ScheduleEntry{"00:00", tmplsOfDay[0].StartTime, 0, BLOCKED, "0", 0})
+					ScheduleEntry{"00:00", day.DayTmpls[0].StartTime, 0, BLOCKED, "0", 0})
 			}
 
 			//insert all slots and free spaces of a day template and
 			//the blocked space between this day template and the next day template
-			for i := range tmplsOfDay {
+			for i := range day.DayTmpls {
 
 				//if two day templates are not exactly subsequent to each other,
 				//then insert a BLOCKED schedule entry
 				if i != 0 {
 
-					if tmplsOfDay[i].StartTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+					if day.DayTmpls[i].StartTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
 						schedule.Entries = append(schedule.Entries,
 							ScheduleEntry{
 								schedule.Entries[len(schedule.Entries)-1].EndTime,
-								tmplsOfDay[i].StartTime,
+								day.DayTmpls[i].StartTime,
 								0, BLOCKED, "0", 0},
 						)
 					}
 				}
 
 				//insert all BOOKED and FREE schedule entries for the current day template
-				for j := range tmplsOfDay[i].Slots {
+				for j := range day.DayTmpls[i].Slots {
 
 					//get start time as string
-					slotStart := CustomTime{"", tmplsOfDay[i].Slots[j].Start.Hour(),
-						tmplsOfDay[i].Slots[j].Start.Minute()}
+					slotStart := CustomTime{"", day.DayTmpls[i].Slots[j].Start.Hour(),
+						day.DayTmpls[i].Slots[j].Start.Minute()}
 					slotStart.String()
 
 					//get end time as string
-					slotEnd := CustomTime{"", tmplsOfDay[i].Slots[j].End.Hour(),
-						tmplsOfDay[i].Slots[j].End.Minute()}
+					slotEnd := CustomTime{"", day.DayTmpls[i].Slots[j].End.Hour(),
+						day.DayTmpls[i].Slots[j].End.Minute()}
 					slotEnd.String()
 
 					//check if there is free space before the first BOOKED slot
 					if j == 0 {
 						//insert FREE schedule entry
-						if tmplsOfDay[i].StartTime != slotStart.Value {
-							schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE, "0", 0})
+						if day.DayTmpls[i].StartTime != slotStart.Value {
+							schedule.Entries = append(schedule.Entries, ScheduleEntry{day.DayTmpls[i].StartTime,
+								slotStart.Value, day.DayTmpls[i].Interval, FREE, "0", 0})
 						}
 					} else {
 						//check for FREE space between two slots
 						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-								slotStart.Value, tmplsOfDay[i].Interval, FREE, "0", 0})
+								slotStart.Value, day.DayTmpls[i].Interval, FREE, "0", 0})
 						}
 					}
 
 					//insert slot as schedule entry
 					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
-						tmplsOfDay[i].Interval, SLOT,
-						strconv.Itoa(tmplsOfDay[i].Slots[j].UserID),
-						tmplsOfDay[i].Slots[j].ID})
+						day.DayTmpls[i].Interval, SLOT,
+						strconv.Itoa(day.DayTmpls[i].Slots[j].UserID),
+						day.DayTmpls[i].Slots[j].ID})
 
 				} //end of for loop of slots
 
 				if len(schedule.Entries) > 0 {
 					//check for FREE space from the last slot to the end of the day template
-					if tmplsOfDay[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
+					if day.DayTmpls[i].EndTime != schedule.Entries[len(schedule.Entries)-1].EndTime {
 						schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-							tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, "0", 0})
+							day.DayTmpls[i].EndTime, day.DayTmpls[i].Interval, FREE, "0", 0})
 					}
 				} else {
-					schedule.Entries = append(schedule.Entries, ScheduleEntry{tmplsOfDay[i].StartTime,
-						tmplsOfDay[i].EndTime, tmplsOfDay[i].Interval, FREE, "0", 0})
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{day.DayTmpls[i].StartTime,
+						day.DayTmpls[i].EndTime, day.DayTmpls[i].Interval, FREE, "0", 0})
 				}
 
 			} //end of for loop of day templates
@@ -513,7 +511,6 @@ func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.T
 	exceptStart bool) (sTime string) {
 
 	if interval == 0 {
-		//TODO: this looks ugly
 		return prettyTime(exceptTime.Hour()) + ":" + prettyTime(exceptTime.Minute())
 	}
 
