@@ -35,15 +35,15 @@
       <!-- active slots -->
       <a class="nav-link btn-outline-darkblue m-1" id="v-pills-activeSlots-tab" data-toggle="pill"
         href="#v-pills-activeSlots" role="tab" aria-controls="v-pills-activeSlots" aria-selected="false">
-        {{template "icons/archive.html" . }}<!-- TODO: icon -->
-        &nbsp; {{msg $ "profile.activeSlots.events"}} <!-- TODO: messages -->
+        {{template "icons/calendar2Check.html" . }}
+        &nbsp; {{msg $ "profile.activeSlots.events"}}
       </a>
 
       <!-- expired slots -->
       <a class="nav-link btn-outline-darkblue m-1" id="v-pills-expiredSlots-tab" data-toggle="pill"
         href="#v-pills-expiredSlots" role="tab" aria-controls="v-pills-expiredSlots" aria-selected="false">
-        {{template "icons/archive.html" . }}<!-- TODO: icon -->
-        &nbsp; {{msg $ "profile.expiredSlots.events"}} <!-- TODO: messages -->
+        {{template "icons/calendar2x.html" . }}
+        &nbsp; {{msg $ "profile.expiredSlots.events"}}
       </a>
     </div>
   </div>
@@ -268,13 +268,13 @@
       {{end}}
     </div>
 
-    <!-- active Slots -->
+    <!-- active slots -->
     <div class="tab-pane fade" id="v-pills-activeSlots" role="tabpanel"
       aria-labelledby="v-pills-activeSlots-tab">
 
       <!-- header icon + section name -->
       <h4>
-        {{template "icons/layoutTextSidebarReversed.html" . }}
+        {{template "icons/calendar2Check.html" . }}
         &nbsp; {{msg $ "profile.activeSlots.events"}}
       </h4>
       <hr>
@@ -291,12 +291,12 @@
       {{end}}
     </div>
 
-    <!-- expired Slots -->
+    <!-- expired slots -->
     <div class="tab-pane fade" id="v-pills-expiredSlots" role="tabpanel"
       aria-labelledby="v-pills-expired-tab">
 
       <h4>
-        {{template "icons/archive.html" . }}
+        {{template "icons/calendar2x.html" . }}
         &nbsp; {{msg $ "profile.expiredSlots.events"}}
       </h4>
       <hr>
