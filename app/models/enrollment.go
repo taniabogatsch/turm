@@ -21,6 +21,9 @@ type Enrolled struct {
 	CourseID    int    `db:"course_id"`
 	CourseTitle string `db:"course_title"`
 	EventTitle  string `db:"event_title"`
+
+	Start string `db:"start"`
+	End   string `db:"end"`
 }
 
 /*SelectByCourse selects all enrollments of a user for a specific course. */
@@ -44,6 +47,26 @@ func (enrollments *Enrollments) SelectByUser(tx *sqlx.Tx, userID *int, expired b
 			app.TimeZone)
 	} else {
 		err = tx.Select(enrollments, stmtSelectUserEnrollments, *userID,
+			app.TimeZone)
+	}
+
+	if err != nil {
+		log.Error("failed to select user enrollments", "userID", *userID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+/*SelectSlotsByUser returns all slot enrollments of a user. */
+func (enrollments *Enrollments) SelectSlotsByUser(tx *sqlx.Tx, userID *int, expired bool) (err error) {
+
+	if expired {
+		err = tx.Select(enrollments, stmtSelectUserSlotEnrollmentsExpired, *userID,
+			app.TimeZone)
+	} else {
+		err = tx.Select(enrollments, stmtSelectUserSlotEnrollments, *userID,
 			app.TimeZone)
 	}
 
@@ -789,4 +812,30 @@ const (
 			AND current_timestamp < expiration_date
 		ORDER BY time_of_enrollment DESC
 	`
+
+	stmtSelectUserSlotEnrollmentsExpired = `
+		SELECT s.user_id, ce.id AS event_id, c.title AS course_title,
+			ce.title AS event_title, c.id AS course_id,
+		TO_CHAR (s.start_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS start,
+		TO_CHAR (s.end_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS end
+		FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
+			JOIN calendar_events ce ON t.calendar_event_id = ce.id
+			JOIN courses c ON ce.course_id = c.id
+		WHERE s.user_id = $1
+			AND s.end_time <= now()
+		ORDER BY s.start_time DESC
+	`
+
+	stmtSelectUserSlotEnrollments = `
+		SELECT s.user_id, ce.id AS event_id, c.title AS course_title,
+			ce.title AS event_title, c.id AS course_id,
+		TO_CHAR (s.start_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS start,
+		TO_CHAR (s.end_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS end
+		FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
+			JOIN calendar_events ce ON t.calendar_event_id = ce.id
+			JOIN courses c ON ce.course_id = c.id
+		WHERE s.user_id = $1
+			AND s.end_time > now()
+		ORDER BY s.start_time ASC
+		`
 )

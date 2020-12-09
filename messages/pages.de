@@ -152,6 +152,10 @@ profile.active.events = Aktive Veranstaltungen
 profile.active.events.none = Keine aktiven Veranstaltungen.
 profile.expired.events = Abgelaufene Veranstaltungen
 profile.expired.events.none = Keine abgelaufenen Veranstaltungen.
+profile.activeSlots.events = Aktive Kalender Veranstaltungen
+profile.active.events.none = Keine aktiven Kalender Veranstaltungen.
+profile.expiredSlots.events = Abgelaufene Kalender Veranstaltungen
+profile.expired.events.none = Keine abgelaufenen Kalender Veranstaltungen.
 
 profile.change.pw = Passwort ändern
 profile.change.pw.success = Passwort geändert.

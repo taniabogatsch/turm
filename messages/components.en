@@ -226,6 +226,8 @@ enroll.status.freed = Freed
 enroll.status.unsubscribed = Unsubscribed
 
 enroll.time = Time of enrollment
+enroll.start.time = Start
+enroll.end.time = End
 
 enroll.manual.success = Manually enrolled user.
 enroll.manual.unsubscribe.success = User was unsubscribed.
