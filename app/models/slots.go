@@ -120,6 +120,12 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx, calendarEventID int
 	dayTmpls := []DayTmpl{}
 	weekday := int(slot.Start.Weekday()) - 1
 
+	//the weekday time.Weekday function is 1 greater than our weekDay
+	//to compare we have to subtract one (so sundays 0 has to become 7)
+	if weekday == -1 {
+		weekday = 6
+	}
+
 	err = tx.Select(&dayTmpls, stmtSelectDayTemplatesFromWeekDay, weekday, calendarEventID)
 	if err != nil {
 		log.Error("failed to get day template from week day", "calendarEventID",
