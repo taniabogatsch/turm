@@ -5,7 +5,7 @@
     <div class="modal-content">
 
       <!-- form -->
-      <form accept-charset="UTF-8" method="GET" class="needs-validation"
+      <form accept-charset="UTF-8" method="GET" class="needs-validation" id="book-slot-modal-form"
         action='{{url "Enrollment.EnrollInSlot"}}' novalidate>
 
         <!-- modal header -->
@@ -21,18 +21,22 @@
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- calendar event ID -->
+          <!-- calendar event ID, year -->
           <input type="hidden" name="ID" id="book-slot-modal-ID">
           <input type="hidden" name="year" id="book-slot-modal-year">
+          <input type="hidden" name="monday" id="book-slot-modal-monday">
+          <input type="hidden" name="date" id="book-slot-modal-date">
 
+          <!-- date -->
           <div class="d-inline"> {{msg $ "event.calendar.slot.date"}}: </div>
           <div class="d-inline" id="book-slot-modal-date-div"></div>
-          <input type="hidden" name="date" id="book-slot-modal-date">
           <br>
-          <br>
+          <div id="book-slot-modal-time-spans">
+          </div>
 
-          <!-- start time -->
           <div class="row">
+
+            <!-- start time -->
             <div class="col-sm-6">
               <small class="text-muted form-text">
                 {{msg $ "meeting.from.time"}}
@@ -84,3 +88,27 @@
     </div>
   </div>
 </div>
+
+<script>
+  $('#book-slot-modal-form').submit(function (event) {
+
+    $.ajax({
+      type: 'GET',
+      url: $('#book-slot-modal-form').attr("action"),
+      data: $('#book-slot-modal-form').serialize(),
+
+      success: function(response) {
+        let eventID = $('#book-slot-modal-ID').val();
+        $('#calendar-event-' + eventID).html(response);
+        $('#book-slot-modal').modal('hide');
+      },
+
+      error: function (error) {
+        showToast("error", 'danger');
+        $('#book-slot-modal').modal('hide');
+      },
+    });
+
+    event.preventDefault();
+  });
+</script>

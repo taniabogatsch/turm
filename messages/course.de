@@ -104,6 +104,8 @@ event.calendar.slot.date = Datum
 event.calendar.add.exception = Ausnahme hinzufügen
 event.calendar.list.exceptions = Aktuelle und anstehende Ausnahmen
 
+event.calendar.available.time.spans = Verfügbare Zeiten und deren Buchungsintervalle
+
 # -------------------------------------------------------------------------------------------------- #
 # MEETING FIELDS
 # -------------------------------------------------------------------------------------------------- #

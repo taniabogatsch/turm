@@ -557,6 +557,15 @@ func (user *User) HasElevatedRights(ID *int, table string) (authorized, expired 
 		}
 	}
 
+	if table == "calendar_events" {
+		err = tx.Get(ID, stmtGetCourseIDByCalendarEvent, *ID)
+		if err != nil {
+			log.Error("failed to get course ID by calendar event ID", "ID", *ID, "error", err.Error())
+			tx.Rollback()
+			return
+		}
+	}
+
 	err = tx.Get(&expired, stmtCourseExpired, *ID)
 	if err != nil {
 		log.Error("failed to get whether the course expired or not", "userID", user.ID,

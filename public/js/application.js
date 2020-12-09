@@ -192,12 +192,15 @@ function enterKeyModal(action, msg, ID) {
   $('#enter-enroll-key-modal').modal('show');
 }
 
-function bookSlotModal(calendarEventID, date, year) {
+function bookSlotModal(calendarEventID, date, year, weekDay, monday) {
 
   $('#book-slot-modal-ID').val(calendarEventID);
   $('#book-slot-modal-date').val(date)
   $('#book-slot-modal-date-div').html(date);
   $('#book-slot-modal-year').val(year);
+  $('#book-slot-modal-monday').val(monday);
+
+  $('#book-slot-modal-time-spans').html($('#pretty-time-spans-' + weekDay).html());
 
   //show the modal
   $('#book-slot-modal').modal('show');

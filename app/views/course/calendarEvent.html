@@ -268,11 +268,26 @@
                 <br>
                 <div class="text-center">
                   <button type="button" class="btn btn-success w-100 btn-sm" style="word-wrap:break-word;"
-                    onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}});'>
+                    onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}},
+                      {{$k}}, {{$.event.Monday}});'>
                     {{msg $ "button.book.slot"}}
                   </button>
                 </div>
                 <br>
+
+                <!-- create pretty html to be loaded in the book slot modal -->
+                <div id="pretty-time-spans-{{$k}}" class="d-none">
+                  <hr>
+                  {{msg $ "event.calendar.available.time.spans"}}: <br>
+                  <hr>
+                  {{range .Entries}}
+                    {{if eq .Type 0}}
+                      {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}}, {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                      <hr>
+                    {{end}}
+                  {{end}}
+                </div>
+
               {{end}}
             {{end}}
           </div>

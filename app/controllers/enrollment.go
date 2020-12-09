@@ -117,10 +117,11 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 /*EnrollInSlot to enroll into a time slot of a day in a calendar event.
 - Roles: logged in and activated users */
-func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) revel.Result {
+func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime,
+	date string, monday string) revel.Result {
 
 	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "year", year, "startTime",
-		startTime, "endTime", endTime, "date", date)
+		startTime, "endTime", endTime, "date", date, "monday", monday)
 
 	//TODO: redirect to calendar event render, do not reload the page, just this calendar event
 
@@ -181,7 +182,11 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) 
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	} else if c.Validation.HasErrors() {
-		return flashError(errValidation, nil, "", c.Controller, "")
+
+		//TODO: LIKE THIS !!!
+		return flashError(
+			errValidation, nil, "/course/meetings?ID="+strconv.Itoa(ID),
+			c.Controller, "")
 	}
 
 	//send e-mail to the user who enrolled
@@ -189,12 +194,11 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime, date string) 
 		"email.subject.enroll.slot",
 		"enrollToSlot")
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("event.enroll.success"))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.CalendarEvent, ID, data.CourseID, 0, monday)
 }
 
 /*UnsubscribeFromSlot deletes a slot of an user. */

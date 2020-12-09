@@ -143,14 +143,15 @@ func (c Course) auth() revel.Result {
 
 	if c.MethodName == "Meetings" {
 		authorized, expired, err = evalHasElevatedRights(c.Controller, "events")
+	} else if c.MethodName == "CalendarEvents" || c.MethodName == "CalendarEvent" {
+		authorized, expired, err = evalHasElevatedRights(c.Controller, "calendar_events")
 	} else {
 		authorized, expired, err = evalHasElevatedRights(c.Controller, "courses")
 	}
 
 	//only creators, editors and instructors can still see the course after it expired
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if expired && !authorized {
 		c.Flash.Error(c.Message("intercept.course.expired"))
 		return c.Redirect(App.Index)
