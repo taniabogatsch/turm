@@ -643,7 +643,10 @@ func (course *Course) Duplicate() (err error) {
 		return
 	}
 
-	//TODO: duplicate calendar events
+	//duplicate calendar events
+	if err = course.CalendarEvents.Duplicate(tx, &course.ID, &courseIDOld); err != nil {
+		return
+	}
 
 	//duplicate user lists
 	if err = course.Editors.Duplicate(tx, &course.ID, &courseIDOld, "editors"); err != nil {

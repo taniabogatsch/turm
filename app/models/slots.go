@@ -120,6 +120,12 @@ func (slot *Slot) validate(v *revel.Validation, tx *sqlx.Tx, calendarEventID int
 	dayTmpls := []DayTmpl{}
 	weekday := int(slot.Start.Weekday()) - 1
 
+	//the weekday time.Weekday function is 1 greater than our weekDay
+	//to compare we have to subtract one (so sundays 0 has to become 7)
+	if weekday == -1 {
+		weekday = 6
+	}
+
 	err = tx.Select(&dayTmpls, stmtSelectDayTemplatesFromWeekDay, weekday, calendarEventID)
 	if err != nil {
 		log.Error("failed to get day template from week day", "calendarEventID",
@@ -263,6 +269,16 @@ func (slot *Slot) Delete(v *revel.Validation) (data EMailData, err error) {
 	return
 }
 
+/*BelongsToEvent checks if a slot belongs to an event*/
+func (slot *Slot) BelongsToEvent(eventID int) (belongs bool, err error) {
+	err = app.Db.Select(&belongs, stmtExistInEvent, slot.ID, eventID)
+	if err != nil {
+		log.Error("failed to get all slots of a day template", "slot", slot,
+			"event ID", eventID, "error", err.Error())
+	}
+	return
+}
+
 const (
 	stmtInsertSlot = `
 		INSERT INTO slots (
@@ -332,5 +348,14 @@ const (
 		DELETE FROM slots
 		WHERE id = $1
 			AND user_id = $2
+	`
+
+	stmtExistInEvent = `
+		SELECT EXISTS(
+			SELECT true
+			FROM slots s JOIN day_templates t ON s.day_tmpl_id
+			WHERE t.calendar_event_id = $2
+				AND s.id = $1
+		) AS belongs
 	`
 )
