@@ -82,7 +82,7 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday in
 	startTime := monday.AddDate(0, 0, weekday)
 	endTime := startTime.Add(1000000000 * 60 * 60 * 24)
 
-	err = tx.Select(slots, stmtSelectSlots, dayTmplID, startTime, endTime)
+	err = tx.Select(slots, stmtSelectSlots, dayTmplID, startTime, endTime, app.TimeZone)
 	if err != nil {
 		log.Error("failed to get slots of day template on specific day", "dayTmplID", dayTmplID,
 			"startTime", startTime, "endTime", endTime, "weekday", weekday, "error", err.Error())
@@ -273,7 +273,45 @@ func (slot *Slot) Delete(v *revel.Validation) (data EMailData, err error) {
 
 /*DeleteManual manually deletes a slot. */
 func (slot *Slot) DeleteManual() (data EMailData, err error) {
-	//TODO
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	err = tx.Get(&slot.UserID, stmtGetUserID, slot.ID)
+	if err != nil {
+		log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get e-mail data
+	data.User.ID = slot.UserID
+	if err = data.User.Get(tx); err != nil {
+		return
+	}
+
+	err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//delete slot
+	_, err = tx.Exec(stmtDeleteSlotManually, slot.ID)
+	if err != nil {
+		log.Error("failed to delete the slot", "slot", *slot,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	return
 }
 
@@ -297,7 +335,9 @@ const (
 	`
 
 	stmtSelectSlots = `
-    SELECT id, user_id, day_tmpl_id, start_time, end_time, created
+    SELECT id, user_id, day_tmpl_id, start_time, end_time,
+		 TO_CHAR (start_time AT TIME ZONE $4, 'YYYY-MM-DD HH24:MI') AS start_str,
+		 TO_CHAR (end_time AT TIME ZONE $4, 'YYYY-MM-DD HH24:MI') AS end_str
     FROM slots
     WHERE day_tmpl_id = $1
       AND start_time BETWEEN ($2) AND ($3)
@@ -337,7 +377,8 @@ const (
 	`
 
 	stmtSelectAllSlotsOfDayTemplate = `
-		SELECT id, user_id, day_tmpl_id, start_time, end_time
+		SELECT id, user_id, day_tmpl_id, start_time, end_time,
+			start_time AS start_str, end_time AS end_str
 		FROM slots
 		WHERE day_tmpl_id = $1
 		ORDER BY start_time ASC
@@ -359,6 +400,11 @@ const (
 			AND user_id = $2
 	`
 
+	stmtDeleteSlotManually = `
+		DELETE FROM slots
+		WHERE id = $1
+	`
+
 	stmtSlotBelongsToEvent = `
 		SELECT EXISTS (
 			SELECT true
@@ -366,5 +412,11 @@ const (
 			WHERE t.calendar_event_id = $2
 				AND s.id = $1
 		) AS belongs
+	`
+
+	stmtGetUserID = `
+	SELECT user_id
+	FROM slots
+	WHERE id = $1
 	`
 )
