@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -390,24 +389,19 @@ func (c Participants) DeleteSlot(ID, eventID, slotID int, t string) revel.Result
 
 	//delete slot
 	slot := models.Slot{ID: slotID}
-	fmt.Println(slot)
+	data, err := slot.DeleteManual()
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	}
 
-	//TODO
-	/*
-		data, err := slot.DeleteManual()
-		if err != nil {
-			return flashError(errDB, err, "", c.Controller, "")
-		}
+	//send e-mail to the user
+	err = sendEMail(c.Controller, &data,
+		"email.subject.from.slot",
+		"manualRemove")
 
-		//send e-mail to the user
-		err = sendEMail(c.Controller, &data,
-			"email.subject.from.slot",
-			"manualRemove")
-
-		if err != nil {
-			return flashError(errEMail, err, "", c.Controller, data.User.EMail)
-		}
-	*/
+	if err != nil {
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+	}
 
 	c.Flash.Success(c.Message("enroll.manual.delete.slot.success"))
 	return c.Redirect(Participants.Days, ID, eventID, 0, t)

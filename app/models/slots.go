@@ -23,7 +23,9 @@ type Slot struct {
 	End   time.Time `db:"end_time"`
 
 	//used for participants management
-	User User
+	User     User
+	StartStr string `db:"start_str"`
+	EndStr   string `db:"end_str"`
 }
 
 /*Insert a new slot. */
@@ -269,11 +271,18 @@ func (slot *Slot) Delete(v *revel.Validation) (data EMailData, err error) {
 	return
 }
 
+/*DeleteManual manually deletes a slot. */
+func (slot *Slot) DeleteManual() (data EMailData, err error) {
+	//TODO
+	return
+}
+
 /*BelongsToEvent checks if a slot belongs to an event*/
 func (slot *Slot) BelongsToEvent(eventID int) (belongs bool, err error) {
-	err = app.Db.Select(&belongs, stmtExistInEvent, slot.ID, eventID)
+
+	err = app.Db.Get(&belongs, stmtSlotBelongsToEvent, slot.ID, eventID)
 	if err != nil {
-		log.Error("failed to get all slots of a day template", "slot", slot,
+		log.Error("failed to get if the slot belongs to the specified event", "slot", *slot,
 			"event ID", eventID, "error", err.Error())
 	}
 	return
@@ -350,10 +359,10 @@ const (
 			AND user_id = $2
 	`
 
-	stmtExistInEvent = `
-		SELECT EXISTS(
+	stmtSlotBelongsToEvent = `
+		SELECT EXISTS (
 			SELECT true
-			FROM slots s JOIN day_templates t ON s.day_tmpl_id
+			FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
 			WHERE t.calendar_event_id = $2
 				AND s.id = $1
 		) AS belongs

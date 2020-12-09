@@ -607,10 +607,8 @@ func evalElemBelongs(c *revel.Controller, param1, param2, table string) (belongs
 	case "meetings":
 		belongs, err = models.BelongsToElement(table, "event_id", "id", param1ID, param2ID)
 	case "slots":
-		//TODO remove comments once function exists
-		//slot := models.Slot{ID: param2ID}
-		//belongs, err = slot.BelongsToEvent(param1ID)
-		belongs = true
+		slot := models.Slot{ID: param2ID}
+		belongs, err = slot.BelongsToEvent(param1ID)
 	}
 
 	return
