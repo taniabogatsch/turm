@@ -689,12 +689,21 @@ const (
 			)
 
 		/* count the number of enrollments of the user in any of the children */
-		SELECT COUNT(DISTINCT ev.course_id) AS enrollments
-		FROM enrolled e JOIN
-			events ev ON e.event_id = ev.id JOIN
-			courses c ON ev.course_id = c.id JOIN
-			path p ON c.parent_id = p.id
-		WHERE e.user_id = $2
+		SELECT (
+			SELECT COUNT (DISTINCT ev.course_id)
+			FROM enrolled e JOIN events ev ON e.event_id = ev.id
+				JOIN courses c ON ev.course_id = c.id
+				JOIN path p ON c.parent_id = p.id
+			WHERE e.user_id = $2
+		) +
+		(
+			SELECT COUNT (DISTINCT e.course_id)
+			FROM slots s JOIN day_templates d ON s.day_tmpl_id = d.id
+				JOIN calendar_events e ON d.calendar_event_id = e.id
+				JOIN courses c ON e.course_id = c.id
+				JOIN path p ON c.parent_id = p.id
+			WHERE s.user_id = $2
+		) AS enrollments
 	`
 
 	stmtEnrollUser = `

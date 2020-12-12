@@ -36,9 +36,15 @@ type CalendarEvent struct {
 	ExceptionsOfWeek ExceptionsOfWeek
 	//transformed schedule for easy front end usage
 	ScheduleWeek []Schedule
+
+	//used for enrollment
+	NoEnroll      bool
+	NoUnsubscribe bool
+	EnrollMsg     string
+	UnsubMsg      string
 }
 
-/*NewBlank creates a new blank CalendarEvent. */
+/*NewBlank creates a new blank calendar event. */
 func (event *CalendarEvent) NewBlank() (err error) {
 
 	err = app.Db.Get(event, stmtInsertCalendarEvent, event.CourseID, event.Title)
@@ -49,7 +55,115 @@ func (event *CalendarEvent) NewBlank() (err error) {
 	return
 }
 
-/*Get all CalendarEvents by the provided monday. */
+/*Get a calendar event by its ID and a monday. */
+func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	//get general event information
+	err = tx.Get(event, stmtGetCalendarEvent, *courseID, event.ID)
+	if err != nil {
+		log.Error("failed to get calendar event of course", "monday", monday, "course ID", *courseID,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//get all day templates of this event
+	if err = event.Days.Get(tx, &event.ID, monday, false); err != nil {
+		return
+	}
+
+	//get the exceptions of each day of that week (as defined by monday)
+	if err = event.ExceptionsOfWeek.Get(tx, &event.ID, monday); err != nil {
+		return
+	}
+
+	//set the current week
+	event.Monday = monday
+	_, event.Week = monday.ISOWeek()
+	event.Year = monday.Year()
+
+	//get the slot schedule
+	if err = event.getSchedule(tx, monday); err != nil {
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
+/*Update the specific column in the calendar event. */
+func (event *CalendarEvent) Update(column string, value interface{}) (err error) {
+	return updateByID(nil, column, "calendar_events", value, event.ID, event)
+}
+
+/*Duplicate an calendar event. */
+func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
+
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	var newID int
+	err = tx.Get(&newID, stmtDuplicateCalendarEvent, event.CourseID, event.ID)
+	if err != nil {
+		log.Error("failed to duplicate calendar Event", "Calendar event", *event,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	//duplicate all day templates of this event
+	tmpls := DayTmpls{}
+	err = tmpls.Duplicate(tx, &newID, &event.ID)
+	if err != nil {
+		return
+	}
+
+	if txWasNil {
+		tx.Commit()
+	}
+	return
+}
+
+/*Delete a calendar event. */
+func (event *CalendarEvent) Delete() (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//TODO: get all users that have booked slots for this event (in the future)
+	//TODO: return these and write them an e-mail
+	//TODO: validation: a course must always have at least one event/calendar event
+
+	//delete event
+	if err = deleteByID("id", "calendar_events", event.ID, tx); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
+/*Get all calendar events by the provided monday. */
 func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
 
 	txWasNil := (tx == nil)
@@ -104,113 +218,37 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 	return
 }
 
-/*Get a calendar event by its ID and a monday. */
-func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
+/*Duplicate all calendar events of a course. */
+func (events *CalendarEvents) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err error) {
 
-	txWasNil := (tx == nil)
-	if txWasNil {
-		tx, err = app.Db.Beginx()
-		if err != nil {
-			log.Error("failed to begin tx", "error", err.Error())
-			return
-		}
-	}
-
-	//get general event information
-	err = tx.Get(event, stmtGetCalendarEvent, *courseID, event.ID)
+	//get all event IDs
+	err = tx.Select(events, stmtGetCalendarEventIDs, *courseIDOld)
 	if err != nil {
-		log.Error("failed to get calendar event of course", "monday", monday, "course ID", *courseID,
-			"error", err.Error())
+		log.Error("failed to get all events for duplication", "course ID old",
+			*courseIDOld, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	//get all day templates of this event
-	if err = event.Days.Get(tx, &event.ID, monday, false); err != nil {
-		return
-	}
+	//duplicate each event
+	for _, event := range *events {
 
-	//get the exceptions of each day of that week (as defined by monday)
-	if err = event.ExceptionsOfWeek.Get(tx, &event.ID, monday); err != nil {
-		return
-	}
-
-	//set the current week
-	event.Monday = monday
-	_, event.Week = monday.ISOWeek()
-	event.Year = monday.Year()
-
-	//get the slot schedule
-	if err = event.getSchedule(tx, monday); err != nil {
-		return
-	}
-
-	if txWasNil {
-		tx.Commit()
-	}
-	return
-}
-
-/*Update the specific column in the CalendarEvent. */
-func (event *CalendarEvent) Update(column string, value interface{}) (err error) {
-	return updateByID(nil, column, "calendar_events", value, event.ID, event)
-}
-
-/*Duplicate an CalendarEvent. */
-func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
-
-	txWasNil := (tx == nil)
-	if txWasNil {
-		tx, err = app.Db.Beginx()
-		if err != nil {
-			log.Error("failed to begin tx", "error", err.Error())
+		event.CourseID = *courseIDNew
+		if err = event.Duplicate(tx); err != nil {
 			return
 		}
 	}
 
-	var newID int
-	err = tx.Get(&newID, stmtDuplicateCalendarEvent, event.CourseID, event.ID)
-	if err != nil {
-		log.Error("failed to duplicate calendar Event", "Calendar event", *event,
-			"error", err.Error())
-		tx.Rollback()
-		return
-	}
-
-	//duplicate all day templates of this event
-	tmpls := DayTmpls{}
-	err = tmpls.Duplicate(tx, &newID, &event.ID)
-	if err != nil {
-		return
-	}
-
-	if txWasNil {
-		tx.Commit()
-	}
 	return
 }
 
-/*Delete a calendar event. */
-func (event *CalendarEvent) Delete() (err error) {
-
-	tx, err := app.Db.Beginx()
-	if err != nil {
-		log.Error("failed to begin tx", "error", err.Error())
-		return
-	}
-
-	//TODO: get all users that have booked slots for this event (in the future)
-	//TODO: return these and write them an e-mail
-
-	//delete event
-	if err = deleteByID("id", "calendar_events", event.ID, tx); err != nil {
-		return
-	}
-
-	tx.Commit()
+/*Insert all calendar events. */
+func (events *CalendarEvents) Insert(tx *sqlx.Tx, courseID *int) (err error) {
+	//TODO
 	return
 }
 
+//getSchedule returns the entries for each day for the specified week
 func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
 
 	//prepare a schedule for the whole week by looping all day templates and
@@ -497,30 +535,58 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 	return
 }
 
-/*Duplicate all CalendarEvents of a course. */
-func (events *CalendarEvents) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int) (err error) {
+//validateEnrollment validates whether a user can enroll in a calendar event
+func (event *CalendarEvent) validateEnrollment(tx *sqlx.Tx, c *Course, userID int) (err error) {
 
-	//get all event IDs
-	err = tx.Select(events, stmtGetCalendarEventIDs, *courseIDOld)
-	if err != nil {
-		log.Error("failed to get all events for duplication", "course ID old",
-			*courseIDOld, "error", err.Error())
-		tx.Rollback()
-		return
+	if c.Expired || !c.Active {
+		event.EnrollMsg = "validation.enrollment.not.active"
+		event.NoEnroll = true
+	}
+	if c.CourseStatus.AtBlacklist {
+		event.EnrollMsg = "validation.enrollment.at.blacklist"
+		event.NoEnroll = true
+	}
+	if c.CourseStatus.NotLDAP {
+		event.EnrollMsg = "validation.enrollment.no.ldap"
+		event.NoEnroll = true
+	}
+	if c.CourseStatus.NotSatisfyRestrictions {
+		event.EnrollMsg = "validation.enrollment.not.satisfy.restrictions"
+		event.NoEnroll = true
+	}
+	if c.CourseStatus.NoEnrollmentPeriod {
+		event.EnrollMsg = "validation.enrollment.no.period"
+		event.NoEnroll = true
 	}
 
-	//duplicate each event
-	for _, event := range *events {
+	//unsubscribe period is over
+	if c.CourseStatus.UnsubscribeOver {
+		event.UnsubMsg = "validation.enrollment.period.over"
+		event.NoUnsubscribe = true
+	}
 
-		event.CourseID = *courseIDNew
-		if err = event.Duplicate(tx); err != nil {
+	//validate if the user already enrolled in a slot of this event
+	if c.CourseStatus.MaxEnrollCoursesReached {
+
+		inEvent := false
+		err = tx.Get(&inEvent, stmtExistsUserInCalendarEvent, userID, event.ID)
+		if err != nil {
+			log.Error("failed to get whether the user already enrolled in a slot of this event",
+				"userID", userID, "eventID", event.ID, "error", err.Error())
+			tx.Rollback()
 			return
+		}
+
+		if !inEvent {
+			event.EnrollMsg = "validation.enrollment.max.enroll.reached"
+			event.NoEnroll = true
 		}
 	}
 
 	return
 }
 
+//parse a date as string into time.Time
 func parseDate(tx *sqlx.Tx, year, date, str string) (t time.Time, err error) {
 
 	//create start/end date + time from entry to compare with exception start/end date + time
@@ -616,6 +682,7 @@ func getExceptionScheduleTimes(interval int, sStart time.Time, exceptTime time.T
 	return
 }
 
+//transform an int to a string with leading zeros
 func prettyTime(i int) string {
 
 	if i < 10 {
@@ -670,5 +737,15 @@ const (
 			WHERE id = $2
 		)
 		RETURNING id AS new_id
+	`
+
+	stmtExistsUserInCalendarEvent = `
+		SELECT EXISTS (
+			SELECT s.user_id
+			FROM slots s JOIN day_templates d ON s.day_tmpl_id = d.id
+			 	JOIN calendar_events e ON d.calendar_event_id = e.id
+			WHERE s.user_id = $1
+				AND e.id = $2
+		) AS in_event
 	`
 )

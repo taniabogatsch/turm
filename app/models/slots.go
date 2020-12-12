@@ -13,10 +13,9 @@ type Slots []Slot
 
 /*Slot is a booked timespan on an specific date. */
 type Slot struct {
-	ID        int    `db:"id"`
-	DayTmplID int    `db:"day_tmpl_id"`
-	UserID    int    `db:"user_id"`
-	Created   string `db:"created"`
+	ID        int `db:"id"`
+	DayTmplID int `db:"day_tmpl_id"`
+	UserID    int `db:"user_id"`
 
 	//date + time
 	Start time.Time `db:"start_time"`
@@ -47,7 +46,7 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailDa
 
 	//insert slot
 	err = tx.Get(slot, stmtInsertSlot, slot.UserID, slot.DayTmplID,
-		slot.Start, slot.End, time.Now())
+		slot.Start, slot.End)
 	if err != nil {
 		log.Error("failed to insert slot", "slot", *slot, "error", err.Error())
 		tx.Rollback()
@@ -329,8 +328,8 @@ func (slot *Slot) BelongsToEvent(eventID int) (belongs bool, err error) {
 const (
 	stmtInsertSlot = `
 		INSERT INTO slots (
-			user_id, day_tmpl_id, start_time, end_time, created)
-		VALUES ($1, $2, $3, $4, $5)
+			user_id, day_tmpl_id, start_time, end_time)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
 

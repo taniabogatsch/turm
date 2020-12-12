@@ -33,8 +33,8 @@ type EMailData struct {
 	ViewMatrNr bool
 
 	//used for slot enrollments
-	Start  string `db:"end"`
-	End    string `db:"start"`
+	Start  string `db:"start"`
+	End    string `db:"end"`
 	UserID int    `db:"user_id"`
 
 	//used for notifying users about edits

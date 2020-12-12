@@ -278,22 +278,15 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		return
 	}
 
-	if !manage && userID != 0 {
-		if err = course.validateEnrollment(tx, userID); err != nil {
-			return
-		}
-	}
-
 	//get the events of the course
 	if err = course.Events.Get(tx, &userID, &course.ID, manage, &course.EnrollLimitEvents); err != nil {
 		return
 	}
 
+	//get the calender events of a course
 	now := time.Now()
 	weekday := time.Now().Weekday()
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
-
-	//get the calander events of a course
 	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
 		return
 	}
@@ -308,6 +301,12 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		}
 	}
 
+	if !manage && userID != 0 {
+		if err = course.validateEnrollment(tx, userID); err != nil {
+			return
+		}
+	}
+
 	//get enroll information for each event
 	if !manage {
 		for key := range course.Events {
@@ -315,7 +314,15 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 		}
 	}
 
-	//TODO: get enroll information for calendar events
+	//get enroll information for each calendar event
+	if !manage {
+		for key := range course.CalendarEvents {
+			err = course.CalendarEvents[key].validateEnrollment(tx, course, userID)
+			if err != nil {
+				return
+			}
+		}
+	}
 
 	//get more detailed creator data
 	if course.Creator.Valid {
@@ -360,7 +367,14 @@ func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 		return
 	}
 
-	//TODO: get calendar events ?
+	now := time.Now()
+	weekday := time.Now().Weekday()
+	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+
+	//get the calender events of a course
+	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
+		return
+	}
 
 	return
 }
@@ -722,7 +736,9 @@ func (course *Course) Insert() (err error) {
 	if err = course.Events.Insert(tx, &course.ID); err != nil {
 		return
 	}
-	//TODO: insert calendar events
+	if err = course.CalendarEvents.Insert(tx, &course.ID); err != nil {
+		return
+	}
 	if err = course.Editors.Insert(tx, &course.ID, "editors"); err != nil {
 		return
 	}

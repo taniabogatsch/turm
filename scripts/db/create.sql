@@ -262,7 +262,6 @@ CREATE TABLE slots (
   day_tmpl_id         integer                     NOT NULL,
   start_time          timestamp with time zone    NOT NULL,
   end_time            timestamp with time zone    NOT NULL,
-  created             timestamp with time zone    DEFAULT now(),
 
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
   FOREIGN KEY (day_tmpl_id) REFERENCES day_templates (id) ON DELETE CASCADE
