@@ -81,6 +81,30 @@ func (tmpl *DayTmpl) Insert(v *revel.Validation) (err error) {
 	return
 }
 
+/*InsertToEventID inserts a day template to a given calendarEventID. */
+func (tmpl *DayTmpl) InsertToEventID(tx *sqlx.Tx, v *revel.Validation, calendarEventID int) (err error) {
+
+	if tmpl.EndTime == "00:00" {
+		tmpl.EndTime = "24:00"
+	}
+
+	if tmpl.validate(v, tx); v.HasErrors() {
+		tx.Rollback()
+		return
+	}
+
+	err = tx.Get(tmpl, stmtInsertDayTemplate, calendarEventID, tmpl.StartTime,
+		tmpl.EndTime, tmpl.Interval, tmpl.DayOfWeek)
+	if err != nil {
+		log.Error("failed to insert day template", "tmpl", *tmpl,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	return
+}
+
 /*Update a day tmpl. */
 func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) {
 

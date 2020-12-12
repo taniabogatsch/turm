@@ -9,6 +9,7 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/revel/revel"
 )
 
 /*CalendarEvents holds all calendar events of a course. */
@@ -47,10 +48,50 @@ type CalendarEvent struct {
 /*NewBlank creates a new blank calendar event. */
 func (event *CalendarEvent) NewBlank() (err error) {
 
-	err = app.Db.Get(event, stmtInsertCalendarEvent, event.CourseID, event.Title)
+	err = app.Db.Get(event, stmtInsertCalendarEvent, event.CourseID, event.Title, event.Annotation)
 	if err != nil {
 		log.Error("failed to insert blank calendar event", "event", *event,
 			"error", err.Error())
+	}
+	return
+}
+
+/*Insert a calendar event into a given Course_ID*/
+func (event *CalendarEvent) Insert(tx *sqlx.Tx, courseID int) (err error) {
+	txWasNil := (tx == nil)
+	if txWasNil {
+		tx, err = app.Db.Beginx()
+		if err != nil {
+			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	err = tx.Get(event, stmtInsertCalendarEvent, courseID, event.Title, event.Annotation)
+	if err != nil {
+		log.Error("failed to insert calendar event of course", "course ID", courseID,
+			"CalendarEvent", *event, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	var v revel.Validation
+
+	for dayIdx := range event.Days {
+		for tmplIdx := range event.Days[dayIdx].DayTmpls {
+			err = event.Days[dayIdx].DayTmpls[tmplIdx].InsertToEventID(tx, &v, event.ID)
+			if err != nil {
+				return
+			}
+			if v.HasErrors() {
+				//TODO Log ERROR ?
+				return
+			}
+		}
+	}
+
+	if txWasNil {
+		tx.Commit()
 	}
 	return
 }
@@ -244,7 +285,12 @@ func (events *CalendarEvents) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *i
 
 /*Insert all calendar events. */
 func (events *CalendarEvents) Insert(tx *sqlx.Tx, courseID *int) (err error) {
-	//TODO
+	for i := range *events {
+		err = (*events)[i].Insert(tx, *courseID)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -694,9 +740,9 @@ func prettyTime(i int) string {
 const (
 	stmtInsertCalendarEvent = `
 		INSERT INTO calendar_events (
-			course_id, title
+			course_id, title, annotation
 		)
-		VALUES ($1, $2)
+		VALUES ($1, $2, $3)
 		RETURNING id
 	`
 
