@@ -279,28 +279,33 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	}
 
 	//get the events of the course
-	if err = course.Events.Get(tx, &userID, &course.ID, manage, &course.EnrollLimitEvents); err != nil {
+	err = course.Events.Get(tx, &userID, &course.ID, manage, &course.EnrollLimitEvents)
+	if err != nil {
 		return
 	}
 
-	//get the calender events of a course
 	now := time.Now()
 	weekday := time.Now().Weekday()
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
-	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
+
+	//get the calender events of a course
+	err = course.CalendarEvents.Get(tx, &course.ID, monday, userID)
+	if err != nil {
 		return
 	}
 
 	if manage {
-		//get courses of studies and degrees
+		//get all courses of studies
 		if err = course.CoursesOfStudies.Get(tx); err != nil {
 			return
 		}
+		//get all degrees
 		if err = course.Degrees.Get(tx); err != nil {
 			return
 		}
 	}
 
+	//get course data for enrollment validation
 	if !manage && userID != 0 {
 		if err = course.validateEnrollment(tx, userID); err != nil {
 			return
@@ -363,7 +368,8 @@ func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 	}
 
 	//get the events of the course
-	if err = course.Events.GetForValidation(tx, &course.ID); err != nil {
+	err = course.Events.GetForValidation(tx, &course.ID)
+	if err != nil {
 		return
 	}
 
@@ -372,7 +378,9 @@ func (course *Course) GetForValidation(tx *sqlx.Tx) (err error) {
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
 
 	//get the calender events of a course
-	if err = course.CalendarEvents.Get(tx, &course.ID, monday); err != nil {
+	//TODO: use more efficient function (GetForValidation)
+	err = course.CalendarEvents.Get(tx, &course.ID, monday, 0)
+	if err != nil {
 		return
 	}
 

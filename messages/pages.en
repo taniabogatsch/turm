@@ -152,10 +152,11 @@ profile.active.events = Active events
 profile.active.events.none = No active events.
 profile.expired.events = Expired events
 profile.expired.events.none = No expired events.
-profile.activeSlots.events = Active bookings
-profile.active.events.none = No active bookings.
-profile.expiredSlots.events = Expired bookings
-profile.expired.events.none = No expired bookings.
+
+profile.active.slots = Active bookings
+profile.active.slots.none = No active bookings.
+profile.expired.slots = Expired bookings
+profile.expired.slots.none = No expired bookings.
 
 profile.change.pw = Change password
 profile.change.pw.success = Changed password

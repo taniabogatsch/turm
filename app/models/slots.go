@@ -28,12 +28,48 @@ type Slot struct {
 }
 
 /*Insert a new slot. */
-func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailData, err error) {
+func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
+	manual bool) (data EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
 		log.Error("failed to begin tx", "error", err.Error())
 		return
+	}
+
+	if !manual {
+
+		now := time.Now()
+		weekday := time.Now().Weekday()
+		monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+
+		//get relevant event information
+		event := CalendarEvent{ID: calendarEventID}
+		if err = event.GetColumnValue(tx, "course_id"); err != nil {
+			return
+		}
+		//TODO: use more efficient function (GetForEnrollment)
+		if err = event.Get(tx, &event.CourseID, monday, slot.UserID); err != nil {
+			return
+		}
+
+		//get relevant course information
+		course := Course{ID: event.CourseID}
+		err = course.GetForEnrollment(tx, &slot.UserID, &event.ID)
+		if err != nil {
+			return
+		}
+
+		//validate if allowed to enroll
+		if err = event.validateEnrollment(tx, &course, slot.UserID); err != nil {
+			return
+		}
+
+		if event.NoEnroll {
+			v.ErrorKey(event.EnrollMsg)
+			tx.Rollback()
+			return
+		}
 	}
 
 	//check if all values are correct and the selected timespan is free
@@ -72,7 +108,8 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int) (data EMailDa
 
 /*Get all slots of a day template. Monday specifies the week for which all slots
 must be loaded and weekday specifies the day. */
-func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time, weekday int) (err error) {
+func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time,
+	weekday int) (err error) {
 
 	//set time of monday to 00:00
 	monday = time.Date(monday.Year(), monday.Month(), monday.Day(), 0, 0, 0, 0, monday.Location())
@@ -101,6 +138,18 @@ func (slots *Slots) GetAll(tx *sqlx.Tx, dayTmplID int) (err error) {
 		tx.Rollback()
 	}
 
+	return
+}
+
+/*Get all data of a slot. */
+func (slot *Slot) Get(tx *sqlx.Tx) (err error) {
+
+	err = tx.Get(slot, stmtGetSlot, slot.ID, app.TimeZone)
+	if err != nil {
+		log.Error("failed to get slot", "slotID", slot.ID,
+			"error", err.Error())
+		tx.Rollback()
+	}
 	return
 }
 
@@ -226,19 +275,51 @@ func (slot *Slot) Delete(v *revel.Validation) (data EMailData, err error) {
 		return
 	}
 
-	//get slot startTime by ID
-	var startTime time.Time
-	err = tx.Get(&startTime, stmtGetSlotStartTime, slot.ID)
+	//get slot data
+	if err = slot.Get(tx); err != nil {
+		return
+	}
+
+	//TODO: put into function and use for Insert and Delete
+
+	now := time.Now()
+	weekday := time.Now().Weekday()
+	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+
+	//get calendar ID
+	event := CalendarEvent{}
+	err = tx.Get(&event, stmtGetCalendarEventIDBySlot, slot.ID)
+
+	//get relevant event information
+	if err = event.GetColumnValue(tx, "course_id"); err != nil {
+		return
+	}
+	//TODO: use more efficient function (GetForEnrollment)
+	if err = event.Get(tx, &event.CourseID, monday, slot.UserID); err != nil {
+		return
+	}
+
+	//get relevant course information
+	course := Course{ID: event.CourseID}
+	err = course.GetForEnrollment(tx, &slot.UserID, &event.ID)
 	if err != nil {
-		log.Error("failed to get slot start time", "slotID", slot.ID,
-			"error", err.Error())
+		return
+	}
+
+	//validate if allowed to unsubscribe
+	if err = event.validateEnrollment(tx, &course, slot.UserID); err != nil {
+		return
+	}
+
+	if event.NoUnsubscribe {
+		v.ErrorKey(event.EnrollMsg)
 		tx.Rollback()
 		return
 	}
 
 	//check if slot is more than an hour away
 	var duration time.Duration = 1000000000 * 60 * 60
-	if startTime.Sub(time.Now()) < duration {
+	if slot.Start.Sub(time.Now()) < duration {
 		v.ErrorKey("validation.calendar.event.slot.unsubscribe.end")
 		tx.Rollback()
 		return
@@ -343,6 +424,20 @@ const (
 		ORDER BY start_time ASC
   `
 
+	stmtGetSlot = `
+		SELECT id, user_id, day_tmpl_id, start_time, end_time,
+		 TO_CHAR (start_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS start_str,
+		 TO_CHAR (end_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS end_str
+		FROM slots
+		WHERE id = $1
+	`
+
+	stmtGetCalendarEventIDBySlot = `
+		SELECT t.calendar_event_id AS id
+		FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
+		WHERE s.id = $1
+	`
+
 	stmtExistsOverlappingSlot = `
 		SELECT EXISTS (
 			SELECT true
@@ -367,12 +462,6 @@ const (
 					OR (($2 <= exception_start) AND ($3 >= exception_end))
 				)
 		) AS slot_in_exception
-	`
-
-	stmtGetSlotStartTime = `
-		SELECT start_time
-		FROM slots
-		WHERE id = $1
 	`
 
 	stmtSelectAllSlotsOfDayTemplate = `

@@ -160,9 +160,13 @@ func (c Course) auth() revel.Result {
 	//only render content if the course is publicly visible or an user is logged in
 	if c.Session["userID"] == nil && c.MethodName != "Open" {
 
-		IDStr := c.Params.Query.Get("ID") //GET request
+		keyID := "ID"
+		if c.MethodName == "CalendarEvent" {
+			keyID = "courseID"
+		}
+		IDStr := c.Params.Query.Get(keyID) //GET request
 		if IDStr == "" {
-			IDStr = c.Params.Form.Get("ID") //POST request
+			IDStr = c.Params.Form.Get(keyID) //POST request
 		}
 
 		//get course ID

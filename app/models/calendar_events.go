@@ -9,7 +9,6 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/revel/revel"
 )
 
 /*CalendarEvents holds all calendar events of a course. */
@@ -42,7 +41,6 @@ type CalendarEvent struct {
 	NoEnroll      bool
 	NoUnsubscribe bool
 	EnrollMsg     string
-	UnsubMsg      string
 }
 
 /*NewBlank creates a new blank calendar event. */
@@ -58,6 +56,7 @@ func (event *CalendarEvent) NewBlank() (err error) {
 
 /*Insert a calendar event into a given Course_ID*/
 func (event *CalendarEvent) Insert(tx *sqlx.Tx, courseID int) (err error) {
+
 	txWasNil := (tx == nil)
 	if txWasNil {
 		tx, err = app.Db.Beginx()
@@ -70,23 +69,56 @@ func (event *CalendarEvent) Insert(tx *sqlx.Tx, courseID int) (err error) {
 	err = tx.Get(event, stmtInsertCalendarEvent, courseID, event.Title, event.Annotation)
 	if err != nil {
 		log.Error("failed to insert calendar event of course", "course ID", courseID,
-			"CalendarEvent", *event, "error", err.Error())
+			"calendar event", *event, "error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	var v revel.Validation
+	//insert all day templates of this event
+	for _, day := range event.Days {
+		for _, tmpl := range day.DayTmpls {
 
-	for dayIdx := range event.Days {
-		for tmplIdx := range event.Days[dayIdx].DayTmpls {
-			err = event.Days[dayIdx].DayTmpls[tmplIdx].InsertToEventID(tx, &v, event.ID)
+			tmpl.CalendarEventID = event.ID
+			err = tmpl.Insert(tx, nil)
 			if err != nil {
 				return
 			}
-			if v.HasErrors() {
-				//TODO Log ERROR ?
-				return
-			}
+		}
+	}
+
+	//insert all exceptions of this event
+	for _, exception := range event.Exceptions {
+
+		loc, err := time.LoadLocation(app.TimeZone)
+		if err != nil {
+			log.Error("failed to get location", "timeZone", app.TimeZone,
+				"error", err.Error())
+			tx.Rollback()
+			return err
+		}
+
+		exception.ExceptionStartDB, err = time.ParseInLocation("2006-01-02 15:04",
+			exception.ExceptionStart, loc)
+		if err != nil {
+			log.Error("failed to parse string to time", "exceptionStart",
+				exception.ExceptionStart, "loc", loc, "error", err.Error())
+			tx.Rollback()
+			return err
+		}
+
+		exception.ExceptionEndDB, err = time.ParseInLocation("2006-01-02 15:04",
+			exception.ExceptionEnd, loc)
+		if err != nil {
+			log.Error("failed to parse string to time", "exceptionEnd",
+				exception.ExceptionEnd, "loc", loc, "error", err.Error())
+			tx.Rollback()
+			return err
+		}
+
+		exception.CalendarEventID = event.ID
+		_, err = exception.Insert(tx, nil)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -97,7 +129,7 @@ func (event *CalendarEvent) Insert(tx *sqlx.Tx, courseID int) (err error) {
 }
 
 /*Get a calendar event by its ID and a monday. */
-func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
+func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time, userID int) (err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
@@ -117,23 +149,7 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 		return
 	}
 
-	//get all day templates of this event
-	if err = event.Days.Get(tx, &event.ID, monday, false); err != nil {
-		return
-	}
-
-	//get the exceptions of each day of that week (as defined by monday)
-	if err = event.ExceptionsOfWeek.Get(tx, &event.ID, monday); err != nil {
-		return
-	}
-
-	//set the current week
-	event.Monday = monday
-	_, event.Week = monday.ISOWeek()
-	event.Year = monday.Year()
-
-	//get the slot schedule
-	if err = event.getSchedule(tx, monday); err != nil {
+	if err = event.get(tx, userID, monday); err != nil {
 		return
 	}
 
@@ -141,6 +157,12 @@ func (event *CalendarEvent) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (e
 		tx.Commit()
 	}
 	return
+}
+
+/*GetColumnValue returns the value of a specific column. */
+func (event *CalendarEvent) GetColumnValue(tx *sqlx.Tx, column string) (err error) {
+
+	return getColumnValue(tx, column, "calendar_events", event.ID, event)
 }
 
 /*Update the specific column in the calendar event. */
@@ -205,7 +227,8 @@ func (event *CalendarEvent) Delete() (err error) {
 }
 
 /*Get all calendar events by the provided monday. */
-func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) (err error) {
+func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time,
+	userID int) (err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
@@ -225,30 +248,7 @@ func (events *CalendarEvents) Get(tx *sqlx.Tx, courseID *int, monday time.Time) 
 	}
 
 	for i := range *events {
-
-		//get all day templates of each week day of this event
-		err = (*events)[i].Days.Get(tx, &(*events)[i].ID, monday, false)
-		if err != nil {
-			return
-		}
-
-		//get the exceptions of each day of that week (as defined by monday)
-		if err = (*events)[i].ExceptionsOfWeek.Get(tx, &(*events)[i].ID, monday); err != nil {
-			return
-		}
-
-		//set the current week
-		(*events)[i].Monday = monday
-		_, (*events)[i].Week = monday.ISOWeek()
-		(*events)[i].Year = monday.Year()
-
-		//get the slot schedule
-		if err = (*events)[i].getSchedule(tx, monday); err != nil {
-			return
-		}
-
-		//get all calendar exceptions
-		if err = (*events)[i].Exceptions.Get(tx, &(*events)[i].ID); err != nil {
+		if err = (*events)[i].get(tx, userID, monday); err != nil {
 			return
 		}
 	}
@@ -285,12 +285,14 @@ func (events *CalendarEvents) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *i
 
 /*Insert all calendar events. */
 func (events *CalendarEvents) Insert(tx *sqlx.Tx, courseID *int) (err error) {
+
 	for i := range *events {
 		err = (*events)[i].Insert(tx, *courseID)
 		if err != nil {
 			return
 		}
 	}
+
 	return
 }
 
@@ -607,7 +609,7 @@ func (event *CalendarEvent) validateEnrollment(tx *sqlx.Tx, c *Course, userID in
 
 	//unsubscribe period is over
 	if c.CourseStatus.UnsubscribeOver {
-		event.UnsubMsg = "validation.enrollment.period.over"
+		event.EnrollMsg = "validation.enrollment.period.over"
 		event.NoUnsubscribe = true
 	}
 
@@ -627,6 +629,58 @@ func (event *CalendarEvent) validateEnrollment(tx *sqlx.Tx, c *Course, userID in
 			event.EnrollMsg = "validation.enrollment.max.enroll.reached"
 			event.NoEnroll = true
 		}
+	}
+
+	return
+}
+
+//get returns specific event fields
+func (event *CalendarEvent) get(tx *sqlx.Tx, userID int, monday time.Time) (err error) {
+
+	//get all day templates of each week day of this event
+	err = event.Days.Get(tx, &event.ID, monday, false)
+	if err != nil {
+		return
+	}
+
+	//get the exceptions of each day of that week (as defined by monday)
+	if err = event.ExceptionsOfWeek.Get(tx, &event.ID, monday); err != nil {
+		return
+	}
+
+	//set the current week
+	event.Monday = monday
+	_, event.Week = monday.ISOWeek()
+	event.Year = monday.Year()
+
+	//get the slot schedule
+	if err = event.getSchedule(tx, monday); err != nil {
+		return
+	}
+
+	//get all calendar exceptions
+	if err = event.Exceptions.Get(tx, &event.ID); err != nil {
+		return
+	}
+
+	//get relevant course information
+	if userID != 0 {
+
+		course := Course{ID: event.CourseID}
+		err = course.GetForEnrollment(tx, &userID, &event.ID)
+		if err != nil {
+			return
+		}
+
+		//validate if allowed to enroll in any slot
+		err = event.validateEnrollment(tx, &course, userID)
+		if err != nil {
+			return
+		}
+
+	} else {
+		event.NoEnroll = true
+		event.NoUnsubscribe = true
 	}
 
 	return

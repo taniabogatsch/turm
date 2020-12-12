@@ -36,14 +36,14 @@
       <a class="nav-link btn-outline-darkblue m-1" id="v-pills-activeSlots-tab" data-toggle="pill"
         href="#v-pills-activeSlots" role="tab" aria-controls="v-pills-activeSlots" aria-selected="false">
         {{template "icons/calendar2Check.html" . }}
-        &nbsp; {{msg $ "profile.activeSlots.events"}}
+        &nbsp; {{msg $ "profile.active.slots"}}
       </a>
 
       <!-- expired slots -->
       <a class="nav-link btn-outline-darkblue m-1" id="v-pills-expiredSlots-tab" data-toggle="pill"
         href="#v-pills-expiredSlots" role="tab" aria-controls="v-pills-expiredSlots" aria-selected="false">
         {{template "icons/calendar2x.html" . }}
-        &nbsp; {{msg $ "profile.expiredSlots.events"}}
+        &nbsp; {{msg $ "profile.expired.slots"}}
       </a>
     </div>
   </div>
@@ -275,7 +275,7 @@
       <!-- header icon + section name -->
       <h4>
         {{template "icons/calendar2Check.html" . }}
-        &nbsp; {{msg $ "profile.activeSlots.events"}}
+        &nbsp; {{msg $ "profile.active.slots"}}
       </h4>
       <hr>
       <br>
@@ -286,7 +286,7 @@
       {{else}}
         <!-- info that none exist -->
         <small class="text-muted">
-          {{msg $ "profile.active.events.none"}}
+          {{msg $ "profile.active.slots.none"}}
         </small>
       {{end}}
     </div>
@@ -297,7 +297,7 @@
 
       <h4>
         {{template "icons/calendar2x.html" . }}
-        &nbsp; {{msg $ "profile.expiredSlots.events"}}
+        &nbsp; {{msg $ "profile.expired.slots"}}
       </h4>
       <hr>
       <br>
@@ -306,7 +306,7 @@
         {{template "user/enrollments.html" dict_addLocale $.currentLocale "enrollments" .user.ExpiredSlots "slots" true}}
       {{else}}
         <small class="text-muted">
-          {{msg $ "profile.expired.events.none"}}
+          {{msg $ "profile.expired.slots.none"}}
         </small>
       {{end}}
     </div>

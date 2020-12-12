@@ -164,7 +164,7 @@ func (c Course) Events(ID int) revel.Result {
 	c.Log.Debug("load events of course", "ID", ID)
 
 	events := models.Events{}
-	userID := 0
+	userID := 0 //edit page, so the user is never allowed to enroll
 	if err := events.Get(nil, &userID, &ID, true, nil); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
@@ -200,8 +200,9 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 	weekday := time.Now().Weekday()
 	monday := now.AddDate(0, 0, -1*(int(weekday)-1))
 
+	userID := 0 //edit page, so the user is never allowed to enroll
 	events := models.CalendarEvents{}
-	if err := events.Get(nil, &ID, monday); err != nil {
+	if err := events.Get(nil, &ID, monday, userID); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -215,6 +216,13 @@ func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Resu
 
 	c.Log.Debug("load calendar event of course", "ID", ID, "courseID",
 		courseID, "shift", shift, "monday", monday)
+
+	//get user from session
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
 
 	loc, err := time.LoadLocation(app.TimeZone)
 	if err != nil {
@@ -235,7 +243,7 @@ func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Resu
 	t = t.AddDate(0, 0, shift*7)
 
 	event := models.CalendarEvent{ID: ID}
-	if err := event.Get(nil, &courseID, t); err != nil {
+	if err := event.Get(nil, &courseID, t, userID); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}

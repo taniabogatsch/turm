@@ -273,14 +273,6 @@ function editCourse() {
   $('#hide-preview-btn').addClass('d-none');
 }
 
-function disableEnrollmentButtons() {
-
-  $(".enroll-btn").each(function() {
-    $(this).attr("href", "#no-scroll");
-    $(this).addClass('disabled');
-  });
-}
-
 function openRestrictionModal(title, ID, degreeID, studiesID, minSemester) {
 
   $('#change-restriction-modal-title').html(title);

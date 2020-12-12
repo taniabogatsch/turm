@@ -87,7 +87,7 @@ func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl)
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	tmpl.CalendarEventID = ID
-	if err := tmpl.Insert(c.Validation); err != nil {
+	if err := tmpl.Insert(nil, c.Validation); err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")

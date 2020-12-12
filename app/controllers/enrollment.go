@@ -146,7 +146,7 @@ func (c Enrollment) EnrollInSlot(ID, courseID, year int, startTime, endTime,
 	}
 
 	//enroll user
-	data, err := slot.Insert(c.Validation, ID)
+	data, err := slot.Insert(c.Validation, ID, false)
 	if err != nil {
 		return flashError(errDB, err, path, c.Controller, "")
 	} else if c.Validation.HasErrors() {

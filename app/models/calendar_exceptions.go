@@ -191,11 +191,13 @@ func (except *Exception) Insert(tx *sqlx.Tx, v *revel.Validation) (users EMailsD
 	}
 
 	//check if all values are correct and the selected timespan is free of other exceptions
-	if err = except.validate(v, tx); err != nil {
-		return
-	} else if v.HasErrors() {
-		tx.Rollback()
-		return
+	if v != nil {
+		if err = except.validate(v, tx); err != nil {
+			return
+		} else if v.HasErrors() {
+			tx.Rollback()
+			return
+		}
 	}
 
 	//insert exception

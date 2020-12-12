@@ -75,21 +75,17 @@
     <br>
   </div>
 
-  <!-- no enrollment info -->
-  {{if .event.NoEnroll}}
-    <small class="form-text text-danger float-left">
-      {{msg $ $.event.EnrollMsg}}
-    </small>
-    <br>
-  {{end}}
-
-  <!-- no unsubscribe info -->
-  {{if .event.NoUnsubscribe}}
-    <small class="form-text text-danger float-left">
-      {{msg $ $.event.EnrollMsg}}
-    </small>
-    <br>
-  {{end}}
+  <div class="enroll-info">
+    {{if .session.userID}}
+      <!-- no enrollment info -->
+      {{if or .event.NoEnroll .event.NoUnsubscribe}}
+        <small class="form-text text-danger float-left">
+          {{msg $ $.event.EnrollMsg}}
+        </small>
+        <br>
+      {{end}}
+    {{end}}
+  </div>
 
   <!-- add annotation button -->
   <div id="div-add-calendar_annotation-{{.event.ID}}" class="{{if .event.Annotation.Valid}}d-none{{else}}d-inline{{end}}">
@@ -245,12 +241,13 @@
                     <div class="card-body p-1 text-center">
                       {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
                       {{if not $v.InPast}}
-                        <a class="btn btn-outline-light btn-sm w-100 enroll-btn" type="button"
+                        <button type="button" class="btn btn-outline-light btn-sm w-100 enroll-btn"
                           style="color:#004085; border-color: #004085; word-wrap:break-all;"
-                          href="#no-scroll" onclick='unsubFromSlot({{.SlotID}}, {{$.event.ID}},
+                          {{if $.event.NoUnsubscribe}}disabled{{end}}
+                          onclick='unsubFromSlot({{.SlotID}}, {{$.event.ID}},
                             {{$.event.CourseID}}, {{$.event.Monday}}, {{url "Enrollment.UnsubscribeFromSlot"}});'>
                           {{msg $ "button.unsubscribe"}}
-                        </a>
+                        </button>
                       {{end}}
                     </div>
                   </div>
@@ -286,12 +283,20 @@
               {{if not $v.InPast}}
                 <br>
                 <div class="text-center">
-                  <button type="button" class="btn btn-success w-100 btn-sm enroll-btn"
-                    style="word-wrap:break-word;"
-                    onclick='bookSlotModal({{$.event.CourseID}},{{$.event.ID}}, {{.Date}},
-                      {{$.event.Year}}, {{$k}}, {{$.event.Monday}});'>
-                    {{msg $ "button.book.slot"}}
-                  </button>
+                  {{if $.session.userID}}
+                    <button type="button" class="btn btn-outline-success w-100 btn-sm enroll-btn"
+                      style="word-wrap:break-word;" {{if $.event.NoEnroll}}disabled{{end}}
+                      onclick='bookSlotModal({{$.event.CourseID}},{{$.event.ID}}, {{.Date}},
+                        {{$.event.Year}}, {{$k}}, {{$.event.Monday}});'>
+                      {{msg $ "button.book.slot"}}
+                    </button>
+                  {{else}}
+                    <a class="btn btn-outline-darkblue w-100 btn-sm enroll-btn"
+                      style="word-wrap:break-word;"
+                      href='{{url "User.LoginPage"}}'>
+                      {{msg $ "button.login"}}
+                    </a>
+                  {{end}}
                 </div>
                 <br>
 
@@ -397,6 +402,7 @@
     //determine if this is the edit course page
     if (window.location.href.includes("edit/open")) {
       disableEnrollmentButtons();
+      hideEnrollInfoMessages();
     }
   });
 </script>

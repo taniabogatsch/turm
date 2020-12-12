@@ -167,7 +167,6 @@ func (user *User) GetProfileData() (err error) {
 		return
 	}
 
-	//TODO: get active and expired Slots if an user
 	//get all active slots
 	err = user.ActiveSlots.SelectSlotsByUser(tx, &user.ID, false)
 	if err != nil {
@@ -198,7 +197,11 @@ func (user *User) GetNavigationData() (err error) {
 		return
 	}
 
-	//TODO: get all calendar slots
+	//get all active slots
+	err = user.ActiveSlots.SelectSlotsByUser(tx, &user.ID, false)
+	if err != nil {
+		return
+	}
 
 	tx.Commit()
 	return

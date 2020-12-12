@@ -306,3 +306,18 @@ function unsubFromSlot(slotID, eventID, courseID, monday, action) {
     $('#calendar-event-' + eventID).html(data);
   })
 }
+
+function disableEnrollmentButtons() {
+
+  $(".enroll-btn").each(function() {
+    $(this).attr("href", "#no-scroll");
+    $(this).addClass('disabled');
+  });
+}
+
+function hideEnrollInfoMessages() {
+
+  $(".enroll-info").each(function() {
+    $(this).addClass("d-none");
+  });
+}
