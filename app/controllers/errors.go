@@ -21,7 +21,7 @@ const (
 func (s ErrorType) String() string {
 	return [...]string{"validation failed", "error.db",
 		"error.auth", "e-mail error", "error.typeConv",
-		"error loading content"}[s]
+		"error.content"}[s]
 }
 
 //flashError flashes an error message and redirects to a page.
@@ -29,18 +29,19 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 
 	c.FlashParams()
 	if err != nil { //log error and send notification e-mail
-		c.Log.Error("flash error", "err", err.Error())
 		app.SendErrorNote()
 	}
 
 	if url == "" {
 		url = c.Session["currPath"].(string)
 	}
-	c.Log.Debug(errType.String(), "redirect", url)
+	if revel.DevMode {
+		c.Log.Error(errType.String(), "redirect", url)
+	}
 
 	//execute the correct error action
 	switch errType {
-	case errAuth, errDB, errTypeConv:
+	case errAuth, errDB, errTypeConv, errContent:
 		c.Flash.Error(c.Message(errType.String()))
 	case errValidation:
 		c.Validation.Keep()
@@ -50,10 +51,6 @@ func flashError(errType ErrorType, err error, url string, c *revel.Controller, i
 			c.Log.Error("error parsing e-mail", "email", email)
 		}
 		c.Flash.Error(c.Message("error.email", email))
-	default:
-		c.Log.Error("undefined error type", "error type", errType)
-		c.Flash.Error(c.Message("error.undefined"))
-		return c.Redirect(App.Index)
 	}
 
 	return c.Redirect(url)

@@ -21,8 +21,9 @@
         <!-- modal body -->
         <div class="modal-body">
 
-          <!-- calendar event ID, year -->
+          <!-- course ID, calendar event ID, year, monday, date -->
           <input type="hidden" name="ID" id="book-slot-modal-ID">
+          <input type="hidden" name="courseID" id="book-slot-modal-course-ID">
           <input type="hidden" name="year" id="book-slot-modal-year">
           <input type="hidden" name="monday" id="book-slot-modal-monday">
           <input type="hidden" name="date" id="book-slot-modal-date">
@@ -93,7 +94,7 @@
   $('#book-slot-modal-form').submit(function (event) {
 
     $.ajax({
-      type: 'GET',
+      type: 'POST',
       url: $('#book-slot-modal-form').attr("action"),
       data: $('#book-slot-modal-form').serialize(),
 

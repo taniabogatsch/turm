@@ -6,7 +6,7 @@
   </div>
 {{end}}
 
-<div id="flash-errors-calendar-events" class="d-none">
+<div id="flash-errors-calendar-event-{{.event.ID}}" class="d-none">
   {{range .errors}}
     <div class="val-div w-100 text-danger">
       {{.}}
@@ -21,9 +21,9 @@
 		{{else if .flash.error}}
 			showToast('{{.flash.error}}', 'danger');
 		{{else if .errors}}
-			let msg = document.getElementById('flash-errors-calendar-events').innerHTML;
+			let msg = document.getElementById('flash-errors-calendar-event-{{.event.ID}}').innerHTML;
 			showToast(msg, 'danger');
-		{{end}}
+    {{end}}
 	});
 </script>
 
@@ -228,11 +228,14 @@
                   <div class="card mb-1 alert-primary">
                     <div class="card-body p-1 text-center">
                       {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
-                      <a class="btn btn-outline-light btn-sm w-100"
-                        style="color:#004085; border-color: #004085; word-wrap:break-all;"
-                        href='{{url "Enrollment.UnsubscribeFromSlot" .SlotID}}'>
-                        {{msg $ "button.unsubscribe"}}
-                      </a>
+                      {{if not $v.InPast}}
+                        <a class="btn btn-outline-light btn-sm w-100" type="button"
+                          style="color:#004085; border-color: #004085; word-wrap:break-all;"
+                          href="#no-scroll" onclick='unsubFromSlot({{.SlotID}}, {{$.event.ID}},
+                            {{$.event.CourseID}}, {{$.event.Monday}}, {{url "Enrollment.UnsubscribeFromSlot"}});'>
+                          {{msg $ "button.unsubscribe"}}
+                        </a>
+                      {{end}}
                     </div>
                   </div>
 
@@ -267,9 +270,10 @@
               {{if not $v.InPast}}
                 <br>
                 <div class="text-center">
-                  <button type="button" class="btn btn-success w-100 btn-sm" style="word-wrap:break-word;"
-                    onclick='bookSlotModal({{$.event.ID}}, {{.Date}}, {{$.event.Year}},
-                      {{$k}}, {{$.event.Monday}});'>
+                  <button type="button" class="btn btn-success w-100 btn-sm"
+                    style="word-wrap:break-word;"
+                    onclick='bookSlotModal({{$.event.CourseID}},{{$.event.ID}}, {{.Date}},
+                      {{$.event.Year}}, {{$k}}, {{$.event.Monday}});'>
                     {{msg $ "button.book.slot"}}
                   </button>
                 </div>

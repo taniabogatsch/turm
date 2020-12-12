@@ -192,8 +192,9 @@ function enterKeyModal(action, msg, ID) {
   $('#enter-enroll-key-modal').modal('show');
 }
 
-function bookSlotModal(calendarEventID, date, year, weekDay, monday) {
+function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday) {
 
+  $('#book-slot-modal-course-ID').val(courseID);
   $('#book-slot-modal-ID').val(calendarEventID);
   $('#book-slot-modal-date').val(date)
   $('#book-slot-modal-date-div').html(date);
@@ -291,5 +292,17 @@ function renderCalendarEvent(ID, courseID, shift, monday, action) {
     "monday": monday
   }, function(data) {
     $('#calendar-event-' + ID).html(data);
+  })
+}
+
+function unsubFromSlot(slotID, eventID, courseID, monday, action) {
+
+  $.get(action, {
+    "slotID": slotID,
+    "eventID": eventID,
+    "courseID": courseID,
+    "monday": monday
+  }, function(data) {
+    $('#calendar-event-' + eventID).html(data);
   })
 }

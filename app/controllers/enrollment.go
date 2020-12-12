@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -18,13 +19,13 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	//enroll user
 	enrolled := models.Enrolled{EventID: ID, UserID: userID}
 	data, waitList, _, msg, err := enrolled.EnrollOrUnsubscribe(models.ENROLL, key)
+
 	if err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	} else if msg != "" {
@@ -45,8 +46,7 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 	}
 
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("event.enroll.success"))
@@ -61,20 +61,18 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, "", c.Controller, "")
 	}
 
 	//unsubscribe user
 	enrolled := models.Enrolled{EventID: ID, UserID: userID}
 	data, waitList, users, msg, err := enrolled.EnrollOrUnsubscribe(models.UNSUBSCRIBE, "")
+
 	if err != nil {
-		return flashError(
-			errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, "", c.Controller, "")
 	} else if msg != "" {
 		c.Validation.ErrorKey(msg)
-		return flashError(
-			errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, "", c.Controller, "")
 	}
 
 	//send e-mail to the user who unsubscribed
@@ -87,9 +85,9 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 			"email.subject.unsubscribe",
 			"unsubscribe")
 	}
+
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
 	}
 
 	//send e-mail to each auto enrolled user
@@ -117,59 +115,29 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 /*EnrollInSlot to enroll into a time slot of a day in a calendar event.
 - Roles: logged in and activated users */
-func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime,
+func (c Enrollment) EnrollInSlot(ID, courseID, year int, startTime, endTime,
 	date string, monday string) revel.Result {
 
-	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "year", year, "startTime",
-		startTime, "endTime", endTime, "date", date, "monday", monday)
+	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "courseID", courseID,
+		"year", year, "startTime", startTime, "endTime", endTime, "date", date,
+		"monday", monday)
 
-	//TODO: redirect to calendar event render, do not reload the page, just this calendar event
+	//path in case of an error
+	path := "/course/calendarEvent?ID=" + url.QueryEscape(strconv.Itoa(ID)) +
+		"&courseID=" + url.QueryEscape(strconv.Itoa(courseID)) +
+		"&shift=0" + "&monday=" + url.QueryEscape(monday)
 
 	//get user
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, path, c.Controller, "")
 	}
 
-	location, err := time.LoadLocation(app.TimeZone)
+	//get start and end time
+	start, end, err := getStartEndForSlot(startTime, endTime, date, year)
 	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, path, c.Controller, "")
 	}
-
-	splitDate := strings.Split(date, ".")
-	month, err := strconv.Atoi(splitDate[1])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-	day, err := strconv.Atoi(splitDate[0])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-
-	//set start and end time
-	splitTime := strings.Split(startTime, ":")
-	hour, err := strconv.Atoi(splitTime[0])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-	min, err := strconv.Atoi(splitTime[1])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-
-	start := time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
-
-	splitTime = strings.Split(endTime, ":")
-	hour, err = strconv.Atoi(splitTime[0])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-	min, err = strconv.Atoi(splitTime[1])
-	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
-	}
-
-	end := time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
 
 	slot := models.Slot{
 		UserID: userID,
@@ -180,13 +148,9 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime,
 	//enroll user
 	data, err := slot.Insert(c.Validation, ID)
 	if err != nil {
-		return flashError(errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, path, c.Controller, "")
 	} else if c.Validation.HasErrors() {
-
-		//TODO: LIKE THIS !!!
-		return flashError(
-			errValidation, nil, "/course/meetings?ID="+strconv.Itoa(ID),
-			c.Controller, "")
+		return flashError(errValidation, err, path, c.Controller, "")
 	}
 
 	//send e-mail to the user who enrolled
@@ -194,44 +158,96 @@ func (c Enrollment) EnrollInSlot(ID, year int, startTime, endTime,
 		"email.subject.enroll.slot",
 		"enrollToSlot")
 	if err != nil {
-		return flashError(errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, path, c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("event.enroll.success"))
-	return c.Redirect(Course.CalendarEvent, ID, data.CourseID, 0, monday)
+	return c.Redirect(Course.CalendarEvent, ID, courseID, 0, monday)
 }
 
 /*UnsubscribeFromSlot deletes a slot of an user. */
-func (c Enrollment) UnsubscribeFromSlot(ID int) revel.Result {
+func (c Enrollment) UnsubscribeFromSlot(slotID, eventID, courseID int,
+	monday string) revel.Result {
 
-	c.Log.Debug("unsubscribe a user from a slot (delete the slot)", "ID", ID)
+	c.Log.Debug("unsubscribe a user from a slot (delete the slot)", "slotID", slotID,
+		"courseID", courseID, "eventID", eventID, "monday", monday)
 
-	//TODO: redirect to calendar event render, do not reload the page, just this calendar event
+	//path in case of an error
+	path := "/course/calendarEvent?ID=" + url.QueryEscape(strconv.Itoa(eventID)) +
+		"&courseID=" + url.QueryEscape(strconv.Itoa(courseID)) +
+		"&shift=0" + "&monday=" + url.QueryEscape(monday)
 
 	//get user
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
+		return flashError(errTypeConv, err, path, c.Controller, "")
 	}
 
 	//delete slot
-	slot := models.Slot{ID: ID, UserID: userID}
+	slot := models.Slot{ID: slotID, UserID: userID}
 	data, err := slot.Delete(c.Validation)
+
 	if err != nil {
-		return flashError(errDB, err, "", c.Controller, "")
+		return flashError(errDB, err, path, c.Controller, "")
 	} else if c.Validation.HasErrors() {
-		return flashError(errValidation, nil, "", c.Controller, "")
+		return flashError(errValidation, nil, path, c.Controller, "")
 	}
 
 	//send e-mail to the user who enrolled
 	err = sendEMail(c.Controller, &data,
 		"email.subject.unsubscribe.from.slot",
 		"unsubscribeFromSlot")
+
 	if err != nil {
-		return flashError(
-			errEMail, err, "", c.Controller, data.User.EMail)
+		return flashError(errEMail, err, path, c.Controller, data.User.EMail)
 	}
 
 	c.Flash.Success(c.Message("event.unsubscribe.success"))
-	return c.Redirect(c.Session["currPath"])
+	return c.Redirect(Course.CalendarEvent, eventID, courseID, 0, monday)
+}
+
+func getStartEndForSlot(startTime, endTime, date string, year int) (start,
+	end time.Time, err error) {
+
+	location, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		return
+	}
+
+	splitDate := strings.Split(date, ".")
+	month, err := strconv.Atoi(splitDate[1])
+	if err != nil {
+		return
+	}
+	day, err := strconv.Atoi(splitDate[0])
+	if err != nil {
+		return
+	}
+
+	//set start time
+	splitTime := strings.Split(startTime, ":")
+	hour, err := strconv.Atoi(splitTime[0])
+	if err != nil {
+		return
+	}
+	min, err := strconv.Atoi(splitTime[1])
+	if err != nil {
+		return
+	}
+
+	start = time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
+
+	//set end time
+	splitTime = strings.Split(endTime, ":")
+	hour, err = strconv.Atoi(splitTime[0])
+	if err != nil {
+		return
+	}
+	min, err = strconv.Atoi(splitTime[1])
+	if err != nil {
+		return
+	}
+
+	end = time.Date(year, time.Month(month), day, hour, min, 0, 0, location)
+	return
 }
