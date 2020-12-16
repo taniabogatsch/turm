@@ -74,10 +74,10 @@ CREATE TABLE courses (
   fee                   numeric,
   custom_email          text,
   enroll_limit_events   integer,
-  enrollment_start      timestamp with time zone  NOT NULL,
-  enrollment_end        timestamp with time zone  NOT NULL,
+  enrollment_start      timestamp with time zone  NOT NULL DEFAULT now(),
+  enrollment_end        timestamp with time zone  NOT NULL DEFAULT now(),
   unsubscribe_end       timestamp with time zone,
-  expiration_date       timestamp with time zone  NOT NULL,
+  expiration_date       timestamp with time zone  NOT NULL DEFAULT now(),
   parent_id             integer,
 
   FOREIGN KEY (creator) REFERENCES users (id) ON DELETE SET NULL,

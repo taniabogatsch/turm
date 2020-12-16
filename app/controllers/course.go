@@ -232,12 +232,21 @@ func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Resu
 		return c.Render()
 	}
 
+	//try this time format
 	t, err := time.ParseInLocation("2006-01-02T15:04:05-07:00", monday, loc)
 	if err != nil {
-		c.Log.Error("failed to parse string to time", "monday", monday,
-			"loc", loc, "error", err.Error())
-		renderQuietError(errTypeConv, err, c.Controller)
-		return c.Render()
+
+		//test another time format
+		t, err = time.ParseInLocation("2006-01-02T15:04:05.999999999Z", monday, loc)
+
+		//no matching format
+		if err != nil {
+			c.Log.Error("failed to parse string to time", "monday", monday,
+				"loc", loc, "error", err.Error())
+			renderQuietError(errTypeConv, err, c.Controller)
+			return c.Render()
+		}
+
 	}
 
 	t = t.AddDate(0, 0, shift*7)

@@ -76,13 +76,15 @@ func backup() (err error) {
 	}
 
 	//upload the backup to the cloud
-	authStr := cloud.User + ":" + cloud.Password
-	connStr = cloud.Address + cloud.User + "/" + cloud.Folder + "/" + filename
-	out, err = exec.Command("curl", "-u", authStr, "-T", fpath, connStr).CombinedOutput()
-	if err != nil {
-		revel.AppLog.Error("failed to upload backup to cloud", "authStr", authStr, "fpath",
-			fpath, "connStr", connStr, "error", err.Error(), "out", string(out))
-		return
+	if false { //TODO: set this in config
+		authStr := cloud.User + ":" + cloud.Password
+		connStr = cloud.Address + cloud.User + "/" + cloud.Folder + "/" + filename
+		out, err = exec.Command("curl", "-u", authStr, "-T", fpath, connStr).CombinedOutput()
+		if err != nil {
+			revel.AppLog.Error("failed to upload backup to cloud", "authStr", authStr, "fpath",
+				fpath, "connStr", connStr, "error", err.Error(), "out", string(out))
+			return
+		}
 	}
 
 	revel.AppLog.Warn("done creating DB backup...")
@@ -97,7 +99,7 @@ type fetchEnrollData struct{}
 /*Run executes the job to fetch the enrollment data file. */
 func (e fetchEnrollData) Run() {
 
-	if !revel.DevMode {
+	if !revel.DevMode && false { //TODO: set to true if not running on test server: get from config
 		if err := fetch(); err != nil {
 			SendErrorNote()
 		}
