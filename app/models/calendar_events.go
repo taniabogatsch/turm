@@ -338,33 +338,26 @@ func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err erro
 				//insert all BOOKED and FREE schedule entries for the current day template
 				for j := range day.DayTmpls[i].Slots {
 
-					//get start time as string
-					slotStart := CustomTime{"", day.DayTmpls[i].Slots[j].Start.Hour(),
-						day.DayTmpls[i].Slots[j].Start.Minute()}
-					slotStart.String()
-
-					//get end time as string
-					slotEnd := CustomTime{"", day.DayTmpls[i].Slots[j].End.Hour(),
-						day.DayTmpls[i].Slots[j].End.Minute()}
-					slotEnd.String()
+					start := strings.Split(day.DayTmpls[i].Slots[j].StartStr, " ")
+					end := strings.Split(day.DayTmpls[i].Slots[j].EndStr, " ")
 
 					//check if there is free space before the first BOOKED slot
 					if j == 0 {
 						//insert FREE schedule entry
-						if day.DayTmpls[i].StartTime != slotStart.Value {
+						if day.DayTmpls[i].StartTime != start[1] {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{day.DayTmpls[i].StartTime,
-								slotStart.Value, day.DayTmpls[i].Interval, FREE, "0", 0})
+								start[1], day.DayTmpls[i].Interval, FREE, "0", 0})
 						}
 					} else {
 						//check for FREE space between two slots
-						if schedule.Entries[len(schedule.Entries)-1].EndTime != slotStart.Value {
+						if schedule.Entries[len(schedule.Entries)-1].EndTime != start[1] {
 							schedule.Entries = append(schedule.Entries, ScheduleEntry{schedule.Entries[len(schedule.Entries)-1].EndTime,
-								slotStart.Value, day.DayTmpls[i].Interval, FREE, "0", 0})
+								start[1], day.DayTmpls[i].Interval, FREE, "0", 0})
 						}
 					}
 
 					//insert slot as schedule entry
-					schedule.Entries = append(schedule.Entries, ScheduleEntry{slotStart.Value, slotEnd.Value,
+					schedule.Entries = append(schedule.Entries, ScheduleEntry{start[1], end[1],
 						day.DayTmpls[i].Interval, SLOT,
 						strconv.Itoa(day.DayTmpls[i].Slots[j].UserID),
 						day.DayTmpls[i].Slots[j].ID})
