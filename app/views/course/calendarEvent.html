@@ -39,6 +39,16 @@
     {{template "icons/trash.html" . }}
   </a>
 
+  <!-- duplicate event -->
+  <a class="btn btn-outline-darkblue float-right ml-3 edit-show d-none"
+    href='#no-scroll' role="button"
+    onclick='confirmDeleteRenderModal({{msg $ "event.duplicate.title"}},
+      {{msg $ "event.duplicate.confirm" .event.Title}},
+      "{{url "EditCalendarEvent.Duplicate" .event.ID .event.CourseID}}", "calendar_events");'
+    title='{{msg $ "title.duplicate"}}'>
+    {{template "icons/files.html" . }}
+  </a>
+
   <!-- event title -->
   <div id="div-calendar_title-{{.event.ID}}" class="d-inline">
     {{.event.Title}}

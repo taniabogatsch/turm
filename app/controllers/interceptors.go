@@ -143,7 +143,7 @@ func (c Course) auth() revel.Result {
 
 	if c.MethodName == "Meetings" {
 		authorized, expired, err = evalHasElevatedRights(c.Controller, "events")
-	} else if c.MethodName == "CalendarEvents" || c.MethodName == "CalendarEvent" {
+	} else if c.MethodName == "CalendarEvent" {
 		authorized, expired, err = evalHasElevatedRights(c.Controller, "calendar_events")
 	} else {
 		authorized, expired, err = evalHasElevatedRights(c.Controller, "courses")
@@ -345,7 +345,8 @@ func (c EditCalendarEvent) auth() revel.Result {
 		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "day_templates")
 
 	} else if c.MethodName == "Delete" || c.MethodName == "EditDayTemplate" ||
-		c.MethodName == "ChangeException" || c.MethodName == "NewDayTemplate" {
+		c.MethodName == "ChangeException" || c.MethodName == "NewDayTemplate" ||
+		c.MethodName == "Duplicate" {
 		belongs, err = evalElemBelongs(c.Controller, "courseID", "ID", "calendar_events")
 
 	}

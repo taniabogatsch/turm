@@ -211,7 +211,7 @@ event.type.calendar = Calendar event
 event.new.calendar.success = Added calendar event '%s', course ID = %d.
 
 event.calendar.delete.success = Deleted calendar event, ID = %d.
-event.calendar.delete.confirm = Please confirm the deletion of the calendar event '%s'. <br><br> CAREFUL: All users who booked slots for this calendar event will be removed and notified by e-mail.
+event.calendar.delete.confirm = Please confirm the deletion of the calendar event '%s'. <br><br> <small class="text-muted form-text"><b>CAREFUL</b>: All users who booked slots for this calendar event will be removed and notified by e-mail.</small>
 event.calendar.delete.title = Delete calendar event
 
 event.calendar.title.change.info = The calendar event title comprises the purpose of the event, e.g. 'Machine 1', 'Room 3', ...

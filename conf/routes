@@ -117,6 +117,7 @@ POST    /edit/meeting/duplicate                     EditMeeting.Duplicate
 
 POST    /edit/calendar/changeText                   EditCalendarEvent.ChangeText
 POST    /edit/calendar/delete                       EditCalendarEvent.Delete
+POST    /edit/calendar/duplicate                    EditCalendarEvent.Duplicate
 POST    /edit/calendar/newDayTemplate               EditCalendarEvent.NewDayTemplate
 POST    /edit/calendar/deleteDayTemplate            EditCalendarEvent.DeleteDayTemplate
 POST    /edit/calendar/editDayTemplate              EditCalendarEvent.EditDayTemplate

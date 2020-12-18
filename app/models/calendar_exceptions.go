@@ -305,6 +305,19 @@ func (excepts *Exceptions) Get(tx *sqlx.Tx, eventID *int) (err error) {
 	return
 }
 
+/*Duplicate all exceptions of a calendar event. */
+func (excepts *Exceptions) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
+
+	_, err = tx.Exec(stmtDuplicateExceptions, *eventIDNew, *eventIDOld)
+	if err != nil {
+		log.Error("failed to duplicate exceptions", "eventIDNew",
+			*eventIDNew, "eventIDOld", *eventIDOld, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
 const (
 	stmtSelectExceptionsOfWeek = `
     SELECT id, calendar_event_id, exception_start, exception_end, annotation
@@ -319,12 +332,9 @@ const (
   `
 
 	stmtInsertException = `
-		INSERT INTO calendar_exceptions (
-			 calendar_event_id, exception_start, exception_end, annotation
-			)
-		VALUES (
-				$1, $2, $3, $4
-		)
+		INSERT INTO calendar_exceptions
+			(calendar_event_id, exception_start, exception_end, annotation)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
 
@@ -386,5 +396,16 @@ const (
 	DELETE
 	FROM calendar_exceptions
 	WHERE id = $1
+	`
+
+	stmtDuplicateExceptions = `
+		INSERT INTO calendar_exceptions
+			(calendar_event_id, exception_start, exception_end, annotation)
+		(
+			SELECT
+				$1 AS calendar_event_id, exception_start, exception_end, annotation
+			FROM calendar_exceptions
+			WHERE calendar_event_id = $2
+		)
 	`
 )

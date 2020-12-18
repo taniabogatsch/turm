@@ -61,7 +61,7 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 
-	c.Log.Debug("delete calendar event", "ID", ID)
+	c.Log.Debug("delete calendar event", "ID", ID, "courseID", courseID)
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
@@ -75,6 +75,25 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 	//TODO: send e-mail to all slots if the course is active
 
 	c.Flash.Success(c.Message("event.calendar.delete.success", ID))
+	return c.Redirect(Course.CalendarEvents, courseID)
+}
+
+/*Duplicate calendar event data.
+- Roles: creator and editors of the course of the event */
+func (c EditCalendarEvent) Duplicate(ID, courseID int) revel.Result {
+
+	c.Log.Debug("duplicate calendar event", "ID", ID, "courseID", courseID)
+
+	//NOTE: the interceptor assures that the event ID is valid
+
+	event := models.CalendarEvent{ID: ID, CourseID: courseID}
+	if err := event.Duplicate(nil); err != nil {
+		return flashError(
+			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("event.duplicate.success", ID))
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 

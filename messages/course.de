@@ -211,7 +211,7 @@ event.type.calendar = Kalenderveranstaltung
 event.new.calendar.success = Kalenderveranstaltung '%s' hinzugefügt, Kurs ID = %d.
 
 event.calendar.delete.success = Kalenderveranstaltung gelöscht, ID = %d.
-event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen? <br><br> ACHTUNG: Alle NutzerInnen, die bereits Buchungen für diese Kalenderveranstaltung vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.
+event.calendar.delete.confirm = Kalenderveranstaltung '%s' wirklich löschen? <br><br> <small class="text-muted form-text"><b>ACHTUNG</b>: Alle NutzerInnen, die bereits Buchungen für diese Kalenderveranstaltung vorgenommen haben, werden entfernt und via E-Mail benachrichtigt.</small>
 event.calendar.delete.title = Kalenderveranstaltung löschen
 
 event.calendar.title.change.info = Der Kalenderveranstaltungstitel fasst den Zweck der Veranstaltung bündig zusammen, Beispiele sind 'Maschine 1', 'Raum 1', ...

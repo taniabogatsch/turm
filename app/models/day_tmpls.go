@@ -190,19 +190,6 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) 
 	return
 }
 
-/*Duplicate all day_templates if the eventIDOld into the eventIDNew*/
-func (tmpls *DayTmpls) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
-
-	_, err = tx.Exec(stmtDuplicateDayTemplates, *eventIDNew, *eventIDOld)
-	if err != nil {
-		log.Error("failed to duplicate day templates", "eventIDNew",
-			*eventIDNew, "eventIDOld", *eventIDOld, "error", err.Error())
-		tx.Rollback()
-	}
-
-	return
-}
-
 /*Delete a day template if it has no slots. */
 func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 
@@ -366,6 +353,19 @@ func (tmpl *DayTmpl) validate(v *revel.Validation, tx *sqlx.Tx) {
 			v.ErrorKey("validation.calendar.event.tmpls.overlap")
 		}
 	}
+}
+
+/*Duplicate all day templates of a calendar event. */
+func (tmpls *DayTmpls) Duplicate(tx *sqlx.Tx, eventIDNew, eventIDOld *int) (err error) {
+
+	_, err = tx.Exec(stmtDuplicateDayTemplates, *eventIDNew, *eventIDOld)
+	if err != nil {
+		log.Error("failed to duplicate day templates", "eventIDNew",
+			*eventIDNew, "eventIDOld", *eventIDOld, "error", err.Error())
+		tx.Rollback()
+	}
+
+	return
 }
 
 const (

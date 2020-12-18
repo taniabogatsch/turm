@@ -185,15 +185,21 @@ func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
 	var newID int
 	err = tx.Get(&newID, stmtDuplicateCalendarEvent, event.CourseID, event.ID)
 	if err != nil {
-		log.Error("failed to duplicate calendar Event", "Calendar event", *event,
+		log.Error("failed to duplicate calendar event", "calendar event", *event,
 			"error", err.Error())
 		tx.Rollback()
 		return
 	}
 
-	//duplicate all day templates of this event
+	//duplicate all day templates
 	tmpls := DayTmpls{}
 	err = tmpls.Duplicate(tx, &newID, &event.ID)
+	if err != nil {
+		return
+	}
+
+	//duplicate all exceptions
+	err = event.Exceptions.Duplicate(tx, &newID, &event.ID)
 	if err != nil {
 		return
 	}
