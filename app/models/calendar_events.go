@@ -211,7 +211,7 @@ func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
 }
 
 /*Delete a calendar event. */
-func (event *CalendarEvent) Delete() (err error) {
+func (event *CalendarEvent) Delete() (users []EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -219,9 +219,39 @@ func (event *CalendarEvent) Delete() (err error) {
 		return
 	}
 
-	//TODO: get all users that have booked slots for this event (in the future)
-	//TODO: return these and write them an e-mail
 	//TODO: validation: a course must always have at least one event/calendar event
+
+	//get all slots of this calendar event
+	var slots Slots
+	if err = slots.GetAllCalendarEvent(tx, event.ID); err != nil {
+		return
+	}
+
+	//get all users that have booked slots for this day template (in the future)
+	now := time.Now()
+	for _, slot := range slots {
+
+		//append e-mail data (if slot is upcoming)
+		if slot.End.After(now) {
+
+			//get e-mail data
+			data := EMailData{}
+			data.User.ID = slot.UserID
+			if err = data.User.Get(tx); err != nil {
+				return
+			}
+
+			err = tx.Get(&data, stmtGetSlotEMailData, slot.ID, app.TimeZone)
+			if err != nil {
+				log.Error("failed to get slot data for e-mail", "slotID", slot.ID,
+					"error", err.Error())
+				tx.Rollback()
+				return
+			}
+
+			users = append(users, data)
+		}
+	}
 
 	//delete event
 	if err = deleteByID("id", "calendar_events", event.ID, tx); err != nil {

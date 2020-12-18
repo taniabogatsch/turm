@@ -66,13 +66,23 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	event := models.CalendarEvent{ID: ID}
-	if err := event.Delete(); err != nil {
+	users, err := event.Delete()
+	if err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
 
-	//TODO: send e-mail to all slots if the course is active
+	//send e-mail to all upcoming slots if the course is active
+	for _, user := range users {
+
+		err = sendEMail(c.Controller, &user,
+			"email.subject.from.slot",
+			"manualRemove")
+		if err != nil {
+			return flashError(errEMail, err, "", c.Controller, user.User.EMail)
+		}
+	}
 
 	c.Flash.Success(c.Message("event.calendar.delete.success", ID))
 	return c.Redirect(Course.CalendarEvents, courseID)

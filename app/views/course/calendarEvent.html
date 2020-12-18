@@ -113,7 +113,20 @@
       <div class="row">
         <div class="col-sm-12 rounded-top">
 
-          <div class="row">
+          <!-- week header for edit -->
+          <div class="row edit-show d-none">
+            <div class="col-sm-1 text-left">
+            </div>
+            <!-- week -->
+            <div class="col-sm-10 text-center">
+              <strong>{{msg $ "event.calendar.week"}}</strong>
+            </div>
+            <div class="col-sm-1 text-right">
+            </div>
+          </div>
+
+          <!-- normal week header -->
+          <div class="row edit-hide">
             <!-- navigate through weeks: PREVIOUS -->
             <div class="col-sm-1 text-left">
               <a href="#no-scroll" class="badge btn-outline-darkblue"
@@ -139,6 +152,7 @@
               </a>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -178,11 +192,11 @@
 
       <!-- content -->
       <br>
-      <div class="row">
 
-        <!-- range each week day and list day templates -->
+      <!-- range each week day and list day templates -->
+      <div class="row edit-show d-none">
         {{range $k, $v := .event.Days}}
-          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-show d-none">
+          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}}">
 
             <!-- range day templates of a day -->
             {{range .DayTmpls}}
@@ -219,10 +233,12 @@
 
           </div>
         {{end}}
+      </div>
 
-        <!-- show schedule of each day -->
+      <!-- show schedule of each day -->
+      <div class="row edit-hide">
         {{range $k, $v := .event.ScheduleWeek}}
-          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}} edit-hide">
+          <div class="{{if lt $k 5}}col-sm-2{{else}}col-sm-1{{end}}">
 
             {{$freeSlot := false}}
 
@@ -327,11 +343,13 @@
             {{end}}
           </div>
         {{end}}
-
       </div>
+
     </div>
   </div>
   <br>
+
+  <!-- legend -->
   <div class="edit-hide">
     <div class="card-body p-1 d-inline mr-2">
       {{msg $ "event.calendar.legend"}}:

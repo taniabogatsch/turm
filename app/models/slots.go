@@ -127,14 +127,28 @@ func (slots *Slots) Get(tx *sqlx.Tx, dayTmplID int, monday time.Time,
 	return
 }
 
-/*GetAll slots of a day template. */
-func (slots *Slots) GetAll(tx *sqlx.Tx, dayTmplID int) (err error) {
+/*GetAllDayTmpl returns all slots of a day template. */
+func (slots *Slots) GetAllDayTmpl(tx *sqlx.Tx, dayTmplID int) (err error) {
 
 	//get slot data for validation
 	err = tx.Select(slots, stmtSelectAllSlotsOfDayTemplate, dayTmplID)
 	if err != nil {
 		log.Error("failed to get all slots of a day template", "dayTmplID", dayTmplID,
 			"error", err.Error())
+		tx.Rollback()
+	}
+
+	return
+}
+
+/*GetAllCalendarEvent returns all slots of a calendar event. */
+func (slots *Slots) GetAllCalendarEvent(tx *sqlx.Tx, calendarEventID int) (err error) {
+
+	//get slot data for validation
+	err = tx.Select(slots, stmtSelectAllSlotsOfCalendarEvent, calendarEventID)
+	if err != nil {
+		log.Error("failed to get all slots of a calendar event", "calendarEventID",
+			calendarEventID, "error", err.Error())
 		tx.Rollback()
 	}
 
@@ -470,6 +484,13 @@ const (
 		FROM slots
 		WHERE day_tmpl_id = $1
 		ORDER BY start_time ASC
+	`
+
+	stmtSelectAllSlotsOfCalendarEvent = `
+		SELECT s.id, s.user_id, s.day_tmpl_id, s.start_time, s.end_time
+		FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
+			JOIN calendar_events e ON t.calendar_event_id = e.id
+		WHERE e.id = $1
 	`
 
 	stmtGetSlotEMailData = `

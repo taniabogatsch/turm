@@ -109,7 +109,7 @@ func (tmpl *DayTmpl) Update(v *revel.Validation) (users []EMailData, err error) 
 	}
 
 	var slots Slots
-	if err = slots.GetAll(tx, tmpl.ID); err != nil {
+	if err = slots.GetAllDayTmpl(tx, tmpl.ID); err != nil {
 		return
 	}
 
@@ -201,15 +201,16 @@ func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 
 	//get all slots of this day template
 	var slots Slots
-	if err = slots.GetAll(tx, tmpl.ID); err != nil {
+	if err = slots.GetAllDayTmpl(tx, tmpl.ID); err != nil {
 		return
 	}
 
 	//get all users that have booked slots for this day template (in the future)
+	now := time.Now()
 	for _, slot := range slots {
 
 		//append e-mail data (if slot is upcoming)
-		if slot.End.After(time.Now()) {
+		if slot.End.After(now) {
 
 			//get e-mail data
 			data := EMailData{}
