@@ -12,11 +12,10 @@ import (
 /*MailerConn contains all Mailer connection fields. */
 type MailerConn struct {
 	EMail    string
-	Server   string
 	URL      string
 	User     string
-	Suffix   string
 	Password string
+	Suffix   string
 }
 
 /*EMail contains all fields required to send an e-mail. */
@@ -152,16 +151,11 @@ func initMailerData() {
 	if Mailer.EMail, found = revel.Config.String("email.email"); !found {
 		revel.AppLog.Fatal("cannot find key in config", "key", "email.email")
 	}
-	if Mailer.Server, found = revel.Config.String("email.server"); !found {
-		revel.AppLog.Fatal("cannot find key in config", "key", "email.server")
-	}
-	var port string
-	if port, found = revel.Config.String("email.port"); !found {
-		revel.AppLog.Fatal("cannot find key in config", "key", "email.port")
-	}
-	Mailer.URL = Mailer.Server + ":" + port
 	if Mailer.User, found = revel.Config.String("email.user"); !found {
 		revel.AppLog.Fatal("cannot find key in config", "key", "email.user")
+	}
+	if Mailer.URL, found = revel.Config.String("email.url"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "email.url")
 	}
 	if Mailer.Suffix, found = revel.Config.String("email.suffix"); !found {
 		revel.AppLog.Fatal("cannot find key in config", "key", "email.suffix")

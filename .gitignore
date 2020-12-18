@@ -4,4 +4,3 @@ routes/
 conf/passwords.json
 none
 target/
-conf/app.conf
