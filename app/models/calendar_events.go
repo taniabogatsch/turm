@@ -9,6 +9,7 @@ import (
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/revel/revel"
 )
 
 /*CalendarEvents holds all calendar events of a course. */
@@ -211,7 +212,7 @@ func (event *CalendarEvent) Duplicate(tx *sqlx.Tx) (err error) {
 }
 
 /*Delete a calendar event. */
-func (event *CalendarEvent) Delete() (users []EMailData, err error) {
+func (event *CalendarEvent) Delete(v *revel.Validation) (users []EMailData, err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -219,7 +220,27 @@ func (event *CalendarEvent) Delete() (users []EMailData, err error) {
 		return
 	}
 
-	//TODO: validation: a course must always have at least one event/calendar event
+	//don't allow courses to have no events and no calendar events
+	if err = event.GetColumnValue(tx, "course_id"); err != nil {
+		return
+	}
+
+	//get course data for validation
+	course := Course{ID: event.CourseID}
+	if err = course.GetForValidation(tx); err != nil {
+		return
+	}
+
+	//validate changes
+	if course.Active {
+		if len(course.CalendarEvents) > 0 {
+			course.CalendarEvents = course.CalendarEvents[:len(course.CalendarEvents)-1]
+		}
+		if course.Validate(v); v.HasErrors() {
+			tx.Commit()
+			return
+		}
+	}
 
 	//get all slots of this calendar event
 	var slots Slots

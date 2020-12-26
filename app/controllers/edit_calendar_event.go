@@ -66,10 +66,14 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	event := models.CalendarEvent{ID: ID}
-	users, err := event.Delete()
+	users, err := event.Delete(c.Validation)
 	if err != nil {
 		return flashError(
 			errDB, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
+			c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, err, "/course/calendarEvents?ID="+strconv.Itoa(courseID),
 			c.Controller, "")
 	}
 

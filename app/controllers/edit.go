@@ -670,7 +670,7 @@ func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) re
 		return c.Render()
 	}
 
-	//TODO: do not load matriculation numbers if the user is not allowed to see them
+	//TODO: do not search by matriculation numbers if the user is not allowed to see them
 
 	return c.Render(users, listType)
 }

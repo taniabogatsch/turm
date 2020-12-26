@@ -66,6 +66,8 @@ func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
+	//TODO: allow user to define from - to for calendar events
+
 	//get the participants
 	participants := models.Participants{ID: ID}
 	if err := participants.Get(userID); err != nil {
@@ -136,6 +138,19 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 					_, exists := emails[user.EMail]
 					if !exists {
 						emails[user.EMail] = true
+					}
+				}
+			}
+
+			//slots
+			for _, day := range event.Days {
+				for _, tmpl := range day.DayTmpls {
+					for _, slot := range tmpl.Slots {
+
+						_, exists := emails[slot.User.EMail]
+						if !exists {
+							emails[slot.User.EMail] = true
+						}
 					}
 				}
 			}
@@ -433,35 +448,49 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 	row = []string{c.Message("pcpts.download.extraction.time") + ": " + date + " " + time}
 	data = append(data, row)
 
-	//first row with headings
-	row = []string{}
-	data = append(data, row)
-	row = []string{}
-	row = append(row,
-		c.Message("event.ID"),
-		c.Message("event.title"),
-		c.Message("user.salutation"),
-		c.Message("user.academic.title"),
-		c.Message("user.title"),
-		c.Message("user.firstname"),
-		c.Message("user.name.affix"),
-		c.Message("user.lastname"),
-		c.Message("user.email"),
-		c.Message("user.language"),
-		c.Message("user.matr.nr"),
-		c.Message("user.affiliation"),
-		c.Message("user.degree"),
-		c.Message("user.course.of.studies"),
-		c.Message("user.semester"),
-		c.Message("enroll.time"),
-		c.Message("enroll.status"))
-	data = append(data, row)
-	row = []string{}
-	data = append(data, row)
+	hasEvent := false
+	hasCalendarEvent := false
+	for _, event := range participants.Lists {
+		if !event.IsCalendarEvent {
+			hasEvent = true
+		} else {
+			hasCalendarEvent = true
+		}
+	}
 
+	//first row with headings for events
+	if hasEvent {
+		row = []string{}
+		data = append(data, row)
+		row = []string{}
+		row = append(row,
+			c.Message("event.ID"),
+			c.Message("event.title"),
+			c.Message("user.salutation"),
+			c.Message("user.academic.title"),
+			c.Message("user.title"),
+			c.Message("user.firstname"),
+			c.Message("user.name.affix"),
+			c.Message("user.lastname"),
+			c.Message("user.email"),
+			c.Message("user.language"),
+			c.Message("user.matr.nr"),
+			c.Message("user.affiliation"),
+			c.Message("user.degree"),
+			c.Message("user.course.of.studies"),
+			c.Message("user.semester"),
+			c.Message("enroll.time"),
+			c.Message("enroll.status"))
+		data = append(data, row)
+		row = []string{}
+		data = append(data, row)
+	}
+
+	//event data
 	for _, event := range participants.Lists {
 
-		if conf.AllEvents || containsEvent(conf.EventIDs, event.ID) {
+		if (conf.AllEvents || containsEvent(conf.EventIDs, event.ID)) &&
+			!event.IsCalendarEvent {
 
 			//participants
 			if conf.Participants && len(event.Participants) != 0 {
@@ -484,6 +513,54 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 				appendList(&data, event.Unsubscribed, c, event.ID, event.Title)
 			}
 
+		}
+	}
+
+	//first row with headings for calendar events
+	if hasCalendarEvent {
+		row = []string{}
+		data = append(data, row)
+		row = []string{}
+		row = append(row,
+			c.Message("event.ID"),
+			c.Message("event.title"),
+			c.Message("user.salutation"),
+			c.Message("user.academic.title"),
+			c.Message("user.title"),
+			c.Message("user.firstname"),
+			c.Message("user.name.affix"),
+			c.Message("user.lastname"),
+			c.Message("user.email"),
+			c.Message("user.language"),
+			c.Message("user.matr.nr"),
+			c.Message("user.affiliation"),
+			c.Message("user.degree"),
+			c.Message("user.course.of.studies"),
+			c.Message("user.semester"),
+			c.Message("enroll.start.time"),
+			c.Message("enroll.end.end"))
+		data = append(data, row)
+		row = []string{}
+		data = append(data, row)
+	}
+
+	//calendar event data
+	for _, event := range participants.Lists {
+
+		if (conf.AllEvents || containsEvent(conf.EventIDs, event.ID)) &&
+			event.IsCalendarEvent {
+
+			for _, day := range event.Days {
+				for _, tmpl := range day.DayTmpls {
+					for _, slot := range tmpl.Slots {
+
+						//add slots
+						row = []string{}
+						data = append(data, row)
+						appendSlot(&data, c, &slot, event.ID, event.Title)
+					}
+				}
+			}
 		}
 	}
 
@@ -586,6 +663,62 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 		//and put them in the csv data array
 		*data = append(*data, row)
 	}
+}
+
+func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
+	ID int, title string) {
+
+	row := []string{}
+
+	salutation := c.Message("user.salutation.ms")
+	if slot.User.Salutation == models.NONE {
+		salutation = c.Message("user.salutation.none")
+	} else if slot.User.Salutation == models.MR {
+		salutation = c.Message("user.salutation.mr")
+	}
+
+	//matriculation number
+	matrNr := c.Message("user.no.matr.nr")
+	if slot.User.MatrNr.Valid {
+		if slot.User.MatrNr.Int32 != 12345 {
+			matrNr = strconv.Itoa(int(slot.User.MatrNr.Int32))
+		} else {
+			matrNr = c.Message("user.matr.nr.not.visible")
+		}
+	}
+
+	//convert array of affiliations to string
+	affiliations := stringFromSlice(slot.User.Affiliations.Affiliations)
+
+	degrees, studies, semesters := "", "", ""
+	for _, study := range slot.User.Studies {
+		degrees = appendValueToString(degrees, study.Degree)
+		studies = appendValueToString(studies, study.CourseOfStudies)
+		semesters = appendValueToString(semesters, strconv.Itoa(study.Semester))
+	}
+
+	row = append(row,
+		strconv.Itoa(ID),
+		title,
+		salutation,
+		slot.User.AcademicTitle.String,
+		slot.User.Title.String,
+		slot.User.FirstName,
+		slot.User.NameAffix.String,
+		slot.User.LastName,
+		slot.User.EMail,
+		slot.User.Language.String,
+		matrNr,
+		affiliations,
+		degrees,
+		studies,
+		semesters,
+		slot.StartStr,
+		slot.EndStr)
+
+	//and put them in the csv data array
+	*data = append(*data, row)
+
 }
 
 func containsEvent(IDs []int, ID int) bool {

@@ -208,15 +208,12 @@ func (event *Event) Delete(v *revel.Validation) (err error) {
 	}
 
 	//don't allow courses to have no events and no calendar events
-	course := Course{}
-	if err = tx.Get(&course, stmtGetCourseIDOfEvent, event.ID); err != nil {
-		log.Error("failed to get course id of event", "event", *event,
-			"error", err.Error())
-		tx.Rollback()
+	if err = event.GetColumnValue(tx, "course_id"); err != nil {
 		return
 	}
 
 	//get course data for validation
+	course := Course{ID: event.CourseID}
 	if err = course.GetForValidation(tx); err != nil {
 		return
 	}
@@ -629,11 +626,5 @@ const (
 			WHERE event_id = $1
 				AND status = 1 /*on waitlist*/
 		)
-	`
-
-	stmtGetCourseIDOfEvent = `
-		SELECT course_id AS id
-		FROM events e
-		WHERE e.id = $1
 	`
 )

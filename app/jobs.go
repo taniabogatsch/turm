@@ -24,6 +24,9 @@ var (
 	enrollFilePath string
 	enrollFileName string
 
+	//testServer is set to true if turm is not running on its official IP
+	testServer string
+
 	//jobSchedules holds the time of each scheduled job
 	jobSchedules map[string]string
 )
@@ -76,7 +79,7 @@ func backup() (err error) {
 	}
 
 	//upload the backup to the cloud
-	if false { //TODO: set this in config
+	if testServer != "true" {
 		authStr := cloud.User + ":" + cloud.Password
 		connStr = cloud.Address + cloud.User + "/" + cloud.Folder + "/" + filename
 		out, err = exec.Command("curl", "-u", authStr, "-T", fpath, connStr).CombinedOutput()
@@ -99,13 +102,13 @@ type fetchEnrollData struct{}
 /*Run executes the job to fetch the enrollment data file. */
 func (e fetchEnrollData) Run() {
 
-	if !revel.DevMode && false { //TODO: set to true if not running on test server: get from config
+	if !revel.DevMode && testServer != "true" {
 		if err := fetch(); err != nil {
 			SendErrorNote()
 		}
 
 	} else {
-		revel.AppLog.Warn("not in production mode, skip fetching studies...")
+		revel.AppLog.Warn("not in production mode or on test server, skip fetching studies...")
 	}
 }
 
@@ -412,6 +415,11 @@ func initJobSchedules() {
 		revel.AppLog.Fatal("cannot find key in config", "key", "jobs.deleteCourses")
 	}
 	jobSchedules["jobs.deleteCourses"] = deleteCourses
+
+	//testServer
+	if testServer, found = revel.Config.String("jobs.testServer"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "enroll.testServer")
+	}
 }
 
 const (

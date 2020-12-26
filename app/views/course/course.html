@@ -493,11 +493,11 @@
   {{template "course/blacklist.html" dict_addLocale $.currentLocale "blacklist" .course.Blacklist}}
 </div>
 
-<br id="events">
-<br>
+<br class="medium-hidden">
+<br class="medium-hidden">
 
 <!-- events info -->
-<div class="row edit-show d-none mb-2">
+<div id="events" class="row edit-show d-none mb-2">
   <div class="col">
     <h5>
       {{template "icons/people.html" .}}
