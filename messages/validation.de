@@ -139,3 +139,9 @@ validation.calendar.exceptions.invalid.time = Die angegebene Zeit ist nicht im g
 validation.calendar.event.exception.start.in.past = Die Ausnahme darf nicht in der Vergangenheit beginnen.
 validation.calendar.event.exception.start.after.end = Der Anfang darf nicht nach dem Ende liegen.
 validation.calendar.event.overlapping.exception = Eine andere Ausnahme belegt bereits einen Teil der angegebenen Zeitspanne.
+
+# -------------------------------------------------------------------------------------------------- #
+# PARTICIPANTS
+# -------------------------------------------------------------------------------------------------- #
+
+validation.pcpts.start.before.end = Der Anfang des Intervals muss vor dessen Ende liegen.

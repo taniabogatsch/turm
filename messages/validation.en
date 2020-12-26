@@ -139,3 +139,9 @@ validation.calendar.exceptions.invalid.time = The provided time is not in the re
 validation.calendar.event.exception.start.in.past = Exceptions cannot start in the past.
 validation.calendar.event.exception.start.after.end = Exceptions must start before they end.
 validation.calendar.event.overlapping.exception = This exception overlaps with an already existing exception.
+
+# -------------------------------------------------------------------------------------------------- #
+# PARTICIPANTS
+# -------------------------------------------------------------------------------------------------- #
+
+validation.pcpts.start.before.end = The interval must start before it ends.

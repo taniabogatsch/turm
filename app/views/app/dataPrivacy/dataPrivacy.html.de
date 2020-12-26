@@ -15,8 +15,8 @@
 <p align="left" style="margin-bottom: 0in; line-height: 100%">
   <font face="Liberation Serif, serif">
     <font size="2" style="font-size: 14pt">
-      Turm2 ist eine Plattform zum Anlegen und Einschreiben in Kurse. Zusätzlich
-      werden weitere Funktionen wie die Suche in allen angebotenen Kursen
+      Turm2 ist eine Plattform zum Anlegen und Einschreiben in Veranstaltungen von Kursen.
+      Zusätzlich werden weitere Funktionen wie die Suche in allen angebotenen Kursen
       und eine Übersicht über die eigenen Kurse bereitgestellt. Anbieter
       ist die Technische Universität Ilmenau. Auf den Dienst kann über
       einen Webbrowser, in dem JavaScript aktiviert ist, zugegriffen
@@ -108,9 +108,9 @@
     <font size="2" style="font-size: 14pt">
       Auf Anfrage beim System-Administrator können Konten zusätzlich zu
       normalen Nutzerrechten die Rechte des Kursverantwortlichen, der Kurse
-      erstellen kann, die Rechte des Bezahlstatusverwalters und des
-      Administrators erhalten. Die Rechte des Kursorganisators erhält ein
-      Nutzer, der von einem Kursverantwortlichen als Kursorganisator in
+      erstellen kann und des Administrators erhalten. Die Rechte des
+      Editors und des Organisators erhält ein Nutzer, der von einem
+      Kursverantwortlichen als Editor bzw. Organisator in
       einen Kurs eingetragen worden ist. Es ist für ein Konto möglich,
       mehrere oder sogar alle spezifischen Rechte zu besitzen.
     </font>
@@ -356,7 +356,8 @@
           <td>Nutzerfreundlichkeit</td>
         </tr>
         <tr>
-          <td>UserID, „Account aktiviert”-Flag, Vorname, Nachname, E-Mail-Adresse, spezielle Nutzerrechte, „Angemeldet bleiben”-Flag</td>
+          <td>UserID, „Account aktiviert”-Flag, Vorname, Nachname, E-Mail-Adresse, spezielle Nutzerrechte,
+              „Angemeldet bleiben”-Flag</td>
           <td>falls der Nutzer eingeloggt ist/ 1 Stunde nach letzter Aktion auf der Seite</td>
           <td>Rollen- und Rechtemanagement, notwendig für Funktionen wie das Einschreiben in Kurse</td>
         </tr>
@@ -374,14 +375,15 @@
           <th scope="row" colspan="3">Accountdaten (allgemein)</th>
         </tr>
         <tr>
-          <td>UserID, Zeitpunkt des letzten Anmeldens, spezielle Nutzerrechte</td>
+          <td>UserID, Zeitpunkt des ersten/letzten Anmeldens, spezielle Nutzerrechte</td>
           <td>alle Nutzer, die sich jemals auf Turm2 angemeldet haben/ 2 Jahre nach letztem Anmelden</td>
           <td>notwendig für den fehlerfreien Betrieb des Systems/ keine Weitergabe</td>
         </tr>
         <tr>
-          <td>Vorname, Nachname, E-Mail-Adresse, Anrede</td>
+          <td>Vorname, Nachname, E-Mail-Adresse, Anrede, Sprache</td>
           <td>alle Nutzer, die sich jemals auf Turm2 angemeldet haben/ 2 Jahre nach letztem Anmelden</td>
-          <td>Teilnehmer- Warte- und Ausgetragenenliste/ weitergegeben an die betreffenden Kursorganisatoren und Kursverantwortlichen</td>
+          <td>Teilnehmer- Warte- und Ausgetragenenliste, Buchungen/ weitergegeben an die betreffenden Organisatoren,
+              Editoren und Kursverantwortlichen</td>
         </tr>
 
         <tr>
@@ -390,12 +392,16 @@
         <tr>
           <td>evtl. Matrikelnummer</td>
           <td>alle Nutzer mit TU Ilmenau Account und darüber erzeugtem Account/ 2 Jahre nach letztem Anmelden</td>
-          <td>Notenvergabe/ Kursorganisator und Kursverantwortlicher, erscheint auf Teilnehmerliste und ist auf der Teilnehmer- und Kursverwaltungsseite einsehbar</td>
+          <td>Notenvergabe/ Organisator, Editor und Kursverantwortlicher, erscheint auf Teilnehmerliste und ist auf der
+              Teilnehmerverwaltungsseite einsehbar (wenn Organisator/Editor die entsprechende Berechtigung
+              vom Kursverantwortlichen erhalten hat)</td>
         </tr>
         <tr>
-          <td>evtl. Studiengang/Studiengänge, Fachsemester, angestrebter Abschluss/angestrebte Abschlüsse, evtl. akademische und Ehrentitel, evtl. Namenszusätze, Zugehörigkeit (Student, Mitarbeiter, Funktion)</td>
+          <td>evtl. Studiengang/Studiengänge, Fachsemester, angestrebter Abschluss/angestrebte Abschlüsse, evtl.
+              akademische und Ehrentitel, evtl. Namenszusätze, Zugehörigkeit (Student, Mitarbeiter, Funktion)</td>
           <td>alle Nutzer mit TU Ilmenau Account und darüber erzeugtem Account/ 2 Jahre nach letztem Anmelden</td>
-          <td>Durchsetzen von Einschreibebeschränkungen von Kursen und Umsetzung des Prioritätensystems (in dem Bachelorstudierende bevorzugt einen Platz bekommen)/ erscheint auf Teilnehmerliste und ist auf der Teilnehmer- und Kursverwaltungsseite einsehbar</td>
+          <td>Durchsetzen von Einschreibebeschränkungen von Kursen/ erscheint auf Teilnehmerliste und ist auf der
+              Teilnehmerverwaltungsseite einsehbar</td>
         </tr>
 
         <tr>
@@ -417,25 +423,29 @@
         </tr>
         <tr>
           <td>KursID, Titel</td>
-          <td>Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Kursorganisatoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
-          <td>Korrekte Beschreibung des Kurses, (Einschreibe)Zeiträume/ wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website, sonst für eingeloggte Nutzer, max. 1 Jahr, wenn Kurs inaktiv, dann nicht sichtbar, die Willkommensemail (insofern vorhanden) ist nur für eingeschriebene Nutzer sichtbar</td>
+          <td>Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Organisatoren, Editoren und
+              Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Korrekte Beschreibung des Kurses, (Einschreibe)Zeiträume/ wenn Kurs öffentlich sichtbar, dann für
+              jeden Nutzer der Website, sonst für eingeloggte Nutzer, max. 1 Jahr, wenn Kurs abgelaufen, dann nicht sichtbar,
+              die Willkommensemail (insofern vorhanden) ist nur für eingeschriebene Nutzer sichtbar</td>
         </tr>
         <tr>
           <td>
             evtl. Untertitel, Beginn des Einschreibezeitraums,
-            Ende des Einschreibezeitraums, Ende des Abmeldezeitraums,
+            Ende des Einschreibezeitraums, evtl. Ende des Abmeldezeitraums,
             Ablaufdatum, öffentliche Sichtbarkeit, evtl.
-            Bezahlpflichtigkeit, evtl. Beschreibung,
-            Kursverantwortlicher, evtl. mehrere Kursorganisatoren
-            (die nicht im System registriert sein müssen), evtl.
-            das übergeordnete Prioritätensystem, „Inaktivitäts“-Flag,
+            Bezahlpflichtigkeit, evtl. Beschreibung, evtl. Referenten (die
+            nicht im System registriert sein müssen), Kursverantwortlicher,
+            evtl. mehrere Organisatoren, evtl. mehrere Editoren, „Inaktivitäts“-Flag,
             evtl. hinterlegte Willkommensemail, evtl. Beschränkungen
             auf der Anzahl an Veranstaltungen, in die sich Nutzer
             einschreiben können, evtl. Beschränkungen bzgl.
-            Studiengang/Semester/angestrebter Abschluss
+            Studiengang/Semester/angestrebter Abschluss, evtl. Beschränkung
+            auf Nutzer mit Universitätsaccount, Zuordnung zu einer Gruppe
           </td>
-          <td>Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Kursorganisatoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
-          <td>Korrektes öffnen von Kursen/ für jeden Nutzer der Website</td>
+          <td>Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Buchungen, Organisatoren, Editoren und
+              Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Korrektes Öffnen von Kursen/ für jeden Nutzer der Website</td>
         </tr>
         <tr>
           <td>evtl. Blacklist, evtl. Whitelist</td>
@@ -447,41 +457,81 @@
           <th scope="row" colspan="3">Veranstaltungsdaten</th>
         </tr>
         <tr>
-          <td>VeranstaltungsID, KursID, Anzahl Plätze, Vorhandensein einer Warteliste, Beschreibung, Einschreibeschlüssel</td>
-          <td>Veranstaltungen können Kursen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Kursorganisatoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
-          <td>Beschreibung der Veranstaltung/  wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website, sonst für eingeloggte Nutzer, max. 1 Jahr sichtbar, wenn Kurs inaktiv, dann nicht sichtbar</td>
+          <td>VeranstaltungsID, KursID, Titel, Anzahl Plätze, Vorhandensein einer Warteliste, Anmerkung, Einschreibeschlüssel</td>
+          <td>Veranstaltungen können Kursen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten,
+              Buchungen, Organisatoren, Editoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Beschreibung der Veranstaltung/ wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website, sonst für
+              eingeloggte Nutzer, max. 1 Jahr sichtbar, wenn Kurs abgelaufen, dann nur für Kursverantwortlichen, Editoren, Organisatoren sichtbar</td>
         </tr>
 
         <tr>
           <th scope="row" colspan="3">Termindaten</th>
         </tr>
         <tr>
-          <td>TerminID, VeranstaltungsID, KursID, Intervall, evtl. Wochentag, evtl. Ort, evtl. Anmerkung, Beginn, Ende</td>
-          <td>Termine können Veranstaltungen zugeordnet werden. Veranstaltungen können Kursen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Kursorganisatoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
-          <td>Beschreibung des Termins/  wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website, sonst für eingeloggte Nutzer, max. 1 Jahr sichtbar, wenn Kurs inaktiv, dann nicht sichtbar</td>
+          <td>TerminID, VeranstaltungsID, Intervall, evtl. Wochentag, evtl. Ort, evtl. Anmerkung, Beginn, Ende</td>
+          <td>Termine können Veranstaltungen zugeordnet werden. Veranstaltungen können Kursen zugeordnet werden. Kurse können
+              mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Buchungen, Organisatoren, Editoren und Kursverantwortlichen
+              in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Beschreibung des Termins/ wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website, sonst für eingeloggte
+              Nutzer, max. 1 Jahr sichtbar, wenn Kurs abgelaufen, dann nur für Kursverantwortlichen, Editoren, Organisatoren sichtbar</td>
+        </tr>
+
+        <tr>
+          <th scope="row" colspan="3">Kalenderveranstaltungsdaten</th>
+        </tr>
+        <tr>
+          <td>KalenderveranstaltungsID, KursID, Titel, Anmerkung, Schablonen, Ausnahmen</td>
+          <td>Kalenderveranstaltungen können Kursen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und
+              Ausgetragenenlisten, Buchungen, Organisatoren, Editoren und Kursverantwortlichen in Verbindung gebracht
+              werden/ max. 5 Jahre</td>
+          <td>Beschreibung der Veranstaltung/ wenn Kurs öffentlich sichtbar, dann für jeden Nutzer der Website,
+              sonst für eingeloggte Nutzer, max. 1 Jahr sichtbar, wenn Kurs abgelaufen, dann nur für Kursverantwortlichen,
+              Editoren, Organisatoren sichtbar</td>
         </tr>
 
         <tr>
           <th scope="row" colspan="3">Gruppendaten</th>
         </tr>
         <tr>
-          <td>GruppenID, Name, ÜbergruppenID, Übergruppenname, evtl. KursID, evtl. das übergeordnete Prioritätensystem, evtl. Maximum an Kursen, in die sich ein Nutzer in dieser Gruppe und deren Untergruppen einschreiben darf</td>
-          <td>Kurs können Gruppen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Kursorganisatoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
-          <td>Korrektes Navigieren zu einem Kurs/  für jeden Nutzer der Website</td>
+          <td>GruppenID, Name, ÜbergruppenID, evtl. Maximum an Kursen, in die sich ein Nutzer in dieser Gruppe und
+              deren Untergruppen einschreiben darf</td>
+          <td>Kurse können Gruppen zugeordnet werden. Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten,
+              Organisatoren, Editoren und Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Korrektes Navigieren zu einem Kurs/ für jeden Nutzer der Website</td>
         </tr>
 
         <tr>
           <th scope="row" colspan="3">Teilnehmer- Warte- und Ausgetragenenliste</th>
         </tr>
         <tr>
-          <td>Anrede, evtl. akademischer Titel, evtl. Ehrentitel, evtl. Namenszusatz, Vorname, Nachname, E-Mail-Adresse, Zugehörigkeit an der TU (Student, Mitarbeiter, Funktion),  evtl. Studiengang, evtl. Semester, evtl. angestrebter Abschluss, Einschreibestatus (eingeschrieben, auf Warteliste, ausgetragen, bezahlt, Bezahlung ausstehend, befreit)</td>
-          <td>Teilnehmer, Nutzer auf der Warteliste des Kurses, Nutzer auf der Ausgetragenenliste des Kurses/max. 5 Jahre nach Ende des Einschreibezeitraums</td>
-          <td>Anwesenheitskontrolle und Benachrichtigungsemails, Verwaltungsaufgaben/ Kursorganisator und Kursverantwortlicher</td>
+          <td>Anrede, evtl. akademischer Titel, evtl. Ehrentitel, evtl. Namenszusatz, Vorname, Nachname, E-Mail-Adresse,
+              Zugehörigkeit an der TU (Student, Mitarbeiter, Funktion),  evtl. Studiengang, evtl. Semester, evtl. angestrebter
+              Abschluss, Einschreibestatus (eingeschrieben, auf Warteliste, ausgetragen, bezahlt, Bezahlung ausstehend,
+              befreit)</td>
+          <td>Teilnehmer, Nutzer auf der Warteliste des Kurses, Nutzer auf der Ausgetragenenliste des Kurses/ max. 5 Jahre nach
+              Ende des Einschreibezeitraums</td>
+          <td>Anwesenheitskontrolle und Benachrichtigungsemails, Verwaltungsaufgaben/ Organisator, Editor und
+              Kursverantwortlicher</td>
         </tr>
         <tr>
           <td>Evtl. Matrikelnummer</td>
-          <td>Teilnehmer, Nutzer auf der Warteliste des Kurses, Nutzer auf der Ausgetragenenliste des Kurses/max. 5 Jahre nach Ende des Einschreibezeitraums</td>
-          <td>Eintragen von Noten und Scheinen/ Kursorganisator und Kursverantwortlicher</td>
+          <td>Teilnehmer, Nutzer auf der Warteliste des Kurses, Nutzer auf der Ausgetragenenliste des Kurses/max. 5 Jahre
+              nach Ende des Einschreibezeitraums</td>
+          <td>Eintragen von Noten und Scheinen/ Organisator, Editor (falls von Kursverantwortlichem dazu berechtigt) und
+              Kursverantwortlicher</td>
+        </tr>
+
+        <tr>
+          <th scope="row" colspan="3">Buchungen</th>
+        </tr>
+        <tr>
+          <td>BuchungsID, KalenderveranstaltungsID, NutzerID, Start, Ende</td>
+          <td>Buchungen können Kalenderveranstaltungen zugeordnet werden. Kalenderveranstaltungen können Kursen zugeordnet werden.
+              Kurse können mit ihren Teilnehmer- Warte- und Ausgetragenenlisten, Buchungen, Organisatoren, Editoren und
+              Kursverantwortlichen in Verbindung gebracht werden/ max. 5 Jahre</td>
+          <td>Anzeigen von Buchungen/ wenn Kurs öffentlich sichtbar, dann Zeitraum (Start, Ende) für jeden Nutzer der Website,
+              sonst Start/Ende für eingeloggte Nutzer, max. 1 Jahr sichtbar, wenn Kurs abgelaufen, dann nur für Kursverantwortlichen,
+              Editoren, Organisatoren sichtbar, NutzerID nur für Kursverantwortlichen, Editoren, Organisatoren sichtbar</td>
         </tr>
       </tbody>
     </table>

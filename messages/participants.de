@@ -10,9 +10,10 @@ pcpts.download.filename.info = Hier können Sie der Liste einen individuellen Da
 pcpts.download.filename = Dateiname
 pcpts.download.select.events.info1 = Wählen Sie aus, ob Sie die Teilnehmerliste für alle Veranstaltungen oder nur für ausgewählte Veranstaltungen herunterladen wollen.
 pcpts.download.select.events.info2 = Wählen Sie alle Veranstaltungen aus, deren TeilnehmerInnen auf der heruntergeladenen Liste vorkommen sollen. Halten Sie dazu beim Auswählen <b>STRG</b> gedrückt.
-pcpts.download.lists.info = Wählen Sie die Listen an, die Sie herunterladen möchten.
+pcpts.download.lists.info = Wählen Sie die Listen an, die Sie herunterladen möchten (normale Veranstaltungen).
 pcpts.download.comma.info = Wählen Sie diese Option, falls Sie NICHT Excel zum Öffnen der Teilnehmerliste verwenden.
 pcpts.download.comma = Einträge kommasepariert speichern
+pcpts.download.interval.info = Hier können Sie (falls vorhanden) ein Interval angeben, in dem die TeilnehmerInnen von/der Kalenderveranstaltung/en heruntergeladen werden sollen.
 
 pcpts.all.events = Alle Veranstaltungen
 pcpts.selected.events = Ausgewählte Veranstaltungen
@@ -23,6 +24,7 @@ pcpts.email.select.events.info1 = Wählen Sie aus, ob die E-Mail an alle Veranst
 pcpts.email.select.events.info2 = Wählen Sie alle Veranstaltungen aus, deren TeilnehmerInnen die E-Mail erhalten sollen. Halten Sie dazu beim Auswählen <b>STRG</b> gedrückt.
 pcpts.email.lists.info = Wählen Sie die Listen an, an die Sie die E-Mail senden möchten.
 pcpts.email.content.info = Hier können Sie die gewünschte E-Mail verfassen.
+pcpts.email.interval.info = Hier können Sie (falls vorhanden) ein Interval angeben, in dem die TeilnehmerInnen von/der Kalenderveranstaltung/en benachrichtigt werden sollen.
 
 pcpts.actions = Aktionen
 pcpts.participants.list = Teilnehmerliste
