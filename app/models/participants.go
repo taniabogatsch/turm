@@ -13,15 +13,27 @@ import (
 /*ListConf determines to whom an e-mail is send or which users are at the
 downloaded participants list. */
 type ListConf struct {
+
+	//specify which users are downloaded/e-mailed
 	AllEvents    bool
 	EventIDs     []int
 	Participants bool
 	WaitList     bool
 	Unsubscribed bool
-	UseComma     bool
-	Filename     string
-	Subject      string
-	Content      string
+
+	//used for downloading the participants list
+	UseComma bool
+	Filename string
+
+	//used for sending an e-mail
+	Subject string
+	Content string
+
+	//used to specify a time interval for calendar events
+	Start     string
+	End       string
+	StartTime string
+	EndTime   string
 }
 
 /*Participants of a course. */
@@ -41,7 +53,7 @@ type Participants struct {
 }
 
 /*Get all participants of a course. */
-func (parts *Participants) Get(userID int) (err error) {
+func (parts *Participants) Get(userID int, allSlots bool) (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -69,7 +81,7 @@ func (parts *Participants) Get(userID int) (err error) {
 	}
 
 	//get all participant lists of this course
-	if err = parts.Lists.Get(tx, &parts.ID, parts.ViewMatrNr); err != nil {
+	if err = parts.Lists.Get(tx, &parts.ID, parts.ViewMatrNr, allSlots); err != nil {
 		return
 	}
 
@@ -98,10 +110,14 @@ type ParticipantList struct {
 	Year            int
 	//day templates for this week [0...6]
 	Days Days
+
+	//all slots of a calendar event
+	Slots Slots
 }
 
 /*Get all participant lists of a course. */
-func (lists *ParticipantLists) Get(tx *sqlx.Tx, courseID *int, viewMatrNr bool) (err error) {
+func (lists *ParticipantLists) Get(tx *sqlx.Tx, courseID *int, viewMatrNr bool,
+	allSlots bool) (err error) {
 
 	//get event data for lists
 	err = tx.Select(lists, stmtSelectEventData, *courseID)
@@ -115,22 +131,50 @@ func (lists *ParticipantLists) Get(tx *sqlx.Tx, courseID *int, viewMatrNr bool) 
 	//get the lists for each event
 	for key, list := range *lists {
 
-		if list.IsCalendarEvent { //get all slots of the current week
+		//get all slots or only those of a specific day
+		if list.IsCalendarEvent {
 
-			//get the last (current) monday
-			now := time.Now()
-			weekday := time.Now().Weekday()
-			monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+			//TODO: make this more efficient: only get slots in interval from DB
 
-			//set the current week
-			(*lists)[key].Monday = monday
-			_, (*lists)[key].Week = monday.ISOWeek()
-			(*lists)[key].Year = monday.Year()
+			if allSlots {
 
-			//get the slots of each day
-			err = (*lists)[key].Days.Get(tx, &list.ID, monday, true)
-			if err != nil {
-				return
+				//get the slots
+				err = (*lists)[key].Slots.GetAllCalendarEvent(tx, list.ID)
+				if err != nil {
+					return
+				}
+
+				for idx := range (*lists)[key].Slots {
+
+					//get user data
+					(*lists)[key].Slots[idx].User.ID = (*lists)[key].Slots[idx].UserID
+					if err = (*lists)[key].Slots[idx].User.Get(tx); err != nil {
+						return
+					}
+
+					//create dummy matriculation numbers, if the user is not allowed to see them
+					if (*lists)[key].Slots[idx].User.MatrNr.Valid && !viewMatrNr {
+						(*lists)[key].Slots[idx].User.MatrNr.Int32 = 12345
+					}
+				}
+
+			} else {
+
+				//get the last (current) monday
+				now := time.Now()
+				weekday := time.Now().Weekday()
+				monday := now.AddDate(0, 0, -1*(int(weekday)-1))
+
+				//set the current week
+				(*lists)[key].Monday = monday
+				_, (*lists)[key].Week = monday.ISOWeek()
+				(*lists)[key].Year = monday.Year()
+
+				//get the slots of each day
+				err = (*lists)[key].Days.Get(tx, &list.ID, monday, true)
+				if err != nil {
+					return
+				}
 			}
 
 		} else { //get all user lists for normal events

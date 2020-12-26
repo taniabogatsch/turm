@@ -145,7 +145,8 @@ func (slots *Slots) GetAllDayTmpl(tx *sqlx.Tx, dayTmplID int) (err error) {
 func (slots *Slots) GetAllCalendarEvent(tx *sqlx.Tx, calendarEventID int) (err error) {
 
 	//get slot data for validation
-	err = tx.Select(slots, stmtSelectAllSlotsOfCalendarEvent, calendarEventID)
+	err = tx.Select(slots, stmtSelectAllSlotsOfCalendarEvent, calendarEventID,
+		app.TimeZone)
 	if err != nil {
 		log.Error("failed to get all slots of a calendar event", "calendarEventID",
 			calendarEventID, "error", err.Error())
@@ -487,7 +488,9 @@ const (
 	`
 
 	stmtSelectAllSlotsOfCalendarEvent = `
-		SELECT s.id, s.user_id, s.day_tmpl_id, s.start_time, s.end_time
+		SELECT s.id, s.user_id, s.day_tmpl_id, s.start_time, s.end_time,
+			TO_CHAR (s.start_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS start_str,
+			TO_CHAR (s.end_time AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS end_str
 		FROM slots s JOIN day_templates t ON s.day_tmpl_id = t.id
 			JOIN calendar_events e ON t.calendar_event_id = e.id
 		WHERE e.id = $1

@@ -93,6 +93,86 @@
             <label class="form-check-label">{{msg $ "pcpts.download.comma"}}</label>
           </div>
 
+          <small class="form-text text-muted">
+            {{msg $ "pcpts.download.interval.info"}}
+          </small>
+
+          <div class="row">
+
+            <div class="col-sm-2">
+              {{msg $ "meeting.start"}}:
+            </div>
+
+            <!-- start date -->
+            <div class="col-sm-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="conf.Start"
+                  class="form-control rounded-right">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+
+            <!-- start time -->
+            <div class="col-sm-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="conf.StartTime" class="form-control rounded-right">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+
+            <div class="col-sm-2">
+              {{msg $ "meeting.end"}}:
+            </div>
+
+            <!-- end date -->
+            <div class="col-sm-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/calendar.html" .}}
+                  </span>
+                </div>
+                <input type="date" max='2200-01-01' min="1980-01-01" name="conf.End"
+                  class="form-control rounded-right">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.date"}}
+                </div>
+              </div>
+            </div>
+
+            <!-- end time -->
+            <div class="col-sm-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    {{template "icons/clock.html" .}}
+                  </span>
+                </div>
+                <input type="time" name="conf.EndTime" class="form-control rounded-right">
+                <div class="invalid-feedback">
+                  {{msg $ "validation.invalid.time"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- modal footer -->

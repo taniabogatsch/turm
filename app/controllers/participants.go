@@ -33,7 +33,7 @@ func (c Participants) Open(ID, eventID int) revel.Result {
 
 	//get the participants
 	participants := models.Participants{ID: ID}
-	if err := participants.Get(userID); err != nil {
+	if err := participants.Get(userID, false); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -66,11 +66,34 @@ func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
-	//TODO: allow user to define from - to for calendar events
+	//validation of time interval
+	if conf.End != "" || conf.EndTime != "" || conf.Start != "" ||
+		conf.StartTime != "" {
+
+		conf.Start += " " + conf.StartTime
+		conf.End += " " + conf.EndTime
+
+		c.Validation.Check(conf.Start,
+			models.IsTimestamp{},
+		).MessageKey("validation.invalid.timestamp")
+
+		c.Validation.Check(conf.End,
+			models.IsTimestamp{},
+		).MessageKey("validation.invalid.timestamp")
+
+		if conf.Start >= conf.End {
+			c.Validation.ErrorKey("validation.pcpts.start.before.end")
+		}
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
 
 	//get the participants
 	participants := models.Participants{ID: ID}
-	if err := participants.Get(userID); err != nil {
+	if err := participants.Get(userID, true); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -99,9 +122,39 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 			errTypeConv, err, "", c.Controller, "")
 	}
 
+	//validation of time interval and subject
+	if conf.End != "" || conf.EndTime != "" || conf.Start != "" ||
+		conf.StartTime != "" {
+
+		c.Validation.Check(conf.Subject,
+			revel.MinSize{3},
+			revel.MaxSize{255},
+		).MessageKey("validation.invalid.text.short")
+
+		conf.Start += " " + conf.StartTime
+		conf.End += " " + conf.EndTime
+
+		c.Validation.Check(conf.Start,
+			models.IsTimestamp{},
+		).MessageKey("validation.invalid.timestamp")
+
+		c.Validation.Check(conf.End,
+			models.IsTimestamp{},
+		).MessageKey("validation.invalid.timestamp")
+
+		if conf.Start >= conf.End {
+			c.Validation.ErrorKey("validation.pcpts.start.before.end")
+		}
+	}
+
+	if c.Validation.HasErrors() {
+		return flashError(
+			errValidation, nil, "", c.Controller, "")
+	}
+
 	//get the participants
 	participants := models.Participants{ID: ID}
-	if err := participants.Get(userID); err != nil {
+	if err := participants.Get(userID, true); err != nil {
 		return flashError(
 			errDB, err, "", c.Controller, "")
 	}
@@ -143,15 +196,18 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 			}
 
 			//slots
-			for _, day := range event.Days {
-				for _, tmpl := range day.DayTmpls {
-					for _, slot := range tmpl.Slots {
+			for _, slot := range event.Slots {
 
-						_, exists := emails[slot.User.EMail]
-						if !exists {
-							emails[slot.User.EMail] = true
-						}
+				//skip all slots not inside the defined interval
+				if conf.Start != "" {
+					if slot.EndStr < conf.Start || slot.StartStr > conf.End {
+						continue
 					}
+				}
+
+				_, exists := emails[slot.User.EMail]
+				if !exists {
+					emails[slot.User.EMail] = true
 				}
 			}
 
@@ -428,6 +484,14 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 	//data that will be written to the csv-file
 	var data [][]string
 
+	//used for replacing characters (opposite of delimiter)
+	old := ";"
+	new := ","
+	if conf.UseComma {
+		old = ","
+		new = ";"
+	}
+
 	//get date and time
 	year, month, day := time.Now().Date()
 	hour, minute, _ := time.Now().Clock()
@@ -441,7 +505,7 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 	filepath = "/tmp/" + conf.Filename + ".csv"
 
 	//course ID, title and extraction time
-	row := []string{c.Message("course.title") + ": " + participants.Title}
+	row := []string{strings.ReplaceAll(c.Message("course.title")+": "+participants.Title, old, new)}
 	data = append(data, row)
 	row = []string{c.Message("course.ID") + ": " + strconv.Itoa(participants.ID)}
 	data = append(data, row)
@@ -496,21 +560,21 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 			if conf.Participants && len(event.Participants) != 0 {
 				row = []string{}
 				data = append(data, row)
-				appendList(&data, event.Participants, c, event.ID, event.Title)
+				appendList(&data, event.Participants, c, event.ID, event.Title, old, new)
 			}
 
 			//wait list
 			if conf.WaitList && len(event.Waitlist) != 0 {
 				row = []string{}
 				data = append(data, row)
-				appendList(&data, event.Waitlist, c, event.ID, event.Title)
+				appendList(&data, event.Waitlist, c, event.ID, event.Title, old, new)
 			}
 
 			//unsubscribed
 			if conf.Unsubscribed && len(event.Unsubscribed) != 0 {
 				row = []string{}
 				data = append(data, row)
-				appendList(&data, event.Unsubscribed, c, event.ID, event.Title)
+				appendList(&data, event.Unsubscribed, c, event.ID, event.Title, old, new)
 			}
 
 		}
@@ -538,7 +602,7 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 			c.Message("user.course.of.studies"),
 			c.Message("user.semester"),
 			c.Message("enroll.start.time"),
-			c.Message("enroll.end.end"))
+			c.Message("enroll.end.time"))
 		data = append(data, row)
 		row = []string{}
 		data = append(data, row)
@@ -550,17 +614,19 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 		if (conf.AllEvents || containsEvent(conf.EventIDs, event.ID)) &&
 			event.IsCalendarEvent {
 
-			for _, day := range event.Days {
-				for _, tmpl := range day.DayTmpls {
-					for _, slot := range tmpl.Slots {
+			for _, slot := range event.Slots {
 
-						//add slots
-						row = []string{}
-						data = append(data, row)
-						appendSlot(&data, c, &slot, event.ID, event.Title)
+				//skip all slots not inside the defined interval
+				if conf.Start != "" {
+					if slot.EndStr < conf.Start || slot.StartStr > conf.End {
+						continue
 					}
 				}
+
+				//add slots
+				appendSlot(&data, c, &slot, event.ID, event.Title, old, new)
 			}
+
 		}
 	}
 
@@ -594,7 +660,7 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 }
 
 func appendList(data *[][]string, list models.Entries, c *revel.Controller,
-	ID int, title string) {
+	ID int, title, old, new string) {
 
 	for _, user := range list {
 
@@ -608,7 +674,7 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 		}
 
 		//matriculation number
-		matrNr := c.Message("user.no.matr.nr")
+		matrNr := ""
 		if user.MatrNr.Valid {
 			if user.MatrNr.Int32 != 12345 {
 				matrNr = strconv.Itoa(int(user.MatrNr.Int32))
@@ -643,20 +709,20 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 
 		row = append(row,
 			strconv.Itoa(ID),
-			title,
+			strings.ReplaceAll(title, old, new),
 			salutation,
-			user.AcademicTitle.String,
-			user.Title.String,
-			user.FirstName,
-			user.NameAffix.String,
-			user.LastName,
-			user.EMail,
+			strings.ReplaceAll(user.AcademicTitle.String, old, new),
+			strings.ReplaceAll(user.Title.String, old, new),
+			strings.ReplaceAll(user.FirstName, old, new),
+			strings.ReplaceAll(user.NameAffix.String, old, new),
+			strings.ReplaceAll(user.LastName, old, new),
+			strings.ReplaceAll(user.EMail, old, new),
 			user.Language.String,
 			matrNr,
-			affiliations,
-			degrees,
-			studies,
-			semesters,
+			strings.ReplaceAll(affiliations, old, new),
+			strings.ReplaceAll(degrees, old, new),
+			strings.ReplaceAll(studies, old, new),
+			strings.ReplaceAll(semesters, old, new),
 			user.TimeOfEnrollment,
 			enrollStatus)
 
@@ -666,7 +732,7 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 }
 
 func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
-	ID int, title string) {
+	ID int, title, old, new string) {
 
 	row := []string{}
 
@@ -678,7 +744,7 @@ func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
 	}
 
 	//matriculation number
-	matrNr := c.Message("user.no.matr.nr")
+	matrNr := ""
 	if slot.User.MatrNr.Valid {
 		if slot.User.MatrNr.Int32 != 12345 {
 			matrNr = strconv.Itoa(int(slot.User.MatrNr.Int32))
@@ -699,26 +765,25 @@ func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
 
 	row = append(row,
 		strconv.Itoa(ID),
-		title,
+		strings.ReplaceAll(title, old, new),
 		salutation,
-		slot.User.AcademicTitle.String,
-		slot.User.Title.String,
-		slot.User.FirstName,
-		slot.User.NameAffix.String,
-		slot.User.LastName,
-		slot.User.EMail,
+		strings.ReplaceAll(slot.User.AcademicTitle.String, old, new),
+		strings.ReplaceAll(slot.User.Title.String, old, new),
+		strings.ReplaceAll(slot.User.FirstName, old, new),
+		strings.ReplaceAll(slot.User.NameAffix.String, old, new),
+		strings.ReplaceAll(slot.User.LastName, old, new),
+		strings.ReplaceAll(slot.User.EMail, old, new),
 		slot.User.Language.String,
 		matrNr,
-		affiliations,
-		degrees,
-		studies,
-		semesters,
+		strings.ReplaceAll(affiliations, old, new),
+		strings.ReplaceAll(degrees, old, new),
+		strings.ReplaceAll(studies, old, new),
+		strings.ReplaceAll(semesters, old, new),
 		slot.StartStr,
 		slot.EndStr)
 
 	//and put them in the csv data array
 	*data = append(*data, row)
-
 }
 
 func containsEvent(IDs []int, ID int) bool {
