@@ -19,6 +19,8 @@ CREATE TABLE users (
   password        varchar(511),
   activation_code varchar(255)
 );
+COMMENT ON TABLE users IS 'salutation is an enum. (0): no salutation, (1): male, (2): female.
+role is an enum. (0): user, (1): creator, (2): admin.';
 
 
 CREATE TABLE degrees (
@@ -110,6 +112,8 @@ CREATE TABLE meetings (
 
   FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 );
+COMMENT ON TABLE meetings IS 'weekday is an enum. (0): monday, (1): tuesday, etc.
+meeting_interval is an enum. (0): single, (1): weekly, (2): even weeks, (3): odd weeks.';
 
 
 CREATE TABLE editors (
@@ -177,6 +181,8 @@ CREATE TABLE enrolled (
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
   FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 );
+COMMENT ON TABLE enrolled IS 'status is an enum. (0): enrolled, (1): on wait list,
+(2): awaiting payment, (3): paid, (4): freed.';
 
 
 CREATE TABLE unsubscribed (
