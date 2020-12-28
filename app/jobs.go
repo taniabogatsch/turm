@@ -90,7 +90,7 @@ func backup() (err error) {
 		}
 	}
 
-	revel.AppLog.Warn("done creating DB backup...")
+	revel.AppLog.Warn("finished creating DB backup...")
 	return
 }
 
@@ -114,6 +114,8 @@ func (e fetchEnrollData) Run() {
 
 //fetch the enrollment data file
 func fetch() (err error) {
+
+	revel.AppLog.Warn("start fetching enrollment data...")
 
 	//TODO: write this function less problem specific for a general file to be fetched
 	//e.g. put the filename and the host in the config, set a custom backup folder, etc.
@@ -180,6 +182,7 @@ func fetch() (err error) {
 		}
 	}
 
+	revel.AppLog.Warn("finished fetching enrollment data...")
 	return
 }
 
@@ -316,6 +319,7 @@ func Parse(tx *sqlx.Tx) (err error) {
 
 	}
 
+	revel.AppLog.Warn("finished parsing studies...")
 	return
 }
 
@@ -342,13 +346,15 @@ func (e deleteCourses) Run() {
 	revel.AppLog.Warn("running DB job to delete all courses older than 10 years...")
 
 	stmt := `DELETE FROM courses
-		WHERE DATE_PART('year', current_date) - DATE_PART('year', creation_date) >= 10`
+		WHERE DATE_PART('year', current_date) - DATE_PART('year', expiration_date) >= 10`
 
 	if _, err := Db.Exec(stmt); err != nil {
 		revel.AppLog.Error("job to delete all courses older than 10 years failed",
 			"error", err.Error())
 		SendErrorNote()
 	}
+
+	revel.AppLog.Warn("finished DB job to delete all courses older than 10 years...")
 }
 
 //initJobData initializes all job config variables

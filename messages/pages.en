@@ -4,6 +4,7 @@
 
 index.tab = Turm2
 index.page = Home
+index.page.info = Please visit our <a href='{{url "App.News"}}'>news feed</a> and <a href='{{url "App.FAQs"}}'>FAQ page</a> to find out more about the usage and development of Turm2!
 
 groups = Groups
 
