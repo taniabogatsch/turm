@@ -149,20 +149,18 @@ func (entry *HelpPageEntry) Validate(v *revel.Validation) {
 		entry.Question = strings.TrimSpace(entry.Question)
 		v.Check(entry.Question,
 			revel.MinSize{3},
-			revel.MaxSize{255},
+			revel.MaxSize{511},
 		).MessageKey("validation.invalid.text.short")
 
 		entry.Answer = strings.TrimSpace(entry.Answer)
 		v.Check(entry.Answer,
 			revel.MinSize{3},
-			revel.MaxSize{255},
 		).MessageKey("validation.invalid.text.short")
 
 	} else { //news feed entry
 		entry.Content = strings.TrimSpace(entry.Content)
 		v.Check(entry.Content,
 			revel.MinSize{3},
-			revel.MaxSize{255},
 		).MessageKey("validation.invalid.text.short")
 	}
 }
