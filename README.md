@@ -6,7 +6,7 @@ It uses:
 - [Go](https://github.com/golang/go)
 - [Revel](https://github.com/revel/)
 - [Bootstrap 4.4.1](https://getbootstrap.com)
-- Bootstrap Icons
+- [Bootstrap Icons](https://icons.getbootstrap.com)
 - [JQuery 3.4.1](https://jquery.com)
 - [Quill](https://quilljs.com) 
 
