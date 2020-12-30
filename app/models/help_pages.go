@@ -215,6 +215,7 @@ const (
 			TO_CHAR (last_edited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI:SS') as last_edited
 		FROM faqs
 		WHERE category_id = $2
+		ORDER BY last_edited DESC
 	`
 
 	stmtSelectNews = `
@@ -222,6 +223,7 @@ const (
 			TO_CHAR (last_edited AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI:SS') as last_edited
 		FROM news_feed
 		WHERE category_id = $2
+		ORDER BY last_edited DESC
 	`
 
 	stmtInsertFAQ = `
