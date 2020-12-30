@@ -1,8 +1,19 @@
 # Welcome to Turm
 
-Turm2 is an enrollment system allowing users to enroll in courses. There is no official release yet. An older version is currently deployed at [Turm2](https://turm2.tu-ilmenau.de). This project provides a new design as well as extended functionality.
+Turm2 is an enrollment system allowing users to enroll in courses. There is no official release yet. It is currently running at [Turm2](https://turm2.tu-ilmenau.de).
 
-It uses [Go](https://github.com/golang/go), [Revel](https://github.com/revel/), [Bootstrap 4.4.1](https://getbootstrap.com), Bootstrap Icons, [JQuery 3.4.1](https://jquery.com) and the [Quill](https://quilljs.com) editor in addition to the go packages mentioned below.
+It uses:
+- [Go](https://github.com/golang/go)
+- [Revel](https://github.com/revel/)
+- [Bootstrap 4.4.1](https://getbootstrap.com)
+- Bootstrap Icons
+- [JQuery 3.4.1](https://jquery.com)
+- [Quill](https://quilljs.com) 
+
+and the following go packages:
+- [jmoiron/sqlx](https://github.com/jmoiron/sqlx)
+- [k3a/html2text](https://github.com/k3a/html2text)
+- [ldap.v2](https://gopkg.in/ldap.v2)
 
 ## Usage
 
@@ -10,21 +21,20 @@ It uses [Go](https://github.com/golang/go), [Revel](https://github.com/revel/), 
 
 ```
 create database turm;
-create user turm with encrypted password 'turmpw';
+create user turm with encrypted password 'your_password';
 grant all privileges on database turm to turm;
 ```
-With the postgreSQL superuser, add the `pgcrypto` extension.
+With the postgreSQL superuser, add the `pgcrypto` extension (`create extension pgcrypto`).
 
 Create the DB schema using `scripts/db/create.sql`.
 
-### Start the web server
+### Start the web server (development)
 
-Requires [Go](https://github.com/golang/go).
+Requires [Go](https://github.com/golang/go) and [Revel](https://github.com/revel/).
 
 ```
 cd $GOPATH
 go get -u github.com/revel/cmd/revel
-
 go get -u github.com/jmoiron/sqlx
 go get -u github.com/jackc/pgx/stdlib
 go get -u gopkg.in/ldap.v2
@@ -34,12 +44,13 @@ cd src
 git clone https://github.com/taniabogatsch/turm.git
 ```
 
-Adjust all config values `app/conf/app.conf`.
+Adjust all config values `app/conf/app.conf`. See below for a detailed description (TODO).
 
-Create a `passwords.json` file at `app/conf/`. Currently, it should only contain one value for the mailer to work properly, which is 
+Create a `passwords.json` file at `app/conf/`. It should only contain the following two values:
 ```
 {
-  "email.pw": "setValue"
+  "db.pw": "your_password",
+  "email.pw": "your_password"
 }
 ```
 
@@ -56,7 +67,10 @@ The directory structure of a generated Revel application:
          controllers/      GET, POST, etc. controllers
          models/           DB models
          views/            HTML templates and some JS
+         conf.go           Init all conf values
+         db.go             Init all DB values
          init.go           App initialization, e.g. opens a DB connection
+         jobs.go           Run scheduled jobs
          mailer.go         Sends e-mails
 
     conf/                  Configuration directory
