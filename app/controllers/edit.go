@@ -215,7 +215,7 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
-	t, err := getTimestamp(timestamp, c.Controller)
+	t, err := getTimestamp(timestamp, c.Controller, valid, fieldID)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})

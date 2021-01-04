@@ -28,18 +28,22 @@ func init() {
 	revel.InterceptMethod(User.auth, revel.BEFORE)
 }
 
-func getTimestamp(str string, c *revel.Controller) (t time.Time, err error) {
+func getTimestamp(str string, c *revel.Controller, valid bool, fieldID string) (t time.Time, err error) {
 
-	loc, err := time.LoadLocation(app.TimeZone)
-	if err != nil {
-		c.Log.Error("failed to load location", "appTimeZone", app.TimeZone,
-			"error", err.Error())
-		return
+	if valid || fieldID != "unsubscribe_end" {
+
+		loc, err := time.LoadLocation(app.TimeZone)
+		if err != nil {
+			c.Log.Error("failed to load location", "appTimeZone", app.TimeZone,
+				"error", err.Error())
+			return t, err
+		}
+
+		t, err = time.ParseInLocation("2006-01-02 15:04", str, loc)
+		if err != nil {
+			c.Log.Error("invalid timestamp", "str", str, "error", err.Error())
+		}
 	}
 
-	t, err = time.ParseInLocation("2006-01-02 15:04", str, loc)
-	if err != nil {
-		c.Log.Error("invalid timestamp", "str", str, "error", err.Error())
-	}
 	return
 }
