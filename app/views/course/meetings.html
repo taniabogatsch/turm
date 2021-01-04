@@ -39,7 +39,7 @@
 
       <!-- time -->
       {{template "icons/calendar.html" .}} &nbsp;
-      <strong>{{.MeetingStart}}</strong> {{msg $ "course.clock"}} - <strong>{{.MeetingEnd}}</strong> {{msg $ "course.clock"}}
+      <strong>{{.MeetingStartStr}}</strong> {{msg $ "course.clock"}} - <strong>{{.MeetingEndStr}}</strong> {{msg $ "course.clock"}}
 
     {{else}} <!-- weekly, even or odd meeting -->
 
@@ -77,8 +77,8 @@
       <script>
         $(function() {
           //render the meeting start and end in a nice format
-          const start = '{{.MeetingStart}}';
-          const end = '{{.MeetingEnd}}';
+          const start = '{{.MeetingStartStr}}';
+          const end = '{{.MeetingEndStr}}';
           const startParts = start.split(" ");
           const endParts = end.split(" ");
 
@@ -105,7 +105,7 @@
   <!-- edit single meeting -->
   {{if eq .MeetingInterval 0}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
-      onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}},
+      onclick='openEditMeeting({{.ID}}, {{.MeetingStartStr}}, {{.MeetingEndStr}},
         {{.Place.String}}, {{.Annotation.String}}, 0, 0, {{.EventID}});'
       title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}
@@ -113,7 +113,7 @@
 
   {{else}} <!-- edit weekly meeting -->
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none float-left ml-2"
-      onclick='openEditMeeting({{.ID}}, {{.MeetingStart}}, {{.MeetingEnd}}, {{.Place.String}},
+      onclick='openEditMeeting({{.ID}}, {{.MeetingStartStr}}, {{.MeetingEndStr}}, {{.Place.String}},
         {{.Annotation.String}}, {{.WeekDay.Int32}}, {{.MeetingInterval}}, {{.EventID}});'
       title='{{msg $ "title.edit"}}'>
       {{template "icons/pencil.html" . }}

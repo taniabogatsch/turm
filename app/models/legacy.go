@@ -112,13 +112,31 @@ func (oldCourse *OldCourse) Transform(course *Course) (err error) {
 		course.EnrollLimitEvents.Int32 = int32(oldCourse.EnrollLimitEvents)
 	}
 
-	course.EnrollmentStart = oldCourse.EnrollmentStartDate + " " + oldCourse.EnrollmentStartTime
-	course.EnrollmentEnd = oldCourse.EnrollmentEndDate + " " + oldCourse.EnrollmentEndTime
-	course.ExpirationDate = oldCourse.ExpirationDate + " " + oldCourse.ExpirationTime
+	enrollStart, err := getTimestamp(oldCourse.EnrollmentStartDate + " " + oldCourse.EnrollmentStartTime)
+	if err != nil {
+		return
+	}
+	course.EnrollmentStart = enrollStart
+
+	enrollEnd, err := getTimestamp(oldCourse.EnrollmentEndDate + " " + oldCourse.EnrollmentEndTime)
+	if err != nil {
+		return
+	}
+	course.EnrollmentEnd = enrollEnd
+
+	expirationDate, err := getTimestamp(oldCourse.ExpirationDate + " " + oldCourse.ExpirationTime)
+	if err != nil {
+		return
+	}
+	course.ExpirationDate = expirationDate
 
 	if oldCourse.DisenrollmentStartDate != "" {
+		unsubscribeEnd, err := getTimestamp(oldCourse.DisenrollmentStartDate + " " + oldCourse.DisenrollmentStartTime)
+		if err != nil {
+			return err
+		}
 		course.UnsubscribeEnd.Valid = true
-		course.UnsubscribeEnd.String = oldCourse.DisenrollmentStartDate + " " + oldCourse.DisenrollmentStartTime
+		course.UnsubscribeEnd.Time = unsubscribeEnd
 	}
 
 	//get onlyLDAP
@@ -167,7 +185,9 @@ func (oldEvent *OldEvent) Transform(event *Event, i int) (err error) {
 	//transform all meetings
 	for _, oldMeeting := range oldEvent.Meeting {
 		meeting := Meeting{}
-		oldMeeting.Transform(&meeting)
+		if err = oldMeeting.Transform(&meeting); err != nil {
+			return
+		}
 		event.Meetings = append(event.Meetings, meeting)
 	}
 
@@ -175,7 +195,7 @@ func (oldEvent *OldEvent) Transform(event *Event, i int) (err error) {
 }
 
 /*Transform an old meeting struct to the new meeting struct. */
-func (oldMeeting *OldMeeting) Transform(meeting *Meeting) {
+func (oldMeeting *OldMeeting) Transform(meeting *Meeting) (err error) {
 
 	if oldMeeting.MeetingRegularity == "periodic" {
 
@@ -225,6 +245,18 @@ func (oldMeeting *OldMeeting) Transform(meeting *Meeting) {
 	if meeting.MeetingInterval != SINGLE {
 		oldMeeting.MeetingDate = time.Now().Format("2006-01-02")
 	}
-	meeting.MeetingStart = oldMeeting.MeetingDate + " " + oldMeeting.MeetingStartTime
-	meeting.MeetingEnd = oldMeeting.MeetingDate + " " + oldMeeting.MeetingEndTime
+
+	start, err := getTimestamp(oldMeeting.MeetingDate + " " + oldMeeting.MeetingStartTime)
+	if err != nil {
+		return
+	}
+	meeting.MeetingStart = start
+
+	end, err := getTimestamp(oldMeeting.MeetingDate + " " + oldMeeting.MeetingEndTime)
+	if err != nil {
+		return
+	}
+	meeting.MeetingEnd = end
+
+	return
 }

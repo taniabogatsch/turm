@@ -1,6 +1,7 @@
 package models
 
 import (
+	"time"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -15,7 +16,10 @@ type Enrolled struct {
 	UserID           int              `db:"user_id, primarykey"`
 	EventID          int              `db:"event_id, primarykey"`
 	Status           EnrollmentStatus `db:"status"`
-	TimeOfEnrollment string           `db:"time_of_enrollment"`
+	TimeOfEnrollment time.Time        `db:"time_of_enrollment"`
+
+	//used for pretty timestamp rendering
+	TimeOfEnrollmentStr string `db:"time_of_enrollment_str"`
 
 	//used for profile page
 	CourseID    int    `db:"course_id"`
@@ -802,8 +806,8 @@ const (
 
 	stmtSelectUserEnrollmentsExpired = `
 		SELECT en.user_id, en.event_id, en.status, c.title AS course_title,
-			e.title AS event_title,
-		TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
+			e.title AS event_title, en.time_of_enrollment,
+		TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id
 		WHERE en.user_id = $1
@@ -813,8 +817,8 @@ const (
 
 	stmtSelectUserEnrollments = `
 		SELECT en.user_id, en.event_id,	en.status, c.title AS course_title,
-			e.title AS event_title, c.id AS course_id,
-			TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
+			e.title AS event_title, c.id AS course_id, en.time_of_enrollment,
+			TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id
 		WHERE en.user_id = $1

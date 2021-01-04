@@ -56,7 +56,7 @@
                     {{template "icons/calendar.html" .}}
                   </span>
                 </div>
-                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingStart"
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingStartStr"
                   class="form-control rounded-right" required id="weekly-start-date">
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.date"}}
@@ -74,7 +74,7 @@
                     {{template "icons/calendar.html" .}}
                   </span>
                 </div>
-                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingEnd"
+                <input type="date" max='2200-01-01' min="1980-01-01" name="meeting.MeetingEndStr"
                   class="form-control rounded-right" required id="weekly-end-date">
                 <div class="invalid-feedback">
                   {{msg $ "validation.invalid.date"}}

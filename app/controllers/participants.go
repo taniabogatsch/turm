@@ -723,7 +723,7 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 			strings.ReplaceAll(degrees, old, new),
 			strings.ReplaceAll(studies, old, new),
 			strings.ReplaceAll(semesters, old, new),
-			user.TimeOfEnrollment,
+			user.TimeOfEnrollmentStr,
 			enrollStatus)
 
 		//and put them in the csv data array

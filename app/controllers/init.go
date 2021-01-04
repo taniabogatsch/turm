@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"time"
+	"turm/app"
+
 	"github.com/revel/revel"
 )
 
@@ -23,4 +26,20 @@ func init() {
 	revel.InterceptMethod(Manage.auth, revel.BEFORE)
 	revel.InterceptMethod(Participants.auth, revel.BEFORE)
 	revel.InterceptMethod(User.auth, revel.BEFORE)
+}
+
+func getTimestamp(str string, c *revel.Controller) (t time.Time, err error) {
+
+	loc, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		c.Log.Error("failed to load location", "appTimeZone", app.TimeZone,
+			"error", err.Error())
+		return
+	}
+
+	t, err = time.ParseInLocation("2006-01-02 15:04", str, loc)
+	if err != nil {
+		c.Log.Error("invalid timestamp", "str", str, "error", err.Error())
+	}
+	return
 }

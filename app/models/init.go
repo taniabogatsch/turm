@@ -140,3 +140,20 @@ func generateCode() string {
 	log.Debug("generated code", "code", string(b))
 	return string(b)
 }
+
+//get the timestamp by parsing a time string at a location
+func getTimestamp(str string) (t time.Time, err error) {
+
+	loc, err := time.LoadLocation(app.TimeZone)
+	if err != nil {
+		log.Error("failed to load location", "appTimeZone", app.TimeZone,
+			"error", err.Error())
+		return
+	}
+
+	t, err = time.ParseInLocation("2006-01-02 15:04", str, loc)
+	if err != nil {
+		log.Error("invalid timestamp", "str", str, "error", err.Error())
+	}
+	return
+}

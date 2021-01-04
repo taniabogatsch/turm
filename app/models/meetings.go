@@ -36,12 +36,16 @@ type Meeting struct {
 	WeekDay         sql.NullInt32   `db:"weekday"`
 	Place           sql.NullString  `db:"place"`
 	Annotation      sql.NullString  `db:"annotation"`
-	MeetingStart    string          `db:"meeting_start"`
-	MeetingEnd      string          `db:"meeting_end"`
+	MeetingStart    time.Time       `db:"meeting_start"`
+	MeetingEnd      time.Time       `db:"meeting_end"`
 
 	//used to get the front end values
 	MeetingStartTime string ``
 	MeetingEndTime   string ``
+
+	//used for pretty timestamp rendering
+	MeetingStartStr string `db:"meeting_start_str"`
+	MeetingEndStr   string `db:"meeting_end_str"`
 }
 
 /*Validate meeting fields. */
@@ -59,16 +63,20 @@ func (meeting *Meeting) Validate(v *revel.Validation) {
 		v.ErrorKey("validation.invalid.params")
 	}
 
-	meeting.MeetingStart += " " + meeting.MeetingStartTime
-	meeting.MeetingEnd += " " + meeting.MeetingEndTime
+	meeting.MeetingStartStr += " " + meeting.MeetingStartTime
+	meeting.MeetingEndStr += " " + meeting.MeetingEndTime
 
-	v.Check(meeting.MeetingStart,
-		IsTimestamp{},
-	).MessageKey("validation.invalid.timestamp")
+	t, err := getTimestamp(meeting.MeetingStartStr)
+	if err != nil {
+		v.ErrorKey("validation.invalid.timestamp")
+	}
+	meeting.MeetingStart = t
 
-	v.Check(meeting.MeetingEnd,
-		IsTimestamp{},
-	).MessageKey("validation.invalid.timestamp")
+	t, err = getTimestamp(meeting.MeetingEndStr)
+	if err != nil {
+		v.ErrorKey("validation.invalid.timestamp")
+	}
+	meeting.MeetingEnd = t
 
 	if meeting.Place.String != "" {
 
@@ -102,10 +110,7 @@ func (meeting *Meeting) NewBlank(conf *EditEMailConfig) (err error) {
 		return
 	}
 
-	now := time.Now().Format(revel.TimeFormats[0])
-
-	err = tx.Get(meeting, stmtInsertBlankMeeting, meeting.EventID,
-		meeting.MeetingInterval, now)
+	err = tx.Get(meeting, stmtInsertBlankMeeting, meeting.EventID, meeting.MeetingInterval)
 	if err != nil {
 		log.Error("failed to insert blank meeting", "meeting", meeting,
 			"error", err.Error())
@@ -253,20 +258,17 @@ const (
 	stmtSelectMeetings = `
 		SELECT
 			id, event_id, meeting_interval, weekday, place, annotation,
-			TO_CHAR (meeting_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_start,
-			TO_CHAR (meeting_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_end
+			meeting_start, meeting_end,
+			TO_CHAR (meeting_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_start_str,
+			TO_CHAR (meeting_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') as meeting_end_str
 		FROM meetings
 		WHERE event_id = $1
 		ORDER BY id ASC
 	`
 
 	stmtInsertBlankMeeting = `
-		INSERT INTO meetings (
-				event_id, meeting_start, meeting_end, meeting_interval
-			)
-		VALUES (
-				$1, $3, $3, $2
-		)
+		INSERT INTO meetings (event_id, meeting_interval)
+		VALUES ($1, $2)
 		RETURNING id
 	`
 

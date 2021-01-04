@@ -2,6 +2,7 @@ package models
 
 import (
 	"strings"
+	"time"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -12,10 +13,11 @@ type Courses []Course
 
 /*CourseListInfo holds only the most essential information about courses. */
 type CourseListInfo struct {
-	ID           int    `db:"id, primarykey, autoincrement"`
-	Title        string `db:"title"`
-	CreationDate string `db:"creation_date"`
-	EMail        string `db:"email"` //e-mail address of either the creator or the editor
+	ID              int       `db:"id, primarykey, autoincrement"`
+	Title           string    `db:"title"`
+	CreationDate    time.Time `db:"creation_date"`
+	CreationDateStr string    `db:"creation_date_str"`
+	EMail           string    `db:"email"` //e-mail address of either the creator or the editor
 }
 
 /*CourseList holds the most essential information about a list of courses. */
@@ -70,8 +72,8 @@ func (list *CourseList) GetByUserID(tx *sqlx.Tx, userID int, userType string, ac
 
 	//construct SQL
 	stmtSelect := `
-		SELECT c.id, c.title, u.email,
-			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
+		SELECT c.id, c.title, u.email, c.creation_date,
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date_str
 	`
 
 	stmtWhere := `
@@ -266,8 +268,8 @@ const (
   `
 
 	stmtAllCoursesAdmin = `
-		SELECT c.id, c.title,
-			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date
+		SELECT c.id, c.title, c.creation_date,
+			TO_CHAR (c.creation_date AT TIME ZONE $1, 'YYYY-MM-DD HH24:MI') as creation_date_str
 		FROM courses c
 		WHERE $2 = 0
 	`

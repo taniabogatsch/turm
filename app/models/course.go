@@ -22,16 +22,16 @@ type Course struct {
 	Visible           bool            `db:"visible"`
 	Active            bool            `db:"active"`
 	OnlyLDAP          bool            `db:"only_ldap"`
-	CreationDate      string          `db:"creation_date"`
+	CreationDate      time.Time       `db:"creation_date"`
 	Description       sql.NullString  `db:"description"`
 	Speaker           sql.NullString  `db:"speaker"`
 	Fee               sql.NullFloat64 `db:"fee"`
 	CustomEMail       sql.NullString  `db:"custom_email"`
 	EnrollLimitEvents sql.NullInt32   `db:"enroll_limit_events"`
-	EnrollmentStart   string          `db:"enrollment_start"`
-	EnrollmentEnd     string          `db:"enrollment_end"`
-	UnsubscribeEnd    sql.NullString  `db:"unsubscribe_end"`
-	ExpirationDate    string          `db:"expiration_date"`
+	EnrollmentStart   time.Time       `db:"enrollment_start"`
+	EnrollmentEnd     time.Time       `db:"enrollment_end"`
+	UnsubscribeEnd    sql.NullTime    `db:"unsubscribe_end"`
+	ExpirationDate    time.Time       `db:"expiration_date"`
 	ParentID          sql.NullInt32   `db:"parent_id"`
 
 	//course data of different tables
@@ -45,8 +45,10 @@ type Course struct {
 
 	//additional information required when displaying the course
 	CreatorData User ``
+
 	//path to the course entry in the groups tree
 	Path Groups ``
+
 	//used for correct template rendering
 	CreatorID string
 	Expired   bool
@@ -63,38 +65,45 @@ type Course struct {
 	CanEdit               bool `db:"can_edit"`
 	CanManageParticipants bool `db:"can_manage_participants"`
 	IsCreator             bool
+
+	//used for pretty timestamp rendering
+	CreationDateStr    string         `db:"creation_date_str"`
+	EnrollmentStartStr string         `db:"enrollment_start_str"`
+	EnrollmentEndStr   string         `db:"enrollment_end_str"`
+	UnsubscribeEndStr  sql.NullString `db:"unsubscribe_end_str"`
+	ExpirationDateStr  string         `db:"expiration_date_str"`
 }
 
 /*Validate all course fields. */
 func (course *Course) Validate(v *revel.Validation) {
 
-	now := time.Now().Format(revel.TimeFormats[0])
+	now := time.Now()
 
 	if !course.Active {
 		//now < EnrollmentStart
-		if now >= course.EnrollmentStart {
+		if now.After(course.EnrollmentStart) {
 			v.ErrorKey("validation.invalid.enrollment.start")
 		}
 	}
 
 	//EnrollmentStart < EnrollmentEnd
-	if course.EnrollmentStart >= course.EnrollmentEnd {
+	if course.EnrollmentStart.After(course.EnrollmentEnd) {
 		v.ErrorKey("validation.invalid.enrollment.end")
 	}
 
 	if course.UnsubscribeEnd.Valid {
 		//if UnsubscribeEnd, then EnrollmentEnd <= UnsubscribeEnd
-		if course.EnrollmentEnd > course.UnsubscribeEnd.String {
+		if course.EnrollmentEnd.After(course.UnsubscribeEnd.Time) {
 			v.ErrorKey("validation.invalid.unsubscribe.end")
 		}
 		//if UnsubscribeEnd, then UnsubscribeEnd <= ExpirationDate
-		if course.ExpirationDate < course.UnsubscribeEnd.String {
+		if course.ExpirationDate.Before(course.UnsubscribeEnd.Time) {
 			v.ErrorKey("validation.invalid.unsubscribe.expiration")
 		}
 	}
 
 	//EnrollmentEnd <= ExpirationDate
-	if course.EnrollmentEnd > course.ExpirationDate {
+	if course.EnrollmentEnd.After(course.ExpirationDate) {
 		v.ErrorKey("validation.invalid.expiration.date")
 	}
 
@@ -107,12 +116,12 @@ func (course *Course) Validate(v *revel.Validation) {
 		for _, meeting := range event.Meetings {
 
 			//EnrollmentStart <= MeetingStart
-			if course.EnrollmentStart > meeting.MeetingStart {
+			if course.EnrollmentStart.After(meeting.MeetingStart) {
 				v.ErrorKey("validation.invalid.meeting.start")
 			}
 
 			//MeetingStart < MeetingEnd
-			if meeting.MeetingStart >= meeting.MeetingEnd {
+			if meeting.MeetingStart.After(meeting.MeetingEnd) {
 				v.ErrorKey("validation.invalid.meeting.end")
 			}
 		}
@@ -175,7 +184,7 @@ func (course *Course) Update(tx *sqlx.Tx, column string, value interface{},
 
 /*UpdateTimestamp of a course. Also ensures validitiy, if the course is already active. */
 func (course *Course) UpdateTimestamp(v *revel.Validation, conf *EditEMailConfig,
-	fieldID string, timestamp string, valid bool) (err error) {
+	fieldID string, t time.Time, valid bool) (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -193,13 +202,13 @@ func (course *Course) UpdateTimestamp(v *revel.Validation, conf *EditEMailConfig
 
 		switch fieldID {
 		case "enrollment_start":
-			course.EnrollmentStart = timestamp
+			course.EnrollmentStart = t
 		case "enrollment_end":
-			course.EnrollmentEnd = timestamp
+			course.EnrollmentEnd = t
 		case "unsubscribe_end":
-			course.UnsubscribeEnd = sql.NullString{timestamp, valid}
+			course.UnsubscribeEnd = sql.NullTime{t, valid}
 		case "expiration_date":
-			course.ExpirationDate = timestamp
+			course.ExpirationDate = t
 		}
 
 		if course.Validate(v); v.HasErrors() {
@@ -210,11 +219,11 @@ func (course *Course) UpdateTimestamp(v *revel.Validation, conf *EditEMailConfig
 
 	//no errors, update the course
 	if fieldID == "unsubscribe_end" {
-		if err = course.Update(tx, fieldID, sql.NullString{timestamp, valid}, conf); err != nil {
+		if err = course.Update(tx, fieldID, sql.NullTime{t, valid}, conf); err != nil {
 			return
 		}
 	} else {
-		if err = course.Update(tx, fieldID, timestamp, conf); err != nil {
+		if err = course.Update(tx, fieldID, t, conf); err != nil {
 			return
 		}
 	}
@@ -809,13 +818,19 @@ const (
 	stmtGetCourse = `
 		SELECT
 			id, title, creator, subtitle, visible, active, only_ldap, parent_id,
-			description, fee, custom_email, enroll_limit_events, speaker,
-			TO_CHAR (creation_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS creation_date,
-			TO_CHAR (enrollment_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_start,
-			TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end,
-			TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribe_end,
-			TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date,
-			(current_timestamp >= expiration_date) AS expired
+			description, fee, custom_email, enroll_limit_events, speaker, creation_date,
+			enrollment_start, enrollment_end, unsubscribe_end, expiration_date,
+			TO_CHAR (creation_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS creation_date_str,
+			TO_CHAR (enrollment_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_start_str,
+			TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end_str,
+			TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date_str,
+			(current_timestamp >= expiration_date) AS expired,
+
+			CASE WHEN unsubscribe_end IS NOT NULL
+					THEN TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI')
+				ELSE null
+			END AS unsubscribe_end_str
+
 		FROM courses
 		WHERE id = $1
 	`

@@ -98,7 +98,7 @@
     {{msg $ "course.enrollment.period"}}:
   </div>
   <div class="col-sm-8">
-    {{msg $ "course.from"}} <div id="div-enrollment_start" class="d-inline">{{.course.EnrollmentStart}}</div> {{msg $ "course.clock"}}
+    {{msg $ "course.from"}} <div id="div-enrollment_start" class="d-inline">{{.course.EnrollmentStartStr}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.start"}}, "enrollment_start",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
@@ -107,7 +107,7 @@
       {{template "icons/pencil.html" . }}
     </a>
     <br>
-    {{msg $ "course.to"}} <div id="div-enrollment_end" class="d-inline">{{.course.EnrollmentEnd}}</div> {{msg $ "course.clock"}}
+    {{msg $ "course.to"}} <div id="div-enrollment_end" class="d-inline">{{.course.EnrollmentEndStr}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.enrollment.end"}}, "enrollment_end",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
@@ -119,13 +119,13 @@
 </div>
 
 <!-- if the course has a time up to which users can unsubscribe -->
-<div id="div-edit-unsubscribe_end" {{if not .course.UnsubscribeEnd.Valid}}class="d-none"{{end}}>
+<div id="div-edit-unsubscribe_end" {{if not .course.UnsubscribeEndStr.Valid}}class="d-none"{{end}}>
   <div class="row mb-2">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.unsubscribe.end"}}:
     </div>
     <div class="col-sm-8">
-      <div id="div-unsubscribe_end" class="d-inline">{{.course.UnsubscribeEnd.String}}</div> {{msg $ "course.clock"}}
+      <div id="div-unsubscribe_end" class="d-inline">{{.course.UnsubscribeEndStr.String}}</div> {{msg $ "course.clock"}}
       <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
         onclick='openChangeModal({{msg $ "course.unsubscribe.end"}}, "unsubscribe_end", true,
           "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",
@@ -143,7 +143,7 @@
     </div>
   </div>
 </div>
-<div id="div-add-unsubscribe_end" {{if .course.UnsubscribeEnd.Valid}}class="d-none"{{end}}>
+<div id="div-add-unsubscribe_end" {{if .course.UnsubscribeEndStr.Valid}}class="d-none"{{end}}>
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
       {{msg $ "course.unsubscribe.end"}}:
@@ -383,7 +383,7 @@
     {{msg $ "course.expiration.date"}}:
   </div>
   <div class="col-sm-8">
-    <div id="div-expiration_date" class="d-inline">{{.course.ExpirationDate}}</div> {{msg $ "course.clock"}}
+    <div id="div-expiration_date" class="d-inline">{{.course.ExpirationDateStr}}</div> {{msg $ "course.clock"}}
     <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
       onclick='openChangeModal({{msg $ "course.expiration.date"}}, "expiration_date",
         true, "{{url "Edit.ChangeTimestamp"}}", "timestamp", "",

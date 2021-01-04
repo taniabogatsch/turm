@@ -202,10 +202,6 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
 			MessageKey("validation.invalid.time")
-
-		c.Validation.Check(timestamp,
-			models.IsTimestamp{},
-		).MessageKey("validation.invalid.timestamp")
 	}
 
 	if c.Validation.HasErrors() {
@@ -219,12 +215,17 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
+	t, err := getTimestamp(timestamp, c.Controller)
+	if err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message("error.undefined")})
+	}
+
 	course := models.Course{ID: ID}
 	conf.ID = ID
-	var err error
 
 	if err = course.UpdateTimestamp(c.Validation, &conf, fieldID,
-		timestamp, valid); err != nil {
+		t, valid); err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	} else if c.Validation.HasErrors() {

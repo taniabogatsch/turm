@@ -38,15 +38,15 @@ type ListConf struct {
 
 /*Participants of a course. */
 type Participants struct {
-	ID              int            `db:"id, primarykey, autoincrement"`
-	Title           string         `db:"title"`
-	Active          bool           `db:"active"`
-	EnrollmentStart string         `db:"enrollment_start"`
-	EnrollmentEnd   string         `db:"enrollment_end"`
-	UnsubscribeEnd  sql.NullString `db:"unsubscribe_end"`
-	ExpirationDate  string         `db:"expiration_date"`
-	ViewMatrNr      bool           `db:"view_matr_nr"`
-	UserEMail       string         `db:"user_email"`
+	ID                 int            `db:"id, primarykey, autoincrement"`
+	Title              string         `db:"title"`
+	Active             bool           `db:"active"`
+	EnrollmentStartStr string         `db:"enrollment_start_str"`
+	EnrollmentEndStr   string         `db:"enrollment_end_str"`
+	UnsubscribeEndStr  sql.NullString `db:"unsubscribe_end_str"`
+	ExpirationDateStr  string         `db:"expiration_date_str"`
+	ViewMatrNr         bool           `db:"view_matr_nr"`
+	UserEMail          string         `db:"user_email"`
 
 	Expired bool
 	Lists   ParticipantLists
@@ -314,16 +314,21 @@ const (
 	stmtSelectParticipantsCourseData = `
     SELECT
       id, title, active,
-      TO_CHAR (enrollment_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_start,
-      TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end,
-      TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS unsubscribe_end,
-      TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date,
+      TO_CHAR (enrollment_start AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_start_str,
+      TO_CHAR (enrollment_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS enrollment_end_str,
+      TO_CHAR (expiration_date AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS expiration_date_str,
       (current_timestamp >= expiration_date) AS expired,
-			(
-				SELECT email
+
+			( SELECT email
 				FROM users
 				WHERE id = $3
-			) AS user_email
+			) AS user_email,
+
+			CASE WHEN unsubscribe_end IS NOT NULL
+					THEN TO_CHAR (unsubscribe_end AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI')
+				ELSE null
+			END AS unsubscribe_end_str
+
     FROM courses
     WHERE id = $1
   `
@@ -357,8 +362,8 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status,
-      TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
+      e.user_id, e.event_id, e.status, e.time_of_enrollment,
+      TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
       AND e.status != 1 /*on waitlist */
@@ -369,8 +374,8 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status,
-      TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment
+      e.user_id, e.event_id, e.status, e.time_of_enrollment,
+      TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
       AND e.status = 1 /*on waitlist */

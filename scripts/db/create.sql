@@ -107,8 +107,8 @@ CREATE TABLE meetings (
   weekday           integer,
   place             varchar(255),
   annotation        varchar(255),
-  meeting_start     timestamp with time zone  NOT NULL,
-  meeting_end       timestamp with time zone  NOT NULL,
+  meeting_start     timestamp with time zone  NOT NULL DEFAULT now(),
+  meeting_end       timestamp with time zone  NOT NULL DEFAULT now(),
 
   FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 );
