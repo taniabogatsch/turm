@@ -9,8 +9,6 @@ It uses:
 - [Bootstrap Icons](https://icons.getbootstrap.com)
 - [JQuery 3.4.1](https://jquery.com)
 - [Quill](https://quilljs.com) 
-
-and the following go packages:
 - [jmoiron/sqlx](https://github.com/jmoiron/sqlx)
 - [k3a/html2text](https://github.com/k3a/html2text)
 - [ldap.v2](https://gopkg.in/ldap.v2)
@@ -27,6 +25,10 @@ grant all privileges on database turm to turm;
 With the postgreSQL superuser, add the `pgcrypto` extension (`create extension pgcrypto`).
 
 Create the DB schema using `scripts/db/create.sql`.
+
+```
+psql -h localhost -d turm -U turm -p 5432 -f create.sql
+```
 
 ### Start the web server (development)
 
@@ -60,13 +62,21 @@ source $HOME/.profile
 revel new -a my-app -r
 ```
 
-Install the following missing go packages.
+Install the following missing packages.
 
 ```
 go get -u github.com/jmoiron/sqlx
 go get -u github.com/jackc/pgx/stdlib
 go get -u gopkg.in/ldap.v2
 go get -u github.com/k3a/html2text
+```
+
+Create the following folders and files:
+
+```
+mkdir ~/go/src/db_backups
+mkdir ~/go/src/studiengaenge
+vim ~/go/src/studiengaenge/enrollment-data-turm2.csv
 ```
 
 Adjust all config values `app/conf/app.conf`. See below for a detailed description.
@@ -82,8 +92,6 @@ Create a `passwords.json` file at `app/conf/`. It should only contain the follow
 ### Run or deploy
 
 Run with `revel run turm` or create a `run.sh` with `revel package turm prod`.
-
-## Config file configuration
 
 ## Code Layout
 
