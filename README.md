@@ -30,21 +30,46 @@ Create the DB schema using `scripts/db/create.sql`.
 
 ### Start the web server (development)
 
-Requires [Go](https://github.com/golang/go) and [Revel](https://github.com/revel/).
+Install [Go](https://github.com/golang/go) and [Git](https://git-scm.com/).
+
+Use [Git](https://git-scm.com/) to clone the repository. 
 
 ```
-cd $GOPATH
+cd ~/go/src
+git clone https://github.com/taniabogatsch/turm.git 
+or (depending on your repo access rights)
+git clone git@github.com:taniabogatsch/turm.git
+```
+
+Now use `go get` to install [Revel](https://github.com/revel/).
+
+```
 go get -u github.com/revel/cmd/revel
+```
+
+In your `~/.profile` file, add the following line:
+
+```
+export PATH="$PATH:~/go/bin"
+```
+
+If you want to, you can verify your revel installation.
+
+```
+source $HOME/.profile
+revel new -a my-app -r
+```
+
+Install the following missing go packages.
+
+```
 go get -u github.com/jmoiron/sqlx
 go get -u github.com/jackc/pgx/stdlib
 go get -u gopkg.in/ldap.v2
 go get -u github.com/k3a/html2text
-
-cd src
-git clone https://github.com/taniabogatsch/turm.git
 ```
 
-Adjust all config values `app/conf/app.conf`. See below for a detailed description (TODO).
+Adjust all config values `app/conf/app.conf`. See below for a detailed description.
 
 Create a `passwords.json` file at `app/conf/`. It should only contain the following two values:
 ```
@@ -57,6 +82,8 @@ Create a `passwords.json` file at `app/conf/`. It should only contain the follow
 ### Run or deploy
 
 Run with `revel run turm` or create a `run.sh` with `revel package turm prod`.
+
+## Config file configuration
 
 ## Code Layout
 
