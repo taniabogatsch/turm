@@ -5,6 +5,8 @@ Turm2 is an enrollment system allowing users to enroll in courses. There is no o
 It uses:
 - [Go](https://github.com/golang/go)
 - [Revel](https://github.com/revel/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Postfix](http://www.postfix.org/)
 - [Bootstrap 4.4.1](https://getbootstrap.com)
 - [Bootstrap Icons](https://icons.getbootstrap.com)
 - [JQuery 3.4.1](https://jquery.com)
@@ -28,6 +30,21 @@ Create the DB schema using `scripts/db/create.sql`.
 
 ```
 psql -h localhost -d turm -U turm -p 5432 -f create.sql
+```
+
+### Set up Postfix
+
+Install [Postfix](http://www.postfix.org/). Choose `internet with smarthost` and set all required parameters.
+
+```
+sudo apt install postfix
+```
+
+For validation, you can do the following, where `your-mail@abc.de` is the receiving e-mail address.
+
+```
+sudo apt install mailutils
+mailx -s'foobar' your-mail@abc.de -r'abc@yourhost.de'
 ```
 
 ### Start the web server (development)
