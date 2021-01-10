@@ -70,6 +70,20 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
 			tx.Rollback()
 			return
 		}
+
+		//get custom welcome e-mail (if exists)
+		if err = course.GetColumnValue(tx, "custom_email"); err != nil {
+			return
+		}
+		data.CustomEMail = course.CustomEMail
+
+		//get all custom e-mail data
+		if data.CustomEMail.Valid {
+			err = data.CustomEMailData.get(tx, slot.UserID, course.ID, event.ID, true)
+			if err != nil {
+				return
+			}
+		}
 	}
 
 	//check if all values are correct and the selected timespan is free

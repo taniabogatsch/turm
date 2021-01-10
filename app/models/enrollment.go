@@ -164,9 +164,17 @@ func (enrolled *Enrolled) EnrollOrUnsubscribe(action EnrollOption, key string) (
 		if course.Fee.Valid {
 			enrolled.Status = AWAITINGPAYMENT
 		}
+
 		if event.EnrollOption == ENROLLTOWAITLIST {
 			enrolled.Status = ONWAITLIST
 			waitList = true
+		} else {
+
+			//get custom welcome e-mail (if exists)
+			if err = course.GetColumnValue(tx, "custom_email"); err != nil {
+				return
+			}
+			data.CustomEMail = course.CustomEMail
 		}
 
 		//validate enrollment key (if required)
@@ -232,6 +240,14 @@ func (enrolled *Enrolled) EnrollOrUnsubscribe(action EnrollOption, key string) (
 	data.User.ID = enrolled.UserID
 	if err = data.User.Get(tx); err != nil {
 		return
+	}
+
+	//get all custom e-mail data
+	if data.CustomEMail.Valid {
+		err = data.CustomEMailData.get(tx, data.User.ID, course.ID, enrolled.EventID, false)
+		if err != nil {
+			return
+		}
 	}
 
 	tx.Commit()

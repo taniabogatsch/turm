@@ -1,7 +1,10 @@
 package models
 
 import (
+	"database/sql"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
@@ -21,9 +24,10 @@ type EMailData struct {
 	URL string
 
 	//used for enrollment
-	CourseTitle string `db:"course_title"`
-	EventTitle  string `db:"event_title"`
-	CourseID    int    `db:"course_id"`
+	CourseTitle string         `db:"course_title"`
+	EventTitle  string         `db:"event_title"`
+	CourseID    int            `db:"course_id"`
+	CustomEMail sql.NullString `db:"custom_email"`
 
 	//used for changing the enrollment status
 	Status EnrollmentStatus
@@ -39,6 +43,9 @@ type EMailData struct {
 
 	//used for notifying users about edits
 	Field string
+
+	//used for the custom enrollment e-mail
+	CustomEMailData CustomEMailData
 }
 
 /*EditEMailConfig provides all information for sending edit notification e-mails. */
@@ -59,32 +66,61 @@ type EditEMailConfig struct {
 	Field string
 }
 
+/*CustomEMailData contains all fields that can be used in the custom e-mail. */
+type CustomEMailData struct {
+	Salutation    Salutation     `db:"salutation"`
+	Title         sql.NullString `db:"title"`
+	NameAffix     sql.NullString `db:"name_affix"`
+	AcademicTitle sql.NullString `db:"academic_title"`
+	LastName      string         `db:"last_name"`
+	FirstName     string         `db:"first_name"`
+	CourseID      int            `db:"course_id"`
+	CourseTitle   string         `db:"course_title"`
+	EventTitle    string         `db:"event_title"`
+	MeetingCount  int            `db:"meeting_count"`
+	EMailCreator  string         `db:"email_creator"`
+	URL           string
+}
+
 /*GetEMailSubjectBody assigns the template content to the e-mail body and sets the e-mail subject. */
 func GetEMailSubjectBody(data *EMailData, language *string, subjectKey string,
 	filename string, email *app.EMail, c *revel.Controller) (err error) {
 
 	data.URL = app.Mailer.URL
-	c.ViewArgs["data"] = data //set the data for parsing the e-mail body
-
-	cLanguage := c.Session["currentLocale"].(string)
-	c.ViewArgs["currentLocale"] = *language //set the preferred language for template parsing
-	c.Request.Locale = *language
 
 	email.Subject = c.Message(subjectKey) //set the e-mail subject
 	email.ReplyTo = c.Message("email.no.reply", app.Mailer.EMail)
 
-	//parse template / e-mail body
-	filepath := filepath.Join("emails", filename+"_"+*language+".html")
-	buf, err := revel.TemplateOutputArgs(filepath, c.ViewArgs)
-	if err != nil {
-		log.Error("failed to parse e-mail template", "filepath", filepath,
-			"viewArgs", c.ViewArgs, "error", err.Error())
-		return
-	}
-	email.Body = string(buf)
+	//set the custom e-mail as the e-mail body
+	if data.CustomEMail.Valid {
 
-	c.ViewArgs["currentLocale"] = cLanguage //reset to original language
-	c.Request.Locale = cLanguage
+		data.CustomEMailData.URL = data.URL
+		parseCustomEMail(&data.CustomEMail.String, &data.CustomEMailData, c)
+		email.Body = app.HTMLToMimeFormat(&data.CustomEMail.String)
+
+	} else { //parse the default e-mail template
+
+		c.ViewArgs["data"] = data //set the data for parsing the e-mail body
+
+		cLanguage := c.Session["currentLocale"].(string)
+		c.ViewArgs["currentLocale"] = *language //set the preferred language for template parsing
+		c.Request.Locale = *language
+
+		//parse template / e-mail body
+		filepath := filepath.Join("emails", filename+"_"+*language+".html")
+		buf, err := revel.TemplateOutputArgs(filepath, c.ViewArgs)
+		if err != nil {
+			log.Error("failed to parse e-mail template", "filepath", filepath,
+				"viewArgs", c.ViewArgs, "error", err.Error())
+			return err
+		}
+		email.Body = string(buf)
+
+		//reset to original language
+		c.ViewArgs["currentLocale"] = cLanguage
+		c.Request.Locale = cLanguage
+	}
+
 	return
 }
 
@@ -215,7 +251,100 @@ func (conf *EditEMailConfig) Get(tx *sqlx.Tx) (err error) {
 	return
 }
 
+func parseCustomEMail(content *string, data *CustomEMailData, c *revel.Controller) {
+
+	//store the current language
+	cLanguage := c.Session["currentLocale"].(string)
+
+	//now parse for each language
+	for _, language := range app.Languages {
+
+		//set the language
+		c.ViewArgs["currentLocale"] = language
+		c.Request.Locale = language
+
+		salutation := c.Message("user.salutation.none")
+		if data.Salutation == MR {
+			salutation = c.Message("user.salutation.mr")
+		} else if data.Salutation == MS {
+			salutation = c.Message("user.salutation.ms")
+		}
+
+		data.URL = data.URL + "/course/open?ID=" + strconv.Itoa(data.CourseID)
+
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.salutation")), salutation)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.title")), data.Title.String)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.academic.title")), data.AcademicTitle.String)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.firstname")), data.FirstName)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.name.affix")), data.NameAffix.String)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("user.lastname")), data.LastName)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("course.title")), data.CourseTitle)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("event.title")), data.EventTitle)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("event.number.meetings")), strconv.Itoa(data.MeetingCount))
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("course.creator.email")), data.EMailCreator)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("course.url")), data.URL)
+	}
+
+	//reset to original language
+	c.ViewArgs["currentLocale"] = cLanguage
+	c.Request.Locale = cLanguage
+
+	return
+}
+
+func (data *CustomEMailData) get(tx *sqlx.Tx, userID, courseID, eventID int,
+	calendarEvent bool) (err error) {
+
+	stmt := stmtGetCustomEMailDataEvent
+	if calendarEvent {
+		stmt = stmtGetCustomEMailDataSlot
+	}
+
+	err = tx.Get(data, stmt, userID, courseID, eventID)
+	if err != nil {
+		log.Error("failed to get custom e-mail data by event", "userID", userID,
+			"courseID", courseID, "eventID", eventID, "calendarEvent", calendarEvent,
+			"error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	return
+}
+
+func inBrackets(str string) string {
+
+	return "[[" + str + "]]"
+}
+
 const (
+	stmtGetCustomEMailDataEvent = `
+		SELECT u.salutation, u.title, u.name_affix, u.academic_title, u.last_name,
+			u.first_name, c.id AS course_id, c.title AS course_title, e.title AS event_title,
+			COUNT(m.id) AS meeting_count, uc.email AS email_creator
+		FROM users u, courses c
+		 	JOIN users uc ON c.creator = uc.id
+			JOIN events e ON c.id = e.course_id
+			LEFT OUTER JOIN meetings m ON e.id = m.event_id
+		WHERE u.id = $1
+			AND c.id = $2
+			AND e.id = $3
+		GROUP BY u.salutation, u.title, u.name_affix, u.academic_title, u.last_name,
+			u.first_name, c.id, c.title, e.title, uc.email
+	`
+
+	stmtGetCustomEMailDataSlot = `
+		SELECT u.salutation, u.title, u.name_affix, u.academic_title, u.last_name,
+			u.first_name, c.id AS course_id, c.title AS course_title, e.title AS event_title,
+			uc.email AS email_creator
+		FROM users u, courses c
+			JOIN users uc ON c.creator = uc.id
+			JOIN calendar_events e ON c.id = e.course_id
+		WHERE u.id = $1
+			AND c.id = $2
+			AND e.id = $3
+	`
+
 	stmtEventDataForEMail = `
 		SELECT e.title AS event_title, c.title AS course_title,
 			c.id AS course_id

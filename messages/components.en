@@ -108,8 +108,8 @@ user.username = Username
 user.password = Password
 
 user.salutation = Form of address
-user.salutation.ms = Ms.
-user.salutation.mr = Mr.
+user.salutation.ms = Ms
+user.salutation.mr = Mr
 user.salutation.none = No form of address
 user.title = Titel
 user.academic.title = Academic titel

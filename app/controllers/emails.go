@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"turm/app"
 	"turm/app/models"
 
@@ -34,9 +33,6 @@ func sendEMail(c *revel.Controller, data *models.EMailData, subjectKey string,
 	if err != nil {
 		return
 	}
-
-	fmt.Println("ACHTUNG URL")
-	fmt.Println(data.URL)
 
 	app.EMailQueue <- email
 	return
