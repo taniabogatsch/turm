@@ -5,12 +5,12 @@ Turm2 is an enrollment system allowing users to enroll in courses. There is no o
 It uses:
 - [Go](https://github.com/golang/go)
 - [Revel](https://github.com/revel/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Postfix](http://www.postfix.org/)
 - [Bootstrap 4.4.1](https://getbootstrap.com)
 - [Bootstrap Icons](https://icons.getbootstrap.com)
 - [JQuery 3.4.1](https://jquery.com)
 - [Quill](https://quilljs.com) 
-
-and the following go packages:
 - [jmoiron/sqlx](https://github.com/jmoiron/sqlx)
 - [k3a/html2text](https://github.com/k3a/html2text)
 - [ldap.v2](https://gopkg.in/ldap.v2)
@@ -28,23 +28,75 @@ With the postgreSQL superuser, add the `pgcrypto` extension (`create extension p
 
 Create the DB schema using `scripts/db/create.sql`.
 
-### Start the web server (development)
+```
+psql -h localhost -d turm -U turm -p 5432 -f create.sql
+```
 
-Requires [Go](https://github.com/golang/go) and [Revel](https://github.com/revel/).
+### Set up Postfix
+
+Install [Postfix](http://www.postfix.org/). Choose `internet with smarthost` and set all required parameters.
 
 ```
-cd $GOPATH
+sudo apt install postfix
+```
+
+For validation, you can do the following, where `your-mail@abc.de` is the receiving e-mail address.
+
+```
+sudo apt install mailutils
+mailx -s'foobar' your-mail@abc.de -r'abc@yourhost.de'
+```
+
+### Start the web server (development)
+
+Install [Go](https://github.com/golang/go) and [Git](https://git-scm.com/).
+
+Use [Git](https://git-scm.com/) to clone the repository. 
+
+```
+cd ~/go/src
+git clone https://github.com/taniabogatsch/turm.git 
+or (depending on your repo access rights)
+git clone git@github.com:taniabogatsch/turm.git
+```
+
+Now use `go get` to install [Revel](https://github.com/revel/).
+
+```
 go get -u github.com/revel/cmd/revel
+```
+
+In your `~/.profile` file, add the following line:
+
+```
+export PATH="$PATH:~/go/bin"
+```
+
+If you want to, you can verify your revel installation.
+
+```
+source $HOME/.profile
+revel new -a my-app -r
+```
+
+Install the following missing packages.
+
+```
 go get -u github.com/jmoiron/sqlx
 go get -u github.com/jackc/pgx/stdlib
 go get -u gopkg.in/ldap.v2
 go get -u github.com/k3a/html2text
-
-cd src
-git clone https://github.com/taniabogatsch/turm.git
 ```
 
-Adjust all config values `app/conf/app.conf`. See below for a detailed description (TODO).
+Create the following folders and files:
+
+```
+mkdir ~/go/src/db_backups
+mkdir ~/go/src/studiengaenge
+vim ~/go/src/studiengaenge/enrollment-data-turm2.csv
+```
+
+Adjust all config values `app/conf/app.conf`. See below for a detailed description.
 
 Create a `passwords.json` file at `app/conf/`. It should only contain the following two values:
 ```
