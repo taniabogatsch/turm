@@ -37,6 +37,7 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
 		return
 	}
 
+	var courseID int
 	if !manual {
 
 		now := time.Now()
@@ -54,6 +55,7 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
 		}
 
 		//get relevant course information
+		courseID = event.CourseID
 		course := Course{ID: event.CourseID}
 		err = course.GetForEnrollment(tx, &slot.UserID, &event.ID)
 		if err != nil {
@@ -76,14 +78,6 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
 			return
 		}
 		data.CustomEMail = course.CustomEMail
-
-		//get all custom e-mail data
-		if data.CustomEMail.Valid {
-			err = data.CustomEMailData.get(tx, slot.UserID, course.ID, event.ID, true)
-			if err != nil {
-				return
-			}
-		}
 	}
 
 	//check if all values are correct and the selected timespan is free
@@ -101,6 +95,14 @@ func (slot *Slot) Insert(v *revel.Validation, calendarEventID int,
 		log.Error("failed to insert slot", "slot", *slot, "error", err.Error())
 		tx.Rollback()
 		return
+	}
+
+	//get all custom e-mail data
+	if data.CustomEMail.Valid {
+		err = data.CustomEMailData.get(tx, slot.UserID, courseID, calendarEventID, slot.ID)
+		if err != nil {
+			return
+		}
 	}
 
 	//get e-mail data

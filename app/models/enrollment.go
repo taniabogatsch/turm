@@ -244,7 +244,7 @@ func (enrolled *Enrolled) EnrollOrUnsubscribe(action EnrollOption, key string) (
 
 	//get all custom e-mail data
 	if data.CustomEMail.Valid {
-		err = data.CustomEMailData.get(tx, data.User.ID, course.ID, enrolled.EventID, false)
+		err = data.CustomEMailData.get(tx, data.User.ID, course.ID, enrolled.EventID, 0)
 		if err != nil {
 			return
 		}

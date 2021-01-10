@@ -263,6 +263,8 @@ course.custom_email.delete.success = Deleted custom enrollment e-mail, course ID
 course.customemail.delete.confirm = Confirm deletion of custom enrollment e-mail.
 course.customemail.delete.title = Delete enrollment e-mail.
 course.custom.email.change.info = The custom welcome e-mail is send to each user that enrolls in the course.
+course.custom.email.fields.event.info = The following fields should only be used for normal events.
+course.custom.email.fields.slots.info = The following fields should only be used for calendar events.
 
 course.speaker.change.success = Changed speaker, course ID = %d.
 course.speaker.delete.success = Deleted speaker, course ID = %d.

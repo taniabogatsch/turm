@@ -79,6 +79,8 @@ type CustomEMailData struct {
 	EventTitle    string         `db:"event_title"`
 	MeetingCount  int            `db:"meeting_count"`
 	EMailCreator  string         `db:"email_creator"`
+	Start         string         `db:"start"`
+	End           string         `db:"end"`
 	URL           string
 }
 
@@ -283,6 +285,8 @@ func parseCustomEMail(content *string, data *CustomEMailData, c *revel.Controlle
 		*content = strings.ReplaceAll(*content, inBrackets(c.Message("event.number.meetings")), strconv.Itoa(data.MeetingCount))
 		*content = strings.ReplaceAll(*content, inBrackets(c.Message("course.creator.email")), data.EMailCreator)
 		*content = strings.ReplaceAll(*content, inBrackets(c.Message("course.url")), data.URL)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("enroll.start.time")), data.Start)
+		*content = strings.ReplaceAll(*content, inBrackets(c.Message("enroll.end.time")), data.End)
 	}
 
 	//reset to original language
@@ -292,19 +296,17 @@ func parseCustomEMail(content *string, data *CustomEMailData, c *revel.Controlle
 	return
 }
 
-func (data *CustomEMailData) get(tx *sqlx.Tx, userID, courseID, eventID int,
-	calendarEvent bool) (err error) {
+func (data *CustomEMailData) get(tx *sqlx.Tx, userID, courseID, eventID, slotID int) (err error) {
 
-	stmt := stmtGetCustomEMailDataEvent
-	if calendarEvent {
-		stmt = stmtGetCustomEMailDataSlot
+	if slotID != 0 {
+		err = tx.Get(data, stmtGetCustomEMailDataSlot, userID, courseID, eventID, slotID, app.TimeZone)
+	} else {
+		err = tx.Get(data, stmtGetCustomEMailDataEvent, userID, courseID, eventID)
 	}
 
-	err = tx.Get(data, stmt, userID, courseID, eventID)
 	if err != nil {
 		log.Error("failed to get custom e-mail data by event", "userID", userID,
-			"courseID", courseID, "eventID", eventID, "calendarEvent", calendarEvent,
-			"error", err.Error())
+			"courseID", courseID, "eventID", eventID, "slotID", slotID, "error", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -336,13 +338,18 @@ const (
 	stmtGetCustomEMailDataSlot = `
 		SELECT u.salutation, u.title, u.name_affix, u.academic_title, u.last_name,
 			u.first_name, c.id AS course_id, c.title AS course_title, e.title AS event_title,
-			uc.email AS email_creator
+			uc.email AS email_creator,
+			TO_CHAR (s.start_time AT TIME ZONE $5, 'YYYY-MM-DD HH24:MI') AS start,
+			TO_CHAR (s.end_time AT TIME ZONE $5, 'YYYY-MM-DD HH24:MI') AS end
 		FROM users u, courses c
 			JOIN users uc ON c.creator = uc.id
 			JOIN calendar_events e ON c.id = e.course_id
+			JOIN day_templates d ON d.calendar_event_id = e.id
+			JOIN slots s ON s.day_tmpl_id = d.id
 		WHERE u.id = $1
 			AND c.id = $2
 			AND e.id = $3
+			AND s.id = $4
 	`
 
 	stmtEventDataForEMail = `

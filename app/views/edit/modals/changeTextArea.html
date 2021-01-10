@@ -57,16 +57,29 @@ formID:         change-text-area-modal-form         action
                 <li>{{msg $ "user.firstname"}}</li>
                 <li>{{msg $ "user.name.affix"}}</li>
                 <li>{{msg $ "user.lastname"}}</li>
-              </ul>
-            </div>
-            <div class="col-sm-6">
-              <ul>
                 <li>{{msg $ "course.title"}}</li>
-                <li>{{msg $ "event.title"}}</li>
-                <li>{{msg $ "event.number.meetings"}}</li>
                 <li>{{msg $ "course.creator.email"}}</li>
                 <li>{{msg $ "course.url"}}</li>
+                <li>{{msg $ "event.title"}}</li>
               </ul>
+            </div>
+            <div class="col-sm-4">
+              <ul>
+                <small class="text-muted">
+                  {{msg $ "course.custom.email.fields.event.info"}}
+                </small>
+                <br>
+                <li>{{msg $ "event.number.meetings"}}</li>
+                <br>
+                <small class="text-muted">
+                  {{msg $ "course.custom.email.fields.slots.info"}}
+                </small>
+                <br>
+                <li>{{msg $ "enroll.start.time"}}</li>
+                <li>{{msg $ "enroll.end.time"}}</li>
+              </ul>
+            </div>
+            <div class="col-sm-2">
             </div>
           </div>
           <div class="only-custom-email">{{msg $ "creator.custom.email.fields.info"}}</div>

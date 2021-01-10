@@ -263,6 +263,8 @@ course.custom_email.delete.success = Individuelle Willkommensemail gelöscht, Ku
 course.customemail.delete.confirm = Individuelle Willkommensemail wirklich löschen?
 course.customemail.delete.title = Willkommensemail löschen.
 course.custom.email.change.info = Die individuelle Willkommensemail wird an die NutzerInnen des Kurses gesendet, wenn diese sich einschreiben.
+course.custom.email.fields.event.info = Die nachfolgenden Felder sollten ausschließlich bei normalen Veranstaltungen verwendet werden.
+course.custom.email.fields.slots.info = Die nachfolgenden Felder sollten ausschließlich bei Kalenderveranstaltungen verwendet werden.
 
 course.speaker.change.success = ReferentIn geändert, Kurs ID = %d.
 course.speaker.delete.success = ReferentIn gelöscht, Kurs ID = %d.
