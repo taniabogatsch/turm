@@ -8,19 +8,23 @@
 
 <strong> General: </strong>
 <br>
-Turm2 is an enrollment system that is mostly designed for the <a href="https://www.tu-ilmenau.de/zib/"> Zentralinstitut für Bildung </a>
-as well as other stakeholders and groups of the <a href="https://www.tu-ilmenau.de/impressum/"> Ilmenau University of Technology</a>.
+Turm2 is an enrollment system that is mostly designed for the <a href="https://www.tu-ilmenau.de/zib/" target="_blank"> Zentralinstitut für Bildung </a>
+as well as other stakeholders and groups of the <a href="https://www.tu-ilmenau.de/impressum/" target="_blank"> Ilmenau University of Technology</a>.
 It originated from an university software project and was continued by research assistants.
-Special thanks go to the <a href="https://www.tu-ilmenau.de/de/dbis/"> Databases and Information Systems Group</a>.
+Special thanks go to the <a href="https://www.tu-ilmenau.de/de/dbis/" target="_blank"> Databases and Information Systems Group</a>.
 <br>
 <br>
-Owner of the system is the <a href="https://www.tu-ilmenau.de/impressum/"> Ilmenau University of Technology</a>.
+Owner of the system is the <a href="https://www.tu-ilmenau.de/impressum/" target="_blank"> Ilmenau University of Technology</a>. <br>
+
+<br>
+You can find the <a href="https://github.com/taniabogatsch/turm" target="_blank">project repository at GitHub</a>. It is licensed by the MIT license.
+At GitHub, you can contribute to the project development, as well as open issues concerning bugs, new features and other things. <br>
 
 <hr>
 
 <strong> Contact: </strong>
 <br>
-<a href="mailto:{{.serviceMail}}">{{.serviceMail}}</a>
+<a href="mailto:{{.serviceEMail}}">{{.serviceEMail}}</a>
 
 <hr>
 <strong> Team: </strong>

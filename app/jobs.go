@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"recipes/app"
 	"strconv"
 	"strings"
 	"time"
@@ -225,7 +224,7 @@ func Parse(tx *sqlx.Tx) (err error) {
 	//start the transaction to insert each row of the csv file
 	txWasNil := (tx == nil)
 	if txWasNil {
-		tx, err = app.Db.Beginx()
+		tx, err = Db.Beginx()
 		if err != nil {
 			revel.AppLog.Error("failed to begin tx", "error", err.Error())
 			return

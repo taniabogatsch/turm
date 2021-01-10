@@ -8,19 +8,23 @@
 
 <strong> Allgemein: </strong>
 <br>
-Turm2 ist ein Einschreibesystem, dass das <a href="https://www.tu-ilmenau.de/zib/"> Zentralinstitut für Bildung </a>
-sowie andere Stabsstellen und Fachgebiete der <a href="https://www.tu-ilmenau.de/impressum/"> Technischen Universität Ilmenau </a> bei deren Arbeit unterstützt.
+Turm2 ist ein Einschreibesystem, dass das <a href="https://www.tu-ilmenau.de/zib/" target="_blank"> Zentralinstitut für Bildung </a>
+sowie andere Stabsstellen und Fachgebiete der <a href="https://www.tu-ilmenau.de/impressum/" target="_blank"> Technischen Universität Ilmenau </a> bei deren Arbeit unterstützt.
 Es ist im Rahmen eines Softwareprojekts und anschließender HiWi-Arbeit entstanden.
-Besonderer Dank gilt dem <a href="https://www.tu-ilmenau.de/de/dbis/"> Fachgebiet für Datenbanken und Informationssysteme</a>.
+Besonderer Dank gilt dem <a href="https://www.tu-ilmenau.de/de/dbis/" target="_blank"> Fachgebiet für Datenbanken und Informationssysteme</a>.
 <br>
 <br>
-Das System gehört der <a href="https://www.tu-ilmenau.de/impressum/"> Technischen Universität Ilmenau</a>.
+Das System gehört der <a href="https://www.tu-ilmenau.de/impressum/" target="_blank"> Technischen Universität Ilmenau</a>. <br>
+
+<br>
+Das Projekt steht unter der MIT Lizenz <a href="https://github.com/taniabogatsch/turm" target="_blank">auf GitHub zur Verfügung</a>.
+Hier können Sie gerne zur Entwicklung beitragen, sowie Bugs, Feature-Wünsche und Sonstiges in Form von Issues aufmachen. <br>
 
 <hr>
 
 <strong> Kontakt: </strong>
 <br>
-<a href="mailto:{{.serviceMail}}">{{.serviceMail}}</a>
+<a href="mailto:{{.serviceEMail}}">{{.serviceEMail}}</a>
 
 <hr>
 <strong> Team: </strong>
