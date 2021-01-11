@@ -271,5 +271,7 @@ title.edit.course = Edit course
 
 title.shift.previous = Previous week
 title.shift.next = Next week
+title.shift.previous.day = Previous day
+title.shift.next.day = Next day
 
 title.remove.slot = Remove slot

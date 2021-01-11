@@ -212,10 +212,10 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 
 /*CalendarEvent of a course.
 - Roles: if public all, else logged in users. */
-func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Result {
+func (c Course) CalendarEvent(ID, courseID, shift int, monday string, day int) revel.Result {
 
 	c.Log.Debug("load calendar event of course", "ID", ID, "courseID",
-		courseID, "shift", shift, "monday", monday)
+		courseID, "shift", shift, "monday", monday, "day", day)
 
 	//get user from session
 	userID, err := getIntFromSession(c.Controller, "userID")
@@ -257,5 +257,11 @@ func (c Course) CalendarEvent(ID, courseID, shift int, monday string) revel.Resu
 		return c.Render()
 	}
 
-	return c.Render(event)
+	if shift == -1 {
+		day = 6
+	} else if shift == 1 {
+		day = 0
+	}
+
+	return c.Render(event, day)
 }

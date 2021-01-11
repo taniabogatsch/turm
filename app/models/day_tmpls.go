@@ -37,6 +37,7 @@ type Schedule struct {
 	Date    string
 	Entries []ScheduleEntry
 	InPast  bool
+	Today   bool
 }
 
 /*ScheduleEntry containing all information to print a section of a day template. */

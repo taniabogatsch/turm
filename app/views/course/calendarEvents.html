@@ -38,7 +38,7 @@
   <ul class="list-group">
     {{range $ek, $ev := .events}}
       <div id="calendar-event-{{$ev.ID}}">
-        {{template "course/calendarEvent.html" dict_addLocale $.currentLocale "event" $ev "session" $.session}}
+        {{template "course/calendarEvent.html" dict_addLocale $.currentLocale "event" $ev "session" $.session "day" -1}}
       </div>
     {{end}}
   </ul>

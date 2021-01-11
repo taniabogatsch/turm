@@ -83,6 +83,11 @@
             <div class="dropdown-menu">
 
               <!-- event enrollments -->
+              <h6 class="dropdown-header">
+                {{msg $ "profile.active.events"}}
+              </h6>
+              <div class="dropdown-divider"></div>
+
               {{range $i, $v := .navUser.ActiveEnrollments}}
                 {{if ne $i 0}}<div class="dropdown-divider"></div>{{end}}
                 <a class="dropdown-item" href='{{url "Course.Open" .CourseID}}'
@@ -98,6 +103,11 @@
               <div class="dropdown-divider"></div>
 
               <!-- slot enrollments -->
+              <h6 class="dropdown-header">
+                {{msg $ "profile.active.slots"}}
+              </h6>
+              <div class="dropdown-divider"></div>
+
               {{range $i, $v := .navUser.ActiveSlots}}
                 {{if ne $i 0}}<div class="dropdown-divider"></div>{{end}}
                 <a class="dropdown-item" href='{{url "Course.Open" .CourseID}}'

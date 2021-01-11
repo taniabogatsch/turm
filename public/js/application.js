@@ -192,7 +192,7 @@ function enterKeyModal(action, msg, ID) {
   $('#enter-enroll-key-modal').modal('show');
 }
 
-function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday) {
+function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday, day) {
 
   $('#book-slot-modal-course-ID').val(courseID);
   $('#book-slot-modal-ID').val(calendarEventID);
@@ -200,6 +200,7 @@ function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday) {
   $('#book-slot-modal-date-div').html(date);
   $('#book-slot-modal-year').val(year);
   $('#book-slot-modal-monday').val(monday);
+  $('#book-slot-modal-day').val(day);
 
   $('#book-slot-modal-time-spans').html($('#pretty-time-spans-' + weekDay).html());
 
@@ -283,25 +284,32 @@ function openDuplicateModal(ID) {
   $('#duplicate-course-modal').modal('show');
 }
 
-function renderCalendarEvent(ID, courseID, shift, monday, action) {
+function renderCalendarEvent(ID, courseID, shift, monday, action, isMobile) {
+
+  let day = 0;
+  if (isMobile) {
+    day = currentDay;
+  }
 
   $.get(action, {
     "ID": ID,
     "courseID": courseID,
     "shift": shift,
-    "monday": monday
+    "monday": monday,
+    "day": day,
   }, function(data) {
     $('#calendar-event-' + ID).html(data);
   })
 }
 
-function unsubFromSlot(slotID, eventID, courseID, monday, action) {
+function unsubFromSlot(slotID, eventID, courseID, monday, action, day) {
 
   $.get(action, {
     "slotID": slotID,
     "eventID": eventID,
     "courseID": courseID,
-    "monday": monday
+    "monday": monday,
+    "day": day,
   }, function(data) {
     $('#calendar-event-' + eventID).html(data);
   })
@@ -320,4 +328,43 @@ function hideEnrollInfoMessages() {
   $(".enroll-info").each(function() {
     $(this).addClass("d-none");
   });
+}
+
+function getPreviousDay(ID, courseID, monday, action) {
+
+  //leaving the current week
+  if (currentDay == 0) {
+    renderCalendarEvent(ID, courseID, -1, monday, action, true);
+
+  } else { //previous day of current week
+
+    currentDay -= 1;
+    getDay();
+  }
+}
+
+function getNextDay(ID, courseID, monday, action) {
+
+  //leaving the current week
+  if (currentDay == 6) {
+    renderCalendarEvent(ID, courseID, 1, monday, action, true);
+
+  } else { //previous day of current week
+
+    currentDay += 1;
+    getDay();
+  }
+}
+
+function getDay() {
+
+  //hide all elements
+  $(".day-elem").each(function() {
+    $(this).addClass("d-none");
+  });
+
+  //only show elements of the selected day
+  $('#day-header-' + currentDay).removeClass('d-none');
+  $('#day-tmpls-' + currentDay).removeClass('d-none');
+  $('#day-schedule-' + currentDay).removeClass('d-none');
 }

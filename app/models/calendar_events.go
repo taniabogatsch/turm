@@ -356,15 +356,26 @@ func (events *CalendarEvents) Insert(tx *sqlx.Tx, courseID *int) (err error) {
 //getSchedule returns the entries for each day for the specified week
 func (event *CalendarEvent) getSchedule(tx *sqlx.Tx, monday time.Time) (err error) {
 
+	endOfDay := time.Date(monday.Year(), monday.Month(), monday.Day(), 23, 59, 0,
+		0, monday.Location())
+
+	today := time.Now()
+	today = time.Date(today.Year(), today.Month(), today.Day(), 23, 59, 0,
+		0, today.Location())
+
 	//prepare a schedule for the whole week by looping all day templates and
 	//their slots for each day respectively
 	for _, day := range event.Days {
 
-		inPast := monday.Before(time.Now())
+		inPast := endOfDay.Before(time.Now())
 
 		//generate blocked and free blocks of this schedule
-		schedule := Schedule{Date: monday.Format("02.01."), InPast: inPast}
-		monday = monday.AddDate(0, 0, 1)
+		schedule := Schedule{
+			Date:   endOfDay.Format("02.01."),
+			InPast: inPast,
+			Today:  endOfDay.Equal(today)}
+
+		endOfDay = endOfDay.AddDate(0, 0, 1)
 
 		if len(day.DayTmpls) != 0 {
 

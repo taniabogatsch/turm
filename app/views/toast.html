@@ -15,3 +15,15 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(function() {
+    $('#feedback-toast').on('hidden.bs.toast', function () {
+      $("#feedback-toast").css("z-index", '');
+    });
+
+    $('#feedback-toast').on('show.bs.toast', function () {
+      $("#feedback-toast").css("z-index", '5000');
+    });
+  });
+</script>

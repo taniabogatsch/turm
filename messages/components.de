@@ -230,7 +230,7 @@ enroll.start.time = Von
 enroll.end.time = Bis
 
 enroll.manual.success = Manuelle Einschreibung erfolgreich.
-enroll.manual.unsubscribe.success = Manuelles austragen erfolgreich.
+enroll.manual.unsubscribe.success = Manuelles Austragen erfolgreich.
 enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste erfolgreich.
 enroll.manual.delete.slot.success = Manuelles Löschen der Buchung erfolgreich.
 
@@ -271,5 +271,7 @@ title.edit.course = Kurs bearbeiten
 
 title.shift.previous = Vorherige Woche
 title.shift.next = Nächste Woche
+title.shift.previous.day = Vorheriger Tag
+title.shift.next.day = Nächster Tag
 
 title.remove.slot = Buchung entfernen

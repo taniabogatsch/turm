@@ -1,0 +1,273 @@
+<!-- template containing the week details of a calendar event for mobile resolutions -->
+
+<div class="border rounded mt-1">
+
+  <!-- day header -->
+  {{range $k, $v := .event.ScheduleWeek}}
+
+    <div class="row day-elem d-none" id="day-header-{{$k}}">
+
+      <!-- navigate through days: PREVIOUS -->
+      <div class="col text-left">
+
+        <!-- for normal course view -->
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-hide"
+          onclick='getPreviousDay({{$.event.ID}}, {{$.event.CourseID}}, {{$.event.Monday}},
+            {{url "Course.CalendarEvent"}});' title='{{msg $ "title.shift.previous.day"}}'>
+          {{template "icons/caretLeft.html" .}}
+        </a>
+
+        <!-- for edit mode -->
+        {{if ne $k 0}}
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+            onclick='getPreviousDay({{$.event.ID}}, {{$.event.CourseID}}, {{$.event.Monday}},
+              {{url "Course.CalendarEvent"}});' title='{{msg $ "title.shift.previous.day"}}'>
+            {{template "icons/caretLeft.html" .}}
+          </a>
+        {{end}}
+      </div>
+
+      <!-- day -->
+      <div class="col text-center">
+        <strong>
+          {{if eq $k 0}}
+            {{msg $ "event.calendar.mo"}} <div class="edit-hide">{{.Date}}</div>
+          {{else if eq $k 1}}
+            {{msg $ "event.calendar.tu"}} <div class="edit-hide">{{.Date}}</div>
+          {{else if eq $k 2}}
+            {{msg $ "event.calendar.we"}} <div class="edit-hide">{{.Date}}</div>
+          {{else if eq $k 3}}
+            {{msg $ "event.calendar.th"}} <div class="edit-hide">{{.Date}}</div>
+          {{else if eq $k 4}}
+            {{msg $ "event.calendar.fr"}} <div class="edit-hide">{{.Date}}</div>
+          {{else if eq $k 5}}
+            {{msg $ "event.calendar.sa"}} <div class="edit-hide">{{.Date}}</div>
+          {{else}}
+            {{msg $ "event.calendar.so"}} <div class="edit-hide">{{.Date}}</div>
+          {{end}}
+        </strong>
+      </div>
+
+      <!-- navigate through weeks: NEXT -->
+      <div class="col text-right">
+
+        <!-- for normal course view -->
+        <a href="#no-scroll" class="badge btn-outline-darkblue edit-hide"
+          onclick='getNextDay({{$.event.ID}}, {{$.event.CourseID}}, {{$.event.Monday}},
+            {{url "Course.CalendarEvent"}});' title='{{msg $ "title.shift.next.day"}}'>
+          {{template "icons/caretRight.html" .}}
+        </a>
+
+        <!-- for edit mode -->
+        {{if ne $k 6}}
+          <a href="#no-scroll" class="badge btn-outline-darkblue edit-show d-none"
+            onclick='getNextDay({{$.event.ID}}, {{$.event.CourseID}}, {{$.event.Monday}},
+              {{url "Course.CalendarEvent"}});' title='{{msg $ "title.shift.next.day"}}'>
+            {{template "icons/caretRight.html" .}}
+          </a>
+        {{end}}
+      </div>
+
+    </div>
+
+  {{end}}
+
+  <!-- range each day and list day templates -->
+  {{range $k, $v := .event.Days}}
+
+    <div class="edit-show d-none">
+      <div class="day-elem d-none" id="day-tmpls-{{$k}}">
+
+        <!-- range day templates -->
+        {{range $v.DayTmpls}}
+          <div class="card mb-1 mx-1 text-center">
+            <div class="card-body pl-1 pr-1 pt-1 pb-0">
+              {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+              {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+            </div>
+
+            <div class="d-inline text-center">
+
+              <!-- edit day template -->
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='openChangeDayTmplModal({{url "EditCalendarEvent.EditDayTemplate"}},
+                  {{msg $ "day.tmpl.edit.title"}}, {{.CalendarEventID}}, {{.DayOfWeek}},
+                  {{.StartTime}}, {{.EndTime}}, {{.Interval}}, {{.ID}});'
+                title='{{msg $ "title.edit"}}'>
+                {{template "icons/pencil.html" . }}
+              </a>
+
+              <!-- delete day template -->
+              <a href="#no-scroll" class="badge btn-outline-darkblue"
+                onclick='confirmDeleteRenderModal({{msg $ "day.tmpl.delete.title"}},
+                  {{msg $ "day.tmpl.delete.confirm"}},
+                  "{{url "EditCalendarEvent.DeleteDayTemplate" .ID $.event.CourseID}}",
+                  "calendar_events");'
+                title='{{msg $ "title.delete"}}'>
+                {{template "icons/trash.html" . }}
+              </a>
+            </div>
+
+          </div>
+        {{end}}
+
+      </div>
+    </div>
+
+  {{end}}
+
+  <!-- range each day and list schedule -->
+  {{range $k, $v := .event.ScheduleWeek}}
+
+    <div class="edit-hide mt-1">
+      <div class="day-elem d-none" id="day-schedule-{{$k}}">
+
+        {{$freeSlot := false}}
+
+        {{range .Entries}}
+
+          {{if eq .Type 0}} <!-- FREE -->
+
+            <div class="card mb-1 bg-success mx-1" style="background-color:#5dd87a !important;">
+              <div class="card-body p-1 text-center">
+                {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}}
+              </div>
+            </div>
+            {{$freeSlot = true}}
+
+          {{else if eq .Type 1}} <!-- SLOT -->
+
+            {{$ownSlot := false}}
+            {{if $.session.userID}}
+              {{if eq $.session.userID .UserID}}
+                {{$ownSlot = true}}
+              {{end}}
+            {{end}}
+
+            {{if $ownSlot}} <!-- slot booked by user -->
+              <div class="card mb-1 bg-primary mx-1" style="background-color:#80bdff !important;">
+                <div class="card-body p-1 text-center">
+                  {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                  {{if not $v.InPast}}
+                    <button type="button" class="btn btn-outline-light btn-sm w-100 enroll-btn"
+                      style="color:#004085; border-color: #004085; word-wrap:break-all;"
+                      {{if $.event.NoUnsubscribe}}disabled{{end}}
+                      onclick='unsubFromSlot({{.SlotID}}, {{$.event.ID}}, {{$.event.CourseID}},
+                        {{$.event.Monday}}, {{url "Enrollment.UnsubscribeFromSlot"}}, {{$k}});'>
+                      {{msg $ "button.unsubscribe"}}
+                    </button>
+                  {{end}}
+                </div>
+              </div>
+
+            {{else}} <!-- slot booked by other user -->
+              <div class="card mb-1 bg-secondary mx-1" style="background-color:#939ba2 !important;">
+                <div class="card-body p-1 text-center">
+                  {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+                </div>
+              </div>
+            {{end}}
+
+          {{else if eq .Type 2}} <!-- EXCEPTION -->
+
+            <div class="card mb-1 bg-danger mx-1" style="background-color:#e4616d !important;">
+              <div class="card-body p-1 text-center">
+                {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+              </div>
+            </div>
+
+          {{else if eq .Type 3}} <!-- BLOCKED -->
+
+            <div class="card mb-1 bg-light mx-1">
+              <div class="card-body p-1 text-center">
+                {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}} <br>
+              </div>
+            </div>
+
+          {{end}}
+
+        {{end}}
+
+        {{if $freeSlot}}
+          {{if not $v.InPast}}
+            <br>
+            <div class="text-center">
+              {{if $.session.userID}}
+                <button type="button" class="btn btn-outline-success w-100 btn-sm enroll-btn"
+                  style="word-wrap:break-word;" {{if $.event.NoEnroll}}disabled{{end}}
+                  onclick='bookSlotModal({{$.event.CourseID}},{{$.event.ID}}, {{.Date}},
+                    {{$.event.Year}}, {{$k}}, {{$.event.Monday}}, {{$k}});'>
+                  {{msg $ "button.book.slot"}}
+                </button>
+              {{else}}
+                <a class="btn btn-outline-darkblue w-100 btn-sm enroll-btn"
+                  style="word-wrap:break-word;"
+                  href='{{url "User.LoginPage"}}'>
+                  {{msg $ "button.login"}}
+                </a>
+              {{end}}
+            </div>
+            <br>
+
+            <!-- create pretty html to be loaded in the book slot modal -->
+            <div id="pretty-time-spans-{{$k}}" class="d-none">
+              <hr>
+              {{msg $ "event.calendar.available.time.spans"}}: <br>
+              <hr>
+              {{range .Entries}}
+                {{if eq .Type 0}}
+                  {{.StartTime}} - {{.EndTime}} {{msg $ "course.clock"}}, {{msg $ "meeting.interval"}}: {{.Interval}}{{msg $ "event.calendar.min"}}
+                  <hr>
+                {{end}}
+              {{end}}
+            </div>
+
+          {{end}}
+        {{end}}
+
+      </div>
+    </div>
+
+  {{end}}
+
+</div>
+
+<!-- legend -->
+<div class="edit-hide mt-2">
+  <div class="card-body p-1">
+    {{msg $ "event.calendar.legend"}}:
+  </div>
+  <div class="card-body p-1 mt-1 bg-primary border rounded" style="background-color:#80bdff !important;">
+    {{msg $ "event.calendar.slot.booking"}}
+  </div>
+  <div class="card-body p-1 mt-1 bg-success border rounded" style="background-color:#5dd87a !important;">
+    {{msg $ "event.calendar.slot.free"}}
+  </div>
+  <div class="card-body p-1 mt-1 bg-secondary border rounded" style="background-color:#939ba2 !important;">
+    {{msg $ "event.calendar.slot.booked"}}
+  </div>
+  <div class="card-body p-1 mt-1 bg-danger border rounded" style="background-color:#e4616d !important;">
+    {{msg $ "event.calendar.slot.blocked"}}
+  </div>
+  <div class="card-body p-1 mt-1 bg-light border rounded">
+    {{msg $ "event.calendar.slot.not.available"}}
+  </div>
+</div>
+
+
+<script>
+
+  var currentDay = {{$.day}};
+
+  {{if eq $.day -1}}
+    {{range $k, $v := .event.ScheduleWeek}}
+      {{if $v.Today}}
+        currentDay = {{$k}};
+      {{end}}
+    {{end}}
+  {{end}}
+
+  $(function() {
+    getDay();
+  });
+</script>
