@@ -164,6 +164,51 @@ func (course *Course) Update(tx *sqlx.Tx, column string, value interface{},
 		}
 	}
 
+	//change the status of users enrolled in this course if a fee is added/deleted
+	if column == "fee" {
+
+		fee, ok := value.(sql.NullFloat64)
+		if !ok {
+
+			_, ok := value.(sql.NullString)
+			if !ok {
+				err = errors.New("parsing error")
+				log.Error("failed to parse fee from interface", "value", value,
+					"error", err.Error())
+				tx.Rollback()
+				return
+			}
+			fee.Valid = false
+		}
+
+		if err = course.GetColumnValue(tx, "fee"); err != nil {
+			return
+		}
+
+		updateStatus := false
+		status := ENROLLED
+
+		//a fee is added
+		if fee.Valid && !course.Fee.Valid {
+			updateStatus = true
+			status = AWAITINGPAYMENT
+		}
+		//a fee is deleted
+		if !fee.Valid && course.Fee.Valid {
+			updateStatus = true
+		}
+
+		if updateStatus {
+			_, err = tx.Exec(stmtUpdateEnrollmentStatusDueToFee, course.ID, status)
+			if err != nil {
+				log.Error("failed to update enrollment status due to fee", "courseID",
+					course.ID, "status", status, "error", err.Error())
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
 	//update the course field
 	if err = updateByID(tx, column, "courses", value, course.ID, course); err != nil {
 		return
@@ -918,5 +963,16 @@ const (
 				WHERE i.user_id = $1
 					AND i.course_id = $2
 			) AS can_manage_participants
+	`
+
+	stmtUpdateEnrollmentStatusDueToFee = `
+		UPDATE enrolled
+		SET status = $2 /* enrolled or awaiting payment */
+		WHERE event_id IN (
+				SELECT e.id
+				FROM events e JOIN courses c ON e.course_id = c.id
+				WHERE c.id = $1
+			)
+			AND status != 1 /* on waitlist */
 	`
 )
