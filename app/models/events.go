@@ -14,6 +14,7 @@ type Event struct {
 	CourseID      int            `db:"course_id"`
 	Capacity      int            `db:"capacity"`
 	HasWaitlist   bool           `db:"has_waitlist"`
+	HasComments   bool           `db:"has_comments"`
 	Title         string         `db:"title"`
 	Annotation    sql.NullString `db:"annotation"`
 	EnrollmentKey sql.NullString `db:"enrollment_key"`
@@ -23,6 +24,9 @@ type Event struct {
 	Fullness int ``
 	//Percentage is (Fullness * 100) / Capacity
 	Percentage int ``
+
+	//comments of enrolled users (if enabled)
+	Comments []sql.NullString
 
 	//used for enrollment
 	EventStatus  EventStatus
@@ -184,6 +188,39 @@ func (event *Event) UpdateWaitlist(option bool, v *revel.Validation) (err error)
 	return
 }
 
+/*UpdateComments of an event. */
+func (event *Event) UpdateComments(option bool, v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	//check if users already placed comments
+	if !option {
+		var exists bool
+		if err = tx.Get(&exists, stmtGetCommentsExist, event.ID); err != nil {
+			log.Error("failed to get if any comments exist", "event", *event,
+				"error", err.Error())
+			tx.Rollback()
+			return
+		} else if exists {
+			v.ErrorKey("validation.invalid.comments.exist")
+			tx.Commit()
+			return
+		}
+	}
+
+	//update the comments flag
+	if err = updateByID(tx, "has_comments", "events", option, event.ID, event); err != nil {
+		return
+	}
+
+	tx.Commit()
+	return
+}
+
 /*Delete an event. */
 func (event *Event) Delete(v *revel.Validation) (err error) {
 
@@ -278,6 +315,16 @@ func (event *Event) Get(tx *sqlx.Tx) (err error) {
 		log.Error("failed to get event by ID", "event", *event, "error", err.Error())
 		tx.Rollback()
 		return
+	}
+
+	//get the comments (if enabled)
+	if event.HasComments {
+		err = tx.Select(&event.Comments, stmtSelectCommentsOfEvent, event.ID)
+		if err != nil {
+			log.Error("failed to select comments of event by ID", "event", *event, "error", err.Error())
+			tx.Rollback()
+			return
+		}
 	}
 
 	//set the percentage field
@@ -448,6 +495,16 @@ func (events *Events) Get(tx *sqlx.Tx, userID, courseID *int, manage bool,
 			}
 		}
 
+		//get all comments of this event (if enabled)
+		if (*events)[key].HasComments {
+			err = tx.Select(&((*events)[key].Comments), stmtSelectCommentsOfEvent, (*events)[key].ID)
+			if err != nil {
+				log.Error("failed to select comments of event by ID", "event", (*events)[key], "error", err.Error())
+				tx.Rollback()
+				return
+			}
+		}
+
 		//get all meetings of this event
 		(*events)[key].Percentage = ((*events)[key].Fullness * 100) / (*events)[key].Capacity
 		if err = (*events)[key].Meetings.Get(tx, &(*events)[key].ID); err != nil {
@@ -512,7 +569,7 @@ func (events *Events) Insert(tx *sqlx.Tx, courseID *int) (err error) {
 
 	for _, event := range *events {
 		err = tx.Get(&event, stmtInsertEvent, event.Annotation, event.Capacity, *courseID,
-			event.EnrollmentKey, event.HasWaitlist, event.Title)
+			event.EnrollmentKey, event.HasWaitlist, event.Title, event.HasComments)
 		if err != nil {
 			log.Error("failed to insert event of course", "course ID", *courseID,
 				"error", err.Error())
@@ -531,7 +588,7 @@ const (
 	stmtSelectEvents = `
 		SELECT
 			e.id, e.course_id, e.capacity, e.has_waitlist,
-			e.title, e.annotation, e.enrollment_key,
+			e.title, e.annotation, e.enrollment_key, e.has_comments,
 			(
 				SELECT COUNT(en.user_id)
 				FROM enrolled en
@@ -555,10 +612,10 @@ const (
 
 	stmtDuplicateEvent = `
 		INSERT INTO events
-			(annotation, capacity, course_id, enrollment_key, has_waitlist, title)
+			(annotation, capacity, course_id, enrollment_key, has_waitlist, title, has_comments)
 		(
 			SELECT
-				annotation, capacity, $1 AS course_id, enrollment_key, has_waitlist, title
+				annotation, capacity, $1 AS course_id, enrollment_key, has_waitlist, title, has_comments
 			FROM events
 			WHERE id = $2
 		)
@@ -573,8 +630,8 @@ const (
 
 	stmtInsertEvent = `
 		INSERT INTO events
-			(annotation, capacity, course_id, enrollment_key, has_waitlist, title)
-		VALUES ($1, $2, $3, $4, $5, $6)
+			(annotation, capacity, course_id, enrollment_key, has_waitlist, title, has_comments)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id
 	`
 
@@ -588,7 +645,7 @@ const (
 	stmtGetEvent = `
 		SELECT
 			e.id, e.course_id, e.capacity, e.has_waitlist,
-			e.title, e.annotation, e.enrollment_key,
+			e.title, e.annotation, e.enrollment_key, e.has_comments,
 			(
 				SELECT COUNT(en.user_id)
 				FROM enrolled en
@@ -626,5 +683,22 @@ const (
 			WHERE event_id = $1
 				AND status = 1 /*on waitlist*/
 		)
+	`
+
+	stmtGetCommentsExist = `
+		SELECT EXISTS (
+			SELECT true
+			FROM enrolled
+			WHERE comment IS NOT NULL
+				AND event_id = $1
+		) AS exists
+	`
+
+	stmtSelectCommentsOfEvent = `
+		SELECT comment
+		FROM enrolled
+		WHERE event_id = $1
+			AND comment IS NOT NULL
+		ORDER BY comment ASC
 	`
 )

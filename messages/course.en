@@ -55,10 +55,19 @@ event.title = Event title
 event.annotation = Annotation
 event.waitlist.yes = A waiting list exists
 event.waitlist.no = There is no waiting list
+
 event.key.set = Set enrollment key
 event.key = Enrollment key
 event.key.repeat = Repeat enrollment key
-event.key.modal.title = Enter enrollment key
+
+event.comments.yes = Comments enabled
+event.comments.show = show
+event.comment = Comment
+event.comments.title = Comments
+event.comments.info = The following comments were provided:
+event.comments.none = No comments
+
+event.enrollment.data.modal.title = Enter enrollment data
 
 event.number.meetings = Number of meetings
 
@@ -196,6 +205,8 @@ event.annotation.delete.title = Delete annotation
 
 event.waitlist.change.success = Changed waiting list option.
 event.waitlist.change.title = Change waiting list option.
+
+event.has.comments.change.success = Changed comments option.
 
 event.key.title = Set enrollment key
 event.key.change.success = Set enrollment key.

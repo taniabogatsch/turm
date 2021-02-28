@@ -544,7 +544,8 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 			c.Message("user.course.of.studies"),
 			c.Message("user.semester"),
 			c.Message("enroll.time"),
-			c.Message("enroll.status"))
+			c.Message("enroll.status"),
+			c.Message("event.comment"))
 		data = append(data, row)
 		row = []string{}
 		data = append(data, row)
@@ -724,7 +725,9 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 			strings.ReplaceAll(studies, old, new),
 			strings.ReplaceAll(semesters, old, new),
 			user.TimeOfEnrollmentStr,
-			enrollStatus)
+			enrollStatus,
+			strings.ReplaceAll(user.Comment.String, old, new),
+		)
 
 		//and put them in the csv data array
 		*data = append(*data, row)

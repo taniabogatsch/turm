@@ -126,4 +126,17 @@
       </small>
     </div>
   </div>
+
+  {{if .Comment.Valid}}
+    <div class="row">
+      <div class="col">
+        <small class="d-inline">
+          {{msg $ "event.comment"}}: &nbsp;
+        </small>
+        <small class="text-muted form-text d-inline">
+          {{.Comment.String}}
+        </small>
+      </div>
+    </div>
+  {{end}}
 {{end}}

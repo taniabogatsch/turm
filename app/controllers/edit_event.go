@@ -202,13 +202,20 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	if listType != "has_waitlist" {
+	if listType != "has_waitlist" && listType != "has_comments" {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.Event{ID: ID}
-	if err := event.UpdateWaitlist(option, c.Validation); err != nil {
+	var err error
+	if listType == "has_waitlist" {
+		err = event.UpdateWaitlist(option, c.Validation)
+	} else if listType == "has_comments" {
+		err = event.UpdateComments(option, c.Validation)
+	}
+
+	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	} else if c.Validation.HasErrors() {
@@ -218,6 +225,10 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 	}
 
 	msg := c.Message("event.waitlist.change.success")
+	if listType == "has_comments" {
+		msg = c.Message("event.has.comments.change.success")
+	}
+
 	return c.RenderJSON(
 		response{Status: SUCCESS, Msg: msg, FieldID: listType, Valid: option, ID: ID})
 }

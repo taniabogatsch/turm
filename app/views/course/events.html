@@ -66,7 +66,7 @@
 
         <!-- enrollment button -->
         {{if $.session.userID}}
-          {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid}}
+          {{template "course/enrollButton.html" dict_addLocale $.currentLocale "option" .EnrollOption "ID" .ID "hasKey" .EnrollmentKey.Valid "hasComments" .HasComments}}
         {{else}}
           <a class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
             href='{{url "User.LoginPage"}}'>
@@ -149,6 +149,65 @@
             event.preventDefault();
           });
         </script>
+
+        <!-- comments information -->
+        <small class="form-text text-muted">
+          <form id="change-has_comments-form-{{.ID}}" accept-charset="UTF-8" method="POST"
+            action='{{url "EditEvent.ChangeBool"}}'>
+            <!-- event ID -->
+            <input type="hidden" name="ID" value="{{.ID}}">
+            <!-- list type -->
+            <input type="hidden" name="listType" value="has_comments">
+            <!-- option -->
+            <label class="switch edit-show d-none">
+              <input type="checkbox" name="option" id="change-has_comments-switch-{{.ID}}"
+                {{if .HasComments}}checked{{end}}>
+              <span class="slider round"></span>
+            </label>
+            <label class="form-check-label edit-show d-none" id="change-has_comments-info-{{.ID}}">
+              {{template "icons/listUL.html" . }} &nbsp; {{msg $ "event.comments.yes"}}
+            </label>
+            {{if not $.manage}}
+              {{if .HasComments}}
+                <a href="#noScroll" onclick="openCommentsModal({{.ID}});"> ({{msg $ "event.comments.show"}}) </a>
+              {{end}}
+            {{end}}
+          </form>
+        </small>
+        <script>
+
+          {{if not $.manage}}
+            $(function() {
+              let switchComments = document.getElementById("change-has_comments-switch-{{.ID}}");
+              if (switchComments.checked) {
+                document.getElementById('change-has_comments-info-{{.ID}}').classList.remove("d-none");
+              } else {
+                document.getElementById('change-has_comments-info-{{.ID}}').classList.add("d-none");
+              }
+            });
+          {{end}}
+
+          //react to has_comments switch events
+          $('#change-has_comments-switch-{{.ID}}').change(function() {
+            $('#change-has_comments-form-{{.ID}}').submit();
+          });
+
+          $('#change-has_comments-form-{{.ID}}').submit(function (event) {
+            submitJSONForm("#change-has_comments-form-{{.ID}}", "");
+            event.preventDefault();
+          });
+        </script>
+
+        <!-- comments of users -->
+        <div id="event-comments-{{.ID}}" class="d-none">
+          <ul>
+            {{range .Comments}}
+              <li>{{.String}}</li>
+            {{else}}
+              {{msg $ "event.comments.none"}}
+            {{end}}
+          </ul>
+        </div>
 
         <!-- annotation -->
         <div id="div-edit-annotation-{{.ID}}" class="{{if not .Annotation.Valid}}d-none{{end}}">

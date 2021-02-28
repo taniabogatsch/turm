@@ -55,10 +55,19 @@ event.title = Veranstaltungstitel
 event.annotation = Anmerkung
 event.waitlist.yes = Warteliste vorhanden
 event.waitlist.no = Keine Warteliste vorhanden
+
 event.key.set = Einschreibeschlüssel gesetzt
 event.key = Einschreibeschlüssel
 event.key.repeat = Einschreibeschlüssel wiederholen
-event.key.modal.title = Einschreibeschlüssel eingeben
+
+event.comments.yes = Kommentare aktiviert
+event.comments.show = anzeigen
+event.comment = Kommentar
+event.comments.title = Kommentare
+event.comments.info = Die folgenden Kommentare wurden abgegeben:
+event.comments.none = Keine Kommentare
+
+event.enrollment.data.modal.title = Einschreibedaten eingeben
 
 event.number.meetings = Anzahl der Termine
 
@@ -196,6 +205,8 @@ event.annotation.delete.title = Anmerkung löschen
 
 event.waitlist.change.success = Wartelistenoption angepasst.
 event.waitlist.change.title = Wartelistenoption ändern.
+
+event.has.comments.change.success = Kommentaroption angepasst.
 
 event.key.title = Einschreibeschlüssel setzen
 event.key.change.success = Einschreibeschlüssel gesetzt.

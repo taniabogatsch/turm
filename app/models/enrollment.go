@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 	"turm/app"
 
@@ -17,6 +18,7 @@ type Enrolled struct {
 	EventID          int              `db:"event_id, primarykey"`
 	Status           EnrollmentStatus `db:"status"`
 	TimeOfEnrollment time.Time        `db:"time_of_enrollment"`
+	Comment          sql.NullString   `db:"comment"`
 
 	//used for pretty timestamp rendering
 	TimeOfEnrollmentStr string `db:"time_of_enrollment_str"`
@@ -157,6 +159,15 @@ func (enrolled *Enrolled) EnrollOrUnsubscribe(action EnrollOption, key string) (
 			msg = "validation.enrollment.already.enrolled"
 			tx.Rollback()
 			return
+		}
+
+		//ensure that the comment is not too long
+		if enrolled.Comment.Valid {
+			if len(enrolled.Comment.String) > 511 || len(enrolled.Comment.String) == 0 {
+				msg = "validation.enrollment.invalid.comment"
+				tx.Rollback()
+				return
+			}
 		}
 
 		//set enroll status
@@ -624,7 +635,7 @@ func (enrolled *Enrolled) updateStatus(tx *sqlx.Tx) (err error) {
 func (enrolled *Enrolled) enroll(tx *sqlx.Tx) (err error) {
 
 	_, err = tx.Exec(stmtEnrollUser, enrolled.UserID, enrolled.EventID,
-		enrolled.Status)
+		enrolled.Status, enrolled.Comment)
 	if err != nil {
 		log.Error("failed to enroll user", "enrolled", *enrolled,
 			"error", err.Error())
@@ -658,7 +669,7 @@ func (enrolled *Enrolled) unsubscribe(tx *sqlx.Tx) (err error) {
 
 const (
 	stmtSelectCourseEnrollments = `
-		SELECT en.user_id, en.event_id, en.status
+		SELECT en.user_id, en.event_id, en.status, en.comment
 		FROM enrolled en JOIN
 			events e ON en.event_id = e.id
 		WHERE en.user_id = $1
@@ -728,8 +739,8 @@ const (
 
 	stmtEnrollUser = `
 		INSERT INTO enrolled
-			(user_id, event_id, status)
-		VALUES ($1, $2, $3)
+			(user_id, event_id, status, comment)
+		VALUES ($1, $2, $3, $4)
 	`
 
 	stmtDeleteUserFromUnsubscribed = `
@@ -822,7 +833,7 @@ const (
 
 	stmtSelectUserEnrollmentsExpired = `
 		SELECT en.user_id, en.event_id, en.status, c.title AS course_title,
-			e.title AS event_title, en.time_of_enrollment,
+			e.title AS event_title, c.id AS course_id, en.time_of_enrollment, en.comment,
 		TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id
@@ -833,7 +844,7 @@ const (
 
 	stmtSelectUserEnrollments = `
 		SELECT en.user_id, en.event_id,	en.status, c.title AS course_title,
-			e.title AS event_title, c.id AS course_id, en.time_of_enrollment,
+			e.title AS event_title, c.id AS course_id, en.time_of_enrollment, en.comment,
 			TO_CHAR (en.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
 		FROM enrolled en JOIN events e ON en.event_id = e.id
 			JOIN courses c ON e.course_id = c.id

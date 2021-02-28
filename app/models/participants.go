@@ -335,7 +335,7 @@ const (
 
 	stmtSelectEventData = `
     (SELECT
-      e.id, e.course_id, e.capacity, e.has_waitlist,
+      e.id, e.course_id, e.capacity, e.has_waitlist, e.has_comments,
       e.title, e.annotation, false AS is_calendar_event,
       (
         SELECT COUNT(en.user_id)
@@ -349,7 +349,7 @@ const (
 		UNION ALL
 
 		(SELECT
-			e.id, e.course_id, 0 AS capacity, false AS has_waitlist,
+			e.id, e.course_id, 0 AS capacity, false AS has_waitlist, false AS has_comments,
 			e.title, e.annotation, true AS is_calendar_event,
 			0 AS fullness
 		FROM calendar_events e
@@ -362,7 +362,7 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status, e.time_of_enrollment,
+      e.user_id, e.event_id, e.status, e.time_of_enrollment, e.comment,
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1
@@ -374,7 +374,7 @@ const (
     SELECT
       u.id, u.last_name, u.first_name, u.email, u.salutation, (u.password IS NULL) AS is_ldap,
       u.language, u.matr_nr, u.academic_title, u.title, u.name_affix, u.affiliations,
-      e.user_id, e.event_id, e.status, e.time_of_enrollment,
+      e.user_id, e.event_id, e.status, e.time_of_enrollment, e.comment,
       TO_CHAR (e.time_of_enrollment AT TIME ZONE $2, 'YYYY-MM-DD HH24:MI') AS time_of_enrollment_str
     FROM users u JOIN enrolled e ON u.id = e.user_id
     WHERE e.event_id = $1

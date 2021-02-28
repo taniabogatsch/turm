@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"net/url"
 	"strconv"
 	"strings"
@@ -13,9 +14,9 @@ import (
 
 /*Enroll a user in an event.
 - Roles: logged in and activated users */
-func (c Enrollment) Enroll(ID int, key string) revel.Result {
+func (c Enrollment) Enroll(ID int, key, comment string) revel.Result {
 
-	c.Log.Debug("enroll a user in an event", "ID", ID, "key", key)
+	c.Log.Debug("enroll a user in an event", "ID", ID, "key", key, "comment", comment)
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -23,7 +24,10 @@ func (c Enrollment) Enroll(ID int, key string) revel.Result {
 	}
 
 	//enroll user
-	enrolled := models.Enrolled{EventID: ID, UserID: userID}
+	enrolled := models.Enrolled{
+		EventID: ID,
+		UserID:  userID,
+		Comment: sql.NullString{String: comment, Valid: (len(comment) != 0)}}
 	data, waitList, _, msg, err := enrolled.EnrollOrUnsubscribe(models.ENROLL, key)
 
 	if err != nil {

@@ -74,6 +74,7 @@ validation.invalid.restriction = Please provide at least a pursued degree, a cou
 
 validation.invalid.delete = You cannot delete events in which users are enrolled. Please manually unsubscribe all users first.
 validation.invalid.at.wait.list = You cannot deactivate the wait list because users already enrolled to it.
+validation.invalid.comments.exist = Comments already exist for this event.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
@@ -104,6 +105,7 @@ validation.enrollment.full = This event is full.
 validation.enrollment.already.enrolled = You already enrolled in this event.
 validation.enrollment.already.unsubscribed = You already unsubscribed from this event.
 validation.enrollment.invalid.key = Invalid enrollment key.
+validation.enrollment.invalid.comment = Comments must be between 1 and 511 characters.
 
 validation.enrollment.manual.already.enrolled = The user is already enrolled in this event.
 validation.enrollment.manual.already.at.wait.list = The user is already at the wait list of this event.

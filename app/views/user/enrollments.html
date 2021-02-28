@@ -68,20 +68,31 @@
           {{.TimeOfEnrollmentStr}}
         </small>
       </div>
-      {{else}}
-      <!-- how slot start and end times -->
 
+    {{else}}
+      <!-- slot starting time -->
       <div class="col-sm-3">
         <small class="text-muted">
           {{.Start}}
         </small>
       </div>
 
+      <!-- slot ending time -->
       <div class="col-sm-3">
         <small class="text-muted">
           {{.End}}
         </small>
       </div>
-      {{end}}
+    {{end}}
   </div>
+
+  {{if .Comment.Valid}}
+    <div class="row">
+      <div class="col">
+        <small class="text-muted form-text">
+          {{.Comment.String}}
+        </small>
+      </div>
+    </div>
+  {{end}}
 {{end}}

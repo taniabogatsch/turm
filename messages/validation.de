@@ -74,6 +74,7 @@ validation.invalid.restriction = Bitte geben Sie mindestens einen angestrebten A
 
 validation.invalid.delete = Veranstaltungen, in denen TeilnehmerInnen eingeschrieben sind, können nicht gelöscht werden. Bitte tragen Sie zunächst alle TeilnehmerInnen manuell aus.
 validation.invalid.at.wait.list = Die Warteliste kann nicht deaktiviert werden, da sich bereits NutzerInnen auf diese eingeschrieben haben.
+validation.invalid.comments.exist = Es wurden bereits Kommentare zu dieser Veranstaltung abgegeben.
 
 # -------------------------------------------------------------------------------------------------- #
 # CREATOR
@@ -104,6 +105,7 @@ validation.enrollment.full = Diese Veranstaltung ist bereits voll.
 validation.enrollment.already.enrolled = Sie sind bereits in diese Veranstaltung eingeschrieben.
 validation.enrollment.already.unsubscribed = Sie haben sich bereits aus dieser Veranstaltung ausgetragen.
 validation.enrollment.invalid.key = Ungültiger Einschreibeschlüssel.
+validation.enrollment.invalid.comment = Der Kommentar muss aus 1 bis 511 Zeichen bestehen.
 
 validation.enrollment.manual.already.enrolled = NutzerIn ist bereits eingeschrieben.
 validation.enrollment.manual.already.at.wait.list = NutzerIn ist bereits auf der Warteliste.

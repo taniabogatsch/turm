@@ -4,9 +4,10 @@
 
 {{if eq .option 0}}
   <!-- enroll button -->
-  {{if .hasKey}}
+  {{if or .hasKey .hasComments}}
     <button class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
-      onclick='enterKeyModal({{url "Enrollment.Enroll"}}, {{msg $ "button.enroll"}}, {{.ID}});'>
+      onclick='enterEnrollDataModal({{url "Enrollment.Enroll"}}, {{msg $ "button.enroll"}},
+        {{.ID}}, {{.hasKey}}, {{.hasComments}});'>
       {{msg $ "button.enroll"}}
     </button>
   {{else}}
@@ -43,9 +44,10 @@
 
 {{if eq .option 4}}
   <!-- enroll to waitlist button -->
-  {{if .hasKey}}
+  {{if or .hasKey .hasComments}}
     <button class="btn btn-outline-darkblue float-right ml-3 edit-hide enroll-btn"
-      onclick='enterKeyModal({{url "Enrollment.Enroll"}}, {{msg $ "button.to.waitlist"}}, {{.ID}});'>
+      onclick='enterEnrollDataModal({{url "Enrollment.Enroll"}}, {{msg $ "button.to.waitlist"}},
+        {{.ID}}, {{.hasKey}}, {{.hasComments}});'>
       {{msg $ "button.to.waitlist"}}
     </button>
   {{else}}

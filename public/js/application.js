@@ -182,14 +182,32 @@ function openAdminGroupModal(ID, parentID, inheritsLimits, action, title,
   $('#admin-group-modal').modal('show');
 }
 
-function enterKeyModal(action, msg, ID) {
+function enterEnrollDataModal(action, msg, ID, hasKey, hasComments) {
 
-  $('#enter-enroll-key-modal-form').attr("action", action);
-  $('#enter-enroll-key-modal-ID').val(ID);
-  $('#enter-enroll-key-modal-btn').html(msg);
+  $('#enter-enrollment-data-modal-form').attr("action", action);
+  $('#enter-enrollment-data-modal-ID').val(ID);
+  $('#enter-enrollment-data-modal-btn').html(msg);
+
+  if (hasKey) {
+    $('#enter-enrollment-data-modal-key').removeClass("d-none");
+  } else {
+    $('#enter-enrollment-data-modal-key').addClass("d-none");
+  }
+
+  if (hasComments) {
+    $('#enter-enrollment-data-modal-comment').removeClass("d-none");
+  } else {
+    $('#enter-enrollment-data-modal-comment').addClass("d-none");
+  }
 
   //show the modal
-  $('#enter-enroll-key-modal').modal('show');
+  $('#enter-enrollment-data-modal').modal('show');
+}
+
+function openCommentsModal(ID) {
+
+  $('#comments-modal-content').html($('#event-comments-' + ID).html());
+  $('#comments-modal').modal('show');
 }
 
 function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday, day) {
