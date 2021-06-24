@@ -31,8 +31,9 @@
         {{msg $ "user.role.admin"}}
       {{end}}
     </div>
-    <div class="col-sm-2">
-      <a href="#no-scroll" onclick="userDetails({{.ID}})" class="btn btn-outline-darkblue">
+    <div class="col-sm-2 text-right">
+      <a href="#no-scroll" onclick='userDetails({{.ID}}, {{url "Admin.Users"}});'
+        class="btn btn-outline-darkblue">
         {{template "icons/tools.html" . }}
       </a>
     </div>

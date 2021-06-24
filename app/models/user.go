@@ -49,31 +49,10 @@ type User struct {
 	ExpiredSlots       Enrollments
 }
 
-/*Validate User fields of newly registered users. */
-func (user *User) Validate(tx *sqlx.Tx, v *revel.Validation) {
+/*ValidateRegister User fields of newly registered users. */
+func (user *User) ValidateRegister(tx *sqlx.Tx, v *revel.Validation) {
 
-	user.EMail = strings.ToLower(user.EMail)
-
-	user.LastName = strings.TrimSpace(user.LastName)
-	v.Check(user.LastName,
-		revel.Required{},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.lastname")
-
-	user.FirstName = strings.TrimSpace(user.FirstName)
-	v.Check(user.FirstName,
-		revel.Required{},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.firstname")
-
-	user.EMail = strings.TrimSpace(user.EMail)
-	v.Check(user.EMail,
-		revel.Required{},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.email")
-
-	v.Email(user.EMail).
-		MessageKey("validation.invalid.email")
+	user.Validate(tx, v)
 
 	data := ValidateUniqueData{
 		Column: "email",
@@ -89,11 +68,7 @@ func (user *User) Validate(tx *sqlx.Tx, v *revel.Validation) {
 	v.Required(isLdapEMail).
 		MessageKey("validation.email.ldap")
 
-	v.Check(user.Password.String,
-		revel.Required{},
-		revel.MaxSize{127},
-		revel.MinSize{6},
-	).MessageKey("validation.invalid.passwords")
+	ValidateLength(&user.Password.String, "validation.invalid.passwords", 6, 127, v)
 
 	equal := (user.Password.String == user.PasswordRepeat)
 	v.Required(equal).
@@ -109,6 +84,19 @@ func (user *User) Validate(tx *sqlx.Tx, v *revel.Validation) {
 	).MessageKey("validation.invalid.language")
 
 	user.Language.Valid = true
+}
+
+/*Validate User fields when changing user data. */
+func (user *User) Validate(tx *sqlx.Tx, v *revel.Validation) {
+
+	user.EMail = strings.ToLower(user.EMail)
+
+	ValidateLength(&user.LastName, "validation.invalid.lastname", 1, 255, v)
+	ValidateLength(&user.FirstName, "validation.invalid.firstname", 1, 255, v)
+	ValidateLength(&user.EMail, "validation.invalid.email", 1, 255, v)
+
+	v.Email(user.EMail).
+		MessageKey("validation.invalid.email")
 
 	if user.Salutation < NONE || user.Salutation > MS {
 		v.ErrorKey("validation.invalid.salutation")
@@ -286,7 +274,7 @@ func (user *User) Register(v *revel.Validation) (err error) {
 		return
 	}
 
-	if user.Validate(tx, v); v.HasErrors() {
+	if user.ValidateRegister(tx, v); v.HasErrors() {
 		tx.Rollback()
 		return
 	}
@@ -467,6 +455,32 @@ func (user *User) ChangeRole() (err error) {
 		log.Error("failed to update user role", "userID", user.ID,
 			"role", user.Role, "error", err.Error())
 	}
+	return
+}
+
+/*ChangeUserData updates the salutation, first name, last name and e-mail of an user. */
+func (user *User) ChangeUserData(v *revel.Validation) (err error) {
+
+	tx, err := app.Db.Beginx()
+	if err != nil {
+		log.Error("failed to begin tx", "error", err.Error())
+		return
+	}
+
+	if user.Validate(tx, v); v.HasErrors() {
+		tx.Rollback()
+		return
+	}
+
+	err = tx.Get(user, stmtUpdateUserData, user.Salutation, user.FirstName,
+		user.LastName, user.EMail, user.ID)
+	if err != nil {
+		log.Error("failed to update user data", "user", user, "error", err.Error())
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 	return
 }
 
@@ -703,6 +717,13 @@ const (
 			/* data to send notification e-mail about the new role */
 			id, first_name, last_name, role, language,
 			academic_title, email, name_affix, salutation, title
+	`
+
+	stmtUpdateUserData = `
+		UPDATE users
+		SET salutation = $1, first_name = $2, last_name = $3, email = $4
+		WHERE id = $5
+		RETURNING id, salutation, first_name, last_name, email
 	`
 
 	stmtAuthorizedToEditCourse = `

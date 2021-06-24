@@ -1,41 +1,12 @@
 <!-- overview over all users with elevated roles -->
 
-{{template "header.html" .}}
+<!-- admins -->
+<h5> {{template "icons/display.html" . }} &nbsp; {{msg $ "user.admins"}} </h5>
+<hr>
+{{template "admin/templates/roles.html" dict_addLocale $.currentLocale "entries" .admins "errMsg" .errMsg}}
 
-{{template "admin/templates/leftNav.html" .}}
-
-<div class="page page-middle">
-  <div class="tab-content">
-
-    <h4>
-      {{template "icons/person.html" . }} &nbsp; {{msg $ "admin.roles"}}
-    </h4>
-    <hr>
-    <br>
-
-    <!-- admins -->
-    <h5> {{template "icons/display.html" . }} &nbsp; {{msg $ "user.admins"}} </h5>
-    <hr>
-    {{template "admin/templates/roles.html" dict_addLocale $.currentLocale "entries" .admins "errMsg" .errMsg}}
-
-    <!-- creators -->
-    <br>
-    <h5> {{template "icons/people.html" . }} &nbsp; {{msg $ "user.creators"}} </h5>
-    <hr>
-    {{template "admin/templates/roles.html" dict_addLocale $.currentLocale "entries" .creators "errMsg" .errMsg}}
-
-  </div>
-</div>
-
-<div class="page page-side">
-  <br class="medium-hidden">
-</div>
-
-<script>
-  $(function() {
-    //adjust the nav pills
-    $('#v-pills-roles-tab').addClass("active");
-  });
-</script>
-
-{{template "footer.html" .}}
+<!-- creators -->
+<br>
+<h5> {{template "icons/people.html" . }} &nbsp; {{msg $ "user.creators"}} </h5>
+<hr>
+{{template "admin/templates/roles.html" dict_addLocale $.currentLocale "entries" .creators "errMsg" .errMsg}}

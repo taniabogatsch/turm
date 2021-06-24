@@ -106,6 +106,28 @@
       </a>
 
     </div>
+
+    {{if .flash.error}}
+      {{$errorDB := msg $ "error.db"}}
+      {{if eq .flash.error $errorDB}}
+        <small class="text-danger">
+          <br>
+          <br>
+          {{msg $ "login.error.warning" .serviceEMail .serviceEMail .serviceEMail}}
+          <br>
+          {{msg $ "login.possible.errors"}}
+          <ul>
+            <li>
+              {{msg $ "login.error.1"}}
+            </li>
+            <li>
+              {{msg $ "login.error.2"}}
+            </li>
+          </ul>
+        </small>
+      {{end}}
+    {{end}}
+    
   </center>
 </div>
 

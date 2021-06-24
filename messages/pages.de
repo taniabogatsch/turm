@@ -41,6 +41,11 @@ login.ldap.auth.failed = Authentifizierung mit dem Universitätsserver nicht mö
 login.stay = Angemeldet bleiben
 login.instead = Zurück zur Anmeldung?
 
+login.error.warning = <b>Achtung</b>: Sollte sich im Zuge einer Namensänderung die E-Mail Adresse Ihres Uni Accounts geändert haben, so kann es zu Fehlern beim Einloggen kommen. In diesem Fall kontaktieren Sie bitte den <a href="mailto:%s?Subject=SupportTurm2" target="_top">Support</a> (<a href="mailto:%s?Subject=SupportTurm2" target="_top">%s</a>).
+login.possible.errors = Mögliche Fehlerarten:
+login.error.1 = Fehlernachricht beim Einloggen.
+login.error.2 = Ihre Einschreibungen (aktiv, abgelaufen) werden mit Ihrer alten E-Mail Adresse assoziiert und sind nach dem Einloggen mit der neuen Adresse nicht länger sichtbar.
+
 logout.success = Erfolgreich abgemeldet.
 
 register.tab = Registrierung
@@ -132,6 +137,7 @@ admin.page = Admin
 admin.users = Nutzerverwaltung
 admin.roles = Rollenverwaltung
 admin.dashboard = Dashboard
+admin.log = Log
 
 admin.no.creators = Keine Kursverantwortlichen
 
@@ -140,6 +146,10 @@ admin.new.role = Neue Rolle wählen
 admin.current.role = Bisher
 admin.new.role.success = Die Rolle von %s %s wurde zu %s geändert.
 admin.account.inactive = Dieser Account wurde noch nicht aktiviert.
+
+admin.load.user = Nutzerdaten laden
+admin.change.data.success = Die Nutzerdaten von %s %s wurden aktualisiert.
+admin.change.data = Nutzerdaten ändern
 
 # -------------------------------------------------------------------------------------------------- #
 # PROFILE

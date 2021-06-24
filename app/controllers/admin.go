@@ -1,17 +1,16 @@
 package controllers
 
 import (
-	"strings"
 	"turm/app/models"
 
 	"github.com/revel/revel"
 )
 
-/*Users renders the user management page.
+/*Index of the user management page.
 - Roles: admin (activated) */
-func (c Admin) Users() revel.Result {
+func (c Admin) Index() revel.Result {
 
-	c.Log.Debug("render user management page", "url", c.Request.URL)
+	c.Log.Debug("render admin page", "url", c.Request.URL)
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
 	c.ViewArgs["tabName"] = c.Message("admin.tab")
@@ -19,14 +18,44 @@ func (c Admin) Users() revel.Result {
 	return c.Render()
 }
 
-/*Roles renders the role management page.
+/*Dashboard renders the dashboard.
+- Roles: admin (activated) */
+func (c Admin) Dashboard() revel.Result {
+
+	c.Log.Debug("render dashboard", "url", c.Request.URL)
+	return c.Render()
+}
+
+/*LogEntries renders error log entries.
+- Roles: admin (activated) */
+func (c Admin) LogEntries() revel.Result {
+
+	c.Log.Debug("render log entries", "url", c.Request.URL)
+	return c.Render()
+}
+
+/*Users renders the user management page and user details.
+- Roles: admin (activated) */
+func (c Admin) Users(ID int) revel.Result {
+
+	c.Log.Debug("render user management page and render user details", "ID", ID)
+
+	if ID != 0 {
+		user := models.UserDetails{User: models.User{ID: ID}}
+		if err := user.Get(); err != nil {
+			return renderError(err, c.Controller)
+		}
+		return c.Render(user)
+	}
+
+	return c.Render()
+}
+
+/*Roles renders the role overview page.
 - Roles: admin (activated) */
 func (c Admin) Roles() revel.Result {
 
-	c.Log.Debug("render role management page", "url", c.Request.URL)
-	c.Session["callPath"] = c.Request.URL.String()
-	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("admin.tab")
+	c.Log.Debug("render role overview page", "url", c.Request.URL)
 
 	//get all admins and creators
 	var admins models.Users
@@ -40,29 +69,14 @@ func (c Admin) Roles() revel.Result {
 	return c.Render(admins, creators)
 }
 
-/*Dashboard renders the dashboard.
-- Roles: admin (activated) */
-func (c Admin) Dashboard() revel.Result {
-
-	c.Log.Debug("render dashboard", "url", c.Request.URL)
-	c.Session["callPath"] = c.Request.URL.String()
-	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("admin.tab")
-
-	return c.Render()
-}
-
 /*SearchUser renders search results for a search value.
 - Roles: admin (activated) */
 func (c Admin) SearchUser(value string, searchInactive bool) revel.Result {
 
 	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive)
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{3},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
+	models.ValidateLength(&value, "validation.invalid.searchValue",
+		3, 127, c.Validation)
 
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
@@ -78,23 +92,6 @@ func (c Admin) SearchUser(value string, searchInactive bool) revel.Result {
 	return c.Render(users)
 }
 
-/*UserDetails renders detailed information about an user.
-- Roles: admin (activated) */
-func (c Admin) UserDetails(ID int) revel.Result {
-
-	c.Log.Debug("get user details", "userID", ID)
-
-	//NOTE: no ID validation, if this controller is called with an
-	//invalid ID, then something is going wrong
-
-	user := models.UserDetails{User: models.User{ID: ID}}
-	if err := user.Get(); err != nil {
-		return renderError(err, c.Controller)
-	}
-
-	return c.Render(user)
-}
-
 /*ChangeRole changes the role of an user and sends a notification e-mail.
 - Roles: admin (activated) */
 func (c Admin) ChangeRole(user models.User) revel.Result {
@@ -108,11 +105,13 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 	}
 
 	if c.Validation.HasErrors() {
-		return flashError(errValidation, nil, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
 	if err := user.ChangeRole(); err != nil {
-		return flashError(errDB, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
 	}
 
 	data := models.EMailData{User: user}
@@ -121,24 +120,60 @@ func (c Admin) ChangeRole(user models.User) revel.Result {
 		"newRole")
 
 	if err != nil {
-		return flashError(errEMail, err, "", c.Controller, user.EMail)
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errEMail.String())})
+		//TODO: use e-mail in wrapper
+		//return flashError(errEMail, err, "", c.Controller, user.EMail)
 	}
 
 	//update the session if the user updated his own role
 	sessionID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
-		return flashError(errTypeConv, err, "", c.Controller, "")
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errTypeConv.String())})
 	}
 	if sessionID == user.ID {
 		c.Session["role"] = user.Role.String()
 	}
 
-	c.Flash.Success(c.Message("admin.new.role.success",
-		user.FirstName,
-		user.LastName,
-		c.Message("user.role."+user.Role.String()),
-	))
-	return c.Redirect(c.Session["currPath"])
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: c.Message("admin.new.role.success",
+			user.FirstName,
+			user.LastName,
+			c.Message("user.role."+user.Role.String()),
+		)})
+}
+
+/*ChangeUserData updates the salutation, first name, last name and e-mail of an user. */
+func (c Admin) ChangeUserData(user models.User) revel.Result {
+
+	c.Log.Debug("change user data", "user", user)
+
+	if err := user.ChangeUserData(c.Validation); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	} else if c.Validation.HasErrors() {
+		return c.RenderJSON(
+			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
+	}
+
+	//update the session if the user updated his own data
+	sessionID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errTypeConv.String())})
+	}
+	if sessionID == user.ID {
+		c.Session["firstName"] = user.FirstName
+		c.Session["lastName"] = user.LastName
+		c.Session["eMail"] = user.EMail
+	}
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: c.Message("admin.change.data.success",
+			user.FirstName,
+			user.LastName,
+		)})
 }
 
 /*InsertGroup inserts a new group.

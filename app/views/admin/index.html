@@ -1,0 +1,123 @@
+<!-- template rendering the admin page -->
+
+{{template "header.html" .}}
+
+{{template "admin/templates/leftNav.html" .}}
+
+<div class="page page-middle">
+
+  {{if .errMsg}}
+    <div class="w-100 text-danger">
+      {{.errMsg}}
+    </div>
+  {{end}}
+
+  <!-- content -->
+  <div class="tab-content" id="v-pills-tabContent">
+
+    <!-- user management -->
+    <div class="tab-pane fade show active" id="v-pills-users" role="tabpanel"
+      aria-labelledby="v-pills-users-tab">
+
+      <h4>
+        {{template "icons/search.html" . }}
+        &nbsp; {{msg $ "admin.users"}}
+      </h4>
+      <hr>
+      <br>
+
+      <button class="btn btn-darkblue" type="button" onclick="openLoadUserModal();">
+        {{msg $ "admin.load.user"}}
+      </button>
+      <br>
+      <br>
+      <hr>
+
+      {{template "admin/modals/loadUser.html" .}}
+
+      <!-- ajax content -->
+      <div id="nav-pill-content-users">
+      </div>
+    </div>
+
+    <!-- role overview -->
+    <div class="tab-pane fade" id="v-pills-roles" role="tabpanel"
+      aria-labelledby="v-pills-roles-tab">
+
+      <h4>
+        {{template "icons/person.html" . }}
+        &nbsp; {{msg $ "admin.roles"}}
+      </h4>
+      <hr>
+      <br>
+
+      <!-- ajax content -->
+      <div id="nav-pill-content-roles">
+      </div>
+    </div>
+
+    <!-- dashboard -->
+    <div class="tab-pane fade" id="v-pills-dashboard" role="tabpanel"
+      aria-labelledby="v-pills-dashboard-tab">
+
+      <h4>
+        {{template "icons/graphUp.html" . }}
+        &nbsp; {{msg $ "admin.dashboard"}}
+      </h4>
+      <hr>
+      <br>
+
+      <!-- ajax content -->
+      <div id="nav-pill-content-dashboard">
+      </div>
+    </div>
+
+    <!-- log -->
+    <div class="tab-pane fade" id="v-pills-log" role="tabpanel"
+      aria-labelledby="v-pills-log-tab">
+
+      <h4>
+        {{template "icons/bug.html" . }}
+        &nbsp; {{msg $ "admin.log"}}
+      </h4>
+      <hr>
+      <br>
+
+      <!-- ajax content -->
+      <div id="nav-pill-content-log">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page page-side page-side-right">
+  <br class="medium-hidden">
+</div>
+
+<script>
+  renderContent('{{url "Admin.Users"}}', '#nav-pill-content-users');
+
+  $(function() {
+
+    //user management
+    $('#v-pills-users-tab').on('click', function (event) {
+      renderContent('{{url "Admin.Users"}}', '#nav-pill-content-users');
+    });
+    //roles
+    $('#v-pills-roles-tab').on('click', function (event) {
+      renderContent('{{url "Admin.Roles"}}', '#nav-pill-content-roles');
+    });
+    //editors
+    $('#v-pills-dashboard-tab').on('click', function (event) {
+      renderContent('{{url "Admin.Dashboard"}}', '#nav-pill-content-dashboard');
+    });
+    //users
+    $('#v-pills-log-tab').on('click', function (event) {
+      renderContent('{{url "Admin.LogEntries"}}', '#nav-pill-content-log');
+    });
+  });
+</script>
+
+<!-- load footer -->
+{{template "footer.html" .}}

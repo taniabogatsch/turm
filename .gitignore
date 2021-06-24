@@ -4,3 +4,4 @@ routes/
 conf/passwords.json
 none
 target/
+log/

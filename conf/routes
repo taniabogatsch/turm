@@ -10,17 +10,20 @@ module:jobs
 # Admin
 # ---------------------------------------------------------------------------- #
 
+GET     /admin/index                                Admin.Index
+
 GET     /admin/users                                Admin.Users
 GET     /admin/roles                                Admin.Roles
 GET     /admin/dashboard                            Admin.Dashboard
+GET     /admin/logEntries                           Admin.LogEntries
 
 POST    /admin/insertGroup                          Admin.InsertGroup
 POST    /admin/updateGroup                          Admin.UpdateGroup
 POST    /admin/deleteGroup                          Admin.DeleteGroup
 
 GET     /admin/searchUser                           Admin.SearchUser
-GET     /admin/userDetails                          Admin.UserDetails
 POST    /admin/changeRole                           Admin.ChangeRole
+POST    /admin/changeUserData                       Admin.ChangeUserData
 
 POST    /admin/insertCategory                       Admin.InsertCategory
 POST    /admin/updateCategory                       Admin.UpdateCategory

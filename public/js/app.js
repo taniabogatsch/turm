@@ -19,8 +19,63 @@
   }, false);
 })();
 
+//asynchronous content rendering
+function renderContent(action, div) {
+
+  $.get(action, {
+  }, function(data) {
+    $(div).html(data);
+  });
+}
+
+//submit a POST request and render content
+function submitPOSTModal(form, modal, action, div) {
+
+  let data = new FormData(jQuery(form)[0]);
+
+  $.ajax({
+    type: 'POST',
+    url: $(form).attr("action"),
+    data: data,
+    processData: false,
+    contentType: false,
+
+    success: function(response) {
+      if (response.Status == "success") {
+
+        renderContent(action, div);
+        showToast(response.Msg, 'success');
+
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+
+      } else {
+
+        showToast(response.Msg, 'danger');
+
+        if (modal != "") {
+          $(modal).modal('hide');
+        }
+
+      }
+    },
+
+    error: function (error) {
+      console.log(error);
+      showToast("error", 'danger');
+
+      if (modal != "") {
+        $(modal).modal('hide');
+      }
+    },
+  });
+}
+
 //changeIcon adjusts the icons (by id) according to the collapse state
 function changeIcon(id) {
+
+  //TODO: use toggle
 
   //get icons
   const iconRightClass = $("#icon-right-" + id).attr("class");
@@ -64,6 +119,7 @@ function confirmPOSTModal(title, content, action) {
 
 //openGroupsNav shows the groups modal of the navigation bar
 function openGroupsNav() {
+
   getGroups("nav", '#nav-groups-modal-content');
   $('#nav-groups-modal').modal('show');
 }
@@ -146,6 +202,7 @@ function openEntryModal(ID, action, title, isFAQ, val1ID, val2ID,
 
 //detectTextFieldChange detects changes in a quill text field area
 function detectTextFieldChange(source, textField, text) {
+
   if (source == 'user') {
     const textArea = document.getElementById(textField);
     if (text != "<p><br></p>" && text != "") {
@@ -182,7 +239,10 @@ function openAdminGroupModal(ID, parentID, inheritsLimits, action, title,
   $('#admin-group-modal').modal('show');
 }
 
+//enterEnrollDataModal opens a modal when enrolling in a course
 function enterEnrollDataModal(action, msg, ID, hasKey, hasComments) {
+
+  //TODO: use toggle
 
   $('#enter-enrollment-data-modal-form').attr("action", action);
   $('#enter-enrollment-data-modal-ID').val(ID);
@@ -204,12 +264,14 @@ function enterEnrollDataModal(action, msg, ID, hasKey, hasComments) {
   $('#enter-enrollment-data-modal').modal('show');
 }
 
+//openCommentsModal opens enrollment comments of an event
 function openCommentsModal(ID) {
 
   $('#comments-modal-content').html($('#event-comments-' + ID).html());
   $('#comments-modal').modal('show');
 }
 
+//bookSlotModal opens a modal for booking a slot
 function bookSlotModal(courseID, calendarEventID, date, year, weekDay, monday, day) {
 
   $('#book-slot-modal-course-ID').val(courseID);

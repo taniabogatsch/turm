@@ -3,13 +3,35 @@ package models
 //more specific validators are in the respective model files
 
 import (
+	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 	"turm/app"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/revel/revel"
 )
+
+/*ValidateLength of a not null string. */
+func ValidateLength(str *string, msgKey string, min, max int, v *revel.Validation) {
+
+	*str = strings.TrimSpace(*str)
+	v.MinSize(*str, min).MessageKey(msgKey)
+	v.MaxSize(*str, max).MessageKey(msgKey)
+}
+
+/*ValidateLengthAndValid sets valid to true if the string is not empty and
+also validates its length (if non-empty). */
+func ValidateLengthAndValid(str *sql.NullString, msgKey string, min, max int, v *revel.Validation) {
+
+	(*str).String = strings.TrimSpace((*str).String)
+	if len((*str).String) > 0 {
+		(*str).Valid = true
+		s := (*str).String //workaround for revel error
+		v.MaxSize(s, max).MessageKey(msgKey)
+	}
+}
 
 /*LanguageValidator implements the validation of the selected language. */
 type LanguageValidator struct{}

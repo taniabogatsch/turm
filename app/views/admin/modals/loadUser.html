@@ -1,0 +1,74 @@
+<!-- modal to load user information -->
+
+<div class="modal fade z-idx-5000" id="admin-load-user-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "admin.load.user"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!--search for users -->
+        <small class="form-text text-muted">
+          {{msg $ "search.criteria"}}
+        </small>
+        <form id="search-form" accept-charset="UTF-8" class="needs-validation"
+          novalidate onkeydown="return event.key != 'Enter';">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text border-right-0">
+                  {{template "icons/search.html" .}}
+                </span>
+              </div>
+              <input id="user-search-input" type="text" class="form-control rounded-right"
+                placeholder='{{msg $ "search.user"}}' required maxlength="127" minlength="3"
+                onpaste="reactToInput();">
+              <div class="invalid-feedback">
+                {{msg $ "validation.invalid.searchValue"}}
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="form-group form-check">
+          <input id="search-inactive" type="checkbox" class="form-check-input">
+          <label class="form-check-label">
+            {{msg $ "search.inactive.users"}}
+          </label>
+        </div>
+
+        <br>
+        <div id="user-search-results"></div>
+
+      </div>
+
+      <!-- modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+          {{msg $ "button.close"}}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    //react to user input
+    $('#user-search-input').keyup(function() {
+      reactToInput();
+    });
+    $('#search-inactive').change(function() {
+      reactToInput();
+    });
+  });
+</script>

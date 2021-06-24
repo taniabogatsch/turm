@@ -41,6 +41,11 @@ login.ldap.auth.failed = The authentication with the university server failed. P
 login.stay = Keep me logged in
 login.instead = Login instead?
 
+login.error.warning = <b>Attention</b>: Log in errors might occur after a change of your university e-mail address. In this case please contact the <a href="mailto:%s?Subject=SupportTurm2" target="_top">support</a> (<a href="mailto:%s?Subject=SupportTurm2" target="_top">%s</a>).
+login.possible.errors = Possible errors:
+login.error.1 = Error message when attempting to log in.
+login.error.2 = Your enrollments (active, expired) are associated with your old e-mail address and are no longer visible after logging in with your new e-mail address.
+
 logout.success = Logged out.
 
 register.tab = Registration
@@ -132,6 +137,7 @@ admin.page = Admin
 admin.users = User management
 admin.roles = Role Management
 admin.dashboard = Dashboard
+admin.log = Log
 
 admin.no.creators = No creators
 
@@ -140,6 +146,10 @@ admin.new.role = Select new role
 admin.current.role = Currently
 admin.new.role.success = Changed the role of %s %s to %s.
 admin.account.inactive = This account is not activated.
+
+admin.load.user = Load user data
+admin.change.data.success = Updated user data of %s %s.
+admin.change.data = Change user data
 
 # -------------------------------------------------------------------------------------------------- #
 # PROFILE
