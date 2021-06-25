@@ -35,13 +35,13 @@
           <!-- content -->
           <div class="col-sm-4 text-right">
 
-            <form id="solve-log-entry-form" accept-charset="UTF-8" action='{{url "Admin.SolveLogEntry"}}'
+            <form id="solve-log-entry-form-{{$k}}" accept-charset="UTF-8" action='{{url "Admin.SolveLogEntry"}}'
               method="POST" class="needs-validation" novalidate>
 
               <input type="hidden" name="entry.ID" value="{{.ID}}">
 
               <button type="button" class="btn btn-outline-darkblue"
-                onclick='submitPOSTModal("#solve-log-entry-form", "", "{{url "Admin.LogEntries"}}",
+                onclick='submitPOSTModal("#solve-log-entry-form-{{$k}}", "", "{{url "Admin.LogEntries"}}",
                   "#nav-pill-content-log");'>
                 {{template "icons/check.html" .}}
               </button>

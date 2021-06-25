@@ -61,7 +61,7 @@ func (c Admin) InsertLogEntries() revel.Result {
 - Roles: admin (activated) */
 func (c Admin) SolveLogEntry(entry models.LogEntry) revel.Result {
 
-	c.Log.Debug("solve log entry")
+	c.Log.Debug("solve log entry", "entry", entry)
 
 	if err := entry.Solve(); err != nil {
 		return c.RenderJSON(
