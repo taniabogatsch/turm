@@ -530,7 +530,9 @@ func evalEditAuth(c *revel.Controller, table, sessionKey string) (authorized, ex
 	//get the course ID
 	ID, err := strconv.Atoi(IDStr)
 	if err != nil {
-		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "error", err.Error())
+		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "callPath",
+			c.Session["callPath"], "currPath", c.Session["currPath"], "lastURL",
+			c.Session["lastURL"], "error", err.Error())
 		return false, false, err
 	}
 
