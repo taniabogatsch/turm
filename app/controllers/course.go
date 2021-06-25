@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"strings"
 	"time"
 	"turm/app"
 	"turm/app/models"
@@ -47,10 +46,11 @@ func (c Course) Open(ID int) revel.Result {
 			Title:   course.Title}
 	}
 
-	//only set these after the course is loaded
+	//only set these after the course is loaded - TODO: why?
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("course")
+	c.Session["lastURL"] = c.Request.URL.String()
+	c.ViewArgs["tab"] = c.Message("course")
 
 	return c.Render(course)
 }
@@ -60,12 +60,10 @@ Roles: all (except not activated users). */
 func (c Course) Search(value string) revel.Result {
 
 	c.Log.Debug("search courses", "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{1},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
+	models.ValidateLength(&value, "validation.invalid.searchValue",
+		1, 127, c.Validation)
 
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
@@ -86,6 +84,7 @@ func (c Course) Search(value string) revel.Result {
 func (c Course) EditorInstructorList(ID int) revel.Result {
 
 	c.Log.Debug("load editors and instructors of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	editors := models.UserList{}
 	instructors, err := editors.GetEditorsInstructors(&ID)
@@ -102,9 +101,10 @@ func (c Course) EditorInstructorList(ID int) revel.Result {
 func (c Course) Whitelist(ID int) revel.Result {
 
 	c.Log.Debug("load whitelist of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	whitelist := models.UserList{}
-	if err := whitelist.Get(nil, &ID, "whitelists"); err != nil {
+	if err := whitelist.Get(nil, &ID, tabWhitelists); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -117,9 +117,10 @@ func (c Course) Whitelist(ID int) revel.Result {
 func (c Course) Blacklist(ID int) revel.Result {
 
 	c.Log.Debug("load blacklist of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	blacklist := models.UserList{}
-	if err := blacklist.Get(nil, &ID, "blacklists"); err != nil {
+	if err := blacklist.Get(nil, &ID, tabBlacklists); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -132,6 +133,7 @@ func (c Course) Blacklist(ID int) revel.Result {
 func (c Course) Path(ID int) revel.Result {
 
 	c.Log.Debug("load path of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	path := models.Groups{}
 	if err := path.SelectPath(&ID, nil); err != nil {
@@ -147,6 +149,7 @@ func (c Course) Path(ID int) revel.Result {
 func (c Course) Restrictions(ID int) revel.Result {
 
 	c.Log.Debug("load restrictions of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	restrictions := models.Restrictions{}
 	if err := restrictions.Get(nil, &ID); err != nil {
@@ -162,6 +165,7 @@ func (c Course) Restrictions(ID int) revel.Result {
 func (c Course) Events(ID int) revel.Result {
 
 	c.Log.Debug("load events of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	events := models.Events{}
 	userID := 0 //edit page, so the user is never allowed to enroll
@@ -179,6 +183,7 @@ func (c Course) Events(ID int) revel.Result {
 func (c Course) Meetings(ID int) revel.Result {
 
 	c.Log.Debug("load meetings of an event", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	meetings := models.Meetings{}
 	if err := meetings.Get(nil, &ID); err != nil {
@@ -194,6 +199,7 @@ func (c Course) Meetings(ID int) revel.Result {
 func (c Course) CalendarEvents(ID int) revel.Result {
 
 	c.Log.Debug("load calendar events of course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//get the last (current) monday
 	now := time.Now()
@@ -210,12 +216,13 @@ func (c Course) CalendarEvents(ID int) revel.Result {
 	return c.Render(events)
 }
 
-/*CalendarEvent of a course.
+/*CalendarEvent of a course. Loads a specific calender event as defined by monday.
 - Roles: if public all, else logged in users. */
 func (c Course) CalendarEvent(ID, courseID, shift int, monday string, day int) revel.Result {
 
 	c.Log.Debug("load calendar event of course", "ID", ID, "courseID",
 		courseID, "shift", shift, "monday", monday, "day", day)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//get user from session
 	userID, err := getIntFromSession(c.Controller, "userID")

@@ -1,5 +1,25 @@
 package controllers
 
+/*
+Next to user related key-value pairs, the session contains the following three important key-value pairs.
+
+currPath:
+The path of the current page. Used for redirection after
+- changing the language
+- redirecting some admin controllers
+- validating a course
+- redirecting after enrollment
+
+callPath:
+The page calling the current page. Used for redirection after
+- login
+- verifying the activation code
+- setting the preferred language
+
+lastURL:
+The url of the last controller being executed. This session value ensures easier debugging.
+*/
+
 import (
 	"strconv"
 

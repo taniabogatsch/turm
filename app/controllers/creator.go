@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"strings"
 	"time"
 	"turm/app/models"
 
@@ -10,11 +9,11 @@ import (
 )
 
 /*Activate a course draft.
-- Roles: creator of the course
-- Roles: creator */
+- Roles: creator of the course */
 func (c Creator) Activate(ID int) revel.Result {
 
-	c.Log.Debug("activate course", "ID", ID)
+	c.Log.Debug("activate course draft", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -48,11 +47,11 @@ func (c Creator) Activate(ID int) revel.Result {
 }
 
 /*Delete a course (draft).
-- Roles: creator of the course
-- Roles: creator */
+- Roles: creator of the course */
 func (c Creator) Delete(ID int) revel.Result {
 
 	c.Log.Debug("delete course (draft)", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -72,11 +71,11 @@ func (c Creator) Delete(ID int) revel.Result {
 }
 
 /*Duplicate a course draft.
-- Roles: creator of the course
-- Roles: creator */
+- Roles: creator of the course */
 func (c Creator) Duplicate(ID int, title string) revel.Result {
 
-	c.Log.Debug("duplicate course draft", "ID", ID)
+	c.Log.Debug("duplicate course draft", "ID", ID, "title", title)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -87,7 +86,10 @@ func (c Creator) Duplicate(ID int, title string) revel.Result {
 	}
 
 	course := models.Course{ID: ID, Title: title,
-		Creator: sql.NullInt32{int32(creatorID), true}}
+		Creator: sql.NullInt32{
+			Int32: int32(creatorID),
+			Valid: true,
+		}}
 	if err := course.Duplicate(); err != nil {
 		return flashError(errDB, err, "", c.Controller, "")
 	}
@@ -99,11 +101,11 @@ func (c Creator) Duplicate(ID int, title string) revel.Result {
 }
 
 /*Expire an active course.
-- Roles: creator of the course
-- Roles: creator */
+- Roles: creator of the course */
 func (c Creator) Expire(ID int) revel.Result {
 
 	c.Log.Debug("expire course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -123,6 +125,8 @@ func (c Creator) Expire(ID int) revel.Result {
 func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 
 	c.Log.Debug("create a new course", "param", param, "file", string(file))
+	c.Session["lastURL"] = c.Request.URL.String()
+
 	param.JSON = file
 
 	var course models.Course
@@ -138,7 +142,10 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 	}
 
 	course.ID = param.CourseID
-	course.Creator = sql.NullInt32{int32(creatorID), true}
+	course.Creator = sql.NullInt32{
+		Int32: int32(creatorID),
+		Valid: true,
+	}
 	course.Title = param.Title
 
 	if param.Option == models.BLANK {
@@ -175,12 +182,10 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 func (c Creator) Search(value string) revel.Result {
 
 	c.Log.Debug("search courses", "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{1},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
+	models.ValidateLength(&value, "validation.invalid.searchValue",
+		1, 127, c.Validation)
 
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()

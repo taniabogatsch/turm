@@ -9,23 +9,22 @@ import (
 	"github.com/revel/revel"
 )
 
-/*ChangeText changes the text of the provided column.
+/*ChangeText of the provided column of a calendar event.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Result {
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	value = strings.TrimSpace(value)
 	valid := (value != "")
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	if value != "" || fieldID == "title" {
+	if value != "" || fieldID == colTitle {
 
-		c.Validation.Check(value,
-			revel.MinSize{3},
-			revel.MaxSize{255},
-		).MessageKey("validation.invalid.text.short")
+		models.ValidateLength(&value, "validation.invalid.text.short",
+			3, 255, c.Validation)
 
 		if c.Validation.HasErrors() {
 			return c.RenderJSON(
@@ -33,13 +32,16 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 		}
 	}
 
-	if fieldID != "title" && fieldID != "annotation" {
+	if fieldID != colTitle && fieldID != colAnnotation {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.CalendarEvent{ID: ID}
-	err := event.Update(fieldID, sql.NullString{value, valid})
+	err := event.Update(fieldID, sql.NullString{
+		String: value,
+		Valid:  valid,
+	})
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -57,11 +59,12 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 			Value: value, ID: ID})
 }
 
-/*Delete calendar event data.
+/*Delete calendar event.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 
 	c.Log.Debug("delete calendar event", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
@@ -92,11 +95,12 @@ func (c EditCalendarEvent) Delete(ID, courseID int) revel.Result {
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*Duplicate calendar event data.
+/*Duplicate calendar event.
 - Roles: creator and editors of the course of the event */
 func (c EditCalendarEvent) Duplicate(ID, courseID int) revel.Result {
 
 	c.Log.Debug("duplicate calendar event", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -116,6 +120,7 @@ func (c EditCalendarEvent) Duplicate(ID, courseID int) revel.Result {
 func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl) revel.Result {
 
 	c.Log.Debug("create a new day template", "ID", ID, "courseID", courseID, "tmpl", tmpl)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
@@ -139,6 +144,7 @@ func (c EditCalendarEvent) NewDayTemplate(ID, courseID int, tmpl models.DayTmpl)
 func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl) revel.Result {
 
 	c.Log.Debug("edit a day template", "ID", ID, "courseID", courseID, "tmpl", tmpl)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
@@ -172,16 +178,17 @@ func (c EditCalendarEvent) EditDayTemplate(ID, courseID int, tmpl models.DayTmpl
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*ChangeException edits or adds an exception.
+/*ChangeException edits or adds an exception. Exceptions block slots of a day template.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Exception) revel.Result {
 
 	c.Log.Debug("change an exception", "ID", ID, "courseID", courseID, "exception", exception)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the calendar event ID is valid
 
 	exception.CalendarEventID = ID
-	users := []models.EMailData{}
+	var users []models.EMailData
 	var err error
 
 	//insert
@@ -218,11 +225,12 @@ func (c EditCalendarEvent) ChangeException(ID, courseID int, exception models.Ex
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*DeleteException deletes an exception.
+/*DeleteException of a calendar event.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) DeleteException(ID, courseID int) revel.Result {
 
 	c.Log.Debug("delete an exception", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the day template ID is valid
 
@@ -237,11 +245,12 @@ func (c EditCalendarEvent) DeleteException(ID, courseID int) revel.Result {
 	return c.Redirect(Course.CalendarEvents, courseID)
 }
 
-/*DeleteDayTemplate deletes a day template.
+/*DeleteDayTemplate of a calendar event.
 - Roles: creator and editors of the course of the calendar event */
 func (c EditCalendarEvent) DeleteDayTemplate(ID, courseID int) revel.Result {
 
 	c.Log.Debug("delete a day template", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the day template ID is valid
 

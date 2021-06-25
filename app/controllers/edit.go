@@ -15,7 +15,7 @@ import (
 )
 
 /*Open an already existing course for modification, etc.
-- Roles: creator and editors of this course. */
+- Roles: creator and editors of this course */
 func (c Edit) Open(ID int) revel.Result {
 
 	c.Log.Debug("open course", "ID", ID)
@@ -34,10 +34,11 @@ func (c Edit) Open(ID int) revel.Result {
 		return c.Redirect(c.Session["callPath"].(string))
 	}
 
-	//only set these after the course is loaded
+	//only set these after the course is loaded - TODO: why?
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+	c.ViewArgs["tab"] = c.Message("creator.tab")
 
 	return c.Render(course)
 }
@@ -47,6 +48,7 @@ func (c Edit) Open(ID int) revel.Result {
 func (c Edit) Download(ID int, filename string) revel.Result {
 
 	c.Log.Debug("download course", "ID", ID, "filename", filename)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -98,10 +100,11 @@ func (c Edit) Download(ID int, filename string) revel.Result {
 }
 
 /*Validate all course data.
-- Roles: creator and editors of this course. */
+- Roles: creator and editors of this course */
 func (c Edit) Validate(ID int) revel.Result {
 
 	c.Log.Debug("validate course", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -123,20 +126,19 @@ func (c Edit) Validate(ID int) revel.Result {
 
 /*NewEvent creates a new blank event in a course.
 - Roles: creator and editors of this course. */
-func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailConfig) revel.Result {
+func (c Edit) NewEvent(ID int, value, eventType string,
+	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("create a new event", "ID", ID, "value", value,
 		"eventType", eventType, "conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{3},
-		revel.MaxSize{255},
-	).MessageKey("validation.invalid.text.short")
+	models.ValidateLength(&value, "validation.invalid.text.short",
+		3, 255, c.Validation)
 
-	if eventType != "normal" && eventType != "calendar" {
+	if eventType != eventTypeNormal && eventType != eventTypeCalendar {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -147,7 +149,7 @@ func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailCon
 	}
 
 	//normal event
-	if eventType == "normal" {
+	if eventType == eventTypeNormal {
 
 		conf.ID = ID
 		event := models.Event{CourseID: ID, Title: value}
@@ -179,7 +181,7 @@ func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailCon
 	}
 
 	//reload correct content
-	if eventType == "normal" {
+	if eventType == eventTypeNormal {
 		return c.Redirect(Course.Events, ID)
 	}
 	return c.Redirect(Course.CalendarEvents, ID)
@@ -190,14 +192,15 @@ func (c Edit) NewEvent(ID int, value, eventType string, conf models.EditEMailCon
 func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change timestamp", "ID", ID, "date", date, "time", time,
-		"fieldID", fieldID, "conf", conf)
+	c.Log.Debug("change timestamp", "ID", ID, "fieldID", fieldID, "date", date,
+		"time", time, "conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
 	timestamp := date + " " + time
 	valid := (timestamp != " ")
-	if valid || fieldID != "unsubscribe_end" { //only the unsubscribeend can be null
+	if valid || fieldID != colUnsubscribeEnd { //only the unsubscribeend can be null
 		c.Validation.Required(date).
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
@@ -209,8 +212,8 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
-	if fieldID != "enrollment_start" && fieldID != "enrollment_end" &&
-		fieldID != "unsubscribe_end" && fieldID != "expiration_date" {
+	if fieldID != colEnrollmentStart && fieldID != colEnrollmentEnd &&
+		fieldID != colUnsubscribeEnd && fieldID != colExpirationDate {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -234,7 +237,7 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 	}
 
 	//if the course is active, send notification e-mail
-	if fieldID != "expiration_date" {
+	if fieldID != colExpirationDate {
 
 		conf.Field = "email.edit." + fieldID
 		if err = sendEMailsEdit(c.Controller, &conf); err != nil {
@@ -256,15 +259,17 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 - Roles: creator and editors of the course */
 func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 
-	c.Log.Debug("add user to user list", "ID", ID, "userID", userID, "listType", listType)
+	c.Log.Debug("add user to user list", "ID", ID, "userID", userID,
+		"listType", listType)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "blacklists" && listType != "whitelists" &&
-		listType != "instructors" && listType != "editors" {
+	if listType != tabBlacklists && listType != tabWhitelists &&
+		listType != tabInstructors && listType != tabEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -299,27 +304,29 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 		entry.CourseID,
 	))
 
-	if listType == "instructors" || listType == "editors" {
+	if listType == tabInstructors || listType == tabEditors {
 		return c.Redirect(Course.EditorInstructorList, ID)
-	} else if listType == "whitelists" {
+	} else if listType == tabWhitelists {
 		return c.Redirect(Course.Whitelist, ID)
 	}
 	return c.Redirect(Course.Blacklist, ID)
 }
 
-/*DeleteFromUserList removes a from the user list of a course.
+/*DeleteFromUserList removes a user from the user list of a course.
 - Roles: creator and editors of the course */
 func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
-	c.Log.Debug("delete user from user list", "ID", ID, "userID", userID, "listType", listType)
+	c.Log.Debug("delete user from user list", "ID", ID, "userID", userID,
+		"listType", listType)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "blacklists" && listType != "whitelists" &&
-		listType != "instructors" && listType != "editors" {
+	if listType != tabBlacklists && listType != tabWhitelists &&
+		listType != tabInstructors && listType != tabEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -351,27 +358,28 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
 	c.Flash.Success(c.Message("course."+listType+".delete.success", ID))
 
-	if listType == "instructors" || listType == "editors" {
+	if listType == tabInstructors || listType == tabEditors {
 		return c.Redirect(Course.EditorInstructorList, ID)
-	} else if listType == "whitelists" {
+	} else if listType == tabWhitelists {
 		return c.Redirect(Course.Whitelist, ID)
 	}
 	return c.Redirect(Course.Blacklist, ID)
 }
 
-/*ChangeViewMatrNr toggles the matriculation number restrictions for an editor/instructor.
+/*ChangeViewMatrNr toggles the matriculation number restrictions of an editor/instructor.
 - Roles: creator and editors of the course */
 func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) revel.Result {
 
 	c.Log.Debug("update user in user list", "ID", ID, "userID", userID,
 		"listType", listType, "option", option)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != "instructors" && listType != "editors" {
+	if listType != tabInstructors && listType != tabEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -410,10 +418,11 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 
 	c.Log.Debug("update bool", "ID", ID, "listType", listType, "option", option)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	if listType != "visible" && listType != "only_ldap" {
+	if listType != colVisible && listType != colOnlyLDAP {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -435,29 +444,28 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 
 	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value,
 		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
 	value = strings.TrimSpace(value)
 	valid := (value != "")
 
-	if valid || fieldID == "title" {
+	if valid || fieldID == colTitle {
 
-		if fieldID == "title" || fieldID == "subtitle" {
-			c.Validation.Check(value,
-				revel.MinSize{3},
-				revel.MaxSize{511},
-			).MessageKey("validation.invalid.text")
+		if fieldID == colTitle || fieldID == colSubtitle {
 
-		} else if fieldID == "fee" {
+			models.ValidateLength(&value, "validation.invalid.text",
+				3, 511, c.Validation)
+
+		} else if fieldID == colFee {
 			c.Validation.Match(value, models.FeePattern).
 				MessageKey("validation.invalid.fee")
 
 		} else {
-			c.Validation.Check(value,
-				revel.MinSize{3},
-				revel.MaxSize{50000},
-			).MessageKey("validation.invalid.text.area")
+
+			models.ValidateLength(&value, "validation.invalid.text.area",
+				3, 50000, c.Validation)
 		}
 
 		if c.Validation.HasErrors() {
@@ -466,9 +474,9 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 		}
 	}
 
-	if fieldID != "description" && fieldID != "custom_email" &&
-		fieldID != "speaker" && fieldID != "title" &&
-		fieldID != "subtitle" && fieldID != "fee" {
+	if fieldID != colDescription && fieldID != colCustomEMail &&
+		fieldID != colSpeaker && fieldID != colTitle &&
+		fieldID != colSubtitle && fieldID != colFee {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -477,17 +485,27 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 	conf.ID = ID
 	var err error
 
-	if fieldID == "fee" && valid {
+	if fieldID == colFee && valid {
+
 		value = strings.ReplaceAll(value, ",", ".")
-		fee, err := strconv.ParseFloat(value, 64)
+		var fee float64
+
+		fee, err = strconv.ParseFloat(value, 64)
 		if err != nil {
 			return c.RenderJSON(
 				response{Status: ERROR, Msg: c.Message("error.undefined")})
 		}
-		err = course.Update(nil, fieldID, sql.NullFloat64{fee, valid}, &conf)
+
+		err = course.Update(nil, fieldID, sql.NullFloat64{
+			Float64: fee,
+			Valid:   valid,
+		}, &conf)
 
 	} else {
-		err = course.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
+		err = course.Update(nil, fieldID, sql.NullString{
+			String: value,
+			Valid:  valid,
+		}, &conf)
 	}
 
 	if err != nil {
@@ -504,7 +522,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 
 	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
-		if fieldID == "title" || fieldID == "subtitle" || fieldID == "fee" {
+		if fieldID == colTitle || fieldID == colSubtitle || fieldID == colFee {
 			msg = c.Message("course."+fieldID+".change.success", value, course.ID)
 		} else {
 			msg = c.Message("course."+fieldID+".change.success", course.ID)
@@ -515,11 +533,13 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: value})
 }
 
-/*ChangeGroup changes the group of a course.
-- Roles: creator and editors of the course. */
+/*ChangeGroup of a course.
+- Roles: creator and editors of the course */
 func (c Edit) ChangeGroup(ID, parentID int, conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change group", "ID", ID, "parentID", parentID)
+	c.Log.Debug("change group", "ID", ID, "parentID", parentID,
+		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -551,6 +571,7 @@ func (c Edit) ChangeGroup(ID, parentID int, conf models.EditEMailConfig) revel.R
 func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result {
 
 	c.Log.Debug("change enrollment limit", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -572,7 +593,10 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 	}
 
 	course := models.Course{ID: ID}
-	err := course.Update(nil, fieldID, sql.NullInt32{int32(value), valid}, nil)
+	err := course.Update(nil, fieldID, sql.NullInt32{
+		Int32: int32(value),
+		Valid: valid,
+	}, nil)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -586,11 +610,12 @@ func (c Edit) ChangeEnrollLimit(ID int, fieldID string, value int) revel.Result 
 		response{Status: SUCCESS, Msg: msg, FieldID: fieldID, Value: strconv.Itoa(value)})
 }
 
-/*ChangeRestriction adds/edits a degree/course of study/semester restriction.
+/*ChangeRestriction adds/edits a degree/course of study/semester restriction of a course.
 - Roles: creator and editors of the course */
 func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Result {
 
 	c.Log.Debug("change enrollment restriction", "ID", ID, "restriction", restriction)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -622,11 +647,12 @@ func (c Edit) ChangeRestriction(ID int, restriction models.Restriction) revel.Re
 	return c.Redirect(Course.Restrictions, ID)
 }
 
-/*DeleteRestriction deletes a restriction.
-- Roles: creator and editors of this course. */
+/*DeleteRestriction of a course.
+- Roles: creator and editors of this course */
 func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 
 	c.Log.Debug("delete enrollment restriction", "ID", ID, "restrictionID", restrictionID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
@@ -642,21 +668,20 @@ func (c Edit) DeleteRestriction(ID, restrictionID int) revel.Result {
 }
 
 /*SearchUser searches for users for the different user lists.
-- Roles: creator and editors of the course. */
+- Roles: creator and editors of the course */
 func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) revel.Result {
 
-	c.Log.Debug("search users", "value", value, "searchInactive", searchInactive, "listType", listType)
+	c.Log.Debug("search users", "ID", ID, "value", value, "listType", listType,
+		"searchInactive", searchInactive)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{3},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
+	models.ValidateLength(&value, "validation.invalid.searchValue",
+		3, 127, c.Validation)
 
-	if listType != "blacklists" && listType != "whitelists" &&
-		listType != "instructors" && listType != "editors" {
+	if listType != tabBlacklists && listType != tabWhitelists &&
+		listType != tabInstructors && listType != tabEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 

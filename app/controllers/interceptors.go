@@ -138,7 +138,7 @@ func (c Course) auth() revel.Result {
 		return c.Redirect(App.Index)
 	}
 
-	authorized, expired := false, false
+	var authorized, expired bool
 	var err error
 
 	if c.MethodName == "Meetings" {
@@ -568,7 +568,9 @@ func evalHasElevatedRights(c *revel.Controller, table string) (authorized, expir
 	//get the course/event ID
 	ID, err := strconv.Atoi(IDStr)
 	if err != nil {
-		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "error", err.Error())
+		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "callPath",
+			c.Session["callPath"], "currPath", c.Session["currPath"], "lastURL",
+			c.Session["lastURL"], "error", err.Error())
 		return false, false, err
 	}
 

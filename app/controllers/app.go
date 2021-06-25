@@ -10,22 +10,28 @@ import (
 - Roles: all (except not activated users) */
 func (c App) Index() revel.Result {
 
-	c.Log.Debug("render index page", "url", c.Request.URL)
+	c.Log.Debug("render app index page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("index.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("index.tab")
 
 	return c.Render()
 }
 
-/*Groups renders all groups.
+/*Groups renders all groups and their children recursively.
 - Roles: all (except not activated users) */
 func (c App) Groups(prefix string) revel.Result {
 
-	c.Log.Debug("get groups", "prefix", prefix)
+	c.Log.Debug("render groups", "prefix", prefix)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: no prefix validation, if this controller is called with an
-	//invalid prefix, then something is going wrong
+	//invalid prefix, then something else is going wrong
+
+	//TODO: why is Groups in upper case?
 
 	var Groups models.Groups
 	if err := Groups.Select(&prefix); err != nil {
@@ -41,6 +47,7 @@ func (c App) ChangeLanguage(language string) revel.Result {
 
 	c.Log.Debug("change language", "old language", c.Session["currentLocale"],
 		"language", language)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	c.Validation.Check(language,
 		models.LanguageValidator{},
@@ -66,9 +73,12 @@ func (c App) ChangeLanguage(language string) revel.Result {
 func (c App) DataPrivacy() revel.Result {
 
 	c.Log.Debug("render data privacy page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("data.privacy.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("data.privacy.tab")
 
 	return c.Render()
 }
@@ -78,24 +88,30 @@ func (c App) DataPrivacy() revel.Result {
 func (c App) Imprint() revel.Result {
 
 	c.Log.Debug("render imprint page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("imprint.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("imprint.tab")
 
 	return c.Render()
 }
 
-/*News renders the news page.
+/*News renders the news feed page.
 - Roles: all (except not activated users) */
 func (c App) News() revel.Result {
 
-	c.Log.Debug("render news page", "url", c.Request.URL)
+	c.Log.Debug("render news feed page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("news.feed.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("news.feed.tab")
 
 	var categories models.Categories
-	if err := categories.Select("news_feed_category"); err != nil {
+	if err := categories.Select(tabNewsFeedCategory); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -108,12 +124,15 @@ func (c App) News() revel.Result {
 func (c App) FAQs() revel.Result {
 
 	c.Log.Debug("render FAQs page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("faq.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("faq.tab")
 
 	var categories models.Categories
-	if err := categories.Select("faq_category"); err != nil {
+	if err := categories.Select(tabFAQCategory); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}

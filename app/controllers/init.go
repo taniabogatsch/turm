@@ -30,7 +30,7 @@ func init() {
 
 func getTimestamp(str string, c *revel.Controller, valid bool, fieldID string) (t time.Time, err error) {
 
-	if valid || fieldID != "unsubscribe_end" {
+	if valid || fieldID != colUnsubscribeEnd {
 
 		loc, err := time.LoadLocation(app.TimeZone)
 		if err != nil {

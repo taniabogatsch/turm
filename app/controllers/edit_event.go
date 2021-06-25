@@ -9,11 +9,12 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Delete event data.
+/*Delete event.
 - Roles: creator and editors of the course of the event */
 func (c EditEvent) Delete(ID, courseID int) revel.Result {
 
-	c.Log.Debug("delete event", "ID", ID)
+	c.Log.Debug("delete event", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -32,11 +33,12 @@ func (c EditEvent) Delete(ID, courseID int) revel.Result {
 	return c.Redirect(Course.Events, courseID)
 }
 
-/*Duplicate event data.
+/*Duplicate event.
 - Roles: creator and editors of the course of the event */
 func (c EditEvent) Duplicate(ID, courseID int) revel.Result {
 
-	c.Log.Debug("duplicate event", "ID", ID)
+	c.Log.Debug("duplicate event", "ID", ID, "courseID", courseID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -51,13 +53,14 @@ func (c EditEvent) Duplicate(ID, courseID int) revel.Result {
 	return c.Redirect(Course.Events, courseID)
 }
 
-/*NewMeeting creates a new blank meeting in an event.
+/*NewMeeting creates a new blank meeting that is part of an event.
 - Roles: creator and editors of the course of the event */
 func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,
 	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("create a new meeting", "ID", ID, "option", option,
 		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -96,6 +99,7 @@ func (c EditEvent) NewMeeting(ID int, option models.MeetingInterval,
 func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Result {
 
 	c.Log.Debug("change capacity", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -144,18 +148,18 @@ func (c EditEvent) ChangeCapacity(ID int, fieldID string, value int) revel.Resul
 func (c EditEvent) ChangeText(ID int, fieldID, value string,
 	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value)
+	c.Log.Debug("change text value", "ID", ID, "fieldID", fieldID, "value", value,
+		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	value = strings.TrimSpace(value)
 	valid := (value != "")
 
 	//NOTE: the interceptor assures that the event ID is valid
-	if value != "" || fieldID == "title" {
+	if value != "" || fieldID == colTitle {
 
-		c.Validation.Check(value,
-			revel.MinSize{3},
-			revel.MaxSize{255},
-		).MessageKey("validation.invalid.text.short")
+		models.ValidateLength(&value, "validation.invalid.text.short",
+			3, 255, c.Validation)
 
 		if c.Validation.HasErrors() {
 			return c.RenderJSON(
@@ -163,7 +167,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 		}
 	}
 
-	if fieldID != "title" && fieldID != "annotation" {
+	if fieldID != colTitle && fieldID != colAnnotation {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -172,7 +176,10 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 	conf.IsEvent = true
 
 	event := models.Event{ID: ID}
-	_, err := event.Update(nil, fieldID, sql.NullString{value, valid}, &conf)
+	_, err := event.Update(nil, fieldID, sql.NullString{
+		String: value,
+		Valid:  valid,
+	}, &conf)
 	if err != nil {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message(errDB.String())})
@@ -199,19 +206,20 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result {
 
 	c.Log.Debug("update bool", "ID", ID, "listType", listType, "option", option)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	if listType != "has_waitlist" && listType != "has_comments" {
+	if listType != colHasWaitlist && listType != colHasComments {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.Event{ID: ID}
 	var err error
-	if listType == "has_waitlist" {
+	if listType == colHasWaitlist {
 		err = event.UpdateWaitlist(option, c.Validation)
-	} else if listType == "has_comments" {
+	} else if listType == colHasComments {
 		err = event.UpdateComments(option, c.Validation)
 	}
 
@@ -225,7 +233,7 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 	}
 
 	msg := c.Message("event.waitlist.change.success")
-	if listType == "has_comments" {
+	if listType == colHasComments {
 		msg = c.Message("event.has.comments.change.success")
 	}
 
@@ -238,16 +246,17 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2, fieldID string) revel.Result {
 
 	c.Log.Debug("change enrollment key", "ID", ID, "key1", key1, "key2", key2, "fieldID", fieldID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
 	key1 = strings.TrimSpace(key1)
 	key2 = strings.TrimSpace(key2)
 	if key1 == key2 {
-		c.Validation.Check(key1,
-			revel.MinSize{3},
-			revel.MaxSize{511}).
-			MessageKey("validation.invalid.keys")
+
+		models.ValidateLength(&key1, "validation.invalid.keys",
+			3, 511, c.Validation)
+
 	} else {
 		c.Validation.ErrorKey("validation.invalid.keys")
 	}
@@ -273,11 +282,14 @@ func (c EditEvent) ChangeEnrollmentKey(ID int, key1, key2, fieldID string) revel
 func (c EditEvent) DeleteEnrollmentKey(ID int) revel.Result {
 
 	c.Log.Debug("delete enrollment key", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
 	event := models.Event{ID: ID}
-	_, err := event.Update(nil, "enrollment_key", sql.NullString{"", false}, nil)
+	_, err := event.Update(nil, "enrollment_key", sql.NullString{
+		Valid: false,
+	}, nil)
 
 	if err != nil {
 		return c.RenderJSON(

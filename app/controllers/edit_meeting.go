@@ -7,13 +7,14 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Edit meeting data.
+/*Edit meeting.
 - Roles: creator and editors of the course of the meeting */
 func (c EditMeeting) Edit(ID int, meeting models.Meeting,
 	conf models.EditEMailConfig) revel.Result {
 
 	c.Log.Debug("change meeting", "ID", ID, "meeting", meeting,
 		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the meeting ID is valid
 
@@ -44,12 +45,14 @@ func (c EditMeeting) Edit(ID int, meeting models.Meeting,
 	return c.Redirect(Course.Meetings, meeting.EventID)
 }
 
-/*Delete a meeting.
+/*Delete meeting.
 - Roles: creator and editors of the course of the meeting */
 func (c EditMeeting) Delete(ID, eventID int,
 	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("delete meeting", "ID", ID, "eventID", eventID)
+	c.Log.Debug("delete meeting", "ID", ID, "eventID", eventID,
+		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 
@@ -73,12 +76,14 @@ func (c EditMeeting) Delete(ID, eventID int,
 	return c.Redirect(Course.Meetings, eventID)
 }
 
-/*Duplicate a meeting.
+/*Duplicate meeting.
 - Roles: creator and editors of the course of the meeting */
 func (c EditMeeting) Duplicate(ID, eventID int,
 	conf models.EditEMailConfig) revel.Result {
 
-	c.Log.Debug("duplicate meeting", "ID", ID, "eventID", eventID)
+	c.Log.Debug("duplicate meeting", "ID", ID, "eventID", eventID,
+		"conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//NOTE: the interceptor assures that the event ID is valid
 

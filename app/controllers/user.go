@@ -15,19 +15,23 @@ import (
 func (c User) LoginPage() revel.Result {
 
 	c.Log.Debug("render login page", "url", c.Request.URL)
+
 	//NOTE: we do not set the callPath because we want to be redirected to the previous page
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("login.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("login.tab")
 
 	return c.Render()
 }
 
-/*Login implements the login of an user.
+/*Login of an user.
 - Roles: not logged in users */
 func (c User) Login(credentials models.Credentials) revel.Result {
 
 	c.Log.Debug("login user", "username", credentials.Username,
 		"email", credentials.EMail, "stayLoggedIn", credentials.StayLoggedIn)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	credentials.Validate(c.Validation)
 	if c.Validation.HasErrors() {
@@ -102,10 +106,12 @@ func (c User) Login(credentials models.Credentials) revel.Result {
 func (c User) Logout() revel.Result {
 
 	c.Log.Debug("logout", "length session", len(c.Session))
+
 	for k := range c.Session {
 		c.Session.Del(k)
 	}
 
+	c.Session["lastURL"] = c.Request.URL.String()
 	c.Flash.Success(c.Message("logout.success"))
 	return c.Redirect(User.LoginPage)
 }
@@ -115,10 +121,13 @@ func (c User) Logout() revel.Result {
 func (c User) RegistrationPage() revel.Result {
 
 	c.Log.Debug("render registration page", "url", c.Request.URL)
+
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("register.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("register.tab")
 
 	return c.Render()
 }
@@ -128,6 +137,7 @@ func (c User) RegistrationPage() revel.Result {
 func (c User) Registration(user models.User) revel.Result {
 
 	c.Log.Debug("registration of user", "user", user)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//register the new user
 	if err := user.Register(c.Validation); err != nil {
@@ -161,10 +171,13 @@ func (c User) Registration(user models.User) revel.Result {
 func (c User) NewPasswordPage() revel.Result {
 
 	c.Log.Debug("render new password page", "url", c.Request.URL)
+
 	//NOTE: we do not set the callPath because we want to be redirected to the
 	//previous page after logging in
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("new.pw.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("new.pw.tab")
 
 	return c.Render()
 }
@@ -174,6 +187,7 @@ func (c User) NewPasswordPage() revel.Result {
 func (c User) NewPassword(email string) revel.Result {
 
 	c.Log.Debug("requesting new password", "email", email)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	user := models.User{EMail: strings.ToLower(email)}
 	err := user.GenerateNewPassword(c.Validation)
@@ -202,10 +216,13 @@ func (c User) NewPassword(email string) revel.Result {
 func (c User) ActivationPage() revel.Result {
 
 	c.Log.Debug("render activation page", "url", c.Request.URL)
+
 	//NOTE: we do not set the callPath because we want to be redirected to
 	//the previous page after account activation
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("activation.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("activation.tab")
 
 	return c.Render()
 }
@@ -213,6 +230,9 @@ func (c User) ActivationPage() revel.Result {
 /*VerifyActivationCode verifies an activation code.
 - Roles: all */
 func (c User) VerifyActivationCode(activationCode string) revel.Result {
+
+	c.Log.Debug("verify activation code", "activationCode", activationCode)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//get the user ID of the to-be-activated account
 	userID := c.Params.Query.Get("userID")
@@ -224,12 +244,14 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 		}
 	}
 
-	user := models.User{ActivationCode: sql.NullString{activationCode, true}}
+	user := models.User{ActivationCode: sql.NullString{
+		String: activationCode,
+		Valid:  true,
+	}}
 	if !c.Validation.HasErrors() {
-		c.Validation.Check(activationCode,
-			revel.MinSize{7},
-			revel.MaxSize{7},
-		).MessageKey("validation.invalid.activation")
+
+		models.ValidateLength(&activationCode, "validation.invalid.activation",
+			7, 7, c.Validation)
 
 		user.ID, _ = strconv.Atoi(userID)
 		c.Validation.Required(user.ID).
@@ -263,6 +285,9 @@ func (c User) VerifyActivationCode(activationCode string) revel.Result {
 - Roles: logged in and not activated users */
 func (c User) NewActivationCode() revel.Result {
 
+	c.Log.Debug("send new activation code")
+	c.Session["lastURL"] = c.Request.URL.String()
+
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
 		return flashError(errTypeConv, err, "", c.Controller, "")
@@ -287,23 +312,27 @@ func (c User) NewActivationCode() revel.Result {
 }
 
 /*PrefLanguagePage renders the page to set a preferred language.
-- Roles: logged in users. */
+- Roles: logged in users */
 func (c User) PrefLanguagePage() revel.Result {
 
 	c.Log.Debug("render preferred language page", "url", c.Request.URL)
+
 	//NOTE: we do not set the callPath because we want to be redirected to the previous
 	//page after a successful login
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("pref.lang.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("pref.lang.tab")
 
 	return c.Render()
 }
 
 /*SetPrefLanguage sets the preferred language of the user.
-- Roles: logged in users. */
+- Roles: logged in users */
 func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 
 	c.Log.Debug("set preferred language", "prefLanguage", prefLanguage)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	c.Validation.Check(prefLanguage,
 		models.LanguageValidator{},
@@ -320,7 +349,10 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 	}
 
 	user := models.User{ID: userID,
-		Language: sql.NullString{prefLanguage, true}}
+		Language: sql.NullString{
+			String: prefLanguage,
+			Valid:  true,
+		}}
 
 	//update the language
 	if err := user.SetPrefLanguage(); err != nil {
@@ -332,10 +364,16 @@ func (c User) SetPrefLanguage(prefLanguage string) revel.Result {
 }
 
 /*Profile page of the user.
-Roles: logged in and activated users. */
+- Roles: logged in and activated users */
 func (c User) Profile() revel.Result {
 
 	c.Log.Debug("render profile page")
+
+	c.Session["callPath"] = c.Request.URL.String()
+	c.Session["currPath"] = c.Request.URL.String()
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("profile.tab")
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -349,18 +387,16 @@ func (c User) Profile() revel.Result {
 		return c.Render()
 	}
 
-	c.Session["callPath"] = c.Request.URL.String()
-	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("profile.tab")
-
 	return c.Render(user)
 }
 
-/*ChangePassword of an user. */
+/*ChangePassword of an user.
+- Roles: logged in and activated users */
 func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 
 	c.Log.Debug("change password of user", "oldPw", oldPw, "newPw1", newPw1,
 		"newPw2", newPw2)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {

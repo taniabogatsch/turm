@@ -17,6 +17,7 @@ import (
 func (c Enrollment) Enroll(ID int, key, comment string) revel.Result {
 
 	c.Log.Debug("enroll a user in an event", "ID", ID, "key", key, "comment", comment)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -62,6 +63,7 @@ func (c Enrollment) Enroll(ID int, key, comment string) revel.Result {
 func (c Enrollment) Unsubscribe(ID int) revel.Result {
 
 	c.Log.Debug("unsubscribe a user from an event", "ID", ID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	userID, err := getIntFromSession(c.Controller, "userID")
 	if err != nil {
@@ -117,14 +119,15 @@ func (c Enrollment) Unsubscribe(ID int) revel.Result {
 	return c.Redirect(c.Session["currPath"])
 }
 
-/*EnrollInSlot to enroll into a time slot of a day in a calendar event.
+/*EnrollInSlot enrolls a user in a time slot of a day in a calendar event.
 - Roles: logged in and activated users */
 func (c Enrollment) EnrollInSlot(ID, courseID, year, day int, startTime, endTime,
 	date string, monday string) revel.Result {
 
-	c.Log.Debug("enroll a user in an calendar event", "ID", ID, "courseID", courseID,
-		"year", year, "startTime", startTime, "endTime", endTime, "date", date,
-		"monday", monday, "day", day)
+	c.Log.Debug("enroll a user in a slot", "ID", ID, "courseID", courseID,
+		"year", year, "day", day, "startTime", startTime, "endTime", endTime, "date", date,
+		"monday", monday)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//path in case of an error
 	path := "/course/calendarEvent?ID=" + url.QueryEscape(strconv.Itoa(ID)) +
@@ -173,8 +176,9 @@ func (c Enrollment) EnrollInSlot(ID, courseID, year, day int, startTime, endTime
 func (c Enrollment) UnsubscribeFromSlot(slotID, eventID, courseID, day int,
 	monday string) revel.Result {
 
-	c.Log.Debug("unsubscribe a user from a slot (delete the slot)", "slotID", slotID,
-		"courseID", courseID, "eventID", eventID, "monday", monday, "day", day)
+	c.Log.Debug("unsubscribe a user from a slot", "slotID", slotID,
+		"eventID", eventID, "courseID", courseID, "day", day, "monday", monday)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//path in case of an error
 	path := "/course/calendarEvent?ID=" + url.QueryEscape(strconv.Itoa(eventID)) +
@@ -210,6 +214,8 @@ func (c Enrollment) UnsubscribeFromSlot(slotID, eventID, courseID, day int,
 	return c.Redirect(Course.CalendarEvent, eventID, courseID, 0, monday, day)
 }
 
+//getStartEndForSlot formats the startTime and endTime of a slot as received
+//by the controller
 func getStartEndForSlot(startTime, endTime, date string, year int) (start,
 	end time.Time, err error) {
 

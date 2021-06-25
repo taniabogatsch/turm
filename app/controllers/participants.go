@@ -12,11 +12,12 @@ import (
 	"github.com/revel/revel"
 )
 
-/*Open a course for user management.
-- Roles: creator, editors and instructors of this course. */
+/*Open a course for participants management.
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Open(ID, eventID int) revel.Result {
 
-	c.Log.Debug("open course for user management", "ID", ID)
+	c.Log.Debug("open course for participants management", "ID", ID,
+		"eventID", eventID)
 
 	//NOTE: the interceptor assures that the course ID is valid
 	//NOTE: we do not have to validate if the eventID fits the course
@@ -38,10 +39,11 @@ func (c Participants) Open(ID, eventID int) revel.Result {
 		return c.Render()
 	}
 
-	//only set these after the course is loaded
+	//only set these after the course is loaded - TODO: why?
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("pcpts.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+	c.ViewArgs["tab"] = c.Message("pcpts.tab")
 
 	if eventID == 0 {
 		if len(participants.Lists) > 0 {
@@ -53,10 +55,11 @@ func (c Participants) Open(ID, eventID int) revel.Result {
 }
 
 /*Download a list of participants.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 
 	c.Log.Debug("download list of participants", "ID", ID, "conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//get the user ID, because not all editors/instructors are allowed to
 	//see matriculation numbers
@@ -108,11 +111,12 @@ func (c Participants) Download(ID int, conf models.ListConf) revel.Result {
 	return c.RenderFileName(filepath, revel.Attachment)
 }
 
-/*EMail a list of participants.
-- Roles: creator, editors and instructors of this course. */
+/*EMail sends an e-mail to a list of participants.
+- Roles: creator, editors and instructors of this course */
 func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 
 	c.Log.Debug("send an e-mail to a list of participants", "ID", ID, "conf", conf)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//get the user ID, because not all editors/instructors are allowed to
 	//see matriculation numbers
@@ -126,10 +130,8 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 	if conf.End != "" || conf.EndTime != "" || conf.Start != "" ||
 		conf.StartTime != "" {
 
-		c.Validation.Check(conf.Subject,
-			revel.MinSize{3},
-			revel.MaxSize{255},
-		).MessageKey("validation.invalid.text.short")
+		models.ValidateLength(&conf.Subject, "validation.invalid.text.short",
+			3, 255, c.Validation)
 
 		conf.Start += " " + conf.StartTime
 		conf.End += " " + conf.EndTime
@@ -230,16 +232,14 @@ func (c Participants) EMail(ID int, conf models.ListConf) revel.Result {
 }
 
 /*SearchUser renders search results for a search value.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 
 	c.Log.Debug("search users", "ID", ID, "eventID", eventID, "value", value)
+	c.Session["lastURL"] = c.Request.URL.String()
 
-	value = strings.TrimSpace(value)
-	c.Validation.Check(value,
-		revel.MinSize{3},
-		revel.MaxSize{127},
-	).MessageKey("validation.invalid.searchValue")
+	models.ValidateLength(&value, "validation.invalid.searchValue",
+		3, 127, c.Validation)
 
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
@@ -264,11 +264,12 @@ func (c Participants) SearchUser(ID, eventID int, value string) revel.Result {
 }
 
 /*Enroll a user without validating enrollment constraints.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("enroll user without constraints", "ID", ID,
 		"eventID", eventID, "userID", userID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//enroll user
 	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
@@ -294,11 +295,12 @@ func (c Participants) Enroll(ID, eventID, userID int) revel.Result {
 }
 
 /*Unsubscribe a user from an event.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("unsubscribe user from an event", "ID", ID,
 		"eventID", eventID, "userID", userID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//unsubscribe user
 	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
@@ -341,11 +343,12 @@ func (c Participants) Unsubscribe(ID, eventID, userID int) revel.Result {
 
 /*Waitlist puts a user at the wait list of an event without validating
 enrollment constraints.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 
 	c.Log.Debug("put user at wait list without validating constraints", "ID", ID,
 		"eventID", eventID, "userID", userID)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//enroll user to wait list
 	enrolled := models.Enrolled{EventID: eventID, UserID: userID}
@@ -387,11 +390,12 @@ func (c Participants) Waitlist(ID, eventID, userID int) revel.Result {
 }
 
 /*ChangeStatus changes the payment status of a user in an event.
-- Roles: creator, editors and instructors of this course. */
+- Roles: creator, editors and instructors of this course */
 func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) revel.Result {
 
 	c.Log.Debug("change status of user", "ID", ID, "eventID", eventID,
 		"enrolled", enrolled)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//enroll user
 	enrolled.EventID = eventID
@@ -417,11 +421,13 @@ func (c Participants) ChangeStatus(ID, eventID int, enrolled models.Enrolled) re
 	return c.Redirect(Participants.Open, ID, eventID)
 }
 
-/*Days renders all slots of each day of a week. */
+/*Days renders all slots of each day of a week.
+- Roles: creator, editors and instructors of this course */
 func (c Participants) Days(ID, eventID, shift int, t string) revel.Result {
 
 	c.Log.Debug("load slots of days of week", "ID", ID, "eventID", eventID,
 		"shift", shift, "t", t)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	loc, err := time.LoadLocation(app.TimeZone)
 	if err != nil {
@@ -452,11 +458,12 @@ func (c Participants) Days(ID, eventID, shift int, t string) revel.Result {
 	return c.Render(days, ID, eventID, monday, week, year)
 }
 
-/*DeleteSlot removes an slot. */
+/*DeleteSlot of a calendar event. */
 func (c Participants) DeleteSlot(ID, eventID, slotID int, t string) revel.Result {
 
 	c.Log.Debug("manually delete a slot", "ID", ID, "eventID", eventID,
 		"slotID", slotID, "t", t)
+	c.Session["lastURL"] = c.Request.URL.String()
 
 	//delete slot
 	slot := models.Slot{ID: slotID}
@@ -478,6 +485,7 @@ func (c Participants) DeleteSlot(ID, eventID, slotID int, t string) revel.Result
 	return c.Redirect(Participants.Days, ID, eventID, 0, t)
 }
 
+//createCSV creates the CSV file containing the list of participants
 func createCSV(c *revel.Controller, participants *models.Participants,
 	conf *models.ListConf) (filepath string, err error) {
 
@@ -660,6 +668,8 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 	return
 }
 
+//appendList appends the users of one of the partiticpant lists (enrolled, waitlist, etc.)
+//to the csv data slice
 func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 	ID int, title, old, new string) {
 
@@ -734,6 +744,7 @@ func appendList(data *[][]string, list models.Entries, c *revel.Controller,
 	}
 }
 
+//appendSlot appends a slot to the csv data slice
 func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
 	ID int, title, old, new string) {
 
@@ -789,6 +800,7 @@ func appendSlot(data *[][]string, c *revel.Controller, slot *models.Slot,
 	*data = append(*data, row)
 }
 
+//containsEvent returns true if a slice of IDs contains a specific ID
 func containsEvent(IDs []int, ID int) bool {
 
 	for _, value := range IDs {
@@ -799,6 +811,7 @@ func containsEvent(IDs []int, ID int) bool {
 	return false
 }
 
+//stringFromSlice appends the values of a slice to create a string
 func stringFromSlice(slice []string) (str string) {
 
 	for _, value := range slice {
@@ -807,6 +820,7 @@ func stringFromSlice(slice []string) (str string) {
 	return str
 }
 
+//appendValueToString appends a string value to a string
 func appendValueToString(str, value string) string {
 
 	if str == "" {

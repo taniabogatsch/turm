@@ -11,9 +11,12 @@ import (
 func (c Manage) Active() revel.Result {
 
 	c.Log.Debug("render active courses", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("creator.tab")
 
 	//get the user
 	userID, err := getIntFromSession(c.Controller, "userID")
@@ -37,9 +40,12 @@ func (c Manage) Active() revel.Result {
 func (c Manage) Drafts() revel.Result {
 
 	c.Log.Debug("render drafts page", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("creator.tab")
 
 	//get the user
 	userID, err := getIntFromSession(c.Controller, "userID")
@@ -63,9 +69,12 @@ func (c Manage) Drafts() revel.Result {
 func (c Manage) Expired() revel.Result {
 
 	c.Log.Debug("render expired courses", "url", c.Request.URL)
+
 	c.Session["callPath"] = c.Request.URL.String()
 	c.Session["currPath"] = c.Request.URL.String()
-	c.ViewArgs["tabName"] = c.Message("creator.tab")
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	c.ViewArgs["tab"] = c.Message("creator.tab")
 
 	//get the user
 	userID, err := getIntFromSession(c.Controller, "userID")

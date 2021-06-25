@@ -38,7 +38,7 @@ func sendEMail(c *revel.Controller, data *models.EMailData, subjectKey string,
 	return
 }
 
-/*SendEMails to users/editors/instructors after editing the course. */
+//sendEMailsEdit to users/editors/instructors after editing the course
 func sendEMailsEdit(c *revel.Controller, conf *models.EditEMailConfig) (err error) {
 
 	//e-mail data
