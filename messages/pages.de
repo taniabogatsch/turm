@@ -151,6 +151,11 @@ admin.load.user = Nutzerdaten laden
 admin.change.data.success = Die Nutzerdaten von %s %s wurden aktualisiert.
 admin.change.data = Nutzerdaten ändern
 
+admin.insert.log.entries.success = Log Einträge aktualisiert.
+admin.solve.log.entry.success = Log Eintrag gelöst.
+admin.log.entry = Log Eintrag
+admin.fetch.new.entries = Neue Log Einträge laden
+
 # -------------------------------------------------------------------------------------------------- #
 # PROFILE
 # -------------------------------------------------------------------------------------------------- #

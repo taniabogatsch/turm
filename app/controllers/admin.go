@@ -31,7 +31,45 @@ func (c Admin) Dashboard() revel.Result {
 func (c Admin) LogEntries() revel.Result {
 
 	c.Log.Debug("render log entries", "url", c.Request.URL)
-	return c.Render()
+
+	var logEntries models.LogEntries
+	if err := logEntries.Select(); err != nil {
+		renderQuietError(errDB, err, c.Controller)
+		return c.Render()
+	}
+
+	return c.Render(logEntries)
+}
+
+/*InsertLogEntries inserts all new log entries of the error log.
+- Roles: admin (activated) */
+func (c Admin) InsertLogEntries() revel.Result {
+
+	c.Log.Debug("insert newest log entries")
+
+	var logEntries models.LogEntries
+	if err := logEntries.Insert(); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	}
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: c.Message("admin.insert.log.entries.success")})
+}
+
+/*SolveLogEntry solves a log entry.
+- Roles: admin (activated) */
+func (c Admin) SolveLogEntry(entry models.LogEntry) revel.Result {
+
+	c.Log.Debug("solve log entry")
+
+	if err := entry.Solve(); err != nil {
+		return c.RenderJSON(
+			response{Status: ERROR, Msg: c.Message(errDB.String())})
+	}
+
+	return c.RenderJSON(
+		response{Status: SUCCESS, Msg: c.Message("admin.solve.log.entry.success")})
 }
 
 /*Users renders the user management page and user details.

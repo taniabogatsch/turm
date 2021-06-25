@@ -17,6 +17,9 @@ GET     /admin/roles                                Admin.Roles
 GET     /admin/dashboard                            Admin.Dashboard
 GET     /admin/logEntries                           Admin.LogEntries
 
+POST    /admin/insertLogEntries                     Admin.InsertLogEntries
+POST    /admin/solveLogEntry                        Admin.SolveLogEntry
+
 POST    /admin/insertGroup                          Admin.InsertGroup
 POST    /admin/updateGroup                          Admin.UpdateGroup
 POST    /admin/deleteGroup                          Admin.DeleteGroup

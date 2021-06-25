@@ -1,3 +1,95 @@
 <!-- template containing error log entries -->
 
-TODO
+<form id="insert-log-entries-form" accept-charset="UTF-8" action='{{url "Admin.InsertLogEntries"}}'
+  method="POST" class="needs-validation" novalidate>
+
+  <button type="button" class="btn btn-darkblue"
+    onclick='submitPOSTModal("#insert-log-entries-form", "", "{{url "Admin.LogEntries"}}",
+      "#nav-pill-content-log");'>
+    {{msg $ "admin.fetch.new.entries"}}
+  </button>
+</form>
+
+<br>
+<hr>
+
+<div class="card-columns">
+
+  {{range $k, $v := .logEntries}}
+
+    <div class="card">
+      <div class="card-body">
+
+        <div class="row">
+
+          <!-- entry ID and time of creation -->
+          <div class="col-sm-8">
+            <h5 class="card-title">
+              {{msg $ "admin.log.entry"}} {{.ID}}
+            </h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+              {{.TimeOfCreationStr}}
+            </h6>
+          </div>
+
+          <!-- content -->
+          <div class="col-sm-4 text-right">
+
+            <form id="solve-log-entry-form" accept-charset="UTF-8" action='{{url "Admin.SolveLogEntry"}}'
+              method="POST" class="needs-validation" novalidate>
+
+              <input type="hidden" name="entry.ID" value="{{.ID}}">
+
+              <button type="button" class="btn btn-outline-darkblue"
+                onclick='submitPOSTModal("#solve-log-entry-form", "", "{{url "Admin.LogEntries"}}",
+                  "#nav-pill-content-log");'>
+                {{template "icons/check.html" .}}
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+
+        <p class="card-text" id="card-content-{{$k}}">
+        </p>
+      </div>
+    </div>
+
+  {{end}}
+
+</div>
+
+<script>
+
+  {{range $k, $v := .logEntries}}
+
+    var obj = JSON.parse("{{.JSON}}");
+    var card = document.getElementById("card-content-{{$k}}");
+
+    //append a row for each entry
+    for (var key of Object.keys(obj)) {
+
+      var row = document.createElement("div");
+      row.classList.add("row");
+      row.classList.add("border-top");
+
+      var col1 = document.createElement("div");
+      var col2 = document.createElement("div");
+
+      col1.classList.add("col-sm-4");
+      col2.classList.add("col-sm-8");
+
+      row.appendChild(col1);
+      row.appendChild(col2);
+
+      var keyName = document.createTextNode(key);
+      var value = document.createTextNode(obj[key]);
+
+      col1.appendChild(keyName);
+      col2.appendChild(value);
+
+      card.appendChild(row);
+    }
+  {{end}}
+</script>

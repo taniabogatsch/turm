@@ -34,6 +34,9 @@ var (
 	//LdapPort is the port of the LDAP server
 	LdapPort int
 
+	//PathErrorLog is the path to the error log file
+	PathErrorLog string
+
 	//Server holds all server connection data
 	Server ServerConn
 
@@ -78,6 +81,11 @@ func initConfigVariables() {
 	}
 	if LdapPort, err = strconv.Atoi(portStr); err != nil {
 		revel.AppLog.Fatal("invalid ldap.port value set in config", "value", portStr, "error", err.Error())
+	}
+
+	//error log path
+	if PathErrorLog, found = revel.Config.String("error.log.path"); !found {
+		revel.AppLog.Fatal("cannot find key in config", "key", "error.log.path")
 	}
 }
 

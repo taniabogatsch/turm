@@ -151,6 +151,11 @@ admin.load.user = Load user data
 admin.change.data.success = Updated user data of %s %s.
 admin.change.data = Change user data
 
+admin.insert.log.entries.success = Updated log entries.
+admin.solve.log.entry.success = Solved log entry.
+admin.log.entry = Log entry
+admin.fetch.new.entries = Fetch new log entries
+
 # -------------------------------------------------------------------------------------------------- #
 # PROFILE
 # -------------------------------------------------------------------------------------------------- #
