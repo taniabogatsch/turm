@@ -509,6 +509,7 @@ func createCSV(c *revel.Controller, participants *models.Participants,
 	//no custom filename set
 	if conf.Filename == "" {
 		conf.Filename = date + "_" + participants.Title
+		conf.Filename = strings.ReplaceAll(conf.Filename, "/", " ")
 	}
 	filepath = "/tmp/" + conf.Filename + ".csv"
 

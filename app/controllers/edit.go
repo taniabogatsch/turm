@@ -72,7 +72,8 @@ func (c Edit) Download(ID int, filename string) revel.Result {
 	//if the user did not provide a custom file name
 	if filename == "" {
 		now := time.Now().Format(revel.TimeFormats[1])
-		filename = strings.ReplaceAll(now+"_"+course.Title, " ", "_")
+		filename = now + " " + course.Title
+		filename = strings.ReplaceAll(filename, "/", " ")
 	}
 
 	//filepath

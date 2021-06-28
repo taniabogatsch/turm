@@ -55,12 +55,12 @@ func (list *CourseList) SearchForDrafts(value string, userID int, role string) (
 	if role == ADMIN.String() {
 		err = app.Db.Select(list, stmtSearchCoursesForDraftAdmin, searchVal)
 	} else {
-		err = app.Db.Select(list, stmtSearchCoursesForDraft, searchVal)
+		err = app.Db.Select(list, stmtSearchCoursesForDraft, searchVal, userID)
 	}
 
 	if err != nil {
 		log.Error("failed to search courses", "value", value, "searchVal",
-			searchVal, "error", err.Error())
+			searchVal, "userID", userID, "error", err.Error())
 	}
 
 	return
