@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strings"
 	"turm/app"
 
 	"github.com/revel/revel"
@@ -27,9 +28,13 @@ func (s ErrorType) String() string {
 //flashError flashes an error message and redirects to a page.
 func flashError(errType ErrorType, err error, url string, c *revel.Controller, i interface{}) revel.Result {
 
+	//muted errors are e.g. caused by erroneous URLs
+
 	c.FlashParams()
 	if err != nil { //log error and send notification e-mail
-		app.SendErrorNote()
+		if !strings.Contains(err.Error(), "muted error") {
+			app.SendErrorNote()
+		}
 	}
 
 	if url == "" {

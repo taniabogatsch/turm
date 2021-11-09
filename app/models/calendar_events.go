@@ -770,6 +770,7 @@ func parseDate(tx *sqlx.Tx, year, date, str string) (t time.Time, err error) {
 	} else {
 		value = year + "-" + split[1] + "-" + split[0] + "T" + str + ":00"
 	}
+	value = strings.ReplaceAll(value, " ", "")
 
 	t, err = time.ParseInLocation("2006-01-02T15:04:05", value, loc)
 	if err != nil {

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"strconv"
 	"turm/app"
 	"turm/app/models"
@@ -138,15 +139,20 @@ func (c Course) auth() revel.Result {
 		return c.Redirect(App.Index)
 	}
 
+	//ensure that the course ID is valid
+	ID, err := getCourseID(c.Controller, "ID")
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
 	var authorized, expired bool
-	var err error
 
 	if c.MethodName == "Meetings" {
-		authorized, expired, err = evalHasElevatedRights(c.Controller, "events")
+		authorized, expired, err = evalHasElevatedRights(c.Controller, "events", ID)
 	} else if c.MethodName == "CalendarEvent" {
-		authorized, expired, err = evalHasElevatedRights(c.Controller, "calendar_events")
+		authorized, expired, err = evalHasElevatedRights(c.Controller, "calendar_events", ID)
 	} else {
-		authorized, expired, err = evalHasElevatedRights(c.Controller, "courses")
+		authorized, expired, err = evalHasElevatedRights(c.Controller, "courses", ID)
 	}
 
 	//only creators, editors and instructors can still see the course after it expired
@@ -160,23 +166,16 @@ func (c Course) auth() revel.Result {
 	//only render content if the course is publicly visible or an user is logged in
 	if c.Session["userID"] == nil && c.MethodName != "Open" {
 
+		//get the param key of the course ID
 		keyID := "ID"
 		if c.MethodName == "CalendarEvent" {
 			keyID = "courseID"
 		}
-		IDStr := c.Params.Query.Get(keyID) //GET request
-		if IDStr == "" {
-			IDStr = c.Params.Form.Get(keyID) //POST request
-		}
 
-		//get course ID
-		ID, err := strconv.Atoi(IDStr)
+		//ensure that the course ID is valid
+		ID, err = getCourseID(c.Controller, keyID)
 		if err != nil {
-			c.Log.Error("failed to parse ID from parameter", "query",
-				c.Params.Query.Get("ID"), "form", c.Params.Form.Get("ID"),
-				"error", err.Error())
-			return flashError(
-				errTypeConv, err, "/", c.Controller, "")
+			return flashError(errTypeConv, err, "/", c.Controller, "")
 		}
 
 		course := models.Course{ID: ID}
@@ -187,8 +186,7 @@ func (c Course) auth() revel.Result {
 		}
 
 		if err = course.GetVisible(elem); err != nil {
-			return flashError(
-				errDB, err, "/", c.Controller, "")
+			return flashError(errDB, err, "/", c.Controller, "")
 		}
 
 		if !course.Visible {
@@ -208,10 +206,9 @@ func (c Course) auth() revel.Result {
 	if c.Session["userID"] != nil && (c.MethodName == "Whitelist" ||
 		c.MethodName == "Blacklist") {
 
-		authorized, _, err := evalEditAuth(c.Controller, "courses", "ID")
+		authorized, _, err := evalEditAuth(c.Controller, "courses", ID)
 		if err != nil {
-			return flashError(
-				errTypeConv, err, "/", c.Controller, "")
+			return flashError(errTypeConv, err, "/", c.Controller, "")
 		} else if !authorized {
 			c.Flash.Error(c.Message("intercept.invalid.action"))
 			return c.Redirect(App.Index)
@@ -242,10 +239,14 @@ func (c Creator) auth() revel.Result {
 		}
 	}
 
-	authorized, expired, err := evalEditAuth(c.Controller, "onlyCreator", "ID")
+	ID, err := getCourseID(c.Controller, "ID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
+	authorized, expired, err := evalEditAuth(c.Controller, "onlyCreator", ID)
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	}
 
 	if c.Session["role"] != nil {
@@ -272,10 +273,14 @@ func (c Edit) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit courses interceptor")
 
-	authorized, expired, err := evalEditAuth(c.Controller, "courses", "ID")
+	ID, err := getCourseID(c.Controller, "ID")
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
+	authorized, expired, err := evalEditAuth(c.Controller, "courses", ID)
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if expired || !authorized {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
@@ -289,7 +294,12 @@ func (c EditEvent) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit events interceptor")
 
-	authorized, expired, err := evalEditAuth(c.Controller, "events", "ID")
+	ID, err := getCourseID(c.Controller, "ID")
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
+	authorized, expired, err := evalEditAuth(c.Controller, "events", ID)
 
 	if err != nil {
 		return flashError(errTypeConv, err, "/", c.Controller, "")
@@ -318,18 +328,31 @@ func (c EditCalendarEvent) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit calendar events interceptor")
 
-	authorized, expired := false, false
+	var authorized, expired bool
 	var err error
+	var ID int
 
 	if c.MethodName == "DeleteException" || c.MethodName == "DeleteDayTemplate" {
-		authorized, expired, err = evalEditAuth(c.Controller, "courses", "courseID")
+
+		ID, err = getCourseID(c.Controller, "courseID")
+		if err != nil {
+			return flashError(errTypeConv, err, "/", c.Controller, "")
+		}
+
+		authorized, expired, err = evalEditAuth(c.Controller, "courses", ID)
+
 	} else {
-		authorized, expired, err = evalEditAuth(c.Controller, "calendar_events", "ID")
+
+		ID, err = getCourseID(c.Controller, "ID")
+		if err != nil {
+			return flashError(errTypeConv, err, "/", c.Controller, "")
+		}
+
+		authorized, expired, err = evalEditAuth(c.Controller, "calendar_events", ID)
 	}
 
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if expired || !authorized {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
@@ -352,8 +375,7 @@ func (c EditCalendarEvent) auth() revel.Result {
 	}
 
 	if err != nil {
-		return flashError(
-			errTypeConv, err, "/", c.Controller, "")
+		return flashError(errTypeConv, err, "/", c.Controller, "")
 	} else if !belongs {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
@@ -367,7 +389,12 @@ func (c EditMeeting) auth() revel.Result {
 
 	c.Log.Debug("executing auth edit meetings interceptor")
 
-	authorized, expired, err := evalEditAuth(c.Controller, "meetings", "ID")
+	ID, err := getCourseID(c.Controller, "ID")
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
+	authorized, expired, err := evalEditAuth(c.Controller, "meetings", ID)
 
 	if err != nil {
 		return flashError(errTypeConv, err, "/", c.Controller, "")
@@ -457,7 +484,12 @@ func (c Participants) auth() revel.Result {
 
 	c.Log.Debug("executing auth participants interceptor")
 
-	if authorized, _, err := evalHasElevatedRights(c.Controller, "courses"); err != nil {
+	ID, err := getCourseID(c.Controller, "ID")
+	if err != nil {
+		return flashError(errTypeConv, err, "/", c.Controller, "")
+	}
+
+	if authorized, _, err := evalHasElevatedRights(c.Controller, "courses", ID); err != nil {
 		return flashError(
 			errTypeConv, err, "/", c.Controller, "")
 	} else if !authorized {
@@ -504,7 +536,7 @@ func (c Participants) auth() revel.Result {
 }
 
 //evalEditAuth evaluates if a user is authorized to edit a course/event/meeting.
-func evalEditAuth(c *revel.Controller, table, sessionKey string) (authorized, expired bool, err error) {
+func evalEditAuth(c *revel.Controller, table string, ID int) (authorized, expired bool, err error) {
 
 	user := models.User{}
 	if c.Session["userID"] != nil && c.Session["role"] != nil &&
@@ -521,28 +553,13 @@ func evalEditAuth(c *revel.Controller, table, sessionKey string) (authorized, ex
 		}
 	}
 
-	//get the course ID
-	IDStr := c.Params.Query.Get(sessionKey) //GET request
-	if IDStr == "" {
-		IDStr = c.Params.Form.Get(sessionKey) //POST request
-	}
-
-	//get the course ID
-	ID, err := strconv.Atoi(IDStr)
-	if err != nil {
-		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "callPath",
-			c.Session["callPath"], "currPath", c.Session["currPath"], "lastURL",
-			c.Session["lastURL"], "error", err.Error())
-		return false, false, err
-	}
-
 	authorized, expired, err = user.AuthorizedToEdit(&table, &ID)
 	return
 }
 
 //evalHasElevatedRights evaluates if a user is an instructor, editor, creator or
 //admin (of a course).
-func evalHasElevatedRights(c *revel.Controller, table string) (authorized, expired bool, err error) {
+func evalHasElevatedRights(c *revel.Controller, table string, ID int) (authorized, expired bool, err error) {
 
 	//only instructors, creators and editors of the specified course are allowed
 	//to manage participants
@@ -559,21 +576,6 @@ func evalHasElevatedRights(c *revel.Controller, table string) (authorized, expir
 		if err != nil {
 			return
 		}
-	}
-
-	//get the course/event ID
-	IDStr := c.Params.Query.Get("ID") //GET request
-	if IDStr == "" {
-		IDStr = c.Params.Form.Get("ID") //POST request
-	}
-
-	//get the course/event ID
-	ID, err := strconv.Atoi(IDStr)
-	if err != nil {
-		c.Log.Error("failed to parse ID from parameter", "IDStr", IDStr, "callPath",
-			c.Session["callPath"], "currPath", c.Session["currPath"], "lastURL",
-			c.Session["lastURL"], "error", err.Error())
-		return false, false, err
 	}
 
 	return user.HasElevatedRights(&ID, table)
@@ -619,6 +621,23 @@ func evalElemBelongs(c *revel.Controller, param1, param2, table string) (belongs
 	case "slots":
 		slot := models.Slot{ID: param2ID}
 		belongs, err = slot.BelongsToEvent(param1ID)
+	}
+
+	return
+}
+
+//getCourseID tries to parse the course ID from the provided param
+func getCourseID(c *revel.Controller, paramKey string) (ID int, err error) {
+
+	IDStr := c.Params.Query.Get(paramKey) //GET request
+	if IDStr == "" {
+		IDStr = c.Params.Form.Get(paramKey) //POST request
+	}
+
+	//try to parse the course/event ID
+	ID, err = strconv.Atoi(IDStr)
+	if err != nil {
+		err = errors.New("muted error: " + IDStr + ", " + err.Error())
 	}
 
 	return

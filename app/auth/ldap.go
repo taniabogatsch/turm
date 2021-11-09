@@ -27,11 +27,21 @@ func LDAPServerAuth(credentials *models.Credentials, user *models.User) (success
 	}
 	defer l.Close()
 
+	/*NOTE: Known ldap 'errors':
+	- Invalid Credentials: Username and password don't match,
+	user with these credentials does not exist
+	- Invalid DN Syntax: The username contains (probably) a comma ',' or
+	any other bad character
+	- NDS error: log account expired: The account is no longer active
+	*/
+
 	//try to bind with specified user
 	base := fmt.Sprintf("cn=%s,ou=user,o=uni", credentials.Username)
 	err = l.Bind(base, credentials.Password) //actual 'login'
 	if err != nil {
-		if !strings.Contains(err.Error(), "Invalid Credentials") {
+		if !strings.Contains(err.Error(), "Invalid Credentials") &&
+			!strings.Contains(err.Error(), "Invalid DN Syntax") &&
+			!strings.Contains(err.Error(), "NDS error: log account expired") {
 			log.Error("cannot login the user", "base", base, "error", err.Error())
 			return
 		}

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"os"
+	"strings"
 	"time"
 	"turm/app"
 )
@@ -90,6 +91,14 @@ func (entries *LogEntries) Insert() (err error) {
 			log.Error("failed to get time of creation of log entry", "line", line)
 			tx.Rollback()
 			return
+		}
+
+		if jsonLine["caller"] != nil {
+			caller := jsonLine["caller"].(string)
+			if strings.Contains(caller, "revel_logger.go:39") || strings.Contains(caller,
+				"compress.go:151") || strings.Contains(caller, "results.go:428") {
+				continue
+			}
 		}
 
 		//format: 2021-03-09T09:10:48.033279498+01:00

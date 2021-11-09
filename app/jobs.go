@@ -83,7 +83,7 @@ func backup() (err error) {
 		connStr = cloud.Address + cloud.User + "/" + cloud.Folder + "/" + filename
 		out, err = exec.Command("curl", "-u", authStr, "-T", fpath, connStr).CombinedOutput()
 		if err != nil {
-			revel.AppLog.Error("failed to upload backup to cloud", "authStr", authStr, "fpath",
+			revel.AppLog.Error("failed to upload backup to cloud", "cloudUser", cloud.User, "fpath",
 				fpath, "connStr", connStr, "error", err.Error(), "out", string(out))
 			return
 		}
