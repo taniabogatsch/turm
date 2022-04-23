@@ -429,6 +429,14 @@ func (c Participants) Days(ID, eventID, shift int, t string) revel.Result {
 		"shift", shift, "t", t)
 	c.Session["lastURL"] = c.Request.URL.String()
 
+	//get the user ID, because not all editors/instructors are allowed to
+	//see matriculation numbers
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
 	loc, err := time.LoadLocation(app.TimeZone)
 	if err != nil {
 		c.Log.Error("failed to parse location", "loc", app.TimeZone,
@@ -450,7 +458,7 @@ func (c Participants) Days(ID, eventID, shift int, t string) revel.Result {
 	year := monday.Year()
 
 	days := models.Days{}
-	if err = days.Get(nil, &eventID, monday, true); err != nil {
+	if err = days.Get(nil, &eventID, monday, true, false, userID); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}

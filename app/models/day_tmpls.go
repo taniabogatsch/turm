@@ -243,13 +243,24 @@ func (tmpl *DayTmpl) Delete() (users EMailsData, err error) {
 
 /*Get all days of a calendar event for a specific week. */
 func (days *Days) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Time,
-	participants bool) (err error) {
+	participants bool, viewMatrNr bool, userID int) (err error) {
 
 	txWasNil := (tx == nil)
 	if txWasNil {
 		tx, err = app.Db.Beginx()
 		if err != nil {
 			log.Error("failed to begin tx", "error", err.Error())
+			return
+		}
+	}
+
+	//get whether the user is allowed to see matriculation numbers
+	if userID != 0 {
+		err = tx.Get(&viewMatrNr, stmtGetViewMatrNrCalendarEvent, *calendarEventID, userID)
+		if err != nil {
+			log.Error("failed to get whether user is allowed to see matr nr or not",
+				"calendarEventID", *calendarEventID, "userID", userID, "error", err.Error())
+			tx.Rollback()
 			return
 		}
 	}
@@ -288,16 +299,20 @@ func (days *Days) Get(tx *sqlx.Tx, calendarEventID *int, monday time.Time,
 				((*days)[i].DayTmpls)[j].EndTime = "24:00"
 			}
 
-			//TODO: get if user is allowed to view matriculation numbers
-
 			if participants {
 
 				//get detailed user information
 				for idx, slot := range ((*days)[i].DayTmpls)[j].Slots {
+
 					((*days)[i].DayTmpls)[j].Slots[idx].User.ID = slot.UserID
 					err = ((*days)[i].DayTmpls)[j].Slots[idx].User.Get(tx)
 					if err != nil {
 						return
+					}
+
+					//remove matriculation numbers
+					if ((*days)[i].DayTmpls)[j].Slots[idx].User.MatrNr.Valid && !viewMatrNr {
+						((*days)[i].DayTmpls)[j].Slots[idx].User.MatrNr.Int32 = 12345
 					}
 				}
 			}

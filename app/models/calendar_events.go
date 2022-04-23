@@ -699,7 +699,7 @@ func (event *CalendarEvent) validateEnrollment(tx *sqlx.Tx, c *Course, userID in
 func (event *CalendarEvent) get(tx *sqlx.Tx, userID int, monday time.Time) (err error) {
 
 	//get all day templates of each week day of this event
-	err = event.Days.Get(tx, &event.ID, monday, false)
+	err = event.Days.Get(tx, &event.ID, monday, false, false, 0)
 	if err != nil {
 		return
 	}

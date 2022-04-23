@@ -171,7 +171,7 @@ func (lists *ParticipantLists) Get(tx *sqlx.Tx, courseID *int, viewMatrNr bool,
 				(*lists)[key].Year = monday.Year()
 
 				//get the slots of each day
-				err = (*lists)[key].Days.Get(tx, &list.ID, monday, true)
+				err = (*lists)[key].Days.Get(tx, &list.ID, monday, true, viewMatrNr, 0)
 				if err != nil {
 					return
 				}
@@ -417,6 +417,50 @@ const (
 				SELECT user_id AS id
 				FROM instructors
 				WHERE course_id = $1
+					AND user_id = $2
+					AND view_matr_nr
+			)
+
+		) AS view_matr_nr
+	`
+
+	stmtGetViewMatrNrCalendarEvent = `
+		SELECT EXISTS (
+			(
+				SELECT id
+				FROM courses
+				WHERE id = (
+						SELECT course_id
+						FROM calendar_events
+						WHERE id = $1
+					)
+					AND creator = $2
+			)
+
+			UNION ALL
+
+			(
+				SELECT user_id AS id
+				FROM editors
+				WHERE course_id = (
+						SELECT course_id
+						FROM calendar_events
+						WHERE id = $1
+					)
+					AND user_id = $2
+					AND view_matr_nr
+			)
+
+			UNION ALL
+
+			(
+				SELECT user_id AS id
+				FROM instructors
+				WHERE course_id = (
+						SELECT course_id
+						FROM calendar_events
+						WHERE id = $1
+					)
 					AND user_id = $2
 					AND view_matr_nr
 			)
