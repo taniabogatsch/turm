@@ -431,6 +431,7 @@ func (c User) auth() revel.Result {
 
 	loggedIn := false
 	if c.Session["userID"] == nil { //not logged in users
+
 		if c.MethodName == "LoginPage" || c.MethodName == "Login" ||
 			c.MethodName == "RegistrationPage" || c.MethodName == "Registration" ||
 			c.MethodName == "NewPasswordPage" {
@@ -438,14 +439,24 @@ func (c User) auth() revel.Result {
 		}
 
 	} else { //logged in users
+
 		if c.MethodName == "SetPrefLanguage" || c.MethodName == "PrefLanguagePage" {
 			return nil
 		}
 
 		//activated users
-		if (c.MethodName == "Profile" || c.MethodName == "ChangePassword") &&
-			c.Session["notActivated"] == nil {
-			return nil
+		if c.Session["notActivated"] == nil {
+
+			//all activated users
+			if c.MethodName == "Profile" {
+				return nil
+			}
+
+			//non-ldap users
+			if c.Session["isLDAP"].(string) == "false" && (c.MethodName == "ChangePassword" ||
+				c.MethodName == "UpdateExternUserData") {
+				return nil
+			}
 		}
 
 		//not activated users

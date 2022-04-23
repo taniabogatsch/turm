@@ -391,7 +391,7 @@ func (c User) Profile() revel.Result {
 }
 
 /*ChangePassword of an user.
-- Roles: logged in and activated users */
+- Roles: logged in and activated extern users */
 func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 
 	c.Log.Debug("change password of user", "oldPw", oldPw, "newPw1", newPw1,
@@ -427,6 +427,32 @@ func (c User) ChangePassword(oldPw, newPw1, newPw2 string) revel.Result {
 	return c.Redirect(User.Profile)
 }
 
+/*UpdateExternUserData of an user.
+- Roles: logged in and activated extern users */
+func (c User) UpdateExternUserData(user models.User) revel.Result {
+
+	c.Log.Debug("update extern user data", "user", user)
+	c.Session["lastURL"] = c.Request.URL.String()
+
+	userID, err := getIntFromSession(c.Controller, "userID")
+	if err != nil {
+		renderQuietError(errTypeConv, err, c.Controller)
+		return c.Render()
+	}
+
+	user.ID = userID
+	err = user.ChangeUserData(c.Validation)
+
+	if err != nil {
+		return flashError(errDB, err, "", c.Controller, "")
+	} else if c.Validation.HasErrors() {
+		return flashError(errValidation, nil, "", c.Controller, "")
+	}
+
+	c.Flash.Success(c.Message("profile.change.data.success"))
+	return c.Redirect(User.Profile)
+}
+
 //setSession sets all user related session values.
 func (c User) setSession(user *models.User) {
 
@@ -439,4 +465,5 @@ func (c User) setSession(user *models.User) {
 	c.Session["isInstructor"] = strconv.FormatBool(user.IsInstructor)
 	c.Session["eMail"] = user.EMail
 	c.Session["prefLanguage"] = user.Language.String
+	c.Session["isLDAP"] = strconv.FormatBool(user.IsLDAP)
 }

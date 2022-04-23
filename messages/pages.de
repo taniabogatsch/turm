@@ -180,4 +180,8 @@ profile.old.password = Altes Passwort
 
 profile.change.language = E-Mail Sprache ändern
 
+profile.change.data = Nutzerdaten bearbeiten
+profile.change.data.success = Nutzerdaten aktualisiert.
+profile.invalid.email.warning = Achtung! Bei Eingabe einer ungültigen E-Mail-Adresse erreichen Sie keine E-Mails mehr.
+
 profile.list.events = Kurs- und Veranstaltungsname

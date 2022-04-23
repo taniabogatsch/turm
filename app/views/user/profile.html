@@ -219,10 +219,20 @@
           {{msg $ "profile.change.pw"}}
         </button>
       {{end}}
+
+      <!-- change preferred language -->
       <button type="button" class="btn btn-outline-darkblue d-inline" data-toggle="modal"
         data-target="#change-language-modal">
         {{msg $ "profile.change.language"}}
       </button>
+
+      <!-- change extern user data -->
+      {{if not .user.IsLDAP}}
+        <button type="button" class="btn btn-outline-darkblue d-inline" data-toggle="modal"
+          data-target="#change-user-data-modal">
+          {{msg $ "profile.change.data"}}
+        </button>
+      {{end}}
     </div>
 
     <!-- active events -->
@@ -318,6 +328,7 @@
 
 {{template "user/modals/changePassword.html" .}}
 {{template "user/modals/changeLanguage.html" .}}
+{{template "user/modals/changeUserData.html" .}}
 
 <div class="page page-side">
   <br class="medium-hidden">

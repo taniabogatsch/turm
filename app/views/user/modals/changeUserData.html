@@ -1,0 +1,117 @@
+<!-- template rendering the modal for changing the user data of an user -->
+
+<div class="modal fade" id="change-user-data-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+
+      <!-- modal header -->
+      <div class="modal-header bg-darkblue border-radius-2">
+        <h5 class="modal-title text-white">
+          {{msg $ "profile.change.data"}}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form action='{{url "User.UpdateExternUserData"}}' method="POST"
+        class="needs-validation" novalidate>
+
+        <!-- modal body -->
+        <div class="modal-body">
+
+          <!-- salutation -->
+          <small class="form-text text-muted">
+            {{msg $ "user.salutation"}}
+          </small>
+          <select name="user.Salutation" class="custom-select mb-3">
+            <option value="1" {{if eq 1 $.user.Salutation}}selected="selected"{{end}}>
+              {{msg $ "user.salutation.mr"}}
+            </option>
+            <option value="2" {{if eq 2 $.user.Salutation}}selected="selected"{{end}}>
+              {{msg $ "user.salutation.ms"}}
+            </option>
+            <option value="0" {{if eq 0 $.user.Salutation}}selected="selected"{{end}}>
+              {{msg $ "user.salutation.none"}}
+            </option>
+          </select>
+          <div class="invalid-feedback">
+            {{msg $ "validation.invalid.salutation"}}
+          </div>
+          <br>
+
+          <!-- first name -->
+          <small class="form-text text-muted">
+            {{msg $ "user.firstname"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input type="text" class="form-control rounded-right" name="user.FirstName"
+              value="{{$.user.FirstName}}" placeholder='{{msg $ "user.firstname"}}'
+              required maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.firstname"}}
+            </div>
+          </div>
+
+          <!-- last name -->
+          <small class="form-text text-muted">
+            {{msg $ "user.lastname"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/pencil.html" .}}
+              </span>
+            </div>
+            <input type="text" class="form-control rounded-right" name="user.LastName"
+              value="{{$.user.LastName}}" placeholder='{{msg $ "user.lastname"}}'
+              required maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.lastname"}}
+            </div>
+          </div>
+
+          <!-- e-mail address -->
+          <small class="form-text text-muted">
+            {{msg $ "user.email"}}
+          </small>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                {{template "icons/envelope.html" .}}
+              </span>
+            </div>
+            <input type="email" class="form-control rounded-right" name="user.EMail"
+              value="{{$.user.EMail}}" placeholder='{{msg $ "user.email"}}'
+              required maxlength="255">
+            <div class="invalid-feedback">
+              {{msg $ "validation.invalid.email"}}
+            </div>
+          </div>
+
+          <small class="form-text text-info">
+            {{msg $ "profile.invalid.email.warning"}}
+          </small>
+
+        </div>
+
+        <!-- modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-darkblue" data-dismiss="modal">
+            {{msg $ "button.close"}}
+          </button>
+          <button type="submit" class="btn btn-darkblue">
+            {{msg $ "button.save"}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

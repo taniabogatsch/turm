@@ -193,6 +193,8 @@ POST    /user/setPrefLanguage                       User.SetPrefLanguage
 GET     /user/profile                               User.Profile
 GET     /user/changePassword                        User.ChangePassword
 
+POST    /user/updateExternUserData                  User.UpdateExternUserData
+
 
 # ---------------------------------------------------------------------------- #
 # Else
