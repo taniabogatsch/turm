@@ -30,8 +30,8 @@ button.confirm = Bestätigen
 button.download = Herunterladen
 button.create = Erstellen
 
-button.login = Anmelden
-button.logout = Abmelden
+button.login = Anmelden / Login
+button.logout = Abmelden / Logout
 button.register = Registrieren
 button.activate.account = Account aktivieren
 
@@ -233,6 +233,8 @@ enroll.manual.success = Manuelle Einschreibung erfolgreich.
 enroll.manual.unsubscribe.success = Manuelles Austragen erfolgreich.
 enroll.manual.to.wait.list.success = Manuelles Einschreiben auf die Warteliste erfolgreich.
 enroll.manual.delete.slot.success = Manuelles Löschen der Buchung erfolgreich.
+
+enroll.login.first.info = Bitte zunächst einloggen.
 
 # -------------------------------------------------------------------------------------------------- #
 # TITLES

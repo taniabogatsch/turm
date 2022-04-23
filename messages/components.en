@@ -234,6 +234,8 @@ enroll.manual.unsubscribe.success = User was unsubscribed.
 enroll.manual.to.wait.list.success = Enrolled user to wait list manually.
 enroll.manual.delete.slot.success = Deleted booking manually.
 
+enroll.login.first.info = Please login first.
+
 # -------------------------------------------------------------------------------------------------- #
 # TITLES
 # -------------------------------------------------------------------------------------------------- #
