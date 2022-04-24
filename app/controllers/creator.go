@@ -164,7 +164,7 @@ func (c Creator) New(param models.NewCourseParam, file []byte) revel.Result {
 	} else {
 
 		c.Log.Debug("insert uploaded course")
-		err = course.Insert()
+		err = course.InsertUploadedCourse()
 
 	}
 

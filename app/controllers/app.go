@@ -111,7 +111,7 @@ func (c App) News() revel.Result {
 	c.ViewArgs["tab"] = c.Message("news.feed.tab")
 
 	var categories models.Categories
-	if err := categories.Select(tabNewsFeedCategory); err != nil {
+	if err := categories.Select(models.TableNewsFeedCategory); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
@@ -132,7 +132,7 @@ func (c App) FAQs() revel.Result {
 	c.ViewArgs["tab"] = c.Message("faq.tab")
 
 	var categories models.Categories
-	if err := categories.Select(tabFAQCategory); err != nil {
+	if err := categories.Select(models.TableFAQCategory); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}

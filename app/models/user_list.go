@@ -10,7 +10,7 @@ import (
 )
 
 /*UserListEntry is a model of the user list tables,
-which are: editors, instructors, blacklist, whitelist.
+which are: editors, instructors, blocklist, allowlist.
 It is also used to render users for the different user
 searches at the course management page. */
 type UserListEntry struct {
@@ -46,7 +46,7 @@ func (user *UserListEntry) Insert(table string) (active bool, data EMailData, er
 	//construct SQL
 	colViewMatrNr := ""
 	colViewMatrNrValue := ""
-	if table == "editors" || table == "instructors" {
+	if table == TableEditors || table == TableInstructors {
 		colViewMatrNr = ", view_matr_nr"
 		colViewMatrNrValue = ", $3"
 	}
@@ -62,7 +62,7 @@ func (user *UserListEntry) Insert(table string) (active bool, data EMailData, er
 		), course_id
 	`
 
-	if table == "editors" || table == "instructors" {
+	if table == TableEditors || table == TableInstructors {
 
 		//get if the course is active
 		course := Course{ID: user.CourseID}
@@ -224,6 +224,18 @@ func (user *UserListEntry) Update(table string) (active bool, data EMailData, er
 	return
 }
 
+/*Exists returns if a user exists in the DB. */
+func (user *UserListEntry) Exists(tx *sqlx.Tx) (exists bool, err error) {
+
+	err = tx.Get(&exists, stmtUserExists, user.UserID)
+	if err != nil {
+		log.Error("failed to get if the user exists", "userID", user.UserID,
+			"error", err.Error())
+		tx.Rollback()
+	}
+	return
+}
+
 /*UserList holds users enlisted on one (or more) of the user lists. */
 type UserList []UserListEntry
 
@@ -232,7 +244,7 @@ func (users *UserList) Get(tx *sqlx.Tx, courseID *int, table string) (err error)
 
 	//construct SQL
 	colViewMatrNr := ""
-	if table == "editors" || table == "instructors" {
+	if table == TableEditors || table == TableInstructors {
 		colViewMatrNr = "l.view_matr_nr,"
 	}
 	selectUsers := `
@@ -265,7 +277,7 @@ func (users *UserList) Duplicate(tx *sqlx.Tx, courseIDNew, courseIDOld *int, tab
 
 	//construct SQL
 	colViewMatrNr := ""
-	if table == "editors" || table == "instructors" {
+	if table == TableEditors || table == TableInstructors {
 		colViewMatrNr = ", view_matr_nr"
 	}
 	stmtDuplicateList := `
@@ -320,15 +332,16 @@ func (users *UserList) Search(value, listType *string, searchInactive *bool, cou
 	return
 }
 
-/*Insert all entries in a user list into a course. */
-func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err error) {
+/*InsertUploaded inserts all entries in a user list into a course. Skips all users with
+an invalid user ID. */
+func (users *UserList) InsertUploaded(tx *sqlx.Tx, courseID *int, table string) (err error) {
 
 	stmt := `
 		INSERT INTO ` + table + `
 			(user_id, course_id, view_matr_nr)
 		VALUES ($1, $2, $3)
 	`
-	if table != "editors" && table != "instructors" {
+	if table != TableEditors && table != TableInstructors {
 		stmt = `
 			INSERT INTO ` + table + `
 				(user_id, course_id)
@@ -337,7 +350,15 @@ func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err err
 	}
 
 	for _, user := range *users {
-		if table != "editors" && table != "instructors" {
+
+		//only try to insert existing users
+		if exists, err := user.Exists(tx); err != nil {
+			return err
+		} else if !exists {
+			continue
+		}
+
+		if table != TableEditors && table != TableInstructors {
 			_, err = tx.Exec(stmt, user.UserID, *courseID)
 		} else {
 			_, err = tx.Exec(stmt, user.UserID, *courseID, user.ViewMatrNr)
@@ -349,6 +370,7 @@ func (users *UserList) Insert(tx *sqlx.Tx, courseID *int, table string) (err err
 			return
 		}
 	}
+
 	return
 }
 
@@ -398,5 +420,13 @@ const (
 			)
 		ORDER BY u.last_name, u.first_name, u.id
 		LIMIT 5
+	`
+
+	stmtUserExists = `
+		SELECT EXISTS (
+			SELECT id
+			FROM users
+			WHERE id = $1
+		) AS exists
 	`
 )

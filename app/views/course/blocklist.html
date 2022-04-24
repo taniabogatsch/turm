@@ -1,4 +1,4 @@
-<!-- template loading the blacklist -->
+<!-- template loading the blocklist -->
 
 {{if .errMsg}}
   <div class="val-div w-100 text-danger">
@@ -6,7 +6,7 @@
   </div>
 {{end}}
 
-<div id="flash-errors-blacklists" class="d-none">
+<div id="flash-errors-blocklists" class="d-none">
   {{range .errors}}
     <div class="val-div w-100 text-danger">
       {{.}}
@@ -21,19 +21,19 @@
 		{{else if .flash.error}}
 			showToast('{{.flash.error}}', 'danger');
 		{{else if .errors}}
-			let msg = document.getElementById('flash-errors-blacklists').innerHTML;
+			let msg = document.getElementById('flash-errors-blocklists').innerHTML;
 			showToast(msg, 'danger');
 		{{end}}
 	});
 </script>
 
-{{if .blacklist}}
+{{if .blocklist}}
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
-      {{msg $ "course.blacklist"}}:
+      {{msg $ "course.blocklist"}}:
     </div>
     <div class="col-sm-8">
-      {{range $key, $user := .blacklist}}
+      {{range $key, $user := .blocklist}}
         {{if ne $key 0}}<br>{{end}}
         {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
         <a href="mailto:{{.EMail}}" target="_top">
@@ -42,9 +42,9 @@
         </a>
         |
         <a href="#no-scroll" class="badge btn-outline-darkblue"
-          onclick='confirmDeleteRenderModal({{msg $ "course.blacklist.delete.title"}},
-            {{msg $ "course.blacklist.delete.confirm" .EMail}},
-            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "blacklists"}}", "blacklists");'
+          onclick='confirmDeleteRenderModal({{msg $ "course.blocklist.delete.title"}},
+            {{msg $ "course.blocklist.delete.confirm" .EMail}},
+            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "blocklists"}}", "blocklists");'
           title='{{msg $ "title.delete"}}'>
           {{template "icons/trash.html" . }}
         </a>
@@ -57,8 +57,8 @@
   </div>
   <div class="col-sm-8">
     <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.blacklist"}}, "blacklists");'>
-      {{msg $ "creator.add.blacklist"}}
+      onclick='openUserListModal({{msg $ "creator.add.blocklist"}}, "blocklists");'>
+      {{msg $ "creator.add.blocklist"}}
     </button>
   </div>
 </div>

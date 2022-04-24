@@ -139,7 +139,7 @@ func (c Edit) NewEvent(ID int, value, eventType string,
 	models.ValidateLength(&value, "validation.invalid.text.short",
 		3, 255, c.Validation)
 
-	if eventType != eventTypeNormal && eventType != eventTypeCalendar {
+	if eventType != models.EventTypeNormal && eventType != models.EventTypeCalendar {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -150,7 +150,7 @@ func (c Edit) NewEvent(ID int, value, eventType string,
 	}
 
 	//normal event
-	if eventType == eventTypeNormal {
+	if eventType == models.EventTypeNormal {
 
 		conf.ID = ID
 		event := models.Event{CourseID: ID, Title: value}
@@ -182,7 +182,7 @@ func (c Edit) NewEvent(ID int, value, eventType string,
 	}
 
 	//reload correct content
-	if eventType == eventTypeNormal {
+	if eventType == models.EventTypeNormal {
 		return c.Redirect(Course.Events, ID)
 	}
 	return c.Redirect(Course.CalendarEvents, ID)
@@ -201,7 +201,7 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 
 	timestamp := date + " " + time
 	valid := (timestamp != " ")
-	if valid || fieldID != colUnsubscribeEnd { //only the unsubscribeend can be null
+	if valid || fieldID != models.ColUnsubscribeEnd { //only the unsubscribeend can be null
 		c.Validation.Required(date).
 			MessageKey("validation.invalid.date")
 		c.Validation.Required(time).
@@ -213,8 +213,8 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 			response{Status: INVALID, Msg: getErrorString(c.Validation.Errors)})
 	}
 
-	if fieldID != colEnrollmentStart && fieldID != colEnrollmentEnd &&
-		fieldID != colUnsubscribeEnd && fieldID != colExpirationDate {
+	if fieldID != models.ColEnrollmentStart && fieldID != models.ColEnrollmentEnd &&
+		fieldID != models.ColUnsubscribeEnd && fieldID != models.ColExpirationDate {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -238,7 +238,7 @@ func (c Edit) ChangeTimestamp(ID int, fieldID, date, time string,
 	}
 
 	//if the course is active, send notification e-mail
-	if fieldID != colExpirationDate {
+	if fieldID != models.ColExpirationDate {
 
 		conf.Field = "email.edit." + fieldID
 		if err = sendEMailsEdit(c.Controller, &conf); err != nil {
@@ -269,8 +269,8 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != tabBlacklists && listType != tabWhitelists &&
-		listType != tabInstructors && listType != tabEditors {
+	if listType != models.TableBlocklists && listType != models.TableAllowlists &&
+		listType != models.TableInstructors && listType != models.TableEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -305,12 +305,12 @@ func (c Edit) ChangeUserList(ID, userID int, listType string) revel.Result {
 		entry.CourseID,
 	))
 
-	if listType == tabInstructors || listType == tabEditors {
+	if listType == models.TableInstructors || listType == models.TableEditors {
 		return c.Redirect(Course.EditorInstructorList, ID)
-	} else if listType == tabWhitelists {
-		return c.Redirect(Course.Whitelist, ID)
+	} else if listType == models.TableAllowlists {
+		return c.Redirect(Course.Allowlist, ID)
 	}
-	return c.Redirect(Course.Blacklist, ID)
+	return c.Redirect(Course.Blocklist, ID)
 }
 
 /*DeleteFromUserList removes a user from the user list of a course.
@@ -326,8 +326,8 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != tabBlacklists && listType != tabWhitelists &&
-		listType != tabInstructors && listType != tabEditors {
+	if listType != models.TableBlocklists && listType != models.TableAllowlists &&
+		listType != models.TableInstructors && listType != models.TableEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -359,12 +359,12 @@ func (c Edit) DeleteFromUserList(ID, userID int, listType string) revel.Result {
 
 	c.Flash.Success(c.Message("course."+listType+".delete.success", ID))
 
-	if listType == tabInstructors || listType == tabEditors {
+	if listType == models.TableInstructors || listType == models.TableEditors {
 		return c.Redirect(Course.EditorInstructorList, ID)
-	} else if listType == tabWhitelists {
-		return c.Redirect(Course.Whitelist, ID)
+	} else if listType == models.TableAllowlists {
+		return c.Redirect(Course.Allowlist, ID)
 	}
-	return c.Redirect(Course.Blacklist, ID)
+	return c.Redirect(Course.Blocklist, ID)
 }
 
 /*ChangeViewMatrNr toggles the matriculation number restrictions of an editor/instructor.
@@ -380,7 +380,7 @@ func (c Edit) ChangeViewMatrNr(ID, userID int, listType string, option bool) rev
 	c.Validation.Required(userID).
 		MessageKey("validation.missing.userID")
 
-	if listType != tabInstructors && listType != tabEditors {
+	if listType != models.TableInstructors && listType != models.TableEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -423,7 +423,7 @@ func (c Edit) ChangeBool(ID int, listType string, option bool) revel.Result {
 
 	//NOTE: the interceptor assures that the course ID is valid
 
-	if listType != colVisible && listType != colOnlyLDAP {
+	if listType != models.ColVisible && listType != models.ColOnlyLDAP {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -452,14 +452,14 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 	value = strings.TrimSpace(value)
 	valid := (value != "")
 
-	if valid || fieldID == colTitle {
+	if valid || fieldID == models.ColTitle {
 
-		if fieldID == colTitle || fieldID == colSubtitle {
+		if fieldID == models.ColTitle || fieldID == models.ColSubtitle {
 
 			models.ValidateLength(&value, "validation.invalid.text",
 				3, 511, c.Validation)
 
-		} else if fieldID == colFee {
+		} else if fieldID == models.ColFee {
 			c.Validation.Match(value, models.FeePattern).
 				MessageKey("validation.invalid.fee")
 
@@ -475,9 +475,9 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 		}
 	}
 
-	if fieldID != colDescription && fieldID != colCustomEMail &&
-		fieldID != colSpeaker && fieldID != colTitle &&
-		fieldID != colSubtitle && fieldID != colFee {
+	if fieldID != models.ColDescription && fieldID != models.ColCustomEMail &&
+		fieldID != models.ColSpeaker && fieldID != models.ColTitle &&
+		fieldID != models.ColSubtitle && fieldID != models.ColFee {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -486,7 +486,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 	conf.ID = ID
 	var err error
 
-	if fieldID == colFee && valid {
+	if fieldID == models.ColFee && valid {
 
 		value = strings.ReplaceAll(value, ",", ".")
 		var fee float64
@@ -523,7 +523,7 @@ func (c Edit) ChangeText(ID int, fieldID, value string, conf models.EditEMailCon
 
 	msg := c.Message("course."+fieldID+".delete.success", course.ID)
 	if valid {
-		if fieldID == colTitle || fieldID == colSubtitle || fieldID == colFee {
+		if fieldID == models.ColTitle || fieldID == models.ColSubtitle || fieldID == models.ColFee {
 			msg = c.Message("course."+fieldID+".change.success", value, course.ID)
 		} else {
 			msg = c.Message("course."+fieldID+".change.success", course.ID)
@@ -681,8 +681,8 @@ func (c Edit) SearchUser(ID int, value, listType string, searchInactive bool) re
 	models.ValidateLength(&value, "validation.invalid.searchValue",
 		3, 127, c.Validation)
 
-	if listType != tabBlacklists && listType != tabWhitelists &&
-		listType != tabInstructors && listType != tabEditors {
+	if listType != models.TableBlocklists && listType != models.TableAllowlists &&
+		listType != models.TableInstructors && listType != models.TableEditors {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 

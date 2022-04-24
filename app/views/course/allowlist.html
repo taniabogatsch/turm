@@ -1,4 +1,4 @@
-<!-- template loading the whitelist -->
+<!-- template loading the allowlist -->
 
 {{if .errMsg}}
   <div class="val-div w-100 text-danger">
@@ -6,7 +6,7 @@
   </div>
 {{end}}
 
-<div id="flash-errors-whitelists" class="d-none">
+<div id="flash-errors-allowlists" class="d-none">
   {{range .errors}}
     <div class="val-div w-100 text-danger">
       {{.}}
@@ -21,19 +21,19 @@
 		{{else if .flash.error}}
 			showToast('{{.flash.error}}', 'danger');
 		{{else if .errors}}
-			let msg = document.getElementById('flash-errors-whitelists').innerHTML;
+			let msg = document.getElementById('flash-errors-allowlists').innerHTML;
 			showToast(msg, 'danger');
 		{{end}}
 	});
 </script>
 
-{{if .whitelist}}
+{{if .allowlist}}
   <div class="row mb-2 edit-show d-none">
     <div class="col-sm-4 text-muted">
-      {{msg $ "course.whitelist"}}:
+      {{msg $ "course.allowlist"}}:
     </div>
     <div class="col-sm-8">
-      {{range $key, $user := .whitelist}}
+      {{range $key, $user := .allowlist}}
         {{if ne $key 0}}<br>{{end}}
         {{template "templates/salutation.html" dict_addLocale $.currentLocale "User" $user}} |
         <a href="mailto:{{.EMail}}" target="_top">
@@ -42,9 +42,9 @@
         </a>
         |
         <a href="#no-scroll" class="badge btn-outline-darkblue"
-          onclick='confirmDeleteRenderModal({{msg $ "course.whitelist.delete.title"}},
-            {{msg $ "course.whitelist.delete.confirm" .EMail}},
-            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "whitelists"}}", "whitelists");'
+          onclick='confirmDeleteRenderModal({{msg $ "course.allowlist.delete.title"}},
+            {{msg $ "course.allowlist.delete.confirm" .EMail}},
+            "{{url "Edit.DeleteFromUserList" .CourseID .UserID "allowlists"}}", "allowlists");'
           title='{{msg $ "title.delete"}}'>
           {{template "icons/trash.html" . }}
         </a>
@@ -57,8 +57,8 @@
   </div>
   <div class="col-sm-8">
     <button type="button" class="btn btn-outline-darkblue"
-      onclick='openUserListModal({{msg $ "creator.add.whitelist"}}, "whitelists");'>
-      {{msg $ "creator.add.whitelist"}}
+      onclick='openUserListModal({{msg $ "creator.add.allowlist"}}, "allowlists");'>
+      {{msg $ "creator.add.allowlist"}}
     </button>
   </div>
 </div>

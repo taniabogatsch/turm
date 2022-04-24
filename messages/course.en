@@ -28,8 +28,8 @@ course.expiration.date = Expiration date
 course.enroll.limit.events = Enroll limit
 course.custom.email = Enrollment e-mail
 course.visibility = Visibility
-course.whitelist = Whitelist
-course.blacklist = Blacklist
+course.allowlist = Allowlist
+course.blocklist = Blocklist
 
 course.not.visible.info = Please log in to view this course.
 
@@ -329,15 +329,15 @@ course.restriction.delete.success = Deleted restriction to course of studies, co
 course.restriction.delete.confirm = Confirm deletion of restriction to course of studies?
 course.restriction.delete.title = Delete restriction to course of studies
 
-course.whitelists.change.success = Added user to whitelist: %s, course ID = %d.
-course.whitelists.delete.success = Deleted user from whitelist, course ID = %d.
-course.whitelist.delete.confirm = Confirm deletion of user from whitelist %s.
-course.whitelist.delete.title = Delete from whitelist
+course.allowlists.change.success = Added user to allowlist: %s, course ID = %d.
+course.allowlists.delete.success = Deleted user from allowlist, course ID = %d.
+course.allowlist.delete.confirm = Confirm deletion of user from allowlist %s.
+course.allowlist.delete.title = Delete from allowlist
 
-course.blacklists.change.success = Added user to blacklist: %s, course ID = %d.
-course.blacklists.delete.success = Deleted user from blacklist, course ID = %d.
-course.blacklist.delete.confirm = Confirm deletion of user from blacklist %s.
-course.blacklist.delete.title = Delete from blacklist
+course.blocklists.change.success = Added user to blocklist: %s, course ID = %d.
+course.blocklists.delete.success = Deleted user from blocklist, course ID = %d.
+course.blocklist.delete.confirm = Confirm deletion of user from blocklist %s.
+course.blocklist.delete.title = Delete from blocklist
 
 course.enroll_limit_events.change.success = Set enroll limit for events to %d, course ID = %d.
 course.enroll_limit_events.delete.success = Deleted enroll limit for events, course ID = %d.

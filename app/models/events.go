@@ -386,8 +386,8 @@ func (event *Event) validateEnrollment(c *Course) {
 		event.EnrollMsg = "validation.enrollment.not.active"
 		return
 	}
-	if c.CourseStatus.AtBlacklist {
-		event.EnrollMsg = "validation.enrollment.at.blacklist"
+	if c.CourseStatus.AtBlocklist {
+		event.EnrollMsg = "validation.enrollment.at.blocklist"
 		return
 	}
 	if c.CourseStatus.NotLDAP {

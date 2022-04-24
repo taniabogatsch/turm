@@ -41,7 +41,7 @@ func general(c *revel.Controller) revel.Result {
 	//reset logout timer
 	c.Session.SetDefaultExpiration()
 	if c.Session["stayLoggedIn"] != nil {
-		if c.Session["stayLoggedIn"] == cTrue {
+		if c.Session["stayLoggedIn"] == models.BoolTrue {
 			c.Session.SetNoExpiration()
 		}
 	}
@@ -105,12 +105,12 @@ func (c Manage) auth() revel.Result {
 			return nil
 		}
 
-		if c.Session["isEditor"].(string) == cTrue {
+		if c.Session["isEditor"].(string) == models.BoolTrue {
 			return nil
 		}
 
 		//instructors are only allowed to see active and expired courses
-		if c.Session["isInstructor"].(string) == cTrue && (c.MethodName == "Active" ||
+		if c.Session["isInstructor"].(string) == models.BoolTrue && (c.MethodName == "Active" ||
 			c.MethodName == "GetActive" || c.MethodName == "Expired" || c.MethodName == "GetExpired") {
 			return nil
 		}
@@ -195,16 +195,16 @@ func (c Course) auth() revel.Result {
 		}
 	}
 
-	//not logged in users cannot see the whitelist or blacklist
-	if c.Session["userID"] == nil && (c.MethodName == "Whitelist" ||
-		c.MethodName == "Blacklist") {
+	//not logged in users cannot see the allowlist or blocklist
+	if c.Session["userID"] == nil && (c.MethodName == "Allowlist" ||
+		c.MethodName == "Blocklist") {
 		c.Flash.Error(c.Message("intercept.invalid.action"))
 		return c.Redirect(App.Index)
 	}
 
-	//only elevated users are allowed to see the whitelist and blacklist
-	if c.Session["userID"] != nil && (c.MethodName == "Whitelist" ||
-		c.MethodName == "Blacklist") {
+	//only elevated users are allowed to see the allowlist and blocklist
+	if c.Session["userID"] != nil && (c.MethodName == "Allowlist" ||
+		c.MethodName == "Blocklist") {
 
 		authorized, _, err := evalEditAuth(c.Controller, "courses", ID)
 		if err != nil {

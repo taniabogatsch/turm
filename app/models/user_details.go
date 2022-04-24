@@ -18,9 +18,9 @@ type UserDetails struct {
 	EditorOf       []Course
 	InstructorOf   []Course
 
-	//all courses of which the user was on the whitelist/blacklist
-	OnWhitelist []Course
-	OnBlacklist []Course
+	//all courses of which the user was on the allowlist/blocklist
+	OnAllowlist []Course
+	OnBlocklist []Course
 
 	//all categories, faqs and news created by this user
 	Categories []Category

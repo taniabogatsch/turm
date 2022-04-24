@@ -21,7 +21,7 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	if value != "" || fieldID == colTitle {
+	if value != "" || fieldID == models.ColTitle {
 
 		models.ValidateLength(&value, "validation.invalid.text.short",
 			3, 255, c.Validation)
@@ -32,7 +32,7 @@ func (c EditCalendarEvent) ChangeText(ID int, fieldID, value string) revel.Resul
 		}
 	}
 
-	if fieldID != colTitle && fieldID != colAnnotation {
+	if fieldID != models.ColTitle && fieldID != models.ColAnnotation {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}

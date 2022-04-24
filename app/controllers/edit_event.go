@@ -156,7 +156,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 	valid := (value != "")
 
 	//NOTE: the interceptor assures that the event ID is valid
-	if value != "" || fieldID == colTitle {
+	if value != "" || fieldID == models.ColTitle {
 
 		models.ValidateLength(&value, "validation.invalid.text.short",
 			3, 255, c.Validation)
@@ -167,7 +167,7 @@ func (c EditEvent) ChangeText(ID int, fieldID, value string,
 		}
 	}
 
-	if fieldID != colTitle && fieldID != colAnnotation {
+	if fieldID != models.ColTitle && fieldID != models.ColAnnotation {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
@@ -210,16 +210,16 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 
 	//NOTE: the interceptor assures that the event ID is valid
 
-	if listType != colHasWaitlist && listType != colHasComments {
+	if listType != models.ColHasWaitlist && listType != models.ColHasComments {
 		return c.RenderJSON(
 			response{Status: ERROR, Msg: c.Message("error.undefined")})
 	}
 
 	event := models.Event{ID: ID}
 	var err error
-	if listType == colHasWaitlist {
+	if listType == models.ColHasWaitlist {
 		err = event.UpdateWaitlist(option, c.Validation)
-	} else if listType == colHasComments {
+	} else if listType == models.ColHasComments {
 		err = event.UpdateComments(option, c.Validation)
 	}
 
@@ -233,7 +233,7 @@ func (c EditEvent) ChangeBool(ID int, listType string, option bool) revel.Result
 	}
 
 	msg := c.Message("event.waitlist.change.success")
-	if listType == colHasComments {
+	if listType == models.ColHasComments {
 		msg = c.Message("event.has.comments.change.success")
 	}
 

@@ -115,8 +115,8 @@ creator.add.fee = + &nbsp; Teilnahmegebühr
 creator.add.description = + &nbsp; Kursbeschreibung
 creator.add.speaker = + &nbsp; ReferentIn
 creator.add.custom.email = + &nbsp; Willkommensemail
-creator.add.whitelist = + &nbsp; NutzerIn auf Whitelist
-creator.add.blacklist = + &nbsp; NutzerIn auf Blacklist
+creator.add.allowlist = + &nbsp; NutzerIn auf Allowlist
+creator.add.blocklist = + &nbsp; NutzerIn auf Blocklist
 creator.add.enroll.limit = + &nbsp; Einschreibelimit
 creator.add.restriction = + &nbsp; Studiengangbeschränkung
 

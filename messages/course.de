@@ -28,8 +28,8 @@ course.expiration.date = Ablaufdatum
 course.enroll.limit.events = Einschreibelimit
 course.custom.email = Willkommensemail
 course.visibility = Sichtbarkeit
-course.whitelist = Whitelist
-course.blacklist = Blacklist
+course.allowlist = Allowlist
+course.blocklist = Blocklist
 
 course.not.visible.info = Bitte melden Sie sich an, um auf diesen Kurs zuzugreifen!
 
@@ -329,15 +329,15 @@ course.restriction.delete.success = Studiengangbeschränkung entfernt, Kurs ID =
 course.restriction.delete.confirm = Studiengangbeschränkung wirklich löschen?
 course.restriction.delete.title = Studiengangbeschränkung löschen
 
-course.whitelists.change.success = NutzerIn zu Whitelist hinzugefügt: %s, Kurs ID = %d.
-course.whitelists.delete.success = NutzerIn aus Whitelist entfernt, Kurs ID = %d.
-course.whitelist.delete.confirm = NutzerIn %s wirklich aus Whitelist löschen?
-course.whitelist.delete.title = NutzerIn aus Whitelist löschen
+course.allowlists.change.success = NutzerIn zu Allowlist hinzugefügt: %s, Kurs ID = %d.
+course.allowlists.delete.success = NutzerIn aus Allowlist entfernt, Kurs ID = %d.
+course.allowlist.delete.confirm = NutzerIn %s wirklich aus Allowlist löschen?
+course.allowlist.delete.title = NutzerIn aus Allowlist löschen
 
-course.blacklists.change.success = NutzerIn zu Blacklist hinzugefügt: %s, Kurs ID = %d.
-course.blacklists.delete.success = NutzerIn aus Blacklist entfernt, Kurs ID = %d.
-course.blacklist.delete.confirm = NutzerIn %s wirklich aus Blacklist löschen?
-course.blacklist.delete.title = NutzerIn aus Blacklist löschen
+course.blocklists.change.success = NutzerIn zu Blocklist hinzugefügt: %s, Kurs ID = %d.
+course.blocklists.delete.success = NutzerIn aus Blocklist entfernt, Kurs ID = %d.
+course.blocklist.delete.confirm = NutzerIn %s wirklich aus Blocklist löschen?
+course.blocklist.delete.title = NutzerIn aus Blocklist löschen
 
 course.enroll_limit_events.change.success = Das Einschreibelimit für Veranstaltungen ist nun %d, Kurs ID = %d.
 course.enroll_limit_events.delete.success = Einschreibelimit für Veranstaltungen gelöscht, Kurs ID = %d.

@@ -94,7 +94,7 @@ validation.invalid.keys = Die Einschreibeschlüssel stimmen nicht überein.
 # -------------------------------------------------------------------------------------------------- #
 
 validation.enrollment.not.active = Der Kurs ist nicht aktiv.
-validation.enrollment.at.blacklist = Sie wurden für diesen Kurs nicht zugelassen. Bitte wenden Sie sich an die Kursorganisation.
+validation.enrollment.at.blocklist = Sie wurden für diesen Kurs nicht zugelassen. Bitte wenden Sie sich an die Kursorganisation.
 validation.enrollment.no.ldap = Dieser Kurs ist nur für NutzerInnen mit Universitätszugang.
 validation.enrollment.not.satisfy.restrictions = Sie erfüllen die Einschreibebeschränkungen des Kurses nicht.
 validation.enrollment.max.enroll.reached = Sie haben sich bereits in die maximale Anzahl an Veranstaltungen in dieser Kursgruppe eingeschrieben.

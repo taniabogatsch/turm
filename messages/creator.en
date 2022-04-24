@@ -116,8 +116,8 @@ creator.add.fee = + &nbsp; Fee
 creator.add.description = + &nbsp; Course description
 creator.add.speaker = + &nbsp; Speaker
 creator.add.custom.email = + &nbsp; Enrollment e-mail
-creator.add.whitelist = + &nbsp; Add user to Whitelist
-creator.add.blacklist = + &nbsp; Add user to Blacklist
+creator.add.allowlist = + &nbsp; Add user to Allowlist
+creator.add.blocklist = + &nbsp; Add user to Blocklist
 creator.add.enroll.limit = + &nbsp; Enroll limit
 creator.add.restriction = + &nbsp; Restriction to course of studies
 

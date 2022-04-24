@@ -19,10 +19,7 @@ type NewCourseParam struct {
 func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 
 	param.Title = strings.TrimSpace(param.Title)
-	v.Check(param.Title,
-		revel.MinSize{3},
-		revel.MaxSize{511},
-	).MessageKey("validation.invalid.title")
+	ValidateLength(&param.Title, "validation.invalid.title", 3, 511, v)
 
 	if param.Option < BLANK || param.Option > UPLOAD {
 		v.ErrorKey("validation.invalid.option")
@@ -39,10 +36,11 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 		if json.Valid(param.JSON) {
 
 			//NOTE: file might not be compatible with the current version, we must ensure backward compatibility
-			//Unfortunately, there are three different file versions
-			//1: old Turm2, enrolllimitevents is a boolean
-			//2: old Turm2, enrolllimitevents is an integer
-			//3: new Turm
+			//Unfortunately, there are four different file versions
+			//version 1: enrolllimitevents is a boolean
+			//version 2: enrolllimitevents is an integer
+			//version 3: still having blacklist and whitelist
+			//version 4: current version (blocklist and allowlist)
 
 			//unmarshal into interface to determine the file version
 			var jsonIntf map[string]interface{}
@@ -74,10 +72,18 @@ func (param *NewCourseParam) Validate(v *revel.Validation, course *Course) {
 					}
 				}
 
-				course.Load(true, &param.JSON)
+				//this will load the course into an old course struct and then transform it
+				//into the current course struct
+				course.Load(2, &param.JSON)
 
-			} else { //case 3
-				course.Load(false, &param.JSON)
+			} else { //case 3 or 4
+
+				if jsonIntf["Blacklist"] != nil {
+					course.Load(3, &param.JSON)
+
+				} else {
+					course.Load(4, &param.JSON)
+				}
 			}
 
 		} else {

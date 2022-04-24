@@ -3,6 +3,7 @@ package controllers
 import (
 	"time"
 	"turm/app"
+	"turm/app/models"
 
 	"github.com/revel/revel"
 )
@@ -30,7 +31,7 @@ func init() {
 
 func getTimestamp(str string, c *revel.Controller, valid bool, fieldID string) (t time.Time, err error) {
 
-	if valid || fieldID != colUnsubscribeEnd {
+	if valid || fieldID != models.ColUnsubscribeEnd {
 
 		loc, err := time.LoadLocation(app.TimeZone)
 		if err != nil {

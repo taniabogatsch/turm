@@ -61,8 +61,8 @@ GET     /course/open                                Course.Open
 GET     /course/search                              Course.Search
 
 GET     /course/editorInstructorList                Course.EditorInstructorList
-GET     /course/whitelist                           Course.Whitelist
-GET     /course/blacklist                           Course.Blacklist
+GET     /course/allowlist                           Course.Allowlist
+GET     /course/blocklist                           Course.Blocklist
 GET     /course/path                                Course.Path
 GET     /course/restrictions                        Course.Restrictions
 GET     /course/events                              Course.Events

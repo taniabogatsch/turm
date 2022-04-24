@@ -326,7 +326,7 @@ func (c Admin) InsertCategory(category models.Category, table string) revel.Resu
 	c.Log.Debug("insert category", "category", category, "table", table)
 	c.Session["lastURL"] = c.Request.URL.String()
 
-	if table != tabFAQCategory && table != tabNewsFeedCategory {
+	if table != models.TableFAQCategory && table != models.TableNewsFeedCategory {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -357,7 +357,7 @@ func (c Admin) UpdateCategory(category models.Category, table string) revel.Resu
 	c.Log.Debug("update category", "category", category, "table", table)
 	c.Session["lastURL"] = c.Request.URL.String()
 
-	if table != tabFAQCategory && table != tabNewsFeedCategory {
+	if table != models.TableFAQCategory && table != models.TableNewsFeedCategory {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 
@@ -391,7 +391,7 @@ func (c Admin) DeleteCategory(ID int, table string) revel.Result {
 	c.Log.Debug("delete category", "ID", ID, "table", table)
 	c.Session["lastURL"] = c.Request.URL.String()
 
-	if table != tabFAQCategory && table != tabNewsFeedCategory {
+	if table != models.TableFAQCategory && table != models.TableNewsFeedCategory {
 		c.Validation.ErrorKey("validation.invalid.params")
 	}
 

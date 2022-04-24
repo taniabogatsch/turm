@@ -96,36 +96,36 @@ func (c Course) EditorInstructorList(ID int) revel.Result {
 	return c.Render(editors, instructors)
 }
 
-/*Whitelist of a course.
+/*Allowlist of a course.
 - Roles: creator and editors of this course. */
-func (c Course) Whitelist(ID int) revel.Result {
+func (c Course) Allowlist(ID int) revel.Result {
 
-	c.Log.Debug("load whitelist of course", "ID", ID)
+	c.Log.Debug("load allowlist of course", "ID", ID)
 	c.Session["lastURL"] = c.Request.URL.String()
 
-	whitelist := models.UserList{}
-	if err := whitelist.Get(nil, &ID, tabWhitelists); err != nil {
+	allowlist := models.UserList{}
+	if err := allowlist.Get(nil, &ID, models.TableAllowlists); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
 
-	return c.Render(whitelist)
+	return c.Render(allowlist)
 }
 
-/*Blacklist of a course.
+/*Blocklist of a course.
 - Roles: creator and editors of this course. */
-func (c Course) Blacklist(ID int) revel.Result {
+func (c Course) Blocklist(ID int) revel.Result {
 
-	c.Log.Debug("load blacklist of course", "ID", ID)
+	c.Log.Debug("load blocklist of course", "ID", ID)
 	c.Session["lastURL"] = c.Request.URL.String()
 
-	blacklist := models.UserList{}
-	if err := blacklist.Get(nil, &ID, tabBlacklists); err != nil {
+	blocklist := models.UserList{}
+	if err := blocklist.Get(nil, &ID, models.TableBlocklists); err != nil {
 		renderQuietError(errDB, err, c.Controller)
 		return c.Render()
 	}
 
-	return c.Render(blacklist)
+	return c.Render(blocklist)
 }
 
 /*Path of a course.

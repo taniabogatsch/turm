@@ -93,8 +93,8 @@ type Unsubscribed struct {
 
 /*CourseStatus validates the enrollment status of an user for a course. */
 type CourseStatus struct {
-	AtBlacklist             bool
-	AtWhitelist             bool
+	AtBlocklist             bool
+	AtAllowlist             bool
 	UnsubscribeOver         bool `db:"unsubscribe_over"`
 	NoEnrollmentPeriod      bool `db:"no_enrollment_period"`
 	NotSatisfyRestrictions  bool

@@ -39,8 +39,8 @@ type Course struct {
 	CalendarEvents CalendarEvents ``
 	Editors        UserList       ``
 	Instructors    UserList       ``
-	Blacklist      UserList       ``
-	Whitelist      UserList       ``
+	Blocklist      UserList       ``
+	Allowlist      UserList       ``
 	Restrictions   Restrictions   ``
 
 	//additional information required when displaying the course
@@ -322,10 +322,10 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 	if err = course.Instructors.Get(tx, &course.ID, "instructors"); err != nil {
 		return
 	}
-	if err = course.Blacklist.Get(tx, &course.ID, "blacklists"); err != nil {
+	if err = course.Blocklist.Get(tx, &course.ID, "blocklists"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Get(tx, &course.ID, "whitelists"); err != nil {
+	if err = course.Allowlist.Get(tx, &course.ID, "allowlists"); err != nil {
 		return
 	}
 	if err = course.Restrictions.Get(tx, &course.ID); err != nil {
@@ -399,8 +399,8 @@ func (course *Course) Get(tx *sqlx.Tx, manage bool, userID int) (err error) {
 
 	//reset some data
 	if !manage {
-		course.Blacklist = UserList{}
-		course.Whitelist = UserList{}
+		course.Blocklist = UserList{}
+		course.Allowlist = UserList{}
 	}
 
 	if txWasNil {
@@ -452,10 +452,10 @@ func (course *Course) GetForEnrollment(tx *sqlx.Tx, userID, eventID *int) (err e
 		return
 	}
 
-	if err = course.Blacklist.Get(tx, &course.ID, "blacklists"); err != nil {
+	if err = course.Blocklist.Get(tx, &course.ID, "blocklists"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Get(tx, &course.ID, "whitelists"); err != nil {
+	if err = course.Allowlist.Get(tx, &course.ID, "allowlists"); err != nil {
 		return
 	}
 	if err = course.Restrictions.Get(tx, &course.ID); err != nil {
@@ -475,23 +475,23 @@ func (course *Course) GetColumnValue(tx *sqlx.Tx, column string) (err error) {
 //validateEnrollment validates whether a user can enroll in a course
 func (course *Course) validateEnrollment(tx *sqlx.Tx, userID int) (err error) {
 
-	//if the user is at the blacklist
-	for _, user := range course.Blacklist {
+	//if the user is at the blocklist
+	for _, user := range course.Blocklist {
 		if user.UserID == userID {
-			course.CourseStatus.AtBlacklist = true
+			course.CourseStatus.AtBlocklist = true
 			return
 		}
 	}
 
-	//validate if the user is at the whitelist
-	for _, user := range course.Whitelist {
+	//validate if the user is at the allowlist
+	for _, user := range course.Allowlist {
 		if user.UserID == userID {
-			course.CourseStatus.AtWhitelist = true
+			course.CourseStatus.AtAllowlist = true
 		}
 	}
 
-	//skip some validation if the user is at the whitelist
-	if !course.CourseStatus.AtWhitelist {
+	//skip some validation if the user is at the allowlist
+	if !course.CourseStatus.AtAllowlist {
 
 		//validate if the user complies with the course restrictions
 		//therefore, first get more user information
@@ -731,10 +731,10 @@ func (course *Course) Duplicate() (err error) {
 	if err = course.Instructors.Duplicate(tx, &course.ID, &courseIDOld, "instructors"); err != nil {
 		return
 	}
-	if err = course.Whitelist.Duplicate(tx, &course.ID, &courseIDOld, "whitelists"); err != nil {
+	if err = course.Allowlist.Duplicate(tx, &course.ID, &courseIDOld, "allowlists"); err != nil {
 		return
 	}
-	if err = course.Blacklist.Duplicate(tx, &course.ID, &courseIDOld, "blacklists"); err != nil {
+	if err = course.Blocklist.Duplicate(tx, &course.ID, &courseIDOld, "blocklists"); err != nil {
 		return
 	}
 
@@ -748,9 +748,9 @@ func (course *Course) Duplicate() (err error) {
 }
 
 /*Load a course from a JSON file. The JSON can have the struct of the old Turm2. */
-func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err error) {
+func (course *Course) Load(version int, data *[]byte) (success bool, err error) {
 
-	if !oldStruct {
+	if version == 4 {
 		//unmarshal into the course struct
 		err = json.Unmarshal(*data, &course)
 		if err != nil {
@@ -759,25 +759,39 @@ func (course *Course) Load(oldStruct bool, data *[]byte) (success bool, err erro
 			return
 		}
 
-	} else {
-		//unmarshal the struct into the old layout
-		oldCourse := OldCourse{}
-		err = json.Unmarshal(*data, &oldCourse)
+	} else if version == 1 || version == 2 {
+		//unmarshal the struct into the version 2 layout
+		version2Course := Version2Course{}
+		err = json.Unmarshal(*data, &version2Course)
 		if err != nil {
-			log.Error("failed to unmarshal into old struct", "data",
+			log.Error("failed to unmarshal into version 2 struct", "data",
 				*data, "error", err.Error())
 			return
 		}
 
-		//then transfer the data to the new course struct
-		err = oldCourse.Transform(course)
+		//then transform the data to the current (version 4) course struct
+		err = version2Course.Transform(course)
+
+	} else if version == 3 {
+		//unmarshal the struct into the version 3 layout
+		version3Course := Version3Course{}
+		err = json.Unmarshal(*data, &version3Course)
+		if err != nil {
+			log.Error("failed to unmarshal into version 3 struct", "data",
+				*data, "error", err.Error())
+			return
+		}
+
+		//then transform the data to the current (version 4) course struct
+		version3Course.Transform(course)
 	}
 
 	return
 }
 
-/*Insert a new course from a provided course struct. */
-func (course *Course) Insert() (err error) {
+/*InsertUploadedCourse a new course from a provided course struct. The course
+struct is extracted from an uploaded JSON file. */
+func (course *Course) InsertUploadedCourse() (err error) {
 
 	tx, err := app.Db.Beginx()
 	if err != nil {
@@ -801,23 +815,22 @@ func (course *Course) Insert() (err error) {
 	if err = course.CalendarEvents.Insert(tx, &course.ID); err != nil {
 		return
 	}
-	if err = course.Editors.Insert(tx, &course.ID, "editors"); err != nil {
+
+	if err = course.Editors.InsertUploaded(tx, &course.ID, TableEditors); err != nil {
 		return
 	}
-	if err = course.Instructors.Insert(tx, &course.ID, "instructors"); err != nil {
+	if err = course.Instructors.InsertUploaded(tx, &course.ID, TableInstructors); err != nil {
 		return
 	}
-	if err = course.Blacklist.Insert(tx, &course.ID, "blacklists"); err != nil {
+	if err = course.Blocklist.InsertUploaded(tx, &course.ID, TableBlocklists); err != nil {
 		return
 	}
-	if err = course.Whitelist.Insert(tx, &course.ID, "whitelists"); err != nil {
+	if err = course.Allowlist.InsertUploaded(tx, &course.ID, TableAllowlists); err != nil {
 		return
 	}
 
-	for _, restriction := range course.Restrictions {
-		if err = restriction.Insert(tx, course.ID); err != nil {
-			return
-		}
+	if err = course.Restrictions.InsertUploaded(tx, course.ID); err != nil {
+		return
 	}
 
 	tx.Commit()

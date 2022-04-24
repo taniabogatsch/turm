@@ -94,7 +94,7 @@ validation.invalid.keys = The enrollment keys do not match.
 # -------------------------------------------------------------------------------------------------- #
 
 validation.enrollment.not.active = The course is not active.
-validation.enrollment.at.blacklist = You have no permission to enroll in this course. Please contact the course organization.
+validation.enrollment.at.blocklist = You have no permission to enroll in this course. Please contact the course organization.
 validation.enrollment.no.ldap = You need an university account to enroll in this course.
 validation.enrollment.not.satisfy.restrictions = You do not satisfy the enrollment restrictions of this course.
 validation.enrollment.max.enroll.reached = You already enrolled in the maximum number of events of this course group.
@@ -110,7 +110,7 @@ validation.enrollment.invalid.comment = Comments must be between 1 and 511 chara
 validation.enrollment.manual.already.enrolled = The user is already enrolled in this event.
 validation.enrollment.manual.already.at.wait.list = The user is already at the wait list of this event.
 validation.enrollment.manual.already.unsubscribed = The user already unsubscribed from this event.
-validation.enrollment.manual.no.wait.list = Diese Veranstaltung besitzt keine Warteliste.
+validation.enrollment.manual.no.wait.list = This event does not have a wait list.
 validation.enrollment.manual.auto.enrolled = User will get enrolled from the wait list directly.
 
 validation.enrollment.change.status.invalid = This course does not have a course fee.

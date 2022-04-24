@@ -651,8 +651,8 @@ func (event *CalendarEvent) validateEnrollment(tx *sqlx.Tx, c *Course, userID in
 		event.EnrollMsg = "validation.enrollment.not.active"
 		event.NoEnroll = true
 	}
-	if c.CourseStatus.AtBlacklist {
-		event.EnrollMsg = "validation.enrollment.at.blacklist"
+	if c.CourseStatus.AtBlocklist {
+		event.EnrollMsg = "validation.enrollment.at.blocklist"
 		event.NoEnroll = true
 	}
 	if c.CourseStatus.NotLDAP {

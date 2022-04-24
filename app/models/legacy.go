@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-/*OldCourse is the old struct of a course. */
-type OldCourse struct {
+/*Version2Course is the version 2 struct of a course. */
+type Version2Course struct {
 	CourseName             string
 	Subtitle               string
-	CourseLeader           []OldUserList
-	Limitation             []OldLimitations
+	CourseLeader           []Version2UserList
+	Limitation             []Version2Limitations
 	EnrollmentStartDate    string
 	EnrollmentEndDate      string
 	EnrollmentStartTime    string
@@ -23,28 +23,28 @@ type OldCourse struct {
 	Public                 string
 	PaymentAmount          string
 	Description            string
-	Event                  []OldEvent
-	Blacklist              []OldUserList
-	Whitelist              []OldUserList
+	Event                  []Version2Event
+	Blacklist              []Version2UserList
+	Whitelist              []Version2UserList
 	Parent                 string
 	Prioid                 int
 	EnrollLimitEvents      int
 	WelcomeMail            string
 }
 
-/*OldEvent is the old struct of an event. */
-type OldEvent struct {
+/*Version2Event is the version 2 struct of an event. */
+type Version2Event struct {
 	WaitingList         string
 	Description         string
 	MaximumParticipants string
 	EnrollmentKey1      string
 	EnrollmentKey2      string
 	InitEnrollmentKey   string
-	Meeting             []OldMeeting
+	Meeting             []Version2Meeting
 }
 
-/*OldMeeting is the old struct of a meeting. */
-type OldMeeting struct {
+/*Version2Meeting is the version 2 struct of a meeting. */
+type Version2Meeting struct {
 	MeetingRegularity string
 	Day               string
 	WeeklyInterval    string
@@ -55,83 +55,93 @@ type OldMeeting struct {
 	Annotation        string
 }
 
-/*OldLimitations is the old struct used for course restrictions. */
-type OldLimitations struct {
+/*Version2Limitations is the version 2 struct used for course restrictions. */
+type Version2Limitations struct {
 	OnlyLDAP        string
 	Degree          string
 	CourseOfStudies string
 	Semester        string
 }
 
-/*OldUserList is the old struct used for user lists. */
-type OldUserList struct {
+/*Version2UserList is the version 2 struct used for user lists. */
+type Version2UserList struct {
 	Uid       int
 	Firstname string
 	Lastname  string
 	Email     string
 }
 
-/*Transform an old course struct to the new course struct. */
-func (oldCourse *OldCourse) Transform(course *Course) (err error) {
+/*Version3Course contains the Blacklist and Whitelist field for backwards compatibility. */
+type Version3Course struct {
+	Course
+	Blacklist UserList ``
+	Whitelist UserList ``
+}
 
-	if oldCourse.Subtitle != "" {
+/*Transform a version 2 course struct to the current course struct. */
+func (version2Course *Version2Course) Transform(course *Course) (err error) {
+
+	//NOTE: user lists are not transformed because user IDs of the version 2
+	//system do not match the ones of the current system
+
+	if version2Course.Subtitle != "" {
 		course.Subtitle.Valid = true
-		course.Subtitle.String = oldCourse.Subtitle
+		course.Subtitle.String = version2Course.Subtitle
 	}
 
-	course.Visible, err = strconv.ParseBool(oldCourse.Public)
+	course.Visible, err = strconv.ParseBool(version2Course.Public)
 	if err != nil {
-		log.Error("failed to transform visible flag", "public", oldCourse.Public,
+		log.Error("failed to transform visible flag", "public", version2Course.Public,
 			"error", err.Error())
 		return
 	}
 
-	if oldCourse.Description != "" {
+	if version2Course.Description != "" {
 		course.Description.Valid = true
-		course.Description.String = oldCourse.Description
+		course.Description.String = version2Course.Description
 	}
 
-	if oldCourse.PaymentAmount != "0" {
-		oldCourse.PaymentAmount = strings.ReplaceAll(oldCourse.PaymentAmount, ",", ".")
+	if version2Course.PaymentAmount != "0" {
+		version2Course.PaymentAmount = strings.ReplaceAll(version2Course.PaymentAmount, ",", ".")
 		course.Fee.Valid = true
-		course.Fee.Float64, err = strconv.ParseFloat(oldCourse.PaymentAmount, 64)
+		course.Fee.Float64, err = strconv.ParseFloat(version2Course.PaymentAmount, 64)
 		if err != nil {
-			log.Error("failed to transform fee", "payment amount", oldCourse.PaymentAmount,
+			log.Error("failed to transform fee", "payment amount", version2Course.PaymentAmount,
 				"error", err.Error())
 			return
 		}
 	}
 
-	if oldCourse.WelcomeMail != "" && oldCourse.WelcomeMail != "<p>&nbsp;</p>" {
+	if version2Course.WelcomeMail != "" && version2Course.WelcomeMail != "<p>&nbsp;</p>" {
 		course.CustomEMail.Valid = true
-		course.CustomEMail.String = oldCourse.WelcomeMail
+		course.CustomEMail.String = version2Course.WelcomeMail
 	}
 
-	if oldCourse.EnrollLimitEvents != 0 {
+	if version2Course.EnrollLimitEvents != 0 {
 		course.EnrollLimitEvents.Valid = true
-		course.EnrollLimitEvents.Int32 = int32(oldCourse.EnrollLimitEvents)
+		course.EnrollLimitEvents.Int32 = int32(version2Course.EnrollLimitEvents)
 	}
 
-	enrollStart, err := getTimestamp(oldCourse.EnrollmentStartDate + " " + oldCourse.EnrollmentStartTime)
+	enrollStart, err := getTimestamp(version2Course.EnrollmentStartDate + " " + version2Course.EnrollmentStartTime)
 	if err != nil {
 		return
 	}
 	course.EnrollmentStart = enrollStart
 
-	enrollEnd, err := getTimestamp(oldCourse.EnrollmentEndDate + " " + oldCourse.EnrollmentEndTime)
+	enrollEnd, err := getTimestamp(version2Course.EnrollmentEndDate + " " + version2Course.EnrollmentEndTime)
 	if err != nil {
 		return
 	}
 	course.EnrollmentEnd = enrollEnd
 
-	expirationDate, err := getTimestamp(oldCourse.ExpirationDate + " " + oldCourse.ExpirationTime)
+	expirationDate, err := getTimestamp(version2Course.ExpirationDate + " " + version2Course.ExpirationTime)
 	if err != nil {
 		return
 	}
 	course.ExpirationDate = expirationDate
 
-	if oldCourse.DisenrollmentStartDate != "" {
-		unsubscribeEnd, err := getTimestamp(oldCourse.DisenrollmentStartDate + " " + oldCourse.DisenrollmentStartTime)
+	if version2Course.DisenrollmentStartDate != "" {
+		unsubscribeEnd, err := getTimestamp(version2Course.DisenrollmentStartDate + " " + version2Course.DisenrollmentStartTime)
 		if err != nil {
 			return err
 		}
@@ -140,7 +150,7 @@ func (oldCourse *OldCourse) Transform(course *Course) (err error) {
 	}
 
 	//get onlyLDAP
-	for _, limitation := range oldCourse.Limitation {
+	for _, limitation := range version2Course.Limitation {
 		onlyLDAP, err := strconv.ParseBool(limitation.OnlyLDAP)
 		if err != nil {
 			log.Error("failed to transform only ldap flag", "onlyLDAP", limitation.OnlyLDAP,
@@ -153,7 +163,7 @@ func (oldCourse *OldCourse) Transform(course *Course) (err error) {
 	}
 
 	//transform all events
-	for i, oldEvent := range oldCourse.Event {
+	for i, oldEvent := range version2Course.Event {
 		event := Event{}
 		if err = oldEvent.Transform(&event, i); err != nil {
 			return
@@ -164,28 +174,28 @@ func (oldCourse *OldCourse) Transform(course *Course) (err error) {
 	return
 }
 
-/*Transform an old event struct to the new event struct. */
-func (oldEvent *OldEvent) Transform(event *Event, i int) (err error) {
+/*Transform a version 2 event struct to the current event struct. */
+func (version2Event *Version2Event) Transform(event *Event, i int) (err error) {
 
-	event.Capacity, err = strconv.Atoi(oldEvent.MaximumParticipants)
+	event.Capacity, err = strconv.Atoi(version2Event.MaximumParticipants)
 
-	event.HasWaitlist, err = strconv.ParseBool(oldEvent.WaitingList)
+	event.HasWaitlist, err = strconv.ParseBool(version2Event.WaitingList)
 	if err != nil {
-		log.Error("failed to transform has waitlist flag", "waitingList", oldEvent.WaitingList,
+		log.Error("failed to transform has waitlist flag", "waitingList", version2Event.WaitingList,
 			"error", err.Error())
 		return
 	}
 
-	if oldEvent.Description != "" {
-		event.Title = oldEvent.Description
+	if version2Event.Description != "" {
+		event.Title = version2Event.Description
 	} else {
 		event.Title = "Imported event " + strconv.Itoa(i+1)
 	}
 
 	//transform all meetings
-	for _, oldMeeting := range oldEvent.Meeting {
+	for _, version2Meeting := range version2Event.Meeting {
 		meeting := Meeting{}
-		if err = oldMeeting.Transform(&meeting); err != nil {
+		if err = version2Meeting.Transform(&meeting); err != nil {
 			return
 		}
 		event.Meetings = append(event.Meetings, meeting)
@@ -194,13 +204,13 @@ func (oldEvent *OldEvent) Transform(event *Event, i int) (err error) {
 	return
 }
 
-/*Transform an old meeting struct to the new meeting struct. */
-func (oldMeeting *OldMeeting) Transform(meeting *Meeting) (err error) {
+/*Transform a version 2 meeting struct to the current meeting struct. */
+func (version2Meeting *Version2Meeting) Transform(meeting *Meeting) (err error) {
 
-	if oldMeeting.MeetingRegularity == "periodic" {
+	if version2Meeting.MeetingRegularity == "periodic" {
 
 		//get the interval
-		switch oldMeeting.WeeklyInterval {
+		switch version2Meeting.WeeklyInterval {
 		case "everyWeek":
 			meeting.MeetingInterval = WEEKLY
 		case "evenWeek":
@@ -211,7 +221,7 @@ func (oldMeeting *OldMeeting) Transform(meeting *Meeting) (err error) {
 
 		//get the week day
 		meeting.WeekDay.Valid = true
-		switch oldMeeting.Day {
+		switch version2Meeting.Day {
 		case "Monday":
 			meeting.WeekDay.Int32 = 0
 		case "Tuesday":
@@ -232,31 +242,37 @@ func (oldMeeting *OldMeeting) Transform(meeting *Meeting) (err error) {
 		meeting.MeetingInterval = SINGLE
 	}
 
-	if oldMeeting.Location != "" {
+	if version2Meeting.Location != "" {
 		meeting.Place.Valid = true
-		meeting.Place.String = oldMeeting.Location
+		meeting.Place.String = version2Meeting.Location
 	}
 
-	if oldMeeting.Annotation != "" {
+	if version2Meeting.Annotation != "" {
 		meeting.Annotation.Valid = true
-		meeting.Annotation.String = oldMeeting.Annotation
+		meeting.Annotation.String = version2Meeting.Annotation
 	}
 
 	if meeting.MeetingInterval != SINGLE {
-		oldMeeting.MeetingDate = time.Now().Format("2006-01-02")
+		version2Meeting.MeetingDate = time.Now().Format("2006-01-02")
 	}
 
-	start, err := getTimestamp(oldMeeting.MeetingDate + " " + oldMeeting.MeetingStartTime)
+	start, err := getTimestamp(version2Meeting.MeetingDate + " " + version2Meeting.MeetingStartTime)
 	if err != nil {
 		return
 	}
 	meeting.MeetingStart = start
 
-	end, err := getTimestamp(oldMeeting.MeetingDate + " " + oldMeeting.MeetingEndTime)
+	end, err := getTimestamp(version2Meeting.MeetingDate + " " + version2Meeting.MeetingEndTime)
 	if err != nil {
 		return
 	}
 	meeting.MeetingEnd = end
 
 	return
+}
+
+/*Transform a version 3 course struct to the current course struct. */
+func (version3Course *Version3Course) Transform(course *Course) {
+	course.Blocklist = version3Course.Blacklist
+	course.Allowlist = version3Course.Whitelist
 }

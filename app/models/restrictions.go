@@ -73,6 +73,26 @@ func (rests *Restrictions) Duplicate(tx *sqlx.Tx, courseID, courseIDOld *int) (e
 	return
 }
 
+/*InsertUploaded restrictions of a course. */
+func (rests *Restrictions) InsertUploaded(tx *sqlx.Tx, courseID int) (err error) {
+
+	for _, restriction := range *rests {
+
+		//only try to insert existing restrictions
+		if exists, err := restriction.Exists(tx); err != nil {
+			return err
+		} else if !exists {
+			continue
+		}
+
+		if err = restriction.Insert(tx, courseID); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 /*Validate Restriction fields. */
 func (rest *Restriction) Validate(v *revel.Validation) {
 
@@ -136,6 +156,18 @@ func (rest *Restriction) Delete() (err error) {
 	if err != nil {
 		log.Error("failed to delete restriction", "restriction", *rest,
 			"error", err.Error())
+	}
+	return
+}
+
+/*Exists returns if a restriction exists in the DB. */
+func (rest *Restriction) Exists(tx *sqlx.Tx) (exists bool, err error) {
+
+	err = tx.Get(&exists, stmtRestrictionExists, rest.DegreeID, rest.CourseOfStudiesID)
+	if err != nil {
+		log.Error("failed to get if the restriction exists", "rest", *rest,
+			"error", err.Error())
+		tx.Rollback()
 	}
 	return
 }
@@ -212,5 +244,20 @@ const (
 			FROM enrollment_restrictions
 			WHERE course_id = $2
 		)
+	`
+
+	stmtRestrictionExists = `
+		SELECT EXISTS (
+			SELECT d.id
+			FROM degrees d
+			WHERE d.id = $1
+				AND (
+					SELECT EXISTS (
+						SELECT c.id
+						FROM courses_of_studies c
+						WHERE c.id = $2
+					)
+				)
+		) AS exists
 	`
 )
