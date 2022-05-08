@@ -19,7 +19,7 @@ It uses:
 
 ### Set up a PostgreSQL database
 
-```
+```sql
 create database turm;
 create user turm with encrypted password 'your_password';
 grant all privileges on database turm to turm;
@@ -30,6 +30,10 @@ Create the DB schema using `scripts/db/create.sql`.
 
 ```
 psql -h localhost -d turm -U turm -p 5432 -f create.sql
+```
+Update the database to contain more recent changes using `scripts/db/changeLog.sql`.
+```
+psql -h localhost -d turm -U turm -p 5432 -f changeLog.sql
 ```
 
 ### Set up Postfix
@@ -49,9 +53,9 @@ mailx -s'foobar' your-mail@abc.de -r'abc@yourhost.de'
 
 ### Start the web server (development)
 
-Install [Go](https://github.com/golang/go) and [Git](https://git-scm.com/).
+Install [Go](https://github.com/golang/go) and [Git](https://git-scm.com/). NOTE: The project is not yet updated to use go modules.
 
-Use [Git](https://git-scm.com/) to clone the repository. 
+Use [Git](https://git-scm.com/) to clone the repository.
 
 ```
 cd ~/go/src
@@ -96,19 +100,49 @@ mkdir ~/go/src/studiengaenge
 vim ~/go/src/studiengaenge/enrollment-data-turm2.csv
 ```
 
-Adjust all config values `app/conf/app.conf`. See below for a detailed description.
+Adjust all config values `app/conf/app.conf`.
 
 Create a `passwords.json` file at `app/conf/`. It should only contain the following two values:
-```
+```json
 {
   "db.pw": "your_password",
   "email.pw": "your_password"
 }
 ```
 
-### Run or deploy
+### Run
 
 Run with `revel run turm` or create a `run.sh` with `revel package turm prod`.
+
+### Deployment
+
+Prerequesites are a running nginx (or other) proxy, postfix, postgreSQL and scripts to start the database and server on reboot.
+
+First, create an archive containing the executable as well as the views and language files.
+```
+revel package turm prod
+```
+
+Upload the `turm.tar.gz` archive to the server and then get remote access using e.g. ssh.
+```
+scp turm.tar.gz username@host:
+ssh username@host
+```
+
+Backup the old files, then unpack the uploaded archive. Copy the previously used configuration file and the passwords file. 
+```
+mv turm/ backups/turm.bak_2022-05-08
+mkdir turm
+cd turm/
+tar zxf ../turm.tar.gz
+cp ../backups/turm.bak_2022-05-08/src/turm/conf/app.conf src/turm/conf/app.conf 
+cp ../backups/turm.bak_2022-05-08/src/turm/conf/passwords.json src/turm/conf/passwords.json
+```
+
+If required, update the database and make adjustments to the configuration and passwords file. If you want to alter the schema, you need to `stop` the server, change the DB schema, and then `start` the server again. If you did not change the schema, you can just restart the server.
+```
+service turm restart
+```
 
 ## Code Layout
 
@@ -140,7 +174,7 @@ The directory structure of a generated Revel application:
     
     scripts/db/            DB schema
 
-    tests/                 Test suites
+    tests/                 Testing
     
 # Effective Go
 
